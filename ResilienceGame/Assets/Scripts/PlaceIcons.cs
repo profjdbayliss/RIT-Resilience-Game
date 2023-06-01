@@ -15,7 +15,9 @@ public class PlaceIcons : MonoBehaviour
     public List<float2> HospitalLocations;
     public List<float2> FireDeptLocations;
     public List<float2> ElectricityLocations;
-    public List<float2> TestHexLocations;
+    public List<float2> WaterLocations;
+    public List<float2> CommoditiesLocations;
+    public List<float2> CommunicationsLocations;
     public List<Material> HexMaterials;
 
     private static GameObject canvas;
@@ -52,9 +54,18 @@ public class PlaceIcons : MonoBehaviour
         for (int i = 0; i < locationCount; i++)
         {
             // make a copy
-            GameObject hospital = Instantiate(Hospital);
+            //GameObject hospital = Instantiate(Hospital);
+            GameObject hospital = Instantiate(TestHex);
+
             // place
             hospital.transform.position = new Vector3(HospitalLocations[i].x*SizeOfBox.x+Offset.x, -1*HospitalLocations[i].y*SizeOfBox.y+Offset.y-5.0f, 0);
+            //hospital.transform.localRotation = new Quaternion(0, 0, 0.5f, 0);
+            //hospital.transform.rotation = new Quaternion(0, 0, 0.5f, 0);
+            Vector3 tempRot = hospital.transform.rotation.eulerAngles;
+            tempRot.x = 0;
+            tempRot.y = 180;
+            tempRot.z = 90.0f;
+            hospital.transform.eulerAngles = tempRot;
             Vector2 delta = new Vector2();
             //delta.x = Map.GetComponent<RectTransform>().sizeDelta.x * OGDeltaScalar.x;
             //delta.y = Map.GetComponent<RectTransform>().sizeDelta.y * OGDeltaScalar.y;
@@ -67,30 +78,56 @@ public class PlaceIcons : MonoBehaviour
             //float tempX = hospital.transform.position.x * (canvas.GetComponent<RectTransform>().rect.width * 0.66f);
             //float tempY = hospital.transform.position.y * (canvas.GetComponent<RectTransform>().rect.height);
             //hospital.transform.position = new Vector3(tempX, tempY, 0);
+
+            // Apply the health material 
+            hospital.GetComponent<MeshRenderer>().material = HexMaterials[6];
+
             hospital.transform.SetParent (Map.transform,false);
+            hospital.name = "Hospital (Clone)";
+
+            Debug.Log("HOSP LROT: " + hospital.transform.localRotation);
+            Debug.Log("HOSP ROT: " + hospital.transform.rotation);
+            Debug.Log("HOSP EUA: " + hospital.transform.eulerAngles);
+
         }
-        
+
         locationCount = FireDeptLocations.Count;
         for (int i = 0; i < locationCount; i++)
         {
             // make a copy
-            GameObject fire = Instantiate(FireTruck);
+            //GameObject fire = Instantiate(FireTruck);
+            GameObject fire = Instantiate(TestHex);
+
             // place
             fire.transform.position = new Vector3(FireDeptLocations[i].x*SizeOfBox.x+Offset.x, -1*FireDeptLocations[i].y*SizeOfBox.y+Offset.y-5.0f, 0);
             //fire.transform.SetParent (canvas.transform,false);
+
+            // Set the material then parent it to the Map
+            fire.GetComponent<MeshRenderer>().material = HexMaterials[10];
+
             fire.transform.SetParent(Map.transform, false);
+            fire.name = "Fire (Clone)";
         }
         locationCount = ElectricityLocations.Count;
         for(int i = 0; i < locationCount; i++)
         {
             // Make a copy of the original
-            GameObject tempElec = Instantiate(Electricity);
+            //GameObject tempElec = Instantiate(Electricity);
+            GameObject tempElec = Instantiate(TestHex);
+
             // Put it in the right spot
             tempElec.transform.position = new Vector3(ElectricityLocations[i].x * SizeOfBox.x + Offset.x, -1 * ElectricityLocations[i].y * SizeOfBox.y + Offset.y-5.0f, 0);
+            tempElec.transform.eulerAngles = new Vector3(0,180,270);
+            // Set the Material then place it in the right spot
+            tempElec.GetComponent<MeshRenderer>().material = HexMaterials[4];
+
             //tempElec.transform.SetParent(canvas.transform, false);
             tempElec.transform.SetParent(Map.transform, false);
+            tempElec.name = "Electricity (Clone)";
         }
-        locationCount = TestHexLocations.Count;
+
+        // Convert to water
+        locationCount = WaterLocations.Count;
         for(int i = 0; i < locationCount; i++)
         {
 
@@ -99,8 +136,8 @@ public class PlaceIcons : MonoBehaviour
 
 
             // Put it in a random spot
-            tempHex.transform.position = new Vector3(TestHexLocations[i].x * SizeOfBox.x + Offset.x, -1 * TestHexLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            tempHex.transform.rotation = new Quaternion(0, 180, 0, 0);
+            tempHex.transform.position = new Vector3(WaterLocations[i].x * SizeOfBox.x + Offset.x, -1 * WaterLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
+            tempHex.transform.eulerAngles = new Vector3(0, 180, 90);
             //tempHex.transform.localScale = new Vector3(10000, 10000, 10000);
 
             // Set the material
@@ -110,9 +147,48 @@ public class PlaceIcons : MonoBehaviour
             //Debug.Log(tempInt);
             //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[i%10];
             //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[10];
-            tempHex.GetComponentInChildren<MeshRenderer>().material = HexMaterials[10];
+            tempHex.GetComponentInChildren<MeshRenderer>().material = HexMaterials[9];
             // Set the parent
             tempHex.transform.SetParent(Map.transform, false);
+            tempHex.name = "Water (Clone)";
+        }
+
+        // Commodities
+        locationCount = CommoditiesLocations.Count;
+        for(int i = 0; i < locationCount; i++)
+        {
+            // Instantiate the new commodoty
+            GameObject tempCommodoties = Instantiate(TestHex);
+
+            // Set the position and the rotation
+            tempCommodoties.transform.position = new Vector3(CommoditiesLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommoditiesLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
+            tempCommodoties.transform.eulerAngles = new Vector3(0, 180, 90);
+
+            // Set the material
+            tempCommodoties.GetComponentInChildren<MeshRenderer>().material = HexMaterials[1];
+            
+            // Set the parent
+            tempCommodoties.transform.SetParent(Map.transform, false);
+            tempCommodoties.name = "Commodities (Clone)";
+        }
+
+        // Communications
+        locationCount = CommunicationsLocations.Count;
+        for (int i = 0; i < locationCount; i++)
+        {
+            // Instantiate the new commodoty
+            GameObject tempCommunications = Instantiate(TestHex);
+
+            // Set the position and the rotation
+            tempCommunications.transform.position = new Vector3(CommunicationsLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommunicationsLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
+            tempCommunications.transform.eulerAngles = new Vector3(0, 180, 90);
+
+            // Set the material
+            tempCommunications.GetComponentInChildren<MeshRenderer>().material = HexMaterials[2];
+
+            // Set the parent
+            tempCommunications.transform.SetParent(Map.transform, false);
+            tempCommunications.name = "Communications (Clone)";
         }
     }
 
