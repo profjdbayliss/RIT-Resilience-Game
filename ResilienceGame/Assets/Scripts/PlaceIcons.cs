@@ -24,6 +24,9 @@ public class PlaceIcons : MonoBehaviour
     private GameObject Hospital;
     private GameObject FireTruck;
     private GameObject Electricity;
+    private GameObject Water;
+    private GameObject Commodities;
+    private GameObject Communications;
     private GameObject CityHall;
     private GameObject Map;
 
@@ -37,6 +40,8 @@ public class PlaceIcons : MonoBehaviour
         Hospital = GameObject.Find("Hospital");
         FireTruck = GameObject.Find("FireTruck");
         Electricity = GameObject.Find("Electricity");
+        Water = GameObject.Find("Water");
+        Commodities = GameObject.Find("Commodities");
         CityHall = GameObject.Find("CityHall");
         Map = GameObject.Find("Map");
         TestHex = GameObject.Find("NewHexPrefab");
@@ -54,8 +59,8 @@ public class PlaceIcons : MonoBehaviour
         for (int i = 0; i < locationCount; i++)
         {
             // make a copy
-            //GameObject hospital = Instantiate(Hospital);
-            GameObject hospital = Instantiate(TestHex);
+            GameObject hospital = Instantiate(Hospital);
+            //GameObject hospital = Instantiate(TestHex);
 
             // place
             hospital.transform.position = new Vector3(HospitalLocations[i].x*SizeOfBox.x+Offset.x, -1*HospitalLocations[i].y*SizeOfBox.y+Offset.y-5.0f, 0);
@@ -79,8 +84,8 @@ public class PlaceIcons : MonoBehaviour
             //float tempY = hospital.transform.position.y * (canvas.GetComponent<RectTransform>().rect.height);
             //hospital.transform.position = new Vector3(tempX, tempY, 0);
 
-            // Apply the health material 
-            hospital.GetComponent<MeshRenderer>().material = HexMaterials[6];
+            // Apply the health material <-- Uncomment if using hexes
+            //hospital.GetComponent<MeshRenderer>().material = HexMaterials[6];
 
             hospital.transform.SetParent (Map.transform,false);
             hospital.name = "Hospital (Clone)";
@@ -95,15 +100,15 @@ public class PlaceIcons : MonoBehaviour
         for (int i = 0; i < locationCount; i++)
         {
             // make a copy
-            //GameObject fire = Instantiate(FireTruck);
-            GameObject fire = Instantiate(TestHex);
+            GameObject fire = Instantiate(FireTruck);
+            //GameObject fire = Instantiate(TestHex);
 
             // place
             fire.transform.position = new Vector3(FireDeptLocations[i].x*SizeOfBox.x+Offset.x, -1*FireDeptLocations[i].y*SizeOfBox.y+Offset.y-5.0f, 0);
             //fire.transform.SetParent (canvas.transform,false);
 
             // Set the material then parent it to the Map
-            fire.GetComponent<MeshRenderer>().material = HexMaterials[10];
+            //fire.GetComponent<MeshRenderer>().material = HexMaterials[10];
 
             fire.transform.SetParent(Map.transform, false);
             fire.name = "Fire (Clone)";
@@ -112,14 +117,16 @@ public class PlaceIcons : MonoBehaviour
         for(int i = 0; i < locationCount; i++)
         {
             // Make a copy of the original
-            //GameObject tempElec = Instantiate(Electricity);
-            GameObject tempElec = Instantiate(TestHex);
+            GameObject tempElec = Instantiate(Electricity);
+            //GameObject tempElec = Instantiate(TestHex);
 
             // Put it in the right spot
             tempElec.transform.position = new Vector3(ElectricityLocations[i].x * SizeOfBox.x + Offset.x, -1 * ElectricityLocations[i].y * SizeOfBox.y + Offset.y-5.0f, 0);
-            tempElec.transform.eulerAngles = new Vector3(0,180,270);
-            // Set the Material then place it in the right spot
-            tempElec.GetComponent<MeshRenderer>().material = HexMaterials[4];
+            //tempElec.transform.eulerAngles = new Vector3(0,180,270);
+
+
+            // Set the Material then place it in the right spot <-- Uncomment if using hexes
+            //tempElec.GetComponent<MeshRenderer>().material = HexMaterials[4];
 
             //tempElec.transform.SetParent(canvas.transform, false);
             tempElec.transform.SetParent(Map.transform, false);
@@ -132,12 +139,13 @@ public class PlaceIcons : MonoBehaviour
         {
 
             // Instantiate the hex
-            GameObject tempHex = Instantiate(TestHex);
+            //GameObject tempHex = Instantiate(TestHex);
+            GameObject tempHex = Instantiate(Water);
 
 
             // Put it in a random spot
             tempHex.transform.position = new Vector3(WaterLocations[i].x * SizeOfBox.x + Offset.x, -1 * WaterLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            tempHex.transform.eulerAngles = new Vector3(0, 180, 90);
+            //tempHex.transform.eulerAngles = new Vector3(0, 180, 90);
             //tempHex.transform.localScale = new Vector3(10000, 10000, 10000);
 
             // Set the material
@@ -146,8 +154,9 @@ public class PlaceIcons : MonoBehaviour
             //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[tempInt];
             //Debug.Log(tempInt);
             //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[i%10];
-            //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[10];
-            tempHex.GetComponentInChildren<MeshRenderer>().material = HexMaterials[9];
+            //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[10];<-- Uncomment if using hexes
+            //tempHex.GetComponentInChildren<MeshRenderer>().material = HexMaterials[9];
+            
             // Set the parent
             tempHex.transform.SetParent(Map.transform, false);
             tempHex.name = "Water (Clone)";
@@ -158,18 +167,20 @@ public class PlaceIcons : MonoBehaviour
         for(int i = 0; i < locationCount; i++)
         {
             // Instantiate the new commodoty
-            GameObject tempCommodoties = Instantiate(TestHex);
+            //GameObject tempCommodities = Instantiate(TestHex);
+            GameObject tempCommodities = Instantiate(Commodities);
+
 
             // Set the position and the rotation
-            tempCommodoties.transform.position = new Vector3(CommoditiesLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommoditiesLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            tempCommodoties.transform.eulerAngles = new Vector3(0, 180, 90);
+            tempCommodities.transform.position = new Vector3(CommoditiesLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommoditiesLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
+            //tempCommodities.transform.eulerAngles = new Vector3(0, 180, 90);
 
-            // Set the material
-            tempCommodoties.GetComponentInChildren<MeshRenderer>().material = HexMaterials[1];
-            
+            // Set the material<-- Uncomment if using hexes
+            //tempCommodities.GetComponentInChildren<MeshRenderer>().material = HexMaterials[1];
+
             // Set the parent
-            tempCommodoties.transform.SetParent(Map.transform, false);
-            tempCommodoties.name = "Commodities (Clone)";
+            tempCommodities.transform.SetParent(Map.transform, false);
+            tempCommodities.name = "Commodities (Clone)";
         }
 
         // Communications
@@ -177,14 +188,16 @@ public class PlaceIcons : MonoBehaviour
         for (int i = 0; i < locationCount; i++)
         {
             // Instantiate the new commodoty
-            GameObject tempCommunications = Instantiate(TestHex);
+            //GameObject tempCommunications = Instantiate(TestHex);
+            GameObject tempCommunications = Instantiate(Communications);
+
 
             // Set the position and the rotation
             tempCommunications.transform.position = new Vector3(CommunicationsLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommunicationsLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            tempCommunications.transform.eulerAngles = new Vector3(0, 180, 90);
+            //tempCommunications.transform.eulerAngles = new Vector3(0, 180, 90);
 
-            // Set the material
-            tempCommunications.GetComponentInChildren<MeshRenderer>().material = HexMaterials[2];
+            // Set the material <-- Uncomment if using hexes
+            //tempCommunications.GetComponentInChildren<MeshRenderer>().material = HexMaterials[2];
 
             // Set the parent
             tempCommunications.transform.SetParent(Map.transform, false);
