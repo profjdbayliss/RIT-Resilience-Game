@@ -42,6 +42,7 @@ public class PlaceIcons : MonoBehaviour
         Electricity = GameObject.Find("Electricity");
         Water = GameObject.Find("Water");
         Commodities = GameObject.Find("Commodities");
+        Communications = GameObject.Find("Communications");
         CityHall = GameObject.Find("CityHall");
         Map = GameObject.Find("Map");
         TestHex = GameObject.Find("NewHexPrefab");
@@ -50,8 +51,13 @@ public class PlaceIcons : MonoBehaviour
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, canvas.GetComponent<RectTransform>().rect.height);
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, canvas.GetComponent<RectTransform>().rect.width*0.66f);
         mapScalar = Map.GetComponent<RectTransform>().sizeDelta;
+        mapScalar.x = Map.GetComponent<RectTransform>().rect.width;
+        mapScalar.y = Map.GetComponent<RectTransform>().rect.height;
+        Debug.Log("MS: " + mapScalar);
         OGScalar = new Vector2(1920.0f * 0.66f, 1080);
+        Debug.Log("OG: " + OGScalar);
         OGDeltaScalar = (mapScalar - OGScalar);
+        Debug.Log("OGD: " + OGDeltaScalar);
         //OGScalar = mapScalar;
 
         // take hospital image and place it on canvas at locations specified;
@@ -90,11 +96,12 @@ public class PlaceIcons : MonoBehaviour
             hospital.transform.SetParent (Map.transform,false);
             hospital.name = "Hospital (Clone)";
 
-            Debug.Log("HOSP LROT: " + hospital.transform.localRotation);
-            Debug.Log("HOSP ROT: " + hospital.transform.rotation);
-            Debug.Log("HOSP EUA: " + hospital.transform.eulerAngles);
+            //Debug.Log("HOSP LROT: " + hospital.transform.localRotation);
+            //Debug.Log("HOSP ROT: " + hospital.transform.rotation);
+            //Debug.Log("HOSP EUA: " + hospital.transform.eulerAngles);
 
         }
+        Hospital.SetActive(false);
 
         locationCount = FireDeptLocations.Count;
         for (int i = 0; i < locationCount; i++)
@@ -104,7 +111,43 @@ public class PlaceIcons : MonoBehaviour
             //GameObject fire = Instantiate(TestHex);
 
             // place
-            fire.transform.position = new Vector3(FireDeptLocations[i].x*SizeOfBox.x+Offset.x, -1*FireDeptLocations[i].y*SizeOfBox.y+Offset.y-5.0f, 0);
+            //fire.transform.position = new Vector3(FireDeptLocations[i].x*SizeOfBox.x+Offset.x, -1*FireDeptLocations[i].y*SizeOfBox.y+Offset.y-5.0f + 240.0f, 0);
+            // Old Formula ^^
+
+            if(mapScalar != new Vector2(1920.0f*0.66f, 1080))
+            {
+                Vector3 tempVec = new Vector3(0, 0, 0);
+                if(FireDeptLocations[i].x < 0.0f)
+                {
+                    float scaleCorrection = math.abs(FireDeptLocations[i].x) / (mapScalar.x / 2.0f);
+                    tempVec.x = FireDeptLocations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
+                }
+                else
+                {
+                    float scaleCorrection = math.abs(FireDeptLocations[i].x) / (mapScalar.x / 2.0f);
+                    tempVec.x = FireDeptLocations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
+                }
+                if (FireDeptLocations[i].y < 0.0f)
+                {
+                    float scaleCorrection = math.abs(FireDeptLocations[i].y) / (mapScalar.y / 2.0f);
+                    tempVec.y = FireDeptLocations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
+
+                }
+                else
+                {
+                    float scaleCorrection = math.abs(FireDeptLocations[i].y) / (mapScalar.y / 2.0f);
+
+                    tempVec.y = FireDeptLocations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
+
+                }
+                fire.transform.position = tempVec;
+
+            }
+            else
+            {
+                fire.transform.position = new Vector3(FireDeptLocations[i].x, FireDeptLocations[i].y, 0);
+            }
+
             //fire.transform.SetParent (canvas.transform,false);
 
             // Set the material then parent it to the Map
@@ -113,6 +156,8 @@ public class PlaceIcons : MonoBehaviour
             fire.transform.SetParent(Map.transform, false);
             fire.name = "Fire (Clone)";
         }
+        FireTruck.SetActive(false);
+
         locationCount = ElectricityLocations.Count;
         for(int i = 0; i < locationCount; i++)
         {
@@ -132,6 +177,7 @@ public class PlaceIcons : MonoBehaviour
             tempElec.transform.SetParent(Map.transform, false);
             tempElec.name = "Electricity (Clone)";
         }
+        Electricity.SetActive(false);
 
         // Convert to water
         locationCount = WaterLocations.Count;
@@ -161,6 +207,7 @@ public class PlaceIcons : MonoBehaviour
             tempHex.transform.SetParent(Map.transform, false);
             tempHex.name = "Water (Clone)";
         }
+        Water.SetActive(false);
 
         // Commodities
         locationCount = CommoditiesLocations.Count;
@@ -182,6 +229,7 @@ public class PlaceIcons : MonoBehaviour
             tempCommodities.transform.SetParent(Map.transform, false);
             tempCommodities.name = "Commodities (Clone)";
         }
+        Commodities.SetActive(false);
 
         // Communications
         locationCount = CommunicationsLocations.Count;
@@ -203,6 +251,7 @@ public class PlaceIcons : MonoBehaviour
             tempCommunications.transform.SetParent(Map.transform, false);
             tempCommunications.name = "Communications (Clone)";
         }
+        Communications.SetActive(false);
     }
 
     // Update is called once per frame
@@ -210,7 +259,7 @@ public class PlaceIcons : MonoBehaviour
     {
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, canvas.GetComponent<RectTransform>().rect.height);
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, canvas.GetComponent<RectTransform>().rect.width * 0.66f);
-        Vector2 tempScalar = Map.GetComponent<RectTransform>().sizeDelta;
+        Vector2 tempScalar = new Vector2(Map.GetComponent<RectTransform>().rect.width, Map.GetComponent<RectTransform>().rect.height);
         Vector2 deltaScale = tempScalar - mapScalar;
         if(Mathf.Abs(deltaScale.x + deltaScale.y) > 0)
         {

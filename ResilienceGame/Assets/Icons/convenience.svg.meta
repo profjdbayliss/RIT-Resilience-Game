@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a87c232c8c588e645aa13ecce6e7731e
+guid: 451f9a9012c711442a77d51b1fdd0913
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -8,7 +8,7 @@ ScriptedImporter:
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: a57477913897c46af95d590f580878bd, type: 3}
-  svgType: 4
+  svgType: 0
   texturedSpriteMeshType: 0
   svgPixelsPerUnit: 100
   gradientResolution: 64
@@ -39,16 +39,16 @@ ScriptedImporter:
   spriteData:
     TessellationDetail: 0
     SpriteRect:
-      name: town_hallSprite
+      name: 
       originalName: 
-      pivot: {x: 0.5, y: 0.49999997}
+      pivot: {x: 0, y: 0}
       alignment: 0
       border: {x: 0, y: 0, z: 0, w: 0}
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 12
-        height: 14
-      spriteID: 3bc602ae664eb7443ba8de5d5de0f369
+        width: 0
+        height: 0
+      spriteID: 7640895e276d2474da932a55b27cd2d8
     PhysicsOutlines: []
