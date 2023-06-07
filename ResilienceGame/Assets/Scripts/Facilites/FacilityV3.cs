@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class FacilityV3 : MonoBehaviour
+public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 
     public enum Type
@@ -167,8 +168,23 @@ public class FacilityV3 : MonoBehaviour
 
     public void SetMaterial()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
-        meshRenderer.material = material[0];
+        //meshRenderer = GetComponent<MeshRenderer>();
+        //meshRenderer.material = material[0];
+    }
+
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log("ENTERED");
+        isOver = true;
+
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Debug.Log("EXITED");
+        isOver = false;
+
     }
 
     public void OnMouseEnter()

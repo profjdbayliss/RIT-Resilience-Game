@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Hover : MonoBehaviour
+public class Hover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     // Establish necessary variables
     public string locationName;
@@ -33,6 +34,19 @@ public class Hover : MonoBehaviour
             final = input;
         }
         return final;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log(locationName);
+        locationText.text = inputFix(locationName);
+        locationText.color = new Color(0, 0, 0, 255);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        locationText.color = new Color(0, 0, 0, 0);
+
     }
 
     private void OnMouseOver()
