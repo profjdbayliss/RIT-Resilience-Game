@@ -187,31 +187,6 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     }
 
-    public void OnMouseEnter()
-    {
-        //isOver = true;
-        //Debug.Log("Made it inside mouseEnter");
-        isOver = true;
-    }
-
-    public void OnMouseExit()
-    {
-        //Debug.Log("Made it inside mouseExit");
-        isOver = false;
-    }
-
-    public void OnMouseDown()
-    { 
-        if(isDown == true)
-        {
-            isDown = false;
-        }
-        else
-        {
-            isDown = true;
-        }         
-    }
-
     virtual public void FeedbackPanel()
     {      
         if (isOver == true)

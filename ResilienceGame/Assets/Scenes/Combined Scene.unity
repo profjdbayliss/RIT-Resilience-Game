@@ -4347,7 +4347,7 @@ GameObject:
   - component: {fileID: 1183731421}
   - component: {fileID: 1183731420}
   m_Layer: 5
-  m_Name: Flow Value
+  m_Name: Flow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4923,7 +4923,7 @@ GameObject:
   - component: {fileID: 1252891129}
   - component: {fileID: 1252891128}
   m_Layer: 5
-  m_Name: Flow Number
+  m_Name: FlowNum
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
