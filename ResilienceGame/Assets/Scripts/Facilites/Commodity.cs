@@ -91,7 +91,7 @@ public class Commodity : FacilityV3
 
         //external
         water = Random.Range(1, 101);
-        commondities = Random.Range(1, 101);
+        commodities = Random.Range(1, 101);
         health = Random.Range(1, 101);
         security = Random.Range(1, 101);
         public_goods = Random.Range(1, 101);

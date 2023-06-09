@@ -98,7 +98,7 @@ public class PublicGoods : FacilityV3
 
         electricity = FindClosestFacilityElectricity().output_flow;
         water = FindClosestFacilityWater().output_flow;
-        commondities = FindClosestFacilityCommodities().output_flow;
+        commodities = FindClosestFacilityCommodities().output_flow;
 
         if (FindClosestFacilityElectricity().output_flow <= 0 || FindClosestFacilityWater().output_flow <= 0 || FindClosestFacilityCommodities().output_flow <= 0)
         {
@@ -116,6 +116,6 @@ public class PublicGoods : FacilityV3
     {
         electricity = FindClosestFacilityElectricity().output_flow;
         water = FindClosestFacilityWater().output_flow;
-        commondities = FindClosestFacilityCommodities().output_flow;
+        commodities = FindClosestFacilityCommodities().output_flow;
     }
 }

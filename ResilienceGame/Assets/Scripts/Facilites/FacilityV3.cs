@@ -50,7 +50,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public  float water;
     public  float fuel;
     public  float communications;
-    public  float commondities;
+    public  float commodities;
     public  float health;
     public  float security;
     public  float public_goods;
@@ -160,7 +160,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     virtual public void CalculateFlow()
     {
         internal_flow = (workers + it_level + ot_level + phys_security + funding) / 50f;
-        external_flow = (electricity + water + fuel + communications + commondities + health + security + public_goods + city_resource) / 900f; //900 is max
+        external_flow = (electricity + water + fuel + communications + commodities + health + security + public_goods + city_resource) / 900f; //900 is max
 
         //take the min of the two percents
         output_flow = (float)Math.Round((Mathf.Min(internal_flow, external_flow)) * 100f);
@@ -175,14 +175,14 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("ENTERED");
+        //Debug.Log("ENTERED");
         isOver = true;
 
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("EXITED");
+        //Debug.Log("EXITED");
         isOver = false;
 
     }
@@ -238,6 +238,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = "?";
                     Funding.text = "?";
                     break;
+
+
                 case 2:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -257,6 +259,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = "?";
                     Funding.text = "?";
                     break;
+
+
                 case 3:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -276,6 +280,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = "?";
                     Funding.text = "?";
                     break;
+
+
                 case 4:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -285,7 +291,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -294,8 +300,9 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     OT.text = "?";
                     Phys_Security.text = "?";
                     Funding.text = "?";
-
                     break;
+
+
                 case 5:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -305,7 +312,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -315,6 +322,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = "?";
                     Funding.text = "?";
                     break;
+
+
                 case 6:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -324,7 +333,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -334,6 +343,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = "?";
                     Funding.text = "?";
                     break;
+
+
                 case 7:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -343,7 +354,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -354,6 +365,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Funding.text = funding.ToString();
 
                     break;
+
+
                 case 8:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -363,7 +376,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -373,6 +386,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = phys_security.ToString();
                     Funding.text = funding.ToString();
                     break;
+
+
                 case 9:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -382,7 +397,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -392,6 +407,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = phys_security.ToString();
                     Funding.text = funding.ToString();
                     break;
+
+
                 case 10:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
@@ -401,7 +418,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Fuel.text = fuel.ToString();
                     Communications.text = communications.ToString();
                     Health.text = health.ToString();
-                    Commodities.text = commondities.ToString();
+                    Commodities.text = commodities.ToString();
                     Security.text = security.ToString();
                     Public_Goods.text = public_goods.ToString();
 
@@ -411,14 +428,22 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     Phys_Security.text = phys_security.ToString();
                     Funding.text = funding.ToString();
                     break;
+
+
                 default:
                     break;
             }
         }
     }
 
+    /// <summary>
+    /// Change Image Method
+    /// This method is utilized to change the images in the feedback panel to alert the player of the status of their facilites.
+    /// Depedning on their statuses, the images will either be green (best), yellow (not so good), and red (bad)
+    /// </summary>
     void ChangeImage()
     {
+        // Electricity
         if (electricity > 50)
         {
             Electricity_img.color = Color.green;
@@ -435,6 +460,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
         //////////////////////////////////////////////
 
+        // Water
         if (water > 50)
         {
             Water_img.color = Color.green;
@@ -451,6 +477,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
         //////////////////////////////////////////////
 
+        // Fuel
         if (fuel > 50)
         {
             Fuel_img.color = Color.green;
@@ -466,7 +493,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Fuel_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Communications
         if (communications > 50)
         {
             Communications_img.color = Color.green;
@@ -482,7 +510,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Communications_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Health
         if (health > 50)
         {
             Health_img.color = Color.green;
@@ -498,23 +527,25 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Health_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
-        if (commondities > 50)
+        
+        // Commodities
+        if (commodities > 50)
         {
             Commodities_img.color = Color.green;
         }
 
-        else if (commondities >= 30)
+        else if (commodities >= 30)
         {
             Commodities_img.color = Color.yellow;
         }
 
-        else if (commondities < 30)
+        else if (commodities < 30)
         {
             Commodities_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Public Goods
         if (public_goods > 50)
         {
             Public_Goods_img.color = Color.green;
@@ -530,7 +561,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Public_Goods_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Security
         if (security > 50)
         {
             Security_img.color = Color.green;
@@ -546,7 +578,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Security_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Workers
         if (workers >= 7)
         {
             Workers_img.color = Color.green;
@@ -562,7 +595,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Workers_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // IT Levels
         if (it_level >= 7 )
         {
             IT_img.color = Color.green;
@@ -578,7 +612,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             IT_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // 
         if (ot_level >= 7)
         {
             OT_img.color = Color.green;
@@ -594,7 +629,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             OT_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Physical Security
         if (phys_security >= 7)
         {
             Phys_Security_img.color = Color.green;
@@ -610,7 +646,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Phys_Security_img.color = Color.red;
         }
         //////////////////////////////////////////////
-        ///
+        
+        // Funding
         if (funding >= 7)
         {
             Funding_img.color = Color.green;

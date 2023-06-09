@@ -37,6 +37,8 @@ public class ElectricityDistribution : FacilityV3
       
         return closest;
     }
+
+
     public FacilityV3 FindClosestFacilityWater()
     {
         FacilityV3[] gos;
@@ -57,6 +59,8 @@ public class ElectricityDistribution : FacilityV3
         connectedFacilities.Add(closest);
         return closest;
     }
+
+
     public FacilityV3 FindClosestFacilityCommodities()
     {
         FacilityV3[] gos;
@@ -77,6 +81,8 @@ public class ElectricityDistribution : FacilityV3
         connectedFacilities.Add(closest);
         return closest;
     }
+
+
     public FacilityV3 FindClosestFacilityHealth()
     {
         FacilityV3[] gos;
@@ -97,6 +103,8 @@ public class ElectricityDistribution : FacilityV3
         connectedFacilities.Add(closest);
         return closest;
     }
+
+    
     public FacilityV3 FindClosestFacilityFuel()
     {
         FacilityV3[] gos;
@@ -117,6 +125,8 @@ public class ElectricityDistribution : FacilityV3
         connectedFacilities.Add(closest);
         return closest;
     }
+
+    
     public FacilityV3 FindClosestFacilityComms()
     {
         FacilityV3[] gos;
@@ -137,6 +147,9 @@ public class ElectricityDistribution : FacilityV3
         connectedFacilities.Add(closest);
         return closest;
     }
+
+
+
     public FacilityV3 FindClosestFacilitySec()
     {
         FacilityV3[] gos;
@@ -157,10 +170,33 @@ public class ElectricityDistribution : FacilityV3
         connectedFacilities.Add(closest);
         return closest;
     }
+
+
     public FacilityV3 FindClosestFacilityPG()
     {
         FacilityV3[] gos;
         gos = GameObject.FindObjectsOfType<PublicGoods>();
+        FacilityV3 closest = null;
+        float distance = Mathf.Infinity;
+        Vector3 position = transform.position;
+        foreach (FacilityV3 go in gos)
+        {
+            Vector3 diff = go.transform.position - position;
+            float curDistance = diff.sqrMagnitude;
+            if (curDistance < distance)
+            {
+                closest = go;
+                distance = curDistance;
+            }
+        }
+        connectedFacilities.Add(closest);
+        return closest;
+    }
+
+    public FacilityV3 FindClosestFacility<T>()
+    {
+        FacilityV3[] gos;
+        gos = (FacilityV3[])GameObject.FindObjectsOfType(typeof(T));
         FacilityV3 closest = null;
         float distance = Mathf.Infinity;
         Vector3 position = transform.position;
@@ -186,33 +222,68 @@ public class ElectricityDistribution : FacilityV3
         type = Type.ElectricityDistribution;
 
         //internal
-        workers = FindClosestFacilityElectricity().workers;
-        it_level = FindClosestFacilityElectricity().it_level;
-        ot_level = FindClosestFacilityElectricity().ot_level;
-        phys_security = FindClosestFacilityElectricity().phys_security;
-        funding = FindClosestFacilityElectricity().funding;
+        workers = FindClosestFacility<ElectricityGeneration>().workers;
+        it_level = FindClosestFacility<ElectricityGeneration>().it_level;
+        ot_level = FindClosestFacility<ElectricityGeneration>().ot_level;
+        phys_security = FindClosestFacility<ElectricityGeneration>().phys_security;
+        funding = FindClosestFacility<ElectricityGeneration>().funding;
 
         //external
-        electricity = FindClosestFacilityElectricity().electricity;
-        water = FindClosestFacilityElectricity().water;
-        fuel = FindClosestFacilityElectricity().fuel;
-        communications = FindClosestFacilityElectricity().communications;
-        commondities = FindClosestFacilityElectricity().commondities;
-        health = FindClosestFacilityElectricity().health;
-        security = FindClosestFacilityElectricity().security;
-        public_goods = FindClosestFacilityElectricity().public_goods;
-        city_resource = FindClosestFacilityElectricity().city_resource;
+        electricity = FindClosestFacility<ElectricityGeneration>().electricity;
+        water = FindClosestFacility<ElectricityGeneration>().water;
+        fuel = FindClosestFacility<ElectricityGeneration>().fuel;
+        communications = FindClosestFacility<ElectricityGeneration>().communications;
+        commodities = FindClosestFacility<ElectricityGeneration>().commodities;
+        health = FindClosestFacility<ElectricityGeneration>().health;
+        security = FindClosestFacility<ElectricityGeneration>().security;
+        public_goods = FindClosestFacility<ElectricityGeneration>().public_goods;
+        city_resource = FindClosestFacility<ElectricityGeneration>().city_resource;
 
-        FindClosestFacilityWater();
-        FindClosestFacilityFuel();
-        FindClosestFacilityComms();
-        FindClosestFacilityCommodities();
-        FindClosestFacilityHealth();
-        FindClosestFacilitySec();
-        FindClosestFacilityPG();
+        FindClosestFacility<Water>();
+        FindClosestFacility<Fuel>();
+        FindClosestFacility<Communications>();
+        FindClosestFacility<Commodity>();
+        FindClosestFacility<Health>();
+        FindClosestFacility<Security>();
+        FindClosestFacility<PublicGoods>();
+
+        //FindClosestFacilityWater();
+        //FindClosestFacilityFuel();
+        //FindClosestFacilityComms();
+        //FindClosestFacilityCommodities();
+        //FindClosestFacilityHealth();
+        //FindClosestFacilitySec();
+        //FindClosestFacilityPG();
+
+
+        ////internal
+        //workers = FindClosestFacilityElectricity().workers;
+        //it_level = FindClosestFacilityElectricity().it_level;
+        //ot_level = FindClosestFacilityElectricity().ot_level;
+        //phys_security = FindClosestFacilityElectricity().phys_security;
+        //funding = FindClosestFacilityElectricity().funding;
+
+        ////external
+        //electricity = FindClosestFacilityElectricity().electricity;
+        //water = FindClosestFacilityElectricity().water;
+        //fuel = FindClosestFacilityElectricity().fuel;
+        //communications = FindClosestFacilityElectricity().communications;
+        //commodities = FindClosestFacilityElectricity().commodities;
+        //health = FindClosestFacilityElectricity().health;
+        //security = FindClosestFacilityElectricity().security;
+        //public_goods = FindClosestFacilityElectricity().public_goods;
+        //city_resource = FindClosestFacilityElectricity().city_resource;
+
+        //FindClosestFacilityWater();
+        //FindClosestFacilityFuel();
+        //FindClosestFacilityComms();
+        //FindClosestFacilityCommodities();
+        //FindClosestFacilityHealth();
+        //FindClosestFacilitySec();
+        //FindClosestFacilityPG();
 
         //if (FindClosestFacilityElectricity().workers <= 0 || FindClosestFacilityElectricity().it_level <= 0 || FindClosestFacilityElectricity().ot_level <= 0 || FindClosestFacilityElectricity().phys_security <= 0 || FindClosestFacilityElectricity().funding <= 0
-        //    || FindClosestFacilityElectricity().electricity <= 0 || FindClosestFacilityElectricity().water <= 0 || FindClosestFacilityElectricity().fuel <= 0 || FindClosestFacilityElectricity().communications <= 0 || FindClosestFacilityElectricity().commondities <= 0 || FindClosestFacilityElectricity().health <= 0 || FindClosestFacilityElectricity().security <= 0 || FindClosestFacilityElectricity().public_goods <= 0)
+        //    || FindClosestFacilityElectricity().electricity <= 0 || FindClosestFacilityElectricity().water <= 0 || FindClosestFacilityElectricity().fuel <= 0 || FindClosestFacilityElectricity().communications <= 0 || FindClosestFacilityElectricity().commodities <= 0 || FindClosestFacilityElectricity().health <= 0 || FindClosestFacilityElectricity().security <= 0 || FindClosestFacilityElectricity().public_goods <= 0)
         //{
         //    Invoke("SearchAgain", 3);
         //}
@@ -236,7 +307,7 @@ public class ElectricityDistribution : FacilityV3
     //    water = FindClosestFacilityElectricity().water;
     //    fuel = FindClosestFacilityElectricity().fuel;
     //    communications = FindClosestFacilityElectricity().communications;
-    //    commondities = FindClosestFacilityElectricity().commondities;
+    //    commodities = FindClosestFacilityElectricity().commodities;
     //    health = FindClosestFacilityElectricity().health;
     //    security = FindClosestFacilityElectricity().security;
     //    public_goods = FindClosestFacilityElectricity().public_goods;

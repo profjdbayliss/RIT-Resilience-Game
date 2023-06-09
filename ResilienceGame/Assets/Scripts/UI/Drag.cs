@@ -8,8 +8,6 @@ public class Drag : MonoBehaviour, IDragHandler
     // Establish necessary fields
     public Vector3 minPos;
     public Vector3 maxPos;
-    public RaycastHit hit;
-    public Ray mouseRay;
     public bool isDragging = false;
     public GameObject dragObject;
 
@@ -63,25 +61,21 @@ public class Drag : MonoBehaviour, IDragHandler
                                 tempPos.y = dragObject.transform.position.y;
                                 dragObject.transform.position = tempPos;
                             }
-
                         }
-
                     }
                     else if(dragObject.transform.position.x >= maxPos.x) // Edge case to make sure we are not going too far, if so, set it to just below the max possibel position.
                     {
                         maxPos.x -= 0.001f;
                         dragObject.transform.position = maxPos;
                     }
+
                     else if(dragObject.transform.position.x <= minPos.x) // Edge case to make sure we are not going too far back, if so, set it to just abovet he minimum possible position
                     {
                         minPos.x += 0.001f;
                         dragObject.transform.position = minPos;
                     }
                 }
-
-
             }
         }
     }
-
 }

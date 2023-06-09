@@ -6,23 +6,48 @@ using UnityEngine.UI;
 
 public class PlaceIcons : MonoBehaviour
 {
-    public float2 Offset;
-    public float2 SizeOfBox;
+    // Establish necessary fields
+
+    // float2s to hold the single facility locations
     public float2 PoliceLoc;
     public float2 CityHallPos;
+    public float2 elecDistPos;
+
+    // Vec2s to track the mapscalar, the original scaler, and the different between the two
     public Vector2 mapScalar;
     public Vector2 OGScalar = new Vector2(1920, 1080);
     public Vector2 OGDeltaScalar;
+
+    // List of locations to place the facilities at
     public List<float2> HospitalLocations;
     public List<float2> FireDeptLocations;
     public List<float2> ElectricityLocations;
     public List<float2> WaterLocations;
     public List<float2> CommoditiesLocations;
     public List<float2> CommunicationsLocations;
+    public List<float2> FuelLocations;
+    public List<float2> ElectricityDistributionLocations;
+
+
     public List<Material> HexMaterials;
+    
+    // Lists to output each of the instantiated facilities
+    public List<GameObject> Hospitals;
+    public List<GameObject> FireDepartments;
+    public List<GameObject> ElectricityFacilities;
+    public List<GameObject> WaterFacilities;
+    public List<GameObject> CommoditiesFacilities;
+    public List<GameObject> CommunicationsFacilities;
+    public List<GameObject> FuelFacilities;
+    public List<GameObject> ElectricityDistributionFacilities;
+
+
 
     private static GameObject canvas;
-    public GameObject Police;
+    private GameObject Map;
+
+    // Private gameobjects of the base version of the facilities to instantiate
+    private GameObject Police;
     private GameObject Hospital;
     private GameObject FireTruck;
     private GameObject Electricity;
@@ -30,14 +55,16 @@ public class PlaceIcons : MonoBehaviour
     private GameObject Commodities;
     private GameObject Communications;
     private GameObject CityHall;
-    private GameObject Map;
+    private GameObject ElectricityDistributor;
+    private GameObject Fuel;
+
 
     private GameObject TestHex;
    
     // Start is called before the first frame update
     void Start()
     {
-        // get the canvas
+        // get the canvas and the bases of all of the facilities
         canvas = GameObject.Find("Canvas");
         Police = GameObject.Find("Police");
         Hospital = GameObject.Find("Hospital");
@@ -49,41 +76,28 @@ public class PlaceIcons : MonoBehaviour
         CityHall = GameObject.Find("City Hall");
         Map = GameObject.Find("Map");
         TestHex = GameObject.Find("NewHexPrefab");
+        ElectricityDistributor = GameObject.Find("Electricity Distributor");
+        Fuel = GameObject.Find("Fuel");
 
         // Scale the map properly
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, canvas.GetComponent<RectTransform>().rect.height);
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, canvas.GetComponent<RectTransform>().rect.width*0.66f);
-        mapScalar = Map.GetComponent<RectTransform>().sizeDelta;
+       
         mapScalar.x = Map.GetComponent<RectTransform>().rect.width;
         mapScalar.y = Map.GetComponent<RectTransform>().rect.height;
+
+        // Debug the scalars to make sure that we have the right scaling
         Debug.Log("MS: " + mapScalar);
         OGScalar = new Vector2(1920.0f * 0.66f, 1080);
         Debug.Log("OG: " + OGScalar);
         OGDeltaScalar = (mapScalar - OGScalar);
         Debug.Log("OGD: " + OGDeltaScalar);
-        //OGScalar = mapScalar; 82.79, -21.9
-        //Debug.Log("CHPOS: " + CityHall.transform.position);
-        //GameObject tempCityHall = Instantiate(CityHall);
-        //Vector3 tempVecCityHall = new Vector3(0,0,0);
-        //if (mapScalar != new Vector2(1920.0f * 0.66f, 1080))
-        //{
-        //    float scaleCorrectionX = math.abs(CityHallPos.x) / (mapScalar.x / 2.0f);
-        //    float scaleCorrectionY = math.abs(CityHallPos.y) / (mapScalar.y / 2.0f);
-        //    tempVecCityHall.x = CityHallPos.x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
-        //    tempVecCityHall.y = CityHallPos.y - ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
-        //}
-        //else
-        //{
-        //    tempVecCityHall = new Vector3(CityHallPos.x, CityHallPos.y, 0);
-        //}
-        //tempCityHall.transform.position = tempVecCityHall;
-        //tempCityHall.transform.SetParent(Map.transform, false);
-        //tempCityHall.name = "City Hall (Clone)";
-        //CityHall.SetActive(false);
+
+        // Spawn the one off facilities
         spawnFacility(CityHall, CityHallPos, "City Hall (Clone)");
         spawnFacility(Police, PoliceLoc, "Police (Clone)");
 
-        SpawnFacilities(Hospital, HospitalLocations, "Hospital (Clone)");
+        SpawnFacilities(Hospital, HospitalLocations, Hospitals, "Hospital (Clone)");
         /*
          // take hospital image and place it on canvas at locations specified;
         int locationCount = HospitalLocations.Count;
@@ -138,165 +152,35 @@ public class PlaceIcons : MonoBehaviour
         Hospital.SetActive(false);
          */
 
-        SpawnFacilities(FireTruck, FireDeptLocations, "Fire (Clone)");
-        //locationCount = FireDeptLocations.Count;
-        //for (int i = 0; i < locationCount; i++)
-        //{
-        //    // make a copy
-        //    GameObject fire = Instantiate(FireTruck);
-        //    //GameObject fire = Instantiate(TestHex);
+        // Spawn the fire departments
+        SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
 
-        //    // place
-        //    //fire.transform.position = new Vector3(FireDeptLocations[i].x*SizeOfBox.x+Offset.x, -1*FireDeptLocations[i].y*SizeOfBox.y+Offset.y-5.0f + 240.0f, 0);
-        //    // Old Formula ^^
-
-        //    if(mapScalar != new Vector2(1920.0f*0.66f, 1080))
-        //    {
-        //        Vector3 tempVec = new Vector3(0, 0, 0);
-        //        if(FireDeptLocations[i].x < 0.0f)
-        //        {
-        //            float scaleCorrection = math.abs(FireDeptLocations[i].x) / (mapScalar.x / 2.0f);
-        //            tempVec.x = FireDeptLocations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
-        //        }
-        //        else
-        //        {
-        //            float scaleCorrection = math.abs(FireDeptLocations[i].x) / (mapScalar.x / 2.0f);
-        //            tempVec.x = FireDeptLocations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
-        //        }
-        //        if (FireDeptLocations[i].y < 0.0f)
-        //        {
-        //            float scaleCorrection = math.abs(FireDeptLocations[i].y) / (mapScalar.y / 2.0f);
-        //            tempVec.y = FireDeptLocations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
-
-        //        }
-        //        else
-        //        {
-        //            float scaleCorrection = math.abs(FireDeptLocations[i].y) / (mapScalar.y / 2.0f);
-
-        //            tempVec.y = FireDeptLocations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
-
-        //        }
-        //        fire.transform.position = tempVec;
-
-        //    }
-        //    else
-        //    {
-        //        fire.transform.position = new Vector3(FireDeptLocations[i].x, FireDeptLocations[i].y, 0);
-        //    }
-
-        //    //fire.transform.SetParent (canvas.transform,false);
-
-        //    // Set the material then parent it to the Map
-        //    //fire.GetComponent<MeshRenderer>().material = HexMaterials[10];
-
-        //    fire.transform.SetParent(Map.transform, false);
-        //    fire.name = "Fire (Clone)";
-        //}
-        //FireTruck.SetActive(false);
-
-        SpawnFacilities(Electricity, ElectricityLocations, "Electricity (Clone)");
-
-        //int locationCount = ElectricityLocations.Count;
-        //for(int i = 0; i < locationCount; i++)
-        //{
-        //    // Make a copy of the original
-        //    GameObject tempElec = Instantiate(Electricity);
-        //    //GameObject tempElec = Instantiate(TestHex);
-        //
-        //    // Put it in the right spot
-        //    tempElec.transform.position = new Vector3(ElectricityLocations[i].x * SizeOfBox.x + Offset.x, -1 * ElectricityLocations[i].y * SizeOfBox.y + Offset.y-5.0f, 0);
-        //    //tempElec.transform.eulerAngles = new Vector3(0,180,270);
-        //
-        //
-        //    // Set the Material then place it in the right spot <-- Uncomment if using hexes
-        //    //tempElec.GetComponent<MeshRenderer>().material = HexMaterials[4];
-        //
-        //    //tempElec.transform.SetParent(canvas.transform, false);
-        //    tempElec.transform.SetParent(Map.transform, false);
-        //    tempElec.name = "Electricity (Clone)";
-        //}
-        //Electricity.SetActive(false);
+        // Spawn the electricity facilities
+        SpawnFacilities(Electricity, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
 
         // Convert to water
-        int locationCount = WaterLocations.Count;
-        for(int i = 0; i < locationCount; i++)
-        {
-
-            // Instantiate the hex
-            //GameObject tempHex = Instantiate(TestHex);
-            GameObject tempHex = Instantiate(Water);
-
-
-            // Put it in a random spot
-            tempHex.transform.position = new Vector3(WaterLocations[i].x * SizeOfBox.x + Offset.x, -1 * WaterLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            //tempHex.transform.eulerAngles = new Vector3(0, 180, 90);
-            //tempHex.transform.localScale = new Vector3(10000, 10000, 10000);
-
-            // Set the material
-            //Unity.Mathematics.Random rng = new Unity.Mathematics.Random();
-            //int tempInt = rng.NextInt(0, HexMaterials.Count-1);
-            //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[tempInt];
-            //Debug.Log(tempInt);
-            //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[i%10];
-            //tempHex.GetComponent<MeshRenderer>().material = HexMaterials[10];<-- Uncomment if using hexes
-            //tempHex.GetComponentInChildren<MeshRenderer>().material = HexMaterials[9];
-            
-            // Set the parent
-            tempHex.transform.SetParent(Map.transform, false);
-            tempHex.name = "Water (Clone)";
-        }
-        Water.SetActive(false);
+        SpawnFacilities(Water, WaterLocations, WaterFacilities, "Water (Clone)");
 
         // Commodities
-        locationCount = CommoditiesLocations.Count;
-        for(int i = 0; i < locationCount; i++)
-        {
-            // Instantiate the new commodoty
-            //GameObject tempCommodities = Instantiate(TestHex);
-            GameObject tempCommodities = Instantiate(Commodities);
-
-
-            // Set the position and the rotation
-            tempCommodities.transform.position = new Vector3(CommoditiesLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommoditiesLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            //tempCommodities.transform.eulerAngles = new Vector3(0, 180, 90);
-
-            // Set the material<-- Uncomment if using hexes
-            //tempCommodities.GetComponentInChildren<MeshRenderer>().material = HexMaterials[1];
-
-            // Set the parent
-            tempCommodities.transform.SetParent(Map.transform, false);
-            tempCommodities.name = "Commodities (Clone)";
-        }
-        Commodities.SetActive(false);
+        SpawnFacilities(Commodities, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
 
         // Communications
-        locationCount = CommunicationsLocations.Count;
-        for (int i = 0; i < locationCount; i++)
-        {
-            // Instantiate the new commodoty
-            //GameObject tempCommunications = Instantiate(TestHex);
-            GameObject tempCommunications = Instantiate(Communications);
+        SpawnFacilities(Communications, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
 
+        // Electricity Distributor
+        SpawnFacilities(ElectricityDistributor, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distributor (Clone)");
 
-            // Set the position and the rotation
-            tempCommunications.transform.position = new Vector3(CommunicationsLocations[i].x * SizeOfBox.x + Offset.x, -1 * CommunicationsLocations[i].y * SizeOfBox.y + Offset.y - 5.0f, 0);
-            //tempCommunications.transform.eulerAngles = new Vector3(0, 180, 90);
-
-            // Set the material <-- Uncomment if using hexes
-            //tempCommunications.GetComponentInChildren<MeshRenderer>().material = HexMaterials[2];
-
-            // Set the parent
-            tempCommunications.transform.SetParent(Map.transform, false);
-            tempCommunications.name = "Communications (Clone)";
-        }
-        Communications.SetActive(false);
+        // Fuel
+        SpawnFacilities(Fuel, FuelLocations, FuelFacilities, "Fuel (Clone)");
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Check to see if the size has changed since the start
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, canvas.GetComponent<RectTransform>().rect.height);
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, canvas.GetComponent<RectTransform>().rect.width * 0.66f);
+
         Vector2 tempScalar = new Vector2(Map.GetComponent<RectTransform>().rect.width, Map.GetComponent<RectTransform>().rect.height);
         Vector2 deltaScale = tempScalar - mapScalar;
         if(Mathf.Abs(deltaScale.x + deltaScale.y) > 0)
@@ -327,72 +211,109 @@ public class PlaceIcons : MonoBehaviour
 
     }
 
-    void SpawnFacilities(GameObject baseFacility, List<float2> locations, string name)
+    /// <summary>
+    /// Spawn Facilities Method
+    /// 
+    /// Spawn Facilities takes in the following parameters to then instantiate and position the instantiated facilities in their proper locations. Spawn facilities
+    /// will also sclae the locations based upon the scale of the map to make sure that they are always in the correct spot. Scale scorrection is utilized to make sure that
+    /// the farther away an icon is from the center that they are being scaled more to ensure that all locations are placed in the correct spot. As when the map scales, the icons
+    /// that are closer to the center of the map are not as impacted by the scale, while farther ones are scaled more heavily.
+    /// </summary>
+    /// <param name="baseFacility">
+    /// The parameter base facility is the original facility that is going to be instantiated and used to make the rest of the facilities of that type.
+    /// </param>
+    /// <param name="locations">
+    /// Locations is a list of float2 locations to place each of the instantiated facilities at.
+    /// </param>
+    /// <param name="output">
+    /// The parameter output is the list of gameobjects that holds the instantiated facilities to track them later.
+    /// </param>
+    /// <param name="name">
+    /// The param name is a parameter that is a string used to name the instantiated facility properly so it is easier to notice.
+    /// </param>
+    void SpawnFacilities(GameObject baseFacility, List<float2> locations, List<GameObject> output, string name)
     {
         int locationCount = locations.Count;
         for (int i = 0; i < locationCount; i++)
         {
             // make a copy
             GameObject tempFacility = Instantiate(baseFacility);
-            //GameObject fire = Instantiate(TestHex);
 
-            // place
-            //fire.transform.position = new Vector3(FireDeptLocations[i].x*SizeOfBox.x+Offset.x, -1*FireDeptLocations[i].y*SizeOfBox.y+Offset.y-5.0f + 240.0f, 0);
-            // Old Formula ^^
-
+            // Check to see if we are at the original scale, if we aren't then we will utilize our scalars, if not, we can just use the 
+            // passed in locations
             if (mapScalar != new Vector2(1920.0f * 0.66f, 1080))
             {
                 Vector3 tempVec = new Vector3(0, 0, 0);
+                float scaleCorrectionX = math.abs(locations[i].x) / (mapScalar.x / 2.0f);
+                float scaleCorrectionY = math.abs(locations[i].y) / (mapScalar.y / 2.0f);
+
+
+                // If the y is negative, we want to subtract tom make sure we go in the right direction.
                 if (locations[i].x < 0.0f)
                 {
-                    float scaleCorrection = math.abs(locations[i].x) / (mapScalar.x / 2.0f);
-                    tempVec.x = locations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
+                    tempVec.x = locations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
                 }
                 else
                 {
-                    float scaleCorrection = math.abs(locations[i].x) / (mapScalar.x / 2.0f);
-                    tempVec.x = locations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
+                    tempVec.x = locations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
                 }
+
+                // If the y is negative, we want to subtract tom make sure we go in the right direction.
                 if (FireDeptLocations[i].y < 0.0f)
                 {
-                    float scaleCorrection = math.abs(locations[i].y) / (mapScalar.y / 2.0f);
-                    tempVec.y = locations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
-
+                    tempVec.y = locations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
                 }
                 else
                 {
-                    float scaleCorrection = math.abs(locations[i].y) / (mapScalar.y / 2.0f);
-
-                    tempVec.y = locations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
-
+                    tempVec.y = locations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
                 }
-                tempFacility.transform.position = tempVec;
 
+                // Set the instantiated facilities position to the temporary Vec3 we used to put it in the correct location and add it to the proper list
+                tempFacility.transform.position = tempVec;
+                output.Add(tempFacility);
             }
             else
             {
                 tempFacility.transform.position = new Vector3(locations[i].x, locations[i].y, 0);
+                output.Add(tempFacility);
             }
 
             //fire.transform.SetParent (canvas.transform,false);
 
             // Set the material then parent it to the Map
-            //fire.GetComponent<MeshRenderer>().material = HexMaterials[10];
+            //fire.GetComponent<MeshRenderer>().material = HexMaterials[10]; <-- Only needed when utilizing hexes
 
             tempFacility.transform.SetParent(Map.transform, false);
             tempFacility.name = name;
         }
+        // Disable the original facility
         baseFacility.SetActive(false);
     }
 
+    /// <summary>
+    /// Spawn Facility Method
+    /// 
+    /// Spawn Facility method is the same method as SpawnFacilities, however it is utilized for one off locations like City Hall, etc.
+    /// </summary>
+    /// <param name="baseFacility">
+    /// The parameter base facility is the original facility that is going to be instantiated and used to make the rest of the facilities of that type.
+    /// </param>
+    /// <param name="loc">
+    /// Loc is a float2 to know to place the instantiated facility at.
+    /// </param>
+    /// <param name="name">
+    /// The param name is a parameter that is a string used to name the instantiated facility properly so it is easier to notice.
+    /// </param>
     void spawnFacility(GameObject baseFacility, float2 loc, string name)
     {
         GameObject tempFacility = Instantiate(baseFacility);
         Vector3 tempFacilityPos = new Vector3(0, 0, 0);
+
         if (mapScalar != new Vector2(1920.0f * 0.66f, 1080))
         {
             float scaleCorrectionX = math.abs(loc.x) / (mapScalar.x / 2.0f);
             float scaleCorrectionY = math.abs(loc.y) / (mapScalar.y / 2.0f);
+
             tempFacilityPos.x = loc.x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
             tempFacilityPos.y = loc.y - ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
         }
@@ -400,6 +321,7 @@ public class PlaceIcons : MonoBehaviour
         {
             tempFacilityPos = new Vector3(loc.x, loc.y, 0);
         }
+
         tempFacility.transform.position = tempFacilityPos;
         tempFacility.transform.SetParent(Map.transform, false);
         tempFacility.name = name;
