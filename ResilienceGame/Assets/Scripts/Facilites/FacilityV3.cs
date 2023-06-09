@@ -394,7 +394,6 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                 case 10:
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
-
                     
                     Electricity.text = electricity.ToString();
                     Water.text = water.ToString();
@@ -424,6 +423,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     /// This method is utilized to change the images in the feedback panel to alert the player of the status of their facilites.
     /// Depedning on their statuses, the images will either be green (best), yellow (not so good), and red (bad)
     /// </summary>
+    private void ChangeImage()
     {
         // Electricity
         if (electricity > 50)
