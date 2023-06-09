@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1208773}
   m_Layer: 5
-  m_Name: Water
+  m_Name: Water_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -384,7 +384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 107703007}
   m_Layer: 5
-  m_Name: OT
+  m_Name: OT_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -466,6 +466,7 @@ MonoBehaviour:
   type: 3
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -877,7 +878,7 @@ GameObject:
   m_Component:
   - component: {fileID: 184287980}
   m_Layer: 5
-  m_Name: Commodities
+  m_Name: Commodities_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1454,6 +1455,7 @@ MonoBehaviour:
   type: 6
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -1517,7 +1519,7 @@ GameObject:
   m_Component:
   - component: {fileID: 319882218}
   m_Layer: 5
-  m_Name: IT
+  m_Name: IT_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1869,7 +1871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 440929344}
   m_Layer: 5
-  m_Name: Health
+  m_Name: Health_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1981,6 +1983,7 @@ MonoBehaviour:
   type: 7
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -2352,6 +2355,7 @@ MonoBehaviour:
   type: 9
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -2489,6 +2493,7 @@ MonoBehaviour:
   type: 5
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -2626,6 +2631,7 @@ MonoBehaviour:
   type: 7
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -2839,6 +2845,7 @@ MonoBehaviour:
   type: 4
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -3541,7 +3548,7 @@ GameObject:
   m_Component:
   - component: {fileID: 926032168}
   m_Layer: 5
-  m_Name: Security
+  m_Name: Security_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3954,7 +3961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1105988053}
   m_Layer: 5
-  m_Name: Electricity
+  m_Name: Electricity_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4858,6 +4865,7 @@ MonoBehaviour:
   type: 2
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -5543,7 +5551,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1387885338}
   m_Layer: 5
-  m_Name: Phys_Sec
+  m_Name: Phys_Sec_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6273,7 +6281,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1467121361}
   m_Layer: 5
-  m_Name: Comms
+  m_Name: Comms_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6350,7 +6358,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1499448902}
   m_Layer: 5
-  m_Name: Workers
+  m_Name: Workers_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6580,6 +6588,7 @@ MonoBehaviour:
   type: 0
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -6719,7 +6728,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1748726566}
   m_Layer: 5
-  m_Name: Fuel
+  m_Name: Fuel_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7189,6 +7198,7 @@ MonoBehaviour:
   type: 1
   isOver: 0
   isDown: 0
+  hasChanged: 0
   output_flow: 0
   internal_flow: 0
   external_flow: 0
@@ -7798,7 +7808,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2006020389}
   m_Layer: 5
-  m_Name: Public Goods
+  m_Name: Public Goods_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7957,7 +7967,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2053671016}
   m_Layer: 5
-  m_Name: Funding
+  m_Name: Funding_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

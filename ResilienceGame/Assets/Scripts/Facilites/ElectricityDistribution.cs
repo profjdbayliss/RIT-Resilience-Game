@@ -316,7 +316,10 @@ public class ElectricityDistribution : FacilityV3
 
     override public void Update()
     {
-        FeedbackPanel();
-        CalculateFlow();
+        if (this.gameObject.name.Contains("Clone"))
+        {
+            FeedbackPanel();
+            CalculateFlow();
+        }
     }
 }

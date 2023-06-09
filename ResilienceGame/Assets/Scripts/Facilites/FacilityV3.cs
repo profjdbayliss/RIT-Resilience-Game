@@ -27,6 +27,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public bool isOver;
     public bool isDown;
+    public bool hasChanged;
 
     public  float output_flow;
     public float internal_flow;
@@ -106,40 +107,44 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         FacilityType = GameObject.Find("Facility Type").GetComponentInChildren<TextMeshProUGUI>(true);
         Flow = GameObject.Find("Flow").GetComponentInChildren<TextMeshProUGUI>(true);
 
-        Electricity = GameObject.Find("Electricity").GetComponentInChildren<TextMeshProUGUI>(true);
-        Water = GameObject.Find("Water").GetComponentInChildren<TextMeshProUGUI>(true);
-        Fuel = GameObject.Find("Fuel").GetComponentInChildren<TextMeshProUGUI>(true);
-        Communications = GameObject.Find("Comms").GetComponentInChildren<TextMeshProUGUI>(true);
-        Health = GameObject.Find("Health").GetComponentInChildren<TextMeshProUGUI>(true);
-        Commodities = GameObject.Find("Commodities").GetComponentInChildren<TextMeshProUGUI>(true);
-        Security = GameObject.Find("Security").GetComponentInChildren<TextMeshProUGUI>(true);
-        Public_Goods = GameObject.Find("Public Goods").GetComponentInChildren<TextMeshProUGUI>(true);
+        Electricity = GameObject.Find("Electricity_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Water = GameObject.Find("Water_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Fuel = GameObject.Find("Fuel_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Communications = GameObject.Find("Comms_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Health = GameObject.Find("Health_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Commodities = GameObject.Find("Commodities_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Security = GameObject.Find("Security_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Public_Goods = GameObject.Find("Public Goods_T").GetComponentInChildren<TextMeshProUGUI>(true);
 
-        Electricity_img = GameObject.Find("Electricity").GetComponentInChildren<Image>(true);
-        Water_img = GameObject.Find("Water").GetComponentInChildren<Image>(true);
-        Fuel_img = GameObject.Find("Fuel").GetComponentInChildren<Image>(true);
-        Communications_img = GameObject.Find("Comms").GetComponentInChildren<Image>(true);
-        Health_img = GameObject.Find("Health").GetComponentInChildren<Image>(true);
-        Commodities_img = GameObject.Find("Commodities").GetComponentInChildren<Image>(true);
-        Security_img = GameObject.Find("Security").GetComponentInChildren<Image>(true);
-        Public_Goods_img = GameObject.Find("Public Goods").GetComponentInChildren<Image>(true);
+        Electricity_img = GameObject.Find("Electricity_T").GetComponentInChildren<Image>(true);
+        Water_img = GameObject.Find("Water_T").GetComponentInChildren<Image>(true);
+        Fuel_img = GameObject.Find("Fuel_T").GetComponentInChildren<Image>(true);
+        Communications_img = GameObject.Find("Comms_T").GetComponentInChildren<Image>(true);
+        Health_img = GameObject.Find("Health_T").GetComponentInChildren<Image>(true);
+        Commodities_img = GameObject.Find("Commodities_T").GetComponentInChildren<Image>(true);
+        Security_img = GameObject.Find("Security_T").GetComponentInChildren<Image>(true);
+        Public_Goods_img = GameObject.Find("Public Goods_T").GetComponentInChildren<Image>(true);
 
-        Workers = GameObject.Find("Workers").GetComponentInChildren<TextMeshProUGUI>(true);
-        IT = GameObject.Find("IT").GetComponentInChildren<TextMeshProUGUI>(true);
-        OT = GameObject.Find("OT").GetComponentInChildren<TextMeshProUGUI>(true);
-        Phys_Security = GameObject.Find("Phys_Sec").GetComponentInChildren<TextMeshProUGUI>(true);
-        Funding = GameObject.Find("Funding").GetComponentInChildren<TextMeshProUGUI>(true);
+        Workers = GameObject.Find("Workers_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        IT = GameObject.Find("IT_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        OT = GameObject.Find("OT_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Phys_Security = GameObject.Find("Phys_Sec_T").GetComponentInChildren<TextMeshProUGUI>(true);
+        Funding = GameObject.Find("Funding_T").GetComponentInChildren<TextMeshProUGUI>(true);
 
-        Workers_img = GameObject.Find("Workers").GetComponentInChildren<Image>(true);
-        IT_img = GameObject.Find("IT").GetComponentInChildren<Image>(true);
-        OT_img = GameObject.Find("OT").GetComponentInChildren<Image>(true);
-        Phys_Security_img = GameObject.Find("Phys_Sec").GetComponentInChildren<Image>(true);
-        Funding_img = GameObject.Find("Funding").GetComponentInChildren<Image>(true);
+        Workers_img = GameObject.Find("Workers_T").GetComponentInChildren<Image>(true);
+        IT_img = GameObject.Find("IT_T").GetComponentInChildren<Image>(true);
+        OT_img = GameObject.Find("OT_T").GetComponentInChildren<Image>(true);
+        Phys_Security_img = GameObject.Find("Phys_Sec_T").GetComponentInChildren<Image>(true);
+        Funding_img = GameObject.Find("Funding_T").GetComponentInChildren<Image>(true);
+        hasChanged = false;
     }
 
     virtual public void Update()
-    {      
-        FeedbackPanel();
+    {
+        if (this.gameObject.name.Contains("Clone"))
+        {
+            FeedbackPanel();
+        }
     }
 
     public void FindFacilities()
@@ -184,14 +189,16 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         //Debug.Log("EXITED");
         isOver = false;
-
+        hasChanged = false;
     }
 
     virtual public void FeedbackPanel()
     {      
-        if (isOver == true)
+        if (isOver == true && hasChanged == false)
         {
+            hasChanged = true;
             ChangeImage();
+            
             switch (feedback)
             {             
                 case 1:
@@ -388,6 +395,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                     FacilityType.text = type.ToString();
                     Flow.text = output_flow.ToString();
 
+                    
                     Electricity.text = electricity.ToString();
                     Water.text = water.ToString();
                     Fuel.text = fuel.ToString();
@@ -416,7 +424,6 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     /// This method is utilized to change the images in the feedback panel to alert the player of the status of their facilites.
     /// Depedning on their statuses, the images will either be green (best), yellow (not so good), and red (bad)
     /// </summary>
-    void ChangeImage()
     {
         // Electricity
         if (electricity > 50)
