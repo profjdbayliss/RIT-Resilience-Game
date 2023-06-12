@@ -20,12 +20,12 @@ public class Drag : MonoBehaviour, IDragHandler
         Map = GameObject.Find("Map");
 
         // Scale the Feedback menu
-
         mapScalar.x = Map.GetComponent<RectTransform>().rect.width;
         mapScalar.y = Map.GetComponent<RectTransform>().rect.height;
+
         Vector3 tempPos = dragObject.transform.position;
         tempPos = dragObject.transform.localPosition;
-        tempPos.x = mapScalar.x * -0.75f;
+        tempPos.x = mapScalar.x * -0.75f; // Multiplying by 3/4ths of the map width because that is the edge of the screen, doing so by -1 to ensure it is on the left side of the screen.
         dragObject.transform.localPosition = tempPos;
 
         // Establish the minimum points and the maximum points it can drag out to, and move the min and max just slightly outside what we want to avoid bouncing.

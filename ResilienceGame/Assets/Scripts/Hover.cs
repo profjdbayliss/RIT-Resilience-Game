@@ -50,7 +50,6 @@ public class Hover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //Debug.Log(locationName);
         locationTextTMP.text = inputFix(locationName);
         locationTextTMP.color = new Color(0, 0, 0, 255);
     }

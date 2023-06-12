@@ -589,6 +589,7 @@ GameObject:
   - component: {fileID: 112900651}
   - component: {fileID: 112900650}
   - component: {fileID: 112900649}
+  - component: {fileID: 112900652}
   m_Layer: 5
   m_Name: Fuel
   m_TagString: Untagged
@@ -716,6 +717,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 112900647}
   m_CullTransparentMesh: 1
+--- !u!114 &112900652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 112900647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 1150973429}
+  facility: {fileID: 112900649}
 --- !u!1 &156328437
 GameObject:
   m_ObjectHideFlags: 0
@@ -1555,6 +1570,7 @@ GameObject:
   - component: {fileID: 291618881}
   - component: {fileID: 291618882}
   - component: {fileID: 291618883}
+  - component: {fileID: 291618884}
   m_Layer: 5
   m_Name: Hospital
   m_TagString: Untagged
@@ -1682,6 +1698,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &291618884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291618878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 1976422665}
+  facility: {fileID: 291618883}
 --- !u!1 &319882217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1815,6 +1845,7 @@ RectTransform:
   - {fileID: 1448016501}
   - {fileID: 1132191280}
   - {fileID: 1499110329}
+  - {fileID: 1357449875}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2102,6 +2133,7 @@ GameObject:
   - component: {fileID: 459446032}
   - component: {fileID: 459446031}
   - component: {fileID: 459446033}
+  - component: {fileID: 459446034}
   m_Layer: 5
   m_Name: Police
   m_TagString: Untagged
@@ -2229,6 +2261,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &459446034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459446029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 1013842174}
+  facility: {fileID: 459446033}
 --- !u!1 &494329968
 GameObject:
   m_ObjectHideFlags: 0
@@ -2694,6 +2740,7 @@ GameObject:
   - component: {fileID: 679581236}
   - component: {fileID: 679581237}
   - component: {fileID: 679581238}
+  - component: {fileID: 679581239}
   m_Layer: 5
   m_Name: City Hall
   m_TagString: Untagged
@@ -2821,6 +2868,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &679581239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 679581233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 108179578}
+  facility: {fileID: 679581238}
 --- !u!1 &691838749
 GameObject:
   m_ObjectHideFlags: 0
@@ -2833,6 +2894,7 @@ GameObject:
   - component: {fileID: 691838752}
   - component: {fileID: 691838753}
   - component: {fileID: 691838754}
+  - component: {fileID: 691838755}
   m_Layer: 5
   m_Name: Commodities
   m_TagString: Untagged
@@ -2960,6 +3022,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &691838755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691838749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 494329968}
+  facility: {fileID: 691838754}
 --- !u!1 &714759331
 GameObject:
   m_ObjectHideFlags: 0
@@ -2972,6 +3048,7 @@ GameObject:
   - component: {fileID: 714759334}
   - component: {fileID: 714759335}
   - component: {fileID: 714759336}
+  - component: {fileID: 714759337}
   m_Layer: 5
   m_Name: FireTruck
   m_TagString: Untagged
@@ -3099,6 +3176,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &714759337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714759331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 42318044}
+  facility: {fileID: 714759336}
 --- !u!1 &750083703
 GameObject:
   m_ObjectHideFlags: 0
@@ -3205,6 +3296,7 @@ GameObject:
   - component: {fileID: 752154779}
   - component: {fileID: 752154780}
   - component: {fileID: 752154781}
+  - component: {fileID: 752154782}
   m_Layer: 5
   m_Name: Communications
   m_TagString: Untagged
@@ -3332,6 +3424,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &752154782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752154776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 1194308723}
+  facility: {fileID: 752154781}
 --- !u!1 &752955786
 GameObject:
   m_ObjectHideFlags: 0
@@ -4079,6 +4185,79 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 869458556}
+  m_CullTransparentMesh: 1
+--- !u!1 &885778201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 885778202}
+  - component: {fileID: 885778204}
+  - component: {fileID: 885778203}
+  m_Layer: 5
+  m_Name: RawImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &885778202
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 885778201}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1357449875}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &885778203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 885778201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 2800000, guid: da545229eea36164d8b8cba2f75a1143, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &885778204
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 885778201}
   m_CullTransparentMesh: 1
 --- !u!1 &926032167
 GameObject:
@@ -5610,6 +5789,7 @@ GameObject:
   - component: {fileID: 1218024420}
   - component: {fileID: 1218024421}
   - component: {fileID: 1218024422}
+  - component: {fileID: 1218024423}
   m_Layer: 5
   m_Name: Water
   m_TagString: Untagged
@@ -5737,6 +5917,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &1218024423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218024417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 869458556}
+  facility: {fileID: 1218024422}
 --- !u!1 &1252891126
 GameObject:
   m_ObjectHideFlags: 0
@@ -6377,6 +6571,83 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1356594301}
+  m_CullTransparentMesh: 1
+--- !u!1 &1357449874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1357449875}
+  - component: {fileID: 1357449877}
+  - component: {fileID: 1357449876}
+  m_Layer: 5
+  m_Name: Player Actions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1357449875
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357449874}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 885778202}
+  m_Father: {fileID: 342662961}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1003, y: 423}
+  m_SizeDelta: {x: 125, y: 125}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1357449876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357449874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0.6666667, b: 0.23921569, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1357449877
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357449874}
   m_CullTransparentMesh: 1
 --- !u!1 &1387885337
 GameObject:
@@ -7758,6 +8029,7 @@ GameObject:
   - component: {fileID: 1731729913}
   - component: {fileID: 1731729914}
   - component: {fileID: 1731729915}
+  - component: {fileID: 1731729916}
   m_Layer: 5
   m_Name: Electricity
   m_TagString: Untagged
@@ -7885,6 +8157,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &1731729916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1731729910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 524358742}
+  facility: {fileID: 1731729915}
 --- !u!1 &1733951517
 GameObject:
   m_ObjectHideFlags: 0
@@ -8423,6 +8709,7 @@ GameObject:
   - component: {fileID: 1885734216}
   - component: {fileID: 1885734215}
   - component: {fileID: 1885734217}
+  - component: {fileID: 1885734218}
   m_Layer: 5
   m_Name: Electricity Distributor
   m_TagString: Untagged
@@ -8550,6 +8837,20 @@ MonoBehaviour:
   material: []
   facilities: []
   connectedFacilities: []
+--- !u!114 &1885734218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885734212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2f2c098122b7c4bb0d975ca96f12b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 569855476}
+  facility: {fileID: 1885734217}
 --- !u!1 &1886539351
 GameObject:
   m_ObjectHideFlags: 0
