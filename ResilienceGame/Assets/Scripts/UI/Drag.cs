@@ -10,18 +10,30 @@ public class Drag : MonoBehaviour, IDragHandler
     public Vector3 maxPos;
     public bool isDragging = false;
     public GameObject dragObject;
+    public GameObject Map;
+    public Vector2 mapScalar;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        Map = GameObject.Find("Map");
+
+        // Scale the Feedback menu
+
+        mapScalar.x = Map.GetComponent<RectTransform>().rect.width;
+        mapScalar.y = Map.GetComponent<RectTransform>().rect.height;
+        Vector3 tempPos = dragObject.transform.position;
+        tempPos = dragObject.transform.localPosition;
+        tempPos.x = mapScalar.x * -0.75f;
+        dragObject.transform.localPosition = tempPos;
 
         // Establish the minimum points and the maximum points it can drag out to, and move the min and max just slightly outside what we want to avoid bouncing.
         minPos = dragObject.transform.position;
         minPos.x = dragObject.transform.position.x - 0.001f;
 
         maxPos = dragObject.transform.position;
-        maxPos.x = dragObject.transform.position.x + dragObject.GetComponent<RectTransform>().rect.width;
+        maxPos.x = dragObject.transform.position.x + (dragObject.GetComponent<RectTransform>().rect.width * 1.25f);
     }
 
 

@@ -18,6 +18,9 @@ public class PlaceIcons : MonoBehaviour
     public Vector2 OGScalar = new Vector2(1920, 1080);
     public Vector2 OGDeltaScalar;
 
+
+    public Vector3 feedbackPos;
+
     // List of locations to place the facilities at
     public List<float2> HospitalLocations;
     public List<float2> FireDeptLocations;
@@ -42,6 +45,8 @@ public class PlaceIcons : MonoBehaviour
     public List<GameObject> ElectricityDistributionFacilities;
 
 
+    private GameObject feedbackPanel;
+
 
     private static GameObject canvas;
     private GameObject Map;
@@ -65,6 +70,7 @@ public class PlaceIcons : MonoBehaviour
     void Start()
     {
         // get the canvas and the bases of all of the facilities
+        feedbackPanel = GameObject.Find("Feedback Panel");
         canvas = GameObject.Find("Canvas");
         Police = GameObject.Find("Police");
         Hospital = GameObject.Find("Hospital");
@@ -92,6 +98,7 @@ public class PlaceIcons : MonoBehaviour
         Debug.Log("OG: " + OGScalar);
         OGDeltaScalar = (mapScalar - OGScalar);
         Debug.Log("OGD: " + OGDeltaScalar);
+
 
         // Spawn the one off facilities
         spawnFacility(CityHall, CityHallPos, "City Hall (Clone)");

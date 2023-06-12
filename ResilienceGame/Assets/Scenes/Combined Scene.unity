@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: 21891461}
   - component: {fileID: 21891463}
   - component: {fileID: 21891462}
+  - component: {fileID: 21891464}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -237,6 +238,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 21891460}
   m_CullTransparentMesh: 1
+--- !u!114 &21891464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21891460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Public Goods
+  caption: Essential services provided by local governments - schools, mail services,
+    waste disposal, etc.
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &74614707
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,6 +680,10 @@ PrefabInstance:
     - target: {fileID: 3292657645895612462, guid: 7f29e5f7ffdea4a6793cefb278b61f0c, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3292657645895612464, guid: 7f29e5f7ffdea4a6793cefb278b61f0c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3292657645953925573, guid: 7f29e5f7ffdea4a6793cefb278b61f0c, type: 3}
       propertyPath: m_Color.a
@@ -1235,6 +1258,7 @@ MonoBehaviour:
   mapScalar: {x: 0, y: 0}
   OGScalar: {x: 0, y: 0}
   OGDeltaScalar: {x: 0, y: 0}
+  feedbackPos: {x: 0, y: 0, z: 0}
   HospitalLocations:
   - x: -387.9
     y: 311.7
@@ -1662,6 +1686,7 @@ GameObject:
   - component: {fileID: 350253561}
   - component: {fileID: 350253563}
   - component: {fileID: 350253562}
+  - component: {fileID: 350253564}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -1727,6 +1752,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 350253560}
   m_CullTransparentMesh: 1
+--- !u!114 &350253564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 350253560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: IT Level
+  caption: Combination of modernity, integration, and reliance on IT at this facility
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &367306671
 GameObject:
   m_ObjectHideFlags: 0
@@ -2626,10 +2668,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 714759331}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c8ce3021378577449e0f6f3e751b88b, type: 3}
+  m_Script: {fileID: 11500000, guid: 7db13b68ebbe79a4bb0c190e261755f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 7
+  type: 10
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -2697,6 +2739,7 @@ GameObject:
   - component: {fileID: 750083704}
   - component: {fileID: 750083706}
   - component: {fileID: 750083705}
+  - component: {fileID: 750083707}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -2762,6 +2805,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 750083703}
   m_CullTransparentMesh: 1
+--- !u!114 &750083707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 750083703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Water
+  caption: Water, Wastewater, potable water, coolant
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &752154776
 GameObject:
   m_ObjectHideFlags: 0
@@ -3261,6 +3321,7 @@ GameObject:
   - component: {fileID: 813928725}
   - component: {fileID: 813928727}
   - component: {fileID: 813928726}
+  - component: {fileID: 813928728}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -3326,6 +3387,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 813928724}
   m_CullTransparentMesh: 1
+--- !u!114 &813928728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813928724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Fuel
+  caption: ' Natural gas, oil, coal, fissionable materials '
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &822533643
 GameObject:
   m_ObjectHideFlags: 0
@@ -3337,6 +3415,7 @@ GameObject:
   - component: {fileID: 822533644}
   - component: {fileID: 822533646}
   - component: {fileID: 822533645}
+  - component: {fileID: 822533647}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -3402,6 +3481,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 822533643}
   m_CullTransparentMesh: 1
+--- !u!114 &822533647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 822533643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: OT Level
+  caption: Combination of modernity, integration, and reliance on OT at this facility
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &864258232
 GameObject:
   m_ObjectHideFlags: 0
@@ -4143,6 +4239,7 @@ GameObject:
   - component: {fileID: 1147231144}
   - component: {fileID: 1147231146}
   - component: {fileID: 1147231145}
+  - component: {fileID: 1147231147}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -4208,6 +4305,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1147231143}
   m_CullTransparentMesh: 1
+--- !u!114 &1147231147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1147231143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Commodities
+  caption: Consumer goods, tools, pharmaceuticals, protective equipment - any product
+    needed to perform actions
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1163743426
 GameObject:
   m_ObjectHideFlags: 0
@@ -4491,6 +4606,7 @@ GameObject:
   - component: {fileID: 1187054163}
   - component: {fileID: 1187054165}
   - component: {fileID: 1187054164}
+  - component: {fileID: 1187054166}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -4556,6 +4672,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1187054162}
   m_CullTransparentMesh: 1
+--- !u!114 &1187054166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1187054162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Security
+  caption: Police and other law enforcement, public safety services, crowd control
+    - any augmentation needed to secure the facilities internal security
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1202495920
 GameObject:
   m_ObjectHideFlags: 0
@@ -4567,6 +4701,7 @@ GameObject:
   - component: {fileID: 1202495921}
   - component: {fileID: 1202495923}
   - component: {fileID: 1202495922}
+  - component: {fileID: 1202495924}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -4632,6 +4767,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1202495920}
   m_CullTransparentMesh: 1
+--- !u!114 &1202495924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1202495920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Electricity
+  caption: Electrical Power, regardless of type or source.
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1208116078
 GameObject:
   m_ObjectHideFlags: 0
@@ -4818,7 +4970,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 18, y: -81}
+  m_AnchoredPosition: {x: -17.8, y: -81}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1218024420
@@ -4842,7 +4994,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.04619026, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5203,6 +5355,7 @@ GameObject:
   - component: {fileID: 1311179209}
   - component: {fileID: 1311179211}
   - component: {fileID: 1311179210}
+  - component: {fileID: 1311179212}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -5268,6 +5421,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1311179208}
   m_CullTransparentMesh: 1
+--- !u!114 &1311179212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311179208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Workers
+  caption: The workers and all factors affecting the workforce located on site at
+    this facility
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1316071119
 GameObject:
   m_ObjectHideFlags: 0
@@ -5615,7 +5786,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -19.164993, y: -3.7899704}
+  m_AnchoredPosition: {x: -19.164993, y: -3.789978}
   m_SizeDelta: {x: -27.129988, y: 164.28006}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1390660734
@@ -5655,6 +5826,141 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1390660732}
+  m_CullTransparentMesh: 1
+--- !u!1 &1412206242
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1412206243}
+  - component: {fileID: 1412206245}
+  - component: {fileID: 1412206244}
+  m_Layer: 5
+  m_Name: Header
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1412206243
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412206242}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1415432459}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 75, y: -25}
+  m_SizeDelta: {x: 150, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1412206244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412206242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Electricity
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 18
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 12
+  m_fontSizeMax: 18
+  m_fontStyle: 1
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: -149.6031, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1412206245
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412206242}
   m_CullTransparentMesh: 1
 --- !u!1 &1412358565
 GameObject:
@@ -5817,6 +6123,7 @@ GameObject:
   - component: {fileID: 1413142909}
   - component: {fileID: 1413142911}
   - component: {fileID: 1413142910}
+  - component: {fileID: 1413142912}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -5882,6 +6189,102 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413142908}
   m_CullTransparentMesh: 1
+--- !u!114 &1413142912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413142908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Health
+  caption: Healthcare services of all kinds, whether provided to the notional workers
+    or their families
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
+--- !u!1 &1415432458
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1415432459}
+  - component: {fileID: 1415432461}
+  - component: {fileID: 1415432460}
+  m_Layer: 5
+  m_Name: ToolTip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1415432459
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415432458}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1412206243}
+  - {fileID: 1603009800}
+  m_Father: {fileID: 1499110329}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -18.9, y: 94.2}
+  m_SizeDelta: {x: 300, y: 60}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1415432460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415432458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1415432461
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415432458}
+  m_CullTransparentMesh: 1
 --- !u!1 &1426177077
 GameObject:
   m_ObjectHideFlags: 0
@@ -5893,6 +6296,7 @@ GameObject:
   - component: {fileID: 1426177078}
   - component: {fileID: 1426177080}
   - component: {fileID: 1426177079}
+  - component: {fileID: 1426177081}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -5958,6 +6362,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1426177077}
   m_CullTransparentMesh: 1
+--- !u!114 &1426177081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426177077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Telecomminications
+  caption: 'Landline and over-the-air Internet, radio '
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1428134595
 GameObject:
   m_ObjectHideFlags: 0
@@ -6119,6 +6540,7 @@ GameObject:
   - component: {fileID: 1436289367}
   - component: {fileID: 1436289369}
   - component: {fileID: 1436289368}
+  - component: {fileID: 1436289370}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -6184,6 +6606,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1436289366}
   m_CullTransparentMesh: 1
+--- !u!114 &1436289370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1436289366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Funding
+  caption: Money spent on the facility to handle operating costs
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1448016500
 GameObject:
   m_ObjectHideFlags: 0
@@ -6341,6 +6780,7 @@ RectTransform:
   - {fileID: 648609175}
   - {fileID: 976786483}
   - {fileID: 2024716739}
+  - {fileID: 1415432459}
   m_Father: {fileID: 342662961}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6387,6 +6827,142 @@ RectTransform:
   m_AnchoredPosition: {x: 50, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1603009799
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1603009800}
+  - component: {fileID: 1603009802}
+  - component: {fileID: 1603009801}
+  m_Layer: 5
+  m_Name: Caption
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1603009800
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603009799}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1415432459}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 150, y: -44.5}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1603009801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603009799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Physical barriers, security personnel, camera systems - anything that can
+    be used to protect phsyical access to this facility
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 12
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 12
+  m_fontSizeMax: 18
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: -49.45842, y: 0, z: -49.516075, w: 20.568354}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1603009802
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603009799}
+  m_CullTransparentMesh: 1
 --- !u!1 &1687258581
 GameObject:
   m_ObjectHideFlags: 0
@@ -6654,6 +7230,7 @@ GameObject:
   - component: {fileID: 1733951518}
   - component: {fileID: 1733951520}
   - component: {fileID: 1733951519}
+  - component: {fileID: 1733951521}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -6719,6 +7296,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1733951517}
   m_CullTransparentMesh: 1
+--- !u!114 &1733951521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733951517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539ca593432cd54e85b254ddc09f877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: Physical Security
+  caption: Physical barriers, security personnel, camera systems - anything that
+    can be used to protect phsyical access to this facility
+  tooltipObject: {fileID: 1415432458}
+  headerContent: {fileID: 1412206244}
+  captionContent: {fileID: 1603009801}
 --- !u!1 &1748726565
 GameObject:
   m_ObjectHideFlags: 0
@@ -7967,6 +8562,8 @@ MonoBehaviour:
   maxPos: {x: 0, y: 0, z: 0}
   isDragging: 0
   dragObject: {fileID: 1499110328}
+  Map: {fileID: 1448016500}
+  mapScalar: {x: 0, y: 0}
 --- !u!61 &2024716743
 BoxCollider2D:
   m_ObjectHideFlags: 0
