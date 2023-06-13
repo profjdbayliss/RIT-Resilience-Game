@@ -334,4 +334,15 @@ public class PlaceIcons : MonoBehaviour
         tempFacility.name = name;
         baseFacility.SetActive(false);
     }
+
+
+    // Will want to move to a game manager later
+    public void EnableAllOutline(bool toggled)
+    {
+        FacilityOutline[] allOutlines = GameObject.FindObjectsOfType<FacilityOutline>();
+        for (int i = 0; i < allOutlines.Length; i++)
+        {
+            allOutlines[i].outline.SetActive(toggled);
+        }
+    }
 }
