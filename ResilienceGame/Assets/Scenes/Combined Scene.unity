@@ -1605,6 +1605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 276892435}
   - component: {fileID: 276892434}
+  - component: {fileID: 276892436}
   m_Layer: 0
   m_Name: FakeMapTest
   m_TagString: Untagged
@@ -1637,6 +1638,7 @@ MonoBehaviour:
   OGScalar: {x: 0, y: 0}
   OGDeltaScalar: {x: 0, y: 0}
   feedbackPos: {x: 0, y: 0, z: 0}
+  gameManager: {fileID: 276892436}
   HospitalLocations:
   - x: -387.9
     y: 311.7
@@ -1774,6 +1776,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &276892436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 276892433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8f6d54f3722f524290f07c6e2695f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  funds: 0
+  Facilities: []
 --- !u!1 &291618878
 GameObject:
   m_ObjectHideFlags: 0
@@ -3524,7 +3540,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 659858985}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: IncreaseFunding
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &659858985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4767,7 +4795,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 784778868}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ImprovePhysSec
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &784778868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5288,7 +5328,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 833060228}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostHealth
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &833060228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5410,7 +5462,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 840188632}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostOT
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &840188632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8047,7 +8111,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1267119393}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: IncreaseOneFeedback
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1267119393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8691,7 +8767,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1313978431}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostIT
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1313978431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9567,8 +9655,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892434}
-        m_TargetAssemblyTypeName: PlaceIcons, Assembly-CSharp
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: EnableAllOutline
         m_Mode: 0
         m_Arguments:
@@ -11000,7 +11088,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1485963041}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostWater
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1485963041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11200,7 +11300,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1507435101}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostFuel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1507435101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11322,7 +11434,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1534526565}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostElectricity
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1534526565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12019,7 +12143,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1698276166}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: BoostCommunications
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1698276166
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12470,7 +12606,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1759285409}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: IncreaseAllFeedback
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1759285409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13780,7 +13928,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1931928126}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 276892436}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: HireWorkers
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1931928126
 MonoBehaviour:
   m_ObjectHideFlags: 0

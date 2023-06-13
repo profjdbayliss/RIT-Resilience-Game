@@ -20,6 +20,7 @@ public class PlaceIcons : MonoBehaviour
 
 
     public Vector3 feedbackPos;
+    public GameManager gameManager;
 
     // List of locations to place the facilities at
     public List<float2> HospitalLocations;
@@ -277,11 +278,13 @@ public class PlaceIcons : MonoBehaviour
 
                 // Set the instantiated facilities position to the temporary Vec3 we used to put it in the correct location and add it to the proper list
                 tempFacility.transform.position = tempVec;
+                gameManager.Facilities.Add(tempFacility);
                 output.Add(tempFacility);
             }
             else
             {
                 tempFacility.transform.position = new Vector3(locations[i].x, locations[i].y, 0);
+                gameManager.Facilities.Add(tempFacility);
                 output.Add(tempFacility);
             }
 
@@ -333,16 +336,10 @@ public class PlaceIcons : MonoBehaviour
         tempFacility.transform.SetParent(Map.transform, false);
         tempFacility.name = name;
         baseFacility.SetActive(false);
+        gameManager.Facilities.Add(tempFacility);
+
     }
 
 
-    // Will want to move to a game manager later
-    public void EnableAllOutline(bool toggled)
-    {
-        FacilityOutline[] allOutlines = GameObject.FindObjectsOfType<FacilityOutline>();
-        for (int i = 0; i < allOutlines.Length; i++)
-        {
-            allOutlines[i].outline.SetActive(toggled);
-        }
-    }
+
 }
