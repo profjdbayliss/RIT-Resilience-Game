@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Unity.Mathematics;
 using TMPro;
 
 public class Hover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
@@ -9,6 +10,10 @@ public class Hover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     // Establish necessary variables
     public string locationName;
     public TextMeshProUGUI locationTextTMP;
+    public GameObject Map;
+    public Vector2 mapScalar;
+    public Vector2 OGScalar = new Vector2(1920, 1080);
+    public Vector2 OGDeltaScalar;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +21,39 @@ public class Hover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         locationTextTMP = GetComponent<TextMeshProUGUI>();
         locationTextTMP.text = inputFix(locationName);
         locationTextTMP.color = new Color(0, 0, 0, 0);
+        Map = GameObject.Find("Map");
+
+        // Scale the Feedback menu
+        mapScalar.x = Map.GetComponent<RectTransform>().rect.width;
+        mapScalar.y = Map.GetComponent<RectTransform>().rect.height;
+        OGScalar = new Vector2(1920.0f * 0.66f, 1080);
+        OGDeltaScalar = (mapScalar - OGScalar);
+
+        Vector3 tempVec = new Vector3(0, 0, 0);
+        float scaleCorrectionX = math.abs(this.transform.localPosition.x) / (mapScalar.x / 2.0f);
+        float scaleCorrectionY = math.abs(this.transform.localPosition.y) / (mapScalar.y / 2.0f);
+
+
+        // If the y is negative, we want to subtract tom make sure we go in the right direction.
+        if (this.transform.localPosition.x < 0.0f)
+        {
+            tempVec.x = this.transform.localPosition.x - ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
+        }
+        else
+        {
+            tempVec.x = this.transform.localPosition.x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
+        }
+
+        // If the y is negative, we want to subtract tom make sure we go in the right direction.
+        if (this.transform.localPosition.y < 0.0f)
+        {
+            tempVec.y = this.transform.localPosition.y - ((OGDeltaScalar.y) * scaleCorrectionY);
+        }
+        else
+        {
+            tempVec.y = this.transform.localPosition.y + ((OGDeltaScalar.y) * scaleCorrectionY);
+        }
+        this.transform.localPosition = tempVec;
     }
 
     /// <summary>

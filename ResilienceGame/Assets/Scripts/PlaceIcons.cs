@@ -265,8 +265,8 @@ public class PlaceIcons : MonoBehaviour
                     tempVec.x = locations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
                 }
 
-                // If the y is negative, we want to subtract tom make sure we go in the right direction.
-                if (FireDeptLocations[i].y < 0.0f)
+                // If the y is negative, we want to subtract to make sure we go in the right direction.
+                if (locations[i].y < 0.0f)
                 {
                     tempVec.y = locations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
                 }
