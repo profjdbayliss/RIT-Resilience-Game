@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public bool playerActive;
     public GameObject playerMenu;
     public GameObject maliciousActorMenu;
+    public float turnCount;
 
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
         player = GetComponent<Player>();
         maliciousActor = GetComponent<MaliciousActor>();
         playerActive = true;
+        turnCount = 0;
     }
 
     // Update is called once per frame
@@ -52,6 +54,7 @@ public class GameManager : MonoBehaviour
         DisableAllOutline();
         player.seletedFacility = null;
         maliciousActor.targetFacility = null;
+        turnCount += 0.5f;
     }
     public void DisableAllOutline()
     {

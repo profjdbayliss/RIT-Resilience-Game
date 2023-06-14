@@ -22,71 +22,90 @@ public class MaliciousActor : MonoBehaviour
 
     public void CompromiseWorkers()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseIT()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseOT()
     {
+        // Lower associated value
 
     }
 
     public void CompromisePhysSec()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseFunding()
     {
+        // Lower associated value
 
     }
 
     public void ComprpomiseElectricity()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseWater()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseFuel()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseCommunications()
     {
+        // Lower associated value
 
     }
 
     public void CompromiseHealth()
     {
+        // Lower associated value
 
     }
 
     public void DataBreach()
     {
+        // Lower associated value
 
     }
 
     public void GasLineEvent()
     {
+        // Lower associated value
 
     }
 
     public void ElectricityFlowEvent()
     {
+        // Lower associated value
 
     }
 
     public void RansomwareEvent()
     {
+        // Could be a percent chance of happening based off of the preparedness of a facility??
 
+        // Save the current turn count to the target facility
+
+        // if they do not solve it by X turns (I am imagening 2, maybe 3?), deal X amount of damage
+
+        // can be solved by .... (paying, cracking the ransomware, etc.)
     }
 }
