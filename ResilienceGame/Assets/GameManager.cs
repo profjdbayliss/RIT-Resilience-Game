@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public GameObject maliciousActorMenu;
     public float turnCount;
     public TextMeshProUGUI fundText;
+    public GameObject yarnSpinner;
 
     // Start is called before the first frame update
     void Start()
@@ -24,10 +25,12 @@ public class GameManager : MonoBehaviour
         if (playerActive)
         {
             fundText.text = "Funds: " + player.funds;
+            yarnSpinner.SetActive(true);
         }
         else
         {
             fundText.text = "Funds: " + maliciousActor.funds;
+            yarnSpinner.SetActive(false);
         }
     }
 
@@ -39,12 +42,14 @@ public class GameManager : MonoBehaviour
             // Player
             playerMenu.SetActive(true);
             maliciousActorMenu.SetActive(false);
+            yarnSpinner.SetActive(true);
         }
         else
         {
             // Malicious actor
             playerMenu.SetActive(false);
             maliciousActorMenu.SetActive(true);
+            yarnSpinner.SetActive(false);
         }
     }
 
