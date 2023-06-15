@@ -5,7 +5,7 @@ using UnityEngine;
 public class MaliciousActor : MonoBehaviour
 {
     // Establish necessary fields
-    public float funds;
+    public float funds = 750.0f;
     public GameObject targetFacility;
     public GameObject ransomwaredFacility;
     public GameManager manager;
@@ -14,7 +14,7 @@ public class MaliciousActor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        funds = 1000.0f;
+        funds = 750.0f;
         manager = gameObject.GetComponent<GameManager>();
     }
 
@@ -196,6 +196,7 @@ public class MaliciousActor : MonoBehaviour
                 if ((ransomwaredFacility != null) && (manager.GetComponent<GameManager>().turnCount >= ransomwareTurn))
                 {
                     ransomwaredFacility.GetComponent<FacilityV3>().output_flow /= 2.0f;
+                    ransomwareTurn = float.MaxValue;
                 }
             }
 

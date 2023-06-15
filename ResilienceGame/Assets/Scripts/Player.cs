@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     // Establish necessary fields
-    public float funds;
+    public float funds = 1000.0f;
     public List<GameObject> Facilities;
     public GameObject seletedFacility;
 

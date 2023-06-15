@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GameManager : MonoBehaviour
     public GameObject playerMenu;
     public GameObject maliciousActorMenu;
     public float turnCount;
+    public TextMeshProUGUI fundText;
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +21,14 @@ public class GameManager : MonoBehaviour
         maliciousActor = GetComponent<MaliciousActor>();
         playerActive = true;
         turnCount = 0;
+        if (playerActive)
+        {
+            fundText.text = "Funds: " + player.funds;
+        }
+        else
+        {
+            fundText.text = "Funds: " + maliciousActor.funds;
+        }
     }
 
     // Update is called once per frame
@@ -55,6 +65,14 @@ public class GameManager : MonoBehaviour
         player.seletedFacility = null;
         maliciousActor.targetFacility = null;
         turnCount += 0.5f;
+        if (playerActive)
+        {
+            fundText.text = "Funds: " + player.funds;
+        }
+        else
+        {
+            fundText.text = "Funds: " + maliciousActor.funds;
+        }
     }
     public void DisableAllOutline()
     {
