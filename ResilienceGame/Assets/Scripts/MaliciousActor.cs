@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class MaliciousActor : MonoBehaviour
 {
     // Establish necessary fields
@@ -10,6 +11,7 @@ public class MaliciousActor : MonoBehaviour
     public GameObject ransomwaredFacility;
     public GameManager manager;
     public float ransomwareTurn;
+    public float randomEventChance;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +31,8 @@ public class MaliciousActor : MonoBehaviour
         // Lower associated value
         if((targetFacility != null) && (funds - 20.0f > 0.0f))
         {
-            targetFacility.GetComponent<FacilityV3>().workers -= 5.0f;
+
+            targetFacility.GetComponent<FacilityV3>().workers -= 1.0f;
             funds -= 20.0f;
         }
     }
@@ -39,7 +42,7 @@ public class MaliciousActor : MonoBehaviour
         // Lower associated value
         if ((targetFacility != null) && (funds - 20.0f > 0.0f))
         {
-            targetFacility.GetComponent<FacilityV3>().it_level -= 5.0f;
+            targetFacility.GetComponent<FacilityV3>().it_level -= 1.0f;
             funds -= 20.0f;
 
         }
@@ -50,7 +53,7 @@ public class MaliciousActor : MonoBehaviour
         // Lower associated value
         if ((targetFacility != null) && (funds - 20.0f > 0.0f))
         {
-            targetFacility.GetComponent<FacilityV3>().ot_level -= 5.0f;
+            targetFacility.GetComponent<FacilityV3>().ot_level -= 1.0f;
             funds -= 20.0f;
 
         }
@@ -61,7 +64,7 @@ public class MaliciousActor : MonoBehaviour
         // Lower associated value
         if ((targetFacility != null) && (funds - 20.0f > 0.0f))
         {
-            targetFacility.GetComponent<FacilityV3>().phys_security -= 5.0f;
+            targetFacility.GetComponent<FacilityV3>().phys_security -= 1.0f;
             funds -= 20.0f;
 
         }
@@ -83,7 +86,7 @@ public class MaliciousActor : MonoBehaviour
         // Lower associated value
         if ((targetFacility != null) && (funds - 20.0f > 0.0f))
         {
-            targetFacility.GetComponent<FacilityV3>().electricity -= 5.0f;
+            targetFacility.GetComponent<FacilityV3>().electricity -= 10.0f;
             funds -= 20.0f;
 
         }
