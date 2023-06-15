@@ -13,7 +13,9 @@ public class GameManager : MonoBehaviour
     public GameObject maliciousActorMenu;
     public float turnCount;
     public TextMeshProUGUI fundText;
+    public TextMeshProUGUI activePlayerText;
     public GameObject yarnSpinner;
+    public Color activePlayerColor;
 
     // Start is called before the first frame update
     void Start()
@@ -25,11 +27,17 @@ public class GameManager : MonoBehaviour
         if (playerActive)
         {
             fundText.text = "Funds: " + player.funds;
+            activePlayerText.text = "Resilient Player";
+            activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
         }
         else
         {
             fundText.text = "Funds: " + maliciousActor.funds;
+            activePlayerText.text = "Malicious Player";
+            activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(false);
         }
     }
@@ -73,10 +81,19 @@ public class GameManager : MonoBehaviour
         if (playerActive)
         {
             fundText.text = "Funds: " + player.funds;
+            activePlayerText.text = "Resilient Player";
+            activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
+            yarnSpinner.SetActive(true);
+
         }
         else
         {
             fundText.text = "Funds: " + maliciousActor.funds;
+            activePlayerText.text = "Malicious Player";
+            activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
+            yarnSpinner.SetActive(false);
         }
     }
     public void DisableAllOutline()
