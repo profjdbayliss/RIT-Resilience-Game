@@ -2097,6 +2097,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   funds: 0
   targetFacility: {fileID: 0}
+  ransomwaredFacility: {fileID: 0}
+  manager: {fileID: 0}
+  ransomwareTurn: 0
 --- !u!1 &288705776
 GameObject:
   m_ObjectHideFlags: 0
@@ -3214,7 +3217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 877, y: 521}
+  m_AnchoredPosition: {x: 877, y: 525}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &434148728
@@ -8235,14 +8238,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.42099905, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: da545229eea36164d8b8cba2f75a1143, type: 3}
+  m_Texture: {fileID: 2800000, guid: 0ac55f9f886d827408c102bdf33c5ff7, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -17695,7 +17698,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: da545229eea36164d8b8cba2f75a1143, type: 3}
+  m_Texture: {fileID: 2800000, guid: 0ac55f9f886d827408c102bdf33c5ff7, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0

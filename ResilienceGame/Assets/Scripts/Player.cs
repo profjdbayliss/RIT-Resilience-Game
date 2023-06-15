@@ -115,7 +115,7 @@ public class Player : MonoBehaviour
         if (funds - 150.0f > 0.0f)
         {
             // Do something
-            seletedFacility.GetComponent<FacilityV3>().funding += 15.0f;
+            seletedFacility.GetComponent<FacilityV3>().funding += 2.0f;
             funds -= 150.0f;
         }
         else
