@@ -200,6 +200,7 @@ public class MaliciousActor : MonoBehaviour
                 {
                     ransomwaredFacility.GetComponent<FacilityV3>().output_flow /= 2.0f;
                     ransomwareTurn = float.MaxValue;
+                    ransomwaredFacility = null;
                 }
             }
 

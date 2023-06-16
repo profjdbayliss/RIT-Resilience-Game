@@ -2068,6 +2068,7 @@ MonoBehaviour:
   activePlayerText: {fileID: 131722516}
   yarnSpinner: {fileID: 2089606453}
   activePlayerColor: {r: 0, g: 0, b: 0, a: 0}
+  continueButton: {fileID: 906454750}
 --- !u!114 &276892437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8238,6 +8239,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 888940629}
   m_CullTransparentMesh: 1
+--- !u!1 &906454750 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7778558434935992802, guid: 7f29e5f7ffdea4a6793cefb278b61f0c, type: 3}
+  m_PrefabInstance: {fileID: 183828614}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &906750756
 GameObject:
   m_ObjectHideFlags: 0

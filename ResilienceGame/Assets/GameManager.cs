@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI activePlayerText;
     public GameObject yarnSpinner;
     public Color activePlayerColor;
+    public GameObject continueButton;
 
     // Start is called before the first frame update
     void Start()
@@ -73,28 +74,37 @@ public class GameManager : MonoBehaviour
 
     public void SwapPlayer()
     {
-        playerActive = !playerActive;
-        DisableAllOutline();
-        player.seletedFacility = null;
-        maliciousActor.targetFacility = null;
-        turnCount += 0.5f;
-        if (playerActive)
+        if((continueButton.activeSelf == false) && (yarnSpinner.activeSelf == true))
         {
-            fundText.text = "Funds: " + player.funds;
-            activePlayerText.text = "Resilient Player";
-            activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
-            activePlayerText.color = activePlayerColor;
-            yarnSpinner.SetActive(true);
-
+            return;
         }
         else
         {
-            fundText.text = "Funds: " + maliciousActor.funds;
-            activePlayerText.text = "Malicious Player";
-            activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-            activePlayerText.color = activePlayerColor;
-            yarnSpinner.SetActive(false);
+            playerActive = !playerActive;
+
+            DisableAllOutline();
+            player.seletedFacility = null;
+            maliciousActor.targetFacility = null;
+            turnCount += 0.5f;
+            if (playerActive)
+            {
+                fundText.text = "Funds: " + player.funds;
+                activePlayerText.text = "Resilient Player";
+                activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
+                activePlayerText.color = activePlayerColor;
+                yarnSpinner.SetActive(true);
+
+            }
+            else
+            {
+                fundText.text = "Funds: " + maliciousActor.funds;
+                activePlayerText.text = "Malicious Player";
+                activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+                activePlayerText.color = activePlayerColor;
+                yarnSpinner.SetActive(false);
+            }
         }
+        
     }
     public void DisableAllOutline()
     {
