@@ -66,6 +66,8 @@ public class PlaceIcons : MonoBehaviour
     private GameObject Fuel;
 
 
+
+
     private GameObject TestHex;
    
     // Start is called before the first frame update
@@ -104,84 +106,54 @@ public class PlaceIcons : MonoBehaviour
 
 
         // Spawn the one off facilities
-        spawnFacility(CityHall, CityHallPos, "City Hall (Clone)");
-        spawnFacility(Police, PoliceLoc, "Police (Clone)");
+        //if (cityHallToggle.isOn)
+        //{
+        //    spawnFacility(CityHall, CityHallPos, "City Hall (Clone)");
+        //}
+        //else
+        //{
+        //    CityHall.SetActive(false);
+        //}
 
-        SpawnFacilities(Hospital, HospitalLocations, Hospitals, "Hospital (Clone)");
-        /*
-         // take hospital image and place it on canvas at locations specified;
-        int locationCount = HospitalLocations.Count;
-        for (int i = 0; i < locationCount; i++)
-        {
-            // make a copy
-            GameObject hospital = Instantiate(Hospital);
-            //GameObject hospital = Instantiate(TestHex);
+        //if (policeToggle.isOn)
+        //{
+        //    spawnFacility(Police, PoliceLoc, "Police (Clone)");
+        //}
+        //else
+        //{
+        //    Police.SetActive(false);
+        //}
 
-            // place
-            //hospital.transform.position = new Vector3(HospitalLocations[i].x*SizeOfBox.x+Offset.x, -1*HospitalLocations[i].y*SizeOfBox.y+Offset.y-5.0f, 0);
-            if (mapScalar != new Vector2(1920.0f * 0.66f, 1080))
-            {
-                Vector3 tempVec = new Vector3(0, 0, 0);
-                if (HospitalLocations[i].x < 0.0f)
-                {
-                    float scaleCorrection = math.abs(HospitalLocations[i].x) / (mapScalar.x / 2.0f);
-                    tempVec.x = HospitalLocations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
-                }
-                else
-                {
-                    float scaleCorrection = math.abs(HospitalLocations[i].x) / (mapScalar.x / 2.0f);
-                    tempVec.x = HospitalLocations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrection);
-                }
-                if (HospitalLocations[i].y < 0.0f)
-                {
-                    float scaleCorrection = math.abs(HospitalLocations[i].y) / (mapScalar.y / 2.0f);
-                    tempVec.y = HospitalLocations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
+        //// Spawn the Hospitals
+        //if (hospitalToggle.isOn)
+        //{
+        //    SpawnFacilities(Hospital, HospitalLocations, Hospitals, "Hospital (Clone)");
+        //}
+        //else
+        //{
 
-                }
-                else
-                {
-                    float scaleCorrection = math.abs(HospitalLocations[i].y) / (mapScalar.y / 2.0f);
+        //}
 
-                    tempVec.y = HospitalLocations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrection);
+        //// Spawn the fire departments
+        //SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
 
-                }
-                hospital.transform.position = tempVec;
+        //// Spawn the electricity facilities
+        //SpawnFacilities(Electricity, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
 
-            }
-            else
-            {
-                hospital.transform.position = new Vector3(HospitalLocations[i].x, HospitalLocations[i].y, 0);
-            }
-            // Apply the health material <-- Uncomment if using hexes
-            //hospital.GetComponent<MeshRenderer>().material = HexMaterials[6];
+        //// Convert to water
+        //SpawnFacilities(Water, WaterLocations, WaterFacilities, "Water (Clone)");
 
-            hospital.transform.SetParent (Map.transform,false);
-            hospital.name = "Hospital (Clone)";
+        //// Commodities
+        //SpawnFacilities(Commodities, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
 
-        }
-        Hospital.SetActive(false);
-         */
+        //// Communications
+        //SpawnFacilities(Communications, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
 
-        // Spawn the fire departments
-        SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
+        //// Electricity Distributor
+        //SpawnFacilities(ElectricityDistributor, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distributor (Clone)");
 
-        // Spawn the electricity facilities
-        SpawnFacilities(Electricity, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
-
-        // Convert to water
-        SpawnFacilities(Water, WaterLocations, WaterFacilities, "Water (Clone)");
-
-        // Commodities
-        SpawnFacilities(Commodities, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
-
-        // Communications
-        SpawnFacilities(Communications, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
-
-        // Electricity Distributor
-        SpawnFacilities(ElectricityDistributor, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distributor (Clone)");
-
-        // Fuel
-        SpawnFacilities(Fuel, FuelLocations, FuelFacilities, "Fuel (Clone)");
+        //// Fuel
+        //SpawnFacilities(Fuel, FuelLocations, FuelFacilities, "Fuel (Clone)");
     }
 
     // Update is called once per frame
@@ -343,5 +315,98 @@ public class PlaceIcons : MonoBehaviour
     }
 
 
+    public void spawnAllFacilities(bool police, bool hospital, bool firedpt, bool elecGen, bool water, bool comms, bool cityHall, bool commodities, bool elecDist, bool fuel)
+    {
 
+        // Spawn the Hospitals
+        if (hospital)
+        {
+            SpawnFacilities(Hospital, HospitalLocations, Hospitals, "Hospital (Clone)");
+        }
+        else
+        {
+            Hospital.SetActive(false);
+        }
+
+        if (police)
+        {
+            spawnFacility(Police, PoliceLoc, "Police (Clone)");
+        }
+        else
+        {
+            Police.SetActive(false);
+        }
+
+        if (firedpt)
+        {
+            SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
+        }
+        else
+        {
+            FireTruck.SetActive(false);
+        }
+
+        if (elecGen)
+        {
+            SpawnFacilities(Electricity, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
+        }
+        else
+        {
+            Electricity.SetActive(false);
+        }
+
+        if (water)
+        {
+            SpawnFacilities(Water, WaterLocations, WaterFacilities, "Water (Clone)");
+        }
+        else
+        {
+            Water.SetActive(false);
+        }
+
+        if (comms)
+        {
+            SpawnFacilities(Communications, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
+        }
+        else
+        {
+            Communications.SetActive(false);
+        }
+
+        if (cityHall)
+        {
+            spawnFacility(CityHall, CityHallPos, "City Hall (Clone)");
+        }
+        else
+        {
+            CityHall.SetActive(false);
+        }
+
+        if (commodities)
+        {
+            SpawnFacilities(Commodities, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
+        }
+        else
+        {
+            Commodities.SetActive(false);
+        }
+
+        if (elecDist)
+        {
+            SpawnFacilities(ElectricityDistributor, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distribution (Clone)");
+        }
+        else
+        {
+            ElectricityDistributor.SetActive(false);
+        }
+
+        if (fuel)
+        {
+            SpawnFacilities(Fuel, FuelLocations, FuelFacilities, "Fuel (Clone)");
+        }
+        else
+        {
+            Fuel.SetActive(false);
+        }
+    }
 }

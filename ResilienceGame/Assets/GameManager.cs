@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,7 +12,12 @@ public class GameManager : MonoBehaviour
     public bool playerActive;
     public GameObject playerMenu;
     public GameObject maliciousActorMenu;
-    
+
+    public bool gameStarted = false;
+
+    public GameObject gameCanvas;
+    public GameObject startScreen;
+
     public float turnCount;
     
     public TextMeshProUGUI fundText;
@@ -26,54 +32,53 @@ public class GameManager : MonoBehaviour
     public GameObject maliciousPlayerEndMenu;
     public GameObject resilientPlayerEndMenu;
 
+    public Toggle policeToggle;
+    public Toggle hospitalToggle;
+    public Toggle fireDeptToggle;
+    public Toggle elecGenToggle;
+    public Toggle waterToggle;
+    public Toggle commoditiesToggle;
+    public Toggle commToggle;
+    public Toggle elecDistToggle;
+    public Toggle cityHallToggle;
+    public Toggle fuelToggle;
+
+
 
 
     // Start is called before the first frame update
     void Start()
     {
-        player = GetComponent<Player>();
-        maliciousActor = GetComponent<MaliciousActor>();
-        playerActive = true;
-        turnCount = 0;
-        if (playerActive)
-        {
-            fundText.text = "Funds: " + player.funds;
-            activePlayerText.text = "Resilient Player";
-            activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
-            activePlayerText.color = activePlayerColor;
-            yarnSpinner.SetActive(true);
-        }
-        else
-        {
-            fundText.text = "Funds: " + maliciousActor.funds;
-            activePlayerText.text = "Malicious Player";
-            activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-            activePlayerText.color = activePlayerColor;
-            yarnSpinner.SetActive(false);
-        }
+        startScreen.SetActive(true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (playerActive)
+        if (gameStarted)
         {
-            // Player
-            playerMenu.SetActive(true);
-            maliciousActorMenu.SetActive(false);
-            yarnSpinner.SetActive(true);
+            if (playerActive)
+            {
+                // Player
+                playerMenu.SetActive(true);
+                maliciousActorMenu.SetActive(false);
+                yarnSpinner.SetActive(true);
+                fundText.text = "Funds: " + player.funds;
+                // If enough of the facilites are down, trigger response from the govt
 
-            // If enough of the facilites are down, trigger response from the govt
 
+            }
+            else
+            {
+                // Malicious actor
+                playerMenu.SetActive(false);
+                maliciousActorMenu.SetActive(true);
+                yarnSpinner.SetActive(false);
+                fundText.text = "Funds: " + maliciousActor.funds;
 
+            }
         }
-        else
-        {
-            // Malicious actor
-            playerMenu.SetActive(false);
-            maliciousActorMenu.SetActive(true);
-            yarnSpinner.SetActive(false);
-        }
+
     }
 
     // Will want to move to a game manager later
@@ -119,6 +124,7 @@ public class GameManager : MonoBehaviour
             // IT
 
             // Transport
+
         }
     }
 
@@ -185,5 +191,35 @@ public class GameManager : MonoBehaviour
             }
         }
 
+    }
+
+    public void StartGame()
+    {
+        gameCanvas.SetActive(true);
+        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
+        startScreen.SetActive(false);
+        gameStarted = true;
+        player = GetComponent<Player>();
+        maliciousActor = GetComponent<MaliciousActor>();
+        playerActive = true;
+        turnCount = 0;
+        player.seletedFacility = null;
+        maliciousActor.targetFacility = null;
+        if (playerActive)
+        {
+            fundText.text = "Funds: " + player.funds;
+            activePlayerText.text = "Resilient Player";
+            activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
+            yarnSpinner.SetActive(true);
+        }
+        else
+        {
+            fundText.text = "Funds: " + maliciousActor.funds;
+            activePlayerText.text = "Malicious Player";
+            activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
+            yarnSpinner.SetActive(false);
+        }
     }
 }

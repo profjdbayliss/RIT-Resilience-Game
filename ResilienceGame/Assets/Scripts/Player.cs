@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class Player : MonoBehaviour
     public float funds = 1000.0f;
     public List<GameObject> Facilities;
     public GameObject seletedFacility;
+    public TextMeshProUGUI fundsText;
 
     // Start is called before the first frame update
     void Start()
