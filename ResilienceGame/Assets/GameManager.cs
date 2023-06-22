@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
     // Establish necessary fields
     public Player player;
@@ -43,8 +44,11 @@ public class GameManager : MonoBehaviour
     public Toggle cityHallToggle;
     public Toggle fuelToggle;
 
+    public Camera cam;
 
+    public GameObject map;
 
+    public GameObject tiles;
 
     // Start is called before the first frame update
     void Start()
@@ -195,16 +199,24 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+
         gameCanvas.SetActive(true);
         this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
         startScreen.SetActive(false);
+
+        Debug.Log("STARTED");
+
         gameStarted = true;
         player = GetComponent<Player>();
         maliciousActor = GetComponent<MaliciousActor>();
+
         playerActive = true;
+
         turnCount = 0;
+
         player.seletedFacility = null;
         maliciousActor.targetFacility = null;
+
         if (playerActive)
         {
             fundText.text = "Funds: " + player.funds;
@@ -222,4 +234,63 @@ public class GameManager : MonoBehaviour
             yarnSpinner.SetActive(false);
         }
     }
+
+    public void OnPointerDown(PointerEventData pointer)
+    {
+        Debug.Log("Down");
+    }
+
+    public void OnPointerUp(PointerEventData pointer)
+    {
+        Debug.Log("UP");
+    }
+
+
+
+    public void OnPointerClick(PointerEventData pointer)
+    {
+        Debug.Log("Click");
+    }
+
+
+    public void OnScroll(PointerEventData pointer)
+    {
+        Debug.Log("Scrolled");
+        if(pointer.scrollDelta.y > 0.0f)
+        {
+            gameCanvas.GetComponent<Canvas>().planeDistance -= 0.01f;
+        }
+        else
+        {
+            gameCanvas.GetComponent<Canvas>().planeDistance += 0.01f;
+            
+        }
+    }
+
+
+
+    public void OnDrag(PointerEventData pointer)
+    {
+        Debug.Log("DRAG");
+        if (tiles.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
+        {
+            // Create a vector2 to hold the previous position of the element and also set our target of what we want to actually drag.
+            Vector2 tempVec2 = default(Vector2);
+            RectTransform target = tiles.gameObject.GetComponent<RectTransform>();
+            Vector2 tempPos = target.transform.localPosition;
+
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(target, pointer.position - pointer.delta, pointer.pressEventCamera, out tempVec2) == true) // Check the older position of the element and see if it was previously
+            {
+                Vector2 tempNewVec = default(Vector2); // Create a new Vec2 to track the current position of the object
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(target, pointer.position, pointer.pressEventCamera, out tempNewVec) == true)
+                {
+                    tempPos.x += tempNewVec.x - tempVec2.x;
+                    tempPos.y = tiles.transform.localPosition.y;
+                    tiles.transform.localPosition = tempPos;
+                }
+            }
+        }
+    }
+
+
 }
