@@ -25,7 +25,20 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
     void Update()
     {
         // Depending on how healthy the output flow of the facility is, change the color.
-        if ((player.seletedFacility == this.gameObject) && (gameManager.playerActive))
+        if (gameManager.criticalEnabled && outline.activeSelf)
+        {
+            outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+            if(player.seletedFacility == this.gameObject)
+            {
+                outline.GetComponent<RawImage>().color = Color.cyan;
+            }
+            if (facility.isDown)
+            {
+                outline.GetComponent<RawImage>().color = Color.black;
+
+            }
+        }
+        else if ((player.seletedFacility == this.gameObject) && (gameManager.playerActive))
         {
             outline.GetComponent<RawImage>().color = Color.cyan;
 
@@ -33,6 +46,11 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         else if((maliciousActor.targetFacility == this.gameObject) && (gameManager.playerActive == false))
         {
             outline.GetComponent<RawImage>().color = Color.magenta;
+        }
+        else if (facility.isDown)
+        {
+            outline.GetComponent<RawImage>().color = Color.black;
+
         }
         else if (facility.output_flow > 75.0f)
         {

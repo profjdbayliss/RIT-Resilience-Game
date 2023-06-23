@@ -50,6 +50,10 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 
     public GameObject tiles;
 
+    public FacilityEvents facilityEvents;
+
+    public bool criticalEnabled;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -97,18 +101,22 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 
     public void EnableCriticalOutline(bool toggled)
     {
+        criticalEnabled = toggled;
         FacilityOutline[] criticalOutlines = GameObject.FindObjectsOfType<FacilityOutline>();
         for(int i = 0; i < criticalOutlines.Length; i++)
         {
             // Comms
             if(criticalOutlines[i].gameObject.GetComponent<Communications>() != null)
             {
+                criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
                 criticalOutlines[i].outline.SetActive(toggled);
             }
             
             // Water
             else if(criticalOutlines[i].gameObject.GetComponent<Water>() != null)
             {
+                criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
                 criticalOutlines[i].outline.SetActive(toggled);
 
             }
@@ -116,11 +124,15 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             // Power
             else if(criticalOutlines[i].gameObject.GetComponent<ElectricityDistribution>() != null)
             {
+                criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
                 criticalOutlines[i].outline.SetActive(toggled);
 
             }
             else if(criticalOutlines[i].gameObject.GetComponent<ElectricityGeneration>() != null)
             {
+                criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
                 criticalOutlines[i].outline.SetActive(toggled);
 
             }
@@ -155,7 +167,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
                 activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(true);
-
+                facilityEvents.SpawnEvent();
             }
             else
             {
