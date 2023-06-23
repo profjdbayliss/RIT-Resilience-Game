@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 {
@@ -17,17 +18,27 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 
     public float minScale;
 
+    public InputAction resetScale;
+
+    public PlayerInput playerInput;
+
     // Start is called before the first frame update
     void Start()
     {
         maxScale = 3.0f;
         minScale = 0.5f;
+        //resetScale.AddBinding("<Keyboard>/a");
+        resetScale = playerInput.actions["Reset Scale"];
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (resetScale.WasPressedThisFrame())
+        {
+            ResetScale();
+        }
+
     }
     public void OnScroll(PointerEventData pointer)
     {
@@ -95,5 +106,11 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
                 }
             }
         }
+    }
+
+     public void ResetScale()
+    {
+        Debug.Log("RS");
+        map.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
     }
 }
