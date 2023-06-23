@@ -27,7 +27,29 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         // Depending on how healthy the output flow of the facility is, change the color.
         if (gameManager.criticalEnabled && outline.activeSelf)
         {
-            outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+            switch (facility.type)
+            {
+                case FacilityV3.Type.ElectricityGeneration:
+                    outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
+                    break;
+                case FacilityV3.Type.ElectricityDistribution:
+                    outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
+                    break;
+                case FacilityV3.Type.Water:
+                    outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
+                    break;
+                case FacilityV3.Type.Transportation:
+                    outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
+                    break;
+                default:
+                    break;
+
+            }
+            //outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
             if(player.seletedFacility == this.gameObject)
             {
                 outline.GetComponent<RawImage>().color = Color.cyan;

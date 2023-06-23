@@ -154,7 +154,18 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             // IT
 
             // Transport
+            else if (criticalOutlines[i].gameObject.GetComponent<Transportation>() != null)
+            {
+                criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
 
+                criticalOutlines[i].outline.SetActive(toggled);
+
+            }
+            else
+            {
+                criticalOutlines[i].outline.SetActive(false);
+
+            }
         }
     }
 
