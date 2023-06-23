@@ -32,6 +32,7 @@ public class PlaceIcons : MonoBehaviour
     public List<float2> CommunicationsLocations;
     public List<float2> FuelLocations;
     public List<float2> ElectricityDistributionLocations;
+    public List<float2> TransportationLocations;
 
 
     public List<Material> HexMaterials;
@@ -45,13 +46,14 @@ public class PlaceIcons : MonoBehaviour
     public List<GameObject> CommunicationsFacilities;
     public List<GameObject> FuelFacilities;
     public List<GameObject> ElectricityDistributionFacilities;
+    public List<GameObject> TransportationFacilities;
 
 
     private GameObject feedbackPanel;
 
 
     private static GameObject canvas;
-    private GameObject Map;
+    public  GameObject Map;
 
     // Private gameobjects of the base version of the facilities to instantiate
     private GameObject Police;
@@ -64,6 +66,7 @@ public class PlaceIcons : MonoBehaviour
     private GameObject CityHall;
     private GameObject ElectricityDistributor;
     private GameObject Fuel;
+    private GameObject Transportation;
 
 
 
@@ -84,10 +87,11 @@ public class PlaceIcons : MonoBehaviour
         Commodities = GameObject.Find("Commodities");
         Communications = GameObject.Find("Communications");
         CityHall = GameObject.Find("City Hall");
-        Map = GameObject.Find("Map");
+        //Map = GameObject.Find("Map");
         TestHex = GameObject.Find("NewHexPrefab");
         ElectricityDistributor = GameObject.Find("Electricity Distributor");
         Fuel = GameObject.Find("Fuel");
+        Transportation = GameObject.Find("Transportation");
         player = GetComponent<Player>();
 
         // Scale the map properly
@@ -408,5 +412,74 @@ public class PlaceIcons : MonoBehaviour
         {
             Fuel.SetActive(false);
         }
+
+        SpawnVariableFacilities(Transportation, gameManager.TransportationInputCount, TransportationLocations, TransportationFacilities, "Transportation (Clone)");
+    }
+
+    void SpawnVariableFacilities(GameObject baseFacility, int amount, List<float2> locations, List<GameObject> output, string name)
+    {
+        int locationCount = locations.Count;
+        for (int i = 0; i < amount; i++)
+        {
+            // make a copy
+            GameObject tempFacility = Instantiate(baseFacility);
+            if (i == locations.Count)
+            {
+                float newLocX = UnityEngine.Random.Range(-mapScalar.x / 2.0f, mapScalar.x / 2.0f);
+                float newLocY = UnityEngine.Random.Range(-mapScalar.y / 2.0f, mapScalar.y / 2.0f);
+                float2 newLoc = new float2(newLocX, newLocY);
+                locations.Add(newLoc);
+            }
+            // Check to see if we are at the original scale, if we aren't then we will utilize our scalars, if not, we can just use the 
+            // passed in locations
+            if (mapScalar != new Vector2(1920.0f * 0.66f, 1080))
+            {
+                Vector3 tempVec = new Vector3(0, 0, 0);
+                float scaleCorrectionX = math.abs(locations[i].x) / (mapScalar.x / 2.0f);
+                float scaleCorrectionY = math.abs(locations[i].y) / (mapScalar.y / 2.0f);
+
+
+                // If the y is negative, we want to subtract tom make sure we go in the right direction.
+                if (locations[i].x < 0.0f)
+                {
+                    tempVec.x = locations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
+                }
+                else
+                {
+                    tempVec.x = locations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
+                }
+
+                // If the y is negative, we want to subtract to make sure we go in the right direction.
+                if (locations[i].y < 0.0f)
+                {
+                    tempVec.y = locations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
+                }
+                else
+                {
+                    tempVec.y = locations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
+                }
+
+                // Set the instantiated facilities position to the temporary Vec3 we used to put it in the correct location and add it to the proper list
+                tempFacility.transform.position = tempVec;
+                player.Facilities.Add(tempFacility);
+                output.Add(tempFacility);
+            }
+            else
+            {
+                tempFacility.transform.position = new Vector3(locations[i].x, locations[i].y, 0);
+                player.Facilities.Add(tempFacility);
+                output.Add(tempFacility);
+            }
+
+            //fire.transform.SetParent (canvas.transform,false);
+
+            // Set the material then parent it to the Map
+            //fire.GetComponent<MeshRenderer>().material = HexMaterials[10]; <-- Only needed when utilizing hexes
+
+            tempFacility.transform.SetParent(Map.transform, false);
+            tempFacility.name = name;
+        }
+        // Disable the original facility
+        baseFacility.SetActive(false);
     }
 }

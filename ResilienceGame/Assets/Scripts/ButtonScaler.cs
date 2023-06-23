@@ -13,7 +13,7 @@ public class ButtonScaler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Map = GameObject.Find("Map");
+        Map = GameObject.Find("Central Map");
 
         // Scale the Feedback menu
         mapScalar.x = Map.GetComponent<RectTransform>().rect.width;

@@ -17,7 +17,7 @@ public class Drag : MonoBehaviour, IDragHandler
     // Start is called before the first frame update
     void Start()
     {
-        Map = GameObject.Find("Map");
+        Map = GameObject.Find("Central Map");
         
 
         // Scale the Feedback menu

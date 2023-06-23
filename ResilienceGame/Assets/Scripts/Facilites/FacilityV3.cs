@@ -21,7 +21,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         Security,
         PublicGoods,
         City,
-        FireDept
+        FireDept,
+        Transportation
     };
 
     public Type type;

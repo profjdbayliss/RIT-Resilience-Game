@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
     public Toggle cityHallToggle;
     public Toggle fuelToggle;
 
+    public int transportationInputCount;
+
     public Camera cam;
 
     public GameObject map;
@@ -58,6 +60,18 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
     void Start()
     {
         startScreen.SetActive(true);
+    }
+
+    public int TransportationInputCount
+    {
+        get
+        {
+            return transportationInputCount;
+        }
+        set
+        {
+            transportationInputCount = value;
+        }
     }
 
     // Update is called once per frame

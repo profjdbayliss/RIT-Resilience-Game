@@ -21,7 +21,7 @@ public class Hover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         locationTextTMP = GetComponent<TextMeshProUGUI>();
         locationTextTMP.text = inputFix(locationName);
         locationTextTMP.color = new Color(0, 0, 0, 0);
-        Map = GameObject.Find("Map");
+        Map = GameObject.Find("Central Map");
 
         // Scale the Feedback menu
         mapScalar.x = Map.GetComponent<RectTransform>().rect.width;
