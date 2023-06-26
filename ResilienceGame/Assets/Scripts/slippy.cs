@@ -87,7 +87,7 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
     public void OnDrag(PointerEventData pointer)
     {
         Debug.Log("DRAG SLIPPY");
-        if (tiles.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
+        if (map.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
         {
             // Create a vector2 to hold the previous position of the element and also set our target of what we want to actually drag.
             Vector2 tempVec2 = default(Vector2);

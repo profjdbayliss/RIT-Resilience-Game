@@ -47,15 +47,15 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 
 
     // Utilize if you want to incorporate player input to determine the number of facilities of each type
-    public int transportationInputCount;
+    public int transportationInputCount = 1;
     public int policeInputCount;
     public int hospitalInputCount;
     public int fireDeptInputCount;
-    public int elecGenInputCount;
-    public int waterInputCount;
-    public int commsInputCount;
+    public int elecGenInputCount = 1;
+    public int waterInputCount = 1;
+    public int commsInputCount = 1;
     public int commoditiesInputCount;
-    public int elecDistInputCount;
+    public int elecDistInputCount = 1;
     public int fuelInputCount;
 
     public Camera cam;
