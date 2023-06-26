@@ -10,12 +10,48 @@ public class Player : MonoBehaviour
     public List<GameObject> Facilities;
     public GameObject seletedFacility;
     public TextMeshProUGUI fundsText;
+    public FacilityV3.Type type;
+    public GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
     {
         funds = 1000.0f;
+        Debug.Log("Now " + type);
+        foreach(GameObject fac in gameManager.allFacilities)
+        {
+            if(fac.GetComponent<FacilityV3>().type == type)
+            {
+                Facilities.Add(fac);
+            }
+            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+            {
+                Facilities.Add(fac);
+            }
+            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+            {
+                Facilities.Add(fac);
 
+            }
+            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+            {
+                Facilities.Add(fac);
+
+            }
+            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+            {
+                Facilities.Add(fac);
+
+            }
+            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+            {
+                Facilities.Add(fac);
+            }
+            else
+            {
+
+            }
+        }
     }
 
     // Update is called once per frame

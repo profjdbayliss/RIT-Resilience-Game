@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 {
     // Establish necessary fields
     public Player player;
+    public Player player2;
     public MaliciousActor maliciousActor;
     public bool playerActive;
     public GameObject playerMenu;
@@ -57,6 +58,10 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
     public int commoditiesInputCount;
     public int elecDistInputCount = 1;
     public int fuelInputCount;
+
+    public List<GameObject> allFacilities;
+
+    public int activePlayerNumber;
 
     public Camera cam;
 
@@ -317,6 +322,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(true);
                 facilityEvents.SpawnEvent();
+                ChangePlayers();
             }
             else
             {
@@ -325,6 +331,10 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
                 activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(false);
+                foreach(GameObject facilities in allFacilities)
+                {
+                    facilities.SetActive(true);
+                }
             }
         }
         
@@ -370,7 +380,9 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
         Debug.Log("STARTED");
 
         gameStarted = true;
-        player = GetComponent<Player>();
+        //player = GetComponent<Player>();
+        player.gameObject.SetActive(true);
+        player2.gameObject.SetActive(true);
         maliciousActor = GetComponent<MaliciousActor>();
 
         playerActive = true;
@@ -387,6 +399,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
+            
         }
         else
         {
@@ -396,6 +409,99 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(false);
         }
+    }
+
+    public void ChangePlayers()
+    {
+        if (playerActive)
+        {
+            if (activePlayerNumber == 0)
+            {
+                activePlayerNumber = 1;
+                foreach (GameObject fac in allFacilities)
+                {
+                    if (fac.GetComponent<FacilityV3>().type == player2.type)
+                    {
+                        fac.SetActive(true);
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+                    {
+                        fac.SetActive(true);
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+                    {
+                        fac.SetActive(true);
+
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+                    {
+                        fac.SetActive(true);
+
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                    {
+                        fac.SetActive(true);
+
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+                    {
+                        fac.SetActive(true);
+                    }
+                    else
+                    {
+                        fac.SetActive(false);
+
+                    }
+                }
+            }
+            else
+            {
+                activePlayerNumber = 0;
+                foreach (GameObject fac in allFacilities)
+                {
+                    if (fac.GetComponent<FacilityV3>().type == player.type)
+                    {
+                        fac.SetActive(true);
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+                    {
+                        fac.SetActive(true);
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+                    {
+                        fac.SetActive(true);
+
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+                    {
+                        fac.SetActive(true);
+
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                    {
+                        fac.SetActive(true);
+
+                    }
+                    else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+                    {
+                        fac.SetActive(true);
+                    }
+                    else
+                    {
+                        fac.SetActive(false);
+
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach (GameObject fac in allFacilities)
+            {
+                fac.SetActive(true);
+            }
+        }
+        
     }
 
     public void OnPointerDown(PointerEventData pointer)

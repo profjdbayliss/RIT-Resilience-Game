@@ -471,14 +471,16 @@ public class PlaceIcons : MonoBehaviour
 
                 // Set the instantiated facilities position to the temporary Vec3 we used to put it in the correct location and add it to the proper list
                 tempFacility.transform.position = tempVec;
-                player.Facilities.Add(tempFacility);
+                //player.Facilities.Add(tempFacility);
                 output.Add(tempFacility);
+                gameManager.allFacilities.Add(tempFacility);
             }
             else
             {
                 tempFacility.transform.position = new Vector3(locations[i].x, locations[i].y, 0);
-                player.Facilities.Add(tempFacility);
+                //player.Facilities.Add(tempFacility);
                 output.Add(tempFacility);
+                gameManager.allFacilities.Add(tempFacility);
             }
 
             //fire.transform.SetParent (canvas.transform,false);
