@@ -319,13 +319,14 @@ public class PlaceIcons : MonoBehaviour
     }
 
 
-    public void spawnAllFacilities(bool police, bool hospital, bool firedpt, bool elecGen, bool water, bool comms, bool cityHall, bool commodities, bool elecDist, bool fuel)
+    public void spawnAllFacilities(bool police = true, bool hospital = true, bool firedpt = true, bool elecGen = true, bool water = true, bool comms = true, bool cityHall = true, bool commodities = true, bool elecDist = true, bool fuel = true)
     {
 
         // Spawn the Hospitals
         if (hospital)
         {
-            SpawnFacilities(Hospital, HospitalLocations, Hospitals, "Hospital (Clone)");
+            SpawnVariableFacilities(Hospital, gameManager.HospitalInputCount, HospitalLocations, Hospitals, "Hospital (Clone)");
+            //SpawnFacilities(Hospital, HospitalLocations, Hospitals, "Hospital (Clone)");
         }
         else
         {
@@ -334,6 +335,7 @@ public class PlaceIcons : MonoBehaviour
 
         if (police)
         {
+            //SpawnVariableFacilities(police, gameManager.policeInputCount, poli)
             spawnFacility(Police, PoliceLoc, "Police (Clone)");
         }
         else
@@ -343,7 +345,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (firedpt)
         {
-            SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
+            SpawnVariableFacilities(FireTruck, gameManager.FireDeptInputCount, FireDeptLocations, FireDepartments, "Fire (Clone)");
+            //SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
         }
         else
         {
@@ -352,7 +355,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (elecGen)
         {
-            SpawnFacilities(Electricity, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
+            SpawnVariableFacilities(Electricity, gameManager.ElecGenInputCount, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
+            //SpawnFacilities(Electricity, ElectricityLocations, ElectricityFacilities, "Electricity (Clone)");
         }
         else
         {
@@ -361,7 +365,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (water)
         {
-            SpawnFacilities(Water, WaterLocations, WaterFacilities, "Water (Clone)");
+            SpawnVariableFacilities(Water, gameManager.WaterInputCount, WaterLocations, WaterFacilities, "Water (Clone)");
+            //SpawnFacilities(Water, WaterLocations, WaterFacilities, "Water (Clone)");
         }
         else
         {
@@ -370,7 +375,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (comms)
         {
-            SpawnFacilities(Communications, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
+            SpawnVariableFacilities(Communications, gameManager.CommsInputCount, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
+            //SpawnFacilities(Communications, CommunicationsLocations, CommunicationsFacilities, "Communications (Clone)");
         }
         else
         {
@@ -379,6 +385,7 @@ public class PlaceIcons : MonoBehaviour
 
         if (cityHall)
         {
+
             spawnFacility(CityHall, CityHallPos, "City Hall (Clone)");
         }
         else
@@ -388,7 +395,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (commodities)
         {
-            SpawnFacilities(Commodities, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
+            SpawnVariableFacilities(Commodities, gameManager.CommoditiesInputCount, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
+            //SpawnFacilities(Commodities, CommoditiesLocations, CommoditiesFacilities, "Commodities (Clone)");
         }
         else
         {
@@ -397,7 +405,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (elecDist)
         {
-            SpawnFacilities(ElectricityDistributor, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distribution (Clone)");
+            SpawnVariableFacilities(ElectricityDistributor, gameManager.ElecDistInputCount, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distribution (Clone)");
+            //SpawnFacilities(ElectricityDistributor, ElectricityDistributionLocations, ElectricityDistributionFacilities, "Electricity Distribution (Clone)");
         }
         else
         {
@@ -406,7 +415,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (fuel)
         {
-            SpawnFacilities(Fuel, FuelLocations, FuelFacilities, "Fuel (Clone)");
+            SpawnVariableFacilities(Fuel, gameManager.FuelInputCount, FuelLocations, FuelFacilities, "Fuel (Clone)");
+            //SpawnFacilities(Fuel, FuelLocations, FuelFacilities, "Fuel (Clone)");
         }
         else
         {

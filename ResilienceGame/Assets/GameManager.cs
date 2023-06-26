@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
     public GameObject maliciousPlayerEndMenu;
     public GameObject resilientPlayerEndMenu;
 
+    // Utilize if you want to have a set number of facilities and have it be toggled on and off
     public Toggle policeToggle;
     public Toggle hospitalToggle;
     public Toggle fireDeptToggle;
@@ -44,7 +45,18 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
     public Toggle cityHallToggle;
     public Toggle fuelToggle;
 
+
+    // Utilize if you want to incorporate player input to determine the number of facilities of each type
     public int transportationInputCount;
+    public int policeInputCount;
+    public int hospitalInputCount;
+    public int fireDeptInputCount;
+    public int elecGenInputCount;
+    public int waterInputCount;
+    public int commsInputCount;
+    public int commoditiesInputCount;
+    public int elecDistInputCount;
+    public int fuelInputCount;
 
     public Camera cam;
 
@@ -62,6 +74,8 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
         startScreen.SetActive(true);
     }
 
+
+    // Created properties to allow for player input to decide how many facilities of each type to have.
     public int TransportationInputCount
     {
         get
@@ -73,6 +87,116 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             transportationInputCount = value;
         }
     }
+
+    public int PoliceInputCount
+    {
+        get
+        {
+            return policeInputCount;
+        }
+        set
+        {
+            policeInputCount = value;
+        }
+    }
+
+    public int HospitalInputCount
+    {
+        get
+        {
+            return hospitalInputCount;
+        }
+        set
+        {
+            hospitalInputCount = value;
+        }
+    }
+
+    public int FireDeptInputCount
+    {
+        get
+        {
+            return fireDeptInputCount;
+        }
+        set
+        {
+            fireDeptInputCount = value;
+        }
+    }
+
+    public int ElecGenInputCount
+    {
+        get
+        {
+            return elecGenInputCount;
+        }
+        set
+        {
+            elecGenInputCount = value;
+        }
+    }
+
+    public int WaterInputCount
+    {
+        get
+        {
+            return waterInputCount;
+        }
+        set
+        {
+            waterInputCount = value;
+        }
+    }
+
+    public int CommsInputCount
+    {
+        get
+        {
+            return commsInputCount;
+        }
+        set
+        {
+            commsInputCount = value;
+        }
+    }
+
+    public int CommoditiesInputCount
+    {
+        get 
+        {
+            return commoditiesInputCount; 
+        }
+        set
+        {
+            commoditiesInputCount = value;
+        }
+    }
+
+    public int ElecDistInputCount
+    {
+        get
+        {
+            return elecDistInputCount;
+        }
+        set
+        {
+            elecDistInputCount = value;
+        }
+    }
+
+    public int FuelInputCount
+    {
+        get
+        {
+            return fuelInputCount;
+        }
+        set
+        {
+            fuelInputCount = value;
+        }
+    }
+
+
 
     // Update is called once per frame
     void Update()
@@ -238,7 +362,9 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
     {
 
         gameCanvas.SetActive(true);
-        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
+        //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
+        this.GetComponent<PlaceIcons>().spawnAllFacilities(true, true, true, true, true, true, true, true, true, true);
+
         startScreen.SetActive(false);
 
         Debug.Log("STARTED");
