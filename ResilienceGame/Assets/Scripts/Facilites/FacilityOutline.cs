@@ -50,7 +50,12 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
                         outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
 
                         break;
+
                     default:
+                        if(facility.type == players[gameManager.activePlayerNumber].type)
+                        {
+                            outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+                        }
                         break;
 
                 }
@@ -106,7 +111,10 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
             {
                 if (players[gameManager.activePlayerNumber].seletedFacility == null)
                 {
-                    players[gameManager.activePlayerNumber].seletedFacility = this.gameObject;
+                    if(players[gameManager.activePlayerNumber].type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                    {
+                        players[gameManager.activePlayerNumber].seletedFacility = this.gameObject;
+                    }
                 }
                 else if (players[gameManager.activePlayerNumber].seletedFacility == this.gameObject)
                 {
@@ -136,7 +144,17 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         }
         else
         {
-            outline.SetActive(true);
+            if (gameManager.playerActive)
+            {
+                if (players[gameManager.activePlayerNumber].type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                {
+                    outline.SetActive(true);
+                }
+            }
+            else
+            {
+                outline.SetActive(true);
+            }
         }
     }
 }
