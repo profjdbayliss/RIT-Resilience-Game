@@ -92,7 +92,7 @@ public class PlaceIcons : MonoBehaviour
         ElectricityDistributor = GameObject.Find("Electricity Distributor");
         Fuel = GameObject.Find("Fuel");
         Transportation = GameObject.Find("Transportation");
-        player = GetComponent<Player>();
+        //player = GetComponent<Player>();
 
         // Scale the map properly
         Map.gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, canvas.GetComponent<RectTransform>().rect.height);
@@ -313,7 +313,8 @@ public class PlaceIcons : MonoBehaviour
         tempFacility.transform.position = tempFacilityPos;
         tempFacility.transform.SetParent(Map.transform, false);
         tempFacility.name = name;
-        player.Facilities.Add(tempFacility);
+        //player.Facilities.Add(tempFacility);
+        gameManager.allFacilities.Add(tempFacility);
         baseFacility.SetActive(false);
 
     }

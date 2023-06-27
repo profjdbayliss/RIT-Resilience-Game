@@ -39,9 +39,9 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         // Make sure to place the tooltip in the correctlocation.
         float toolTipWidth = tooltipObject.GetComponent<RectTransform>().rect.width;
-        Vector3 tempPos = this.transform.position;
-        tempPos.x += (toolTipWidth / 3.0f);
-        tooltipObject.transform.position = tempPos;
+        Vector3 tempPos = this.transform.localPosition;
+        tempPos.x += (toolTipWidth/2.0f);
+        tooltipObject.transform.localPosition = tempPos;
     }
 
     public void OnPointerExit(PointerEventData eventData)

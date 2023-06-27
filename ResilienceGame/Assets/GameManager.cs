@@ -453,6 +453,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 
                     }
                 }
+                DisableAllOutline();
             }
             else
             {
@@ -492,6 +493,7 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 
                     }
                 }
+                DisableAllOutline();
             }
         }
         else
