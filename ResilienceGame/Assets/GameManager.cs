@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Unity.VectorGraphics;
 
-public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+public class GameManager : MonoBehaviour, IDragHandler
 {
     // Establish necessary fields
     public Player player;
@@ -318,7 +318,15 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             if (playerActive)
             {
                 fundText.text = "Funds: " + player.funds;
-                activePlayerText.text = "Resilient Player";
+                if(activePlayerNumber == 0)
+                {
+                    activePlayerText.text = player.type +  " Player";
+                }
+                else
+                {
+                    activePlayerText.text = player2.type + " Player";
+
+                }
                 activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(true);
@@ -397,8 +405,18 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
 
         if (playerActive)
         {
-            fundText.text = "Funds: " + player.funds;
-            activePlayerText.text = "Resilient Player";
+            if(activePlayerNumber == 0)
+            {
+                activePlayerText.text = player.type + " Player";
+                fundText.text = "Funds: " + player.funds;
+
+            }
+            else
+            {
+                activePlayerText.text = player2.type + " Player";
+                fundText.text = "Funds: " + player2.funds;
+
+            }
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
@@ -420,7 +438,9 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
         {
             if (activePlayerNumber == 0)
             {
+                activePlayerText.text = player2.type + " Player";
                 activePlayerNumber = 1;
+                fundText.text = "Funds: " + player.funds;
                 foreach (GameObject fac in allFacilities)
                 {
                     if (fac.GetComponent<FacilityV3>().type == player2.type)
@@ -471,7 +491,9 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
             }
             else
             {
+                activePlayerText.text = player.type + " Player";
                 activePlayerNumber = 0;
+                fundText.text = "Funds: " + player2.funds;
                 foreach (GameObject fac in allFacilities)
                 {
                     if (fac.GetComponent<FacilityV3>().type == player.type)
@@ -531,40 +553,6 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
         }
         
     }
-
-    public void OnPointerDown(PointerEventData pointer)
-    {
-        Debug.Log("Down");
-    }
-
-    public void OnPointerUp(PointerEventData pointer)
-    {
-        Debug.Log("UP");
-    }
-
-
-
-    public void OnPointerClick(PointerEventData pointer)
-    {
-        Debug.Log("Click");
-    }
-
-
-    public void OnScroll(PointerEventData pointer)
-    {
-        Debug.Log("Scrolled");
-        if(pointer.scrollDelta.y > 0.0f)
-        {
-            gameCanvas.GetComponent<Canvas>().planeDistance -= 0.01f;
-        }
-        else
-        {
-            gameCanvas.GetComponent<Canvas>().planeDistance += 0.01f;
-            
-        }
-    }
-
-
 
     public void OnDrag(PointerEventData pointer)
     {
