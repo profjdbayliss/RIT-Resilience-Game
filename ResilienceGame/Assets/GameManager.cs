@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Unity.VectorGraphics;
 
 public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
@@ -331,9 +332,11 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
                 activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(false);
-                foreach(GameObject facilities in allFacilities)
+                foreach (GameObject fac in allFacilities)
                 {
-                    facilities.SetActive(true);
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
         }
@@ -422,34 +425,45 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
                 {
                     if (fac.GetComponent<FacilityV3>().type == player2.type)
                     {
-                        fac.SetActive(true);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
                     {
-                        fac.SetActive(true);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
                     {
-                        fac.SetActive(true);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
                     {
-                        fac.SetActive(true);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
                     {
-                        fac.SetActive(true);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
                     {
-                        fac.SetActive(true);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else
                     {
-                        fac.SetActive(false);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 0.5f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
 
                     }
                 }
@@ -462,35 +476,45 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
                 {
                     if (fac.GetComponent<FacilityV3>().type == player.type)
                     {
-                        fac.SetActive(true);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
                     {
-                        fac.SetActive(true);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
                     {
-                        fac.SetActive(true);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
                     {
-                        fac.SetActive(true);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
                     {
-                        fac.SetActive(true);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
                     {
-                        fac.SetActive(true);
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 1.0f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                     else
                     {
-                        fac.SetActive(false);
-
+                        Color tempColor = fac.GetComponent<SVGImage>().color;
+                        tempColor.a = 0.5f;
+                        fac.GetComponent<SVGImage>().color = tempColor;
                     }
                 }
                 DisableAllOutline();
@@ -500,7 +524,9 @@ public class GameManager : MonoBehaviour, IScrollHandler, IDragHandler, IPointer
         {
             foreach (GameObject fac in allFacilities)
             {
-                fac.SetActive(true);
+                Color tempColor = fac.GetComponent<SVGImage>().color;
+                tempColor.a = 1.0f;
+                fac.GetComponent<SVGImage>().color = tempColor;
             }
         }
         
