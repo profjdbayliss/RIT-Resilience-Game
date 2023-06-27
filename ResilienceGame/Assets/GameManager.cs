@@ -243,6 +243,7 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
+
     public void EnableCriticalOutline(bool toggled)
     {
         criticalEnabled = toggled;
@@ -317,14 +318,15 @@ public class GameManager : MonoBehaviour, IDragHandler
             turnCount += 0.5f;
             if (playerActive)
             {
-                fundText.text = "Funds: " + player.funds;
                 if(activePlayerNumber == 0)
                 {
                     activePlayerText.text = player.type +  " Player";
+                    fundText.text = "Funds: " + player.funds;
                 }
                 else
                 {
                     activePlayerText.text = player2.type + " Player";
+                    fundText.text = "Funds: " + player2.funds;
 
                 }
                 activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
