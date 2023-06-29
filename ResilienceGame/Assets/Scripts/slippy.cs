@@ -27,7 +27,6 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
     {
         maxScale = 3.0f;
         minScale = 0.5f;
-        //resetScale.AddBinding("<Keyboard>/a");
         resetScale = playerInput.actions["Reset Scale"];
     }
 
@@ -42,10 +41,9 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
     }
     public void OnScroll(PointerEventData pointer)
     {
-        Debug.Log("SCrolling slippy");
-        if (pointer.scrollDelta.y > 0.0f)
+        if (pointer.scrollDelta.y > 0.0f) // Zoom in
         {
-            if (map.transform.localScale.x <= maxScale)
+            if ((map.transform.localScale.x + 0.05f) <= maxScale) // Only zoom in when the zoom is less than the max, we allow the zoom in
             {
                 Vector2 tempScale = map.transform.localScale;
                 tempScale.x += 0.05f;
@@ -61,12 +59,10 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
             }
 
 
-            //gameCanvas.GetComponent<Canvas>().planeDistance -= 0.01f;
         }
         else
         {
-            //gameCanvas.GetComponent<Canvas>().planeDistance += 0.01f;
-            if (map.transform.localScale.x >= minScale)
+            if ((map.transform.localScale.x - 0.05f) >= minScale) // Only zoom out when the zoom is more than the minimum.
             {
                 Vector2 tempScale = map.transform.localScale;
                 tempScale.x -= 0.05f;
@@ -86,7 +82,6 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 
     public void OnDrag(PointerEventData pointer)
     {
-        Debug.Log("DRAG SLIPPY");
         if (map.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
         {
             // Create a vector2 to hold the previous position of the element and also set our target of what we want to actually drag.
@@ -101,16 +96,14 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
                 {
                     tempPos.x += tempNewVec.x - tempVec2.x;
                     tempPos.y += tempNewVec.y - tempVec2.y;
-                    //tempPos.y = map.transform.localPosition.y;
                     map.transform.localPosition = tempPos;
                 }
             }
         }
     }
 
-     public void ResetScale()
+    public void ResetScale()
     {
-        Debug.Log("RS");
         map.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
     }
 }

@@ -17,7 +17,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
     void Start()
     {
         gameManager = GameObject.FindObjectOfType<GameManager>();
-        if(GameObject.FindObjectOfType<Player>() != null)
+        if (GameObject.FindObjectOfType<Player>() != null)
         {
             players = GameObject.FindObjectsOfType<Player>();
         }
@@ -27,7 +27,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
     // Update is called once per frame
     void Update()
     {
-        if(players.Length > 0)
+        if (players.Length > 0)
         {
             // Depending on how healthy the output flow of the facility is, change the color.
             if (gameManager.criticalEnabled && outline.activeSelf)
@@ -52,7 +52,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
                         break;
 
                     default:
-                        if(facility.type == players[gameManager.activePlayerNumber].type)
+                        if (facility.type == players[gameManager.activePlayerNumber].type)
                         {
                             outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
                         }
@@ -99,19 +99,19 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
             }
         }
-        
+
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         // When the facility is clicked, if it is currently being outlined, disable the outline, if not then activate it.
-        if(outline.activeSelf == true)
+        if (outline.activeSelf == true)
         {
             if (gameManager.playerActive)
             {
                 if (players[gameManager.activePlayerNumber].seletedFacility == null)
                 {
-                    if(players[gameManager.activePlayerNumber].type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                    if (players[gameManager.activePlayerNumber].type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
                     {
                         players[gameManager.activePlayerNumber].seletedFacility = this.gameObject;
                     }

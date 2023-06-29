@@ -31,16 +31,16 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         // When the facility info is hovered set the tooltip to be active.
         tooltipObject.SetActive(true);
-        
+
         // Set the title and the caption of the tooltip
         headerContent.text = title;
         captionContent.text = caption;
-        
+
 
         // Make sure to place the tooltip in the correctlocation.
         float toolTipWidth = tooltipObject.GetComponent<RectTransform>().rect.width;
         Vector3 tempPos = this.transform.localPosition;
-        tempPos.x += (toolTipWidth/2.0f);
+        tempPos.x += (toolTipWidth / 2.0f);
         tooltipObject.transform.localPosition = tempPos;
     }
 

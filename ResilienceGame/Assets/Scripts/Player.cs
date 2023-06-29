@@ -18,32 +18,32 @@ public class Player : MonoBehaviour
     {
         funds = 1000.0f;
         Debug.Log("Now " + type);
-        foreach(GameObject fac in gameManager.allFacilities)
+        foreach (GameObject fac in gameManager.allFacilities)
         {
-            if(fac.GetComponent<FacilityV3>().type == type)
+            if (fac.GetComponent<FacilityV3>().type == type)
             {
                 Facilities.Add(fac);
             }
-            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
             {
                 Facilities.Add(fac);
             }
-            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
-            {
-                Facilities.Add(fac);
-
-            }
-            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
             {
                 Facilities.Add(fac);
 
             }
-            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
             {
                 Facilities.Add(fac);
 
             }
-            else if(fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+            {
+                Facilities.Add(fac);
+
+            }
+            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
             {
                 Facilities.Add(fac);
             }
@@ -57,7 +57,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
 

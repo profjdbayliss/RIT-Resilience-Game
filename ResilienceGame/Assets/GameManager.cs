@@ -24,14 +24,14 @@ public class GameManager : MonoBehaviour, IDragHandler
     public GameObject startScreen;
 
     public float turnCount;
-    
+
     public TextMeshProUGUI fundText;
     public TextMeshProUGUI activePlayerText;
-    
+
     public GameObject yarnSpinner;
-    
+
     public Color activePlayerColor;
-    
+
     public GameObject continueButton;
 
     public GameObject maliciousPlayerEndMenu;
@@ -171,9 +171,9 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public int CommoditiesInputCount
     {
-        get 
+        get
         {
-            return commoditiesInputCount; 
+            return commoditiesInputCount;
         }
         set
         {
@@ -251,17 +251,17 @@ public class GameManager : MonoBehaviour, IDragHandler
     {
         criticalEnabled = toggled;
         FacilityOutline[] criticalOutlines = GameObject.FindObjectsOfType<FacilityOutline>();
-        for(int i = 0; i < criticalOutlines.Length; i++)
+        for (int i = 0; i < criticalOutlines.Length; i++)
         {
             // Comms
-            if(criticalOutlines[i].gameObject.GetComponent<Communications>() != null)
+            if (criticalOutlines[i].gameObject.GetComponent<Communications>() != null)
             {
                 criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
                 criticalOutlines[i].outline.SetActive(toggled);
             }
-            
+
             // Water
-            else if(criticalOutlines[i].gameObject.GetComponent<Water>() != null)
+            else if (criticalOutlines[i].gameObject.GetComponent<Water>() != null)
             {
                 criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
 
@@ -270,14 +270,14 @@ public class GameManager : MonoBehaviour, IDragHandler
             }
 
             // Power
-            else if(criticalOutlines[i].gameObject.GetComponent<ElectricityDistribution>() != null)
+            else if (criticalOutlines[i].gameObject.GetComponent<ElectricityDistribution>() != null)
             {
                 criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
 
                 criticalOutlines[i].outline.SetActive(toggled);
 
             }
-            else if(criticalOutlines[i].gameObject.GetComponent<ElectricityGeneration>() != null)
+            else if (criticalOutlines[i].gameObject.GetComponent<ElectricityGeneration>() != null)
             {
                 criticalOutlines[i].outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
 
@@ -305,7 +305,7 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public void SwapPlayer()
     {
-        if((continueButton.activeSelf == false) && (yarnSpinner.activeSelf == true))
+        if ((continueButton.activeSelf == false) && (yarnSpinner.activeSelf == true))
         {
             return;
         }
@@ -321,9 +321,9 @@ public class GameManager : MonoBehaviour, IDragHandler
             turnCount += 0.5f;
             if (playerActive)
             {
-                if(activePlayerNumber == 0)
+                if (activePlayerNumber == 0)
                 {
-                    activePlayerText.text = player.type +  " Player";
+                    activePlayerText.text = player.type + " Player";
                     fundText.text = "Funds: " + player.funds;
                 }
                 else
@@ -353,7 +353,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                 }
             }
         }
-        
+
     }
     public void DisableAllOutline()
     {
@@ -407,7 +407,7 @@ public class GameManager : MonoBehaviour, IDragHandler
         playerActive = true;
 
         turnCount = 0;
-        for(int i = 0; i < allPlayers.Length; i++)
+        for (int i = 0; i < allPlayers.Length; i++)
         {
             allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
         }
@@ -436,7 +436,7 @@ public class GameManager : MonoBehaviour, IDragHandler
         if (playerActive)
         {
             activePlayerNumber++;
-            if(activePlayerNumber >= allPlayers.Length)
+            if (activePlayerNumber >= allPlayers.Length)
             {
                 activePlayerNumber = 0;
             }
@@ -499,14 +499,13 @@ public class GameManager : MonoBehaviour, IDragHandler
                 fac.GetComponent<SVGImage>().color = tempColor;
             }
         }
-        
     }
 
     public void SpawnPlayers(int playerCount)
     {
         GameObject basePlayer = GameObject.Find("Base Player");
         allPlayers = new GameObject[playerCount];
-        for(int i = 0; i < playerCount; i++)
+        for (int i = 0; i < playerCount; i++)
         {
             GameObject newPlayer = Instantiate(basePlayer);
             switch (i)
@@ -534,7 +533,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                 case 5:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.City;
                     break;
-                
+
                 case 6:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.FireDept;
                     break;
