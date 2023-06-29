@@ -396,12 +396,11 @@ public class GameManager : MonoBehaviour, IDragHandler
         Debug.Log("STARTED");
 
         gameStarted = true;
-        //player = GetComponent<Player>();
-        // Spawn the players
 
-        SpawnPlayers(6);
-        //player.gameObject.SetActive(true);
-        //player2.gameObject.SetActive(true);
+
+        // Spawn the players
+        SpawnPlayers(6); // <-- Need to change this to an input
+
         maliciousActor = GetComponent<MaliciousActor>();
         activePlayerNumber = 0;
 
@@ -411,7 +410,6 @@ public class GameManager : MonoBehaviour, IDragHandler
         for(int i = 0; i < allPlayers.Length; i++)
         {
             allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
-
         }
         maliciousActor.targetFacility = null;
 
@@ -422,23 +420,6 @@ public class GameManager : MonoBehaviour, IDragHandler
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
-
-            //if (activePlayerNumber == 0)
-            //{
-            //    activePlayerText.text = player.type + " Player";
-            //    fundText.text = "Funds: " + player.funds;
-
-            //}
-            //else
-            //{
-            //    activePlayerText.text = player2.type + " Player";
-            //    fundText.text = "Funds: " + player2.funds;
-
-            //}
-            //activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
-            //activePlayerText.color = activePlayerColor;
-            //yarnSpinner.SetActive(true);
-            
         }
         else
         {
@@ -508,111 +489,6 @@ public class GameManager : MonoBehaviour, IDragHandler
                 }
             }
             DisableAllOutline();
-            //if (activePlayerNumber == 0)
-            //{
-            //    activePlayerText.text = player2.type + " Player";
-            //    activePlayerNumber = 1;
-            //    fundText.text = "Funds: " + player.funds;
-            //    foreach (GameObject fac in allFacilities)
-            //    {
-            //        if (fac.GetComponent<FacilityV3>().type == player2.type)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 0.5f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-
-            //        }
-            //    }
-            //    DisableAllOutline();
-            //}
-            //else
-            //{
-            //    activePlayerText.text = player.type + " Player";
-            //    activePlayerNumber = 0;
-            //    fundText.text = "Funds: " + player2.funds;
-            //    foreach (GameObject fac in allFacilities)
-            //    {
-            //        if (fac.GetComponent<FacilityV3>().type == player.type)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 1.0f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //        else
-            //        {
-            //            Color tempColor = fac.GetComponent<SVGImage>().color;
-            //            tempColor.a = 0.5f;
-            //            fac.GetComponent<SVGImage>().color = tempColor;
-            //        }
-            //    }
-            //    DisableAllOutline();
-            //}
         }
         else
         {
@@ -642,19 +518,17 @@ public class GameManager : MonoBehaviour, IDragHandler
                 case 1:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.Commodities;
                     break;
+
                 case 2:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.Health;
-
                     break;
 
                 case 3:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.Security;
-
                     break;
 
                 case 4:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.PublicGoods;
-
                     break;
 
                 case 5:
