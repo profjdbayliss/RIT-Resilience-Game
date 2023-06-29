@@ -17,7 +17,6 @@ public class Player : MonoBehaviour
     void Start()
     {
         funds = 1000.0f;
-        Debug.Log("Now " + type);
         foreach (GameObject fac in gameManager.allFacilities)
         {
             if (fac.GetComponent<FacilityV3>().type == type)
@@ -81,7 +80,6 @@ public class Player : MonoBehaviour
         {
             foreach (GameObject obj in Facilities)
             {
-                Debug.Log(obj.GetComponent<FacilityV3>().feedback);
                 obj.GetComponent<FacilityV3>().feedback += 1;
             }
             funds -= 50.0f;

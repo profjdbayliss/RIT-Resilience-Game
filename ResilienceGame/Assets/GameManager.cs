@@ -393,7 +393,6 @@ public class GameManager : MonoBehaviour, IDragHandler
 
         startScreen.SetActive(false);
 
-        Debug.Log("STARTED");
 
         gameStarted = true;
 
@@ -548,7 +547,6 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public void OnDrag(PointerEventData pointer)
     {
-        Debug.Log("DRAG");
         if (tiles.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
         {
             // Create a vector2 to hold the previous position of the element and also set our target of what we want to actually drag.
