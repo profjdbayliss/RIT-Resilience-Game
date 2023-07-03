@@ -389,7 +389,8 @@ public class GameManager : MonoBehaviour, IDragHandler
 
         gameCanvas.SetActive(true);
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
-        this.GetComponent<PlaceIcons>().spawnAllFacilities(true, true, true, true, true, true, true, true, true, true);
+        //this.GetComponent<PlaceIcons>().spawnAllFacilities(true, true, true, true, true, true, true, true, true, true);
+        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, true, true, true, cityHallToggle.isOn, commoditiesToggle.isOn, true, fuelToggle.isOn);
 
         startScreen.SetActive(false);
 
@@ -398,7 +399,38 @@ public class GameManager : MonoBehaviour, IDragHandler
 
 
         // Spawn the players
-        SpawnPlayers(6); // <-- Need to change this to an input
+        int playerCount = 0;
+        if (policeToggle.isOn)
+        {
+            playerCount++;
+        }
+        if (hospitalToggle.isOn)
+        {
+            playerCount++;
+        }
+        if (fireDeptToggle.isOn)
+        {
+            playerCount++;
+
+        }
+        if (cityHallToggle.isOn)
+        {
+            playerCount++;
+
+        }
+        if (commoditiesToggle.isOn)
+        {
+            playerCount++;
+
+        }
+        if (fuelToggle.isOn)
+        {
+            playerCount++;
+
+        }
+        SpawnPlayers(playerCount);
+
+        //SpawnPlayers(6); // <-- Need to change this to an input
 
         maliciousActor = GetComponent<MaliciousActor>();
         activePlayerNumber = 0;
