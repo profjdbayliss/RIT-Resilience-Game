@@ -27,7 +27,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
     // Update is called once per frame
     void Update()
     {
-        if (players.Length > 0)
+        if (gameManager.allPlayers.Length > 0)
         {
             // Depending on how healthy the output flow of the facility is, change the color.
             if (gameManager.criticalEnabled && outline.activeSelf)
@@ -51,8 +51,14 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
                         break;
 
+
+                    case FacilityV3.Type.Communications:
+                        outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
+
+                        break;
+
                     default:
-                        if (facility.type == players[gameManager.activePlayerNumber].type)
+                        if (facility.type == gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().type)
                         {
                             outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
                         }
@@ -60,7 +66,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
                 }
                 //outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
-                if (players[gameManager.activePlayerNumber].seletedFacility == this.gameObject)
+                if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacility == this.gameObject)
                 {
                     outline.GetComponent<RawImage>().color = Color.cyan;
                 }
@@ -70,7 +76,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
                 }
             }
-            else if ((players[gameManager.activePlayerNumber].seletedFacility == this.gameObject) && (gameManager.playerActive))
+            else if ((gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacility == this.gameObject) && (gameManager.playerActive))
             {
                 outline.GetComponent<RawImage>().color = Color.cyan;
 
@@ -109,16 +115,16 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         {
             if (gameManager.playerActive)
             {
-                if (players[gameManager.activePlayerNumber].seletedFacility == null)
+                if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacility == null)
                 {
-                    if (players[gameManager.activePlayerNumber].type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                    if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
                     {
-                        players[gameManager.activePlayerNumber].seletedFacility = this.gameObject;
+                        gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacility = this.gameObject;
                     }
                 }
-                else if (players[gameManager.activePlayerNumber].seletedFacility == this.gameObject)
+                else if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacility == this.gameObject)
                 {
-                    players[gameManager.activePlayerNumber].seletedFacility = null;
+                    gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacility = null;
                 }
                 else
                 {
@@ -146,7 +152,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         {
             if (gameManager.playerActive)
             {
-                if (players[gameManager.activePlayerNumber].type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
                 {
                     outline.SetActive(true);
                 }

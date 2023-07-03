@@ -218,7 +218,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                 playerMenu.SetActive(true);
                 maliciousActorMenu.SetActive(false);
                 yarnSpinner.SetActive(true);
-                fundText.text = "Funds: " + player.funds;
+                fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
                 // If enough of the facilites are down, trigger response from the govt
 
 
