@@ -484,7 +484,6 @@ public class GameManager : MonoBehaviour, IDragHandler
                     Color tempColor = fac.GetComponent<SVGImage>().color;
                     tempColor.a = 0.5f;
                     fac.GetComponent<SVGImage>().color = tempColor;
-
                 }
             }
             DisableAllOutline();
