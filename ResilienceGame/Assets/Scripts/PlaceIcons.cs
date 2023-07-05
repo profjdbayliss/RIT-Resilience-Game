@@ -346,7 +346,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (firedpt)
         {
-            SpawnVariableFacilities(FireTruck, gameManager.FireDeptInputCount, FireDeptLocations, FireDepartments, "Fire (Clone)");
+            SpawnFireDepartments(FireTruck, gameManager.FireDeptInputCount, FireDeptLocations, FireDepartments, "Fire (Clone)");
+            //SpawnVariableFacilities(FireTruck, gameManager.FireDeptInputCount, FireDeptLocations, FireDepartments, "Fire (Clone)");
             //SpawnFacilities(FireTruck, FireDeptLocations, FireDepartments, "Fire (Clone)");
         }
         else
@@ -494,5 +495,129 @@ public class PlaceIcons : MonoBehaviour
         }
         // Disable the original facility
         baseFacility.SetActive(false);
+    }
+
+    void SpawnFireDepartments(GameObject baseFacility, int amount, List<float2> locations, List<GameObject> output, string name)
+    {
+        // Need to spread them out equidistantly from eachother.
+        float xGap = mapScalar.x / amount;
+        float yGap = mapScalar.y / amount;
+
+        for (int i = 0; i < amount; i++)
+        {
+            // make a copy
+            GameObject tempFacility = Instantiate(baseFacility);
+            if (i == locations.Count)
+            {
+                float newLocX = UnityEngine.Random.Range(-mapScalar.x / 2.0f, mapScalar.x / 2.0f);
+                float newLocY = UnityEngine.Random.Range(-mapScalar.y / 2.0f, mapScalar.y / 2.0f);
+
+                newLocX = (mapScalar.x / 3.0f) * (math.cos(i * (2 * math.PI) / amount));
+                newLocY = (mapScalar.y / 3.0f) * (math.sin(i * (2 * math.PI) / amount));
+
+
+                float2 newLoc = new float2(newLocX, newLocY);
+                //FireDepartmentDistanceCheck(locations, newLoc, xGap, yGap);
+                locations.Add(newLoc);
+            }
+
+
+            // Check to see if we are at the original scale, if we aren't then we will utilize our scalars, if not, we can just use the 
+            // passed in locations
+            if (mapScalar != new Vector2(1920.0f * 0.66f, 1080))
+            {
+                Vector3 tempVec = new Vector3(0, 0, 0);
+                float scaleCorrectionX = math.abs(locations[i].x) / (mapScalar.x / 2.0f);
+                float scaleCorrectionY = math.abs(locations[i].y) / (mapScalar.y / 2.0f);
+
+
+                // If the y is negative, we want to subtract tom make sure we go in the right direction.
+                if (locations[i].x < 0.0f)
+                {
+                    tempVec.x = locations[i].x - ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
+                }
+                else
+                {
+                    tempVec.x = locations[i].x + ((OGDeltaScalar.x * 0.66f) * scaleCorrectionX);
+                }
+
+                // If the y is negative, we want to subtract to make sure we go in the right direction.
+                if (locations[i].y < 0.0f)
+                {
+                    tempVec.y = locations[i].y - ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
+                }
+                else
+                {
+                    tempVec.y = locations[i].y + ((OGDeltaScalar.y * 0.66f) * scaleCorrectionY);
+                }
+
+                // Set the instantiated facilities position to the temporary Vec3 we used to put it in the correct location and add it to the proper list
+                tempFacility.transform.position = tempVec;
+                //player.Facilities.Add(tempFacility);
+                output.Add(tempFacility);
+                gameManager.allFacilities.Add(tempFacility);
+            }
+            else
+            {
+                tempFacility.transform.position = new Vector3(locations[i].x, locations[i].y, 0);
+                //player.Facilities.Add(tempFacility);
+                output.Add(tempFacility);
+                gameManager.allFacilities.Add(tempFacility);
+            }
+
+            //fire.transform.SetParent (canvas.transform,false);
+
+            // Set the material then parent it to the Map
+            //fire.GetComponent<MeshRenderer>().material = HexMaterials[10]; <-- Only needed when utilizing hexes
+
+            tempFacility.transform.SetParent(Map.transform, false);
+            tempFacility.name = name;
+        }
+        // Disable the original facility
+        baseFacility.SetActive(false);
+    }
+
+    float2 FireDepartmentDistanceCheck(List<float2> locations, float2 newLoc, float xGap, float yGap)
+    {
+        float2 tempPos = new float2(0,0);
+        foreach (float2 locs in locations)
+        {
+            if (newLoc.x + xGap > locs.x)
+            {
+                if (newLoc.x - xGap < locs.x)
+                {
+                    if (newLoc.y + yGap > locs.y)
+                    {
+                        if (newLoc.y - yGap < locs.y)
+                        {
+                            float newLocX = UnityEngine.Random.Range(-mapScalar.x / 2.0f, mapScalar.x / 2.0f);
+                            float newLocY = UnityEngine.Random.Range(-mapScalar.y / 2.0f, mapScalar.y / 2.0f);
+                            FireDepartmentDistanceCheck(locations, new float2(newLocX,newLocY), xGap, yGap);
+                            break;
+                        }
+                        else
+                        {
+                            tempPos = newLoc;
+                        }
+                    }
+                    else
+                    {
+                        tempPos = newLoc;
+
+                    }
+                }
+                else
+                {
+                    tempPos = newLoc;
+
+                }
+            }
+            else
+            {
+                tempPos = newLoc;
+            }
+        }
+        Debug.Log("DISTCHECK");
+        return tempPos;
     }
 }

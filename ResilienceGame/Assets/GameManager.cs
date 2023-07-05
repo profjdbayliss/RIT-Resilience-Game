@@ -316,22 +316,18 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerActive = !playerActive;
 
             DisableAllOutline();
-            player.seletedFacility = null;
+            foreach(GameObject obj in allPlayers)
+            {
+                obj.GetComponent<Player>().seletedFacility = null;
+            }
+            //allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
             maliciousActor.targetFacility = null;
             turnCount += 0.5f;
             if (playerActive)
             {
-                if (activePlayerNumber == 0)
-                {
-                    activePlayerText.text = player.type + " Player";
-                    fundText.text = "Funds: " + player.funds;
-                }
-                else
-                {
-                    activePlayerText.text = player2.type + " Player";
-                    fundText.text = "Funds: " + player2.funds;
+                activePlayerText.text = allPlayers[activePlayerNumber].GetComponent<Player>().type + " Player";
+                fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
 
-                }
                 activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(true);
@@ -390,9 +386,9 @@ public class GameManager : MonoBehaviour, IDragHandler
         gameCanvas.SetActive(true);
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(true, true, true, true, true, true, true, true, true, true);
-        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, true, true, true, cityHallToggle.isOn, commoditiesToggle.isOn, true, fuelToggle.isOn);
+        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, true, true, true, cityHallToggle.isOn, commoditiesToggle.isOn, true, fuelToggle.isOn); // The trues are requried facilities
 
-        startScreen.SetActive(false);
+        startScreen.SetActive(false); // DUsable the start menu where you determine how many of each facility you would like
 
 
         gameStarted = true;
@@ -438,6 +434,8 @@ public class GameManager : MonoBehaviour, IDragHandler
         playerActive = true;
 
         turnCount = 0;
+
+
         for (int i = 0; i < allPlayers.Length; i++)
         {
             allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
@@ -451,6 +449,51 @@ public class GameManager : MonoBehaviour, IDragHandler
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
+            foreach (GameObject fac in allFacilities)
+            {
+                if (fac.GetComponent<FacilityV3>().type == allPlayers[activePlayerNumber].GetComponent<Player>().type)
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 1.0f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                else
+                {
+                    Color tempColor = fac.GetComponent<SVGImage>().color;
+                    tempColor.a = 0.5f;
+                    fac.GetComponent<SVGImage>().color = tempColor;
+                }
+            }
         }
         else
         {
@@ -557,7 +600,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                     break;
 
                 case 4:
-                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.PublicGoods;
+                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.FireDept;
                     break;
 
                 case 5:
@@ -565,7 +608,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                     break;
 
                 case 6:
-                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.FireDept;
+                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.PublicGoods;
                     break;
             }
             newPlayer.transform.SetParent(map.transform, false);
