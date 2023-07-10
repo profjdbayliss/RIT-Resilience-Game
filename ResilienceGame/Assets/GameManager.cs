@@ -641,5 +641,75 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
+    public void ActivePlayerIncreaseOneFeedback()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseOneFeedback();
+    }
 
+    public void ActivePlayerAllFeedback()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseAllFeedback();
+
+    }
+
+    public void ActivePlayerHireWorkers()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().HireWorkers();
+
+
+    }
+    public void ActivePlayerBoostIT()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostIT();
+
+    }
+    public void ActivePlayerBoostOT()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostOT();
+
+
+    }
+    public void ActivePlayerImprovePhysSec()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().ImprovePhysSec();
+
+
+    }
+    public void ActivePlayerIncreaseFunding()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseFunding();
+
+
+    }
+
+    public void ActivePlayerBoostElectricity()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostElectricity();
+
+
+    }
+    public void ActivePlayerBoostWater()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostWater();
+
+
+    }
+    public void ActivePlayerBoostFuel()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostFuel();
+
+
+    }
+    public void ActivePlayerBoostComms()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostCommunications();
+
+
+    }
+    public void ActivePlayerBoostHealth()
+    {
+        allPlayers[activePlayerNumber].GetComponent<Player>().BoostHealth();
+
+
+    }
 }
