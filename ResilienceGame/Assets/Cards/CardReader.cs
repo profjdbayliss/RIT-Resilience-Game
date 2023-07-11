@@ -101,14 +101,33 @@ public class CardReader : MonoBehaviour
 
                 tempCard.cost = int.Parse(individualCSVObjects[6]);
 
-                Debug.Log(individualCSVObjects[7]);
+                //Debug.Log(individualCSVObjects[7]);
 
                 Texture2D tex = new Texture2D(1, 1);
 
-                byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName);
+                byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName); // This gets the entire atlast right now.
 
                 tex.LoadImage(tempBytes);
-                tempCardObj.GetComponent<RawImage>().texture = tex;
+                for(int j = 0; j < TextureAtlas.textureUVs.Count; j++)
+                {
+                    TextureUV texUV = TextureAtlas.textureUVs[j];
+                    if (texUV.location.Trim() == individualCSVObjects[7].Trim())
+                    {
+                        Debug.Log("SUCCESSFUL TUV: " + texUV.location + " SUCC CSV: " + individualCSVObjects[7]);
+
+                        //Texture2D tex3 = new Texture2D((int)(texUV.pixelEndX - texUV.pixelStartX), (int)(texUV.pixelEndY - texUV.pixelStartY));
+                        Texture2D tex3 = new Texture2D(128, 128);
+                        Debug.Log("X: " + (texUV.pixelEndX) + " Y : " + (texUV.pixelEndY));
+                        tempCardObj.GetComponent<RawImage>().texture = tex3;
+                        Color[] tempColors = tex.GetPixels(texUV.column * 128, texUV.row * 128, 128, 128);
+                        tex3.SetPixels(tempColors);
+                        tex3.Apply();
+                        break;
+                    }
+                }
+
+                //Texture2D tex2 = TextureAtlas.textureUVs[i];
+                //tempCardObj.GetComponent<RawImage>().texture = tex;
 
 
 

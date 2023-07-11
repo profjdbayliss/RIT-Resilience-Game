@@ -6,6 +6,7 @@ using Unity.Collections;
 
 public struct TextureUV
 {
+    public string location;
     public int nameID;
     public float pixelStartX;
     public float pixelStartY;
@@ -15,14 +16,16 @@ public struct TextureUV
     public float pixelStartY2;
     public float pixelEndX2;
     public float pixelEndY2;
+    public int row;
+    public int column;
 }
 
 public class TextureAtlas
 {
     public static List<TextureUV> textureUVs;
     public static TextureAtlas instance = new TextureAtlas();
-    public static readonly int pixelWidth = 64;
-    public static readonly int pixelHeight = 64;
+    public static readonly int pixelWidth = 128;
+    public static readonly int pixelHeight = 128;
     public static int atlasHeight = 0;
     public static int atlasWidth = 0;
     public static Texture2D atlas;
@@ -30,10 +33,6 @@ public class TextureAtlas
 
     public void CreateAtlasComponentData(string directoryName, string outputFileName)
     {
-        if (File.Exists(outputFileName))
-        {
-            UnityEngine.Debug.Log(outputFileName);
-        }
         // Get all file names in this directory
         names = Directory.GetFiles(directoryName);
         for (int i = 0; i < names.Length; i++)
@@ -92,6 +91,7 @@ public class TextureAtlas
             float pixelEndY = ((y1 + 1) * pHeight - 1) / aHeight;
             TextureUV currentUVInfo = new TextureUV
             {
+                location = names[i],
                 nameID = i,
                 pixelStartX = pixelStartX,
                 pixelStartY = pixelStartY,
@@ -100,11 +100,14 @@ public class TextureAtlas
                 pixelEndX = pixelEndX,
                 pixelStartY2 = pixelStartY,
                 pixelEndX2 = pixelEndX,
-                pixelEndY2 = pixelEndY
+                pixelEndY2 = pixelEndY,
+                row = y1,
+                column = x1
             };
+            //UnityEngine.Debug.Log(currentUVInfo.location);
             textureUVs.Add(currentUVInfo);
 
-            UnityEngine.Debug.Log(i);
+            //UnityEngine.Debug.Log(i);
             temp.LoadImage(fileData[i]);
             atlas.SetPixels(x1 * pixelWidth, y1 * pixelHeight, pixelWidth, pixelHeight, temp.GetPixels());
 
