@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class CardReader : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class CardReader : MonoBehaviour
 
     public string[] icons;
 
-
+    bool called;
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +40,8 @@ public class CardReader : MonoBehaviour
         
     }
 
+
+
     public void CSVRead()
     {
         // Check to see if the file exists
@@ -46,12 +49,13 @@ public class CardReader : MonoBehaviour
         {
             FileStream stream = File.OpenRead(cardFileLoc);
             TextReader reader = new StreamReader(stream);
+
             string allCardText = reader.ReadToEnd();
             string[] allCSVObjects = allCardText.Split("\n");
+
             Debug.Log(allCSVObjects.Length);
             for(int i = 0; i < allCSVObjects.Length; i++)
             {
-                Debug.Log(allCSVObjects[i]);
                 string[] individualCSVObjects = allCSVObjects[i].Split(",");
                 GameObject tempCardObj = Instantiate(cardPrefab);
                 //Card tempCard = new Card();
@@ -61,12 +65,18 @@ public class CardReader : MonoBehaviour
                 {
                     case "Resilient":
                         tempCard.type = Card.Type.Resilient;
-                        Debug.Log("RESGIVEN");
+                        break;
+
+                    case "Blue":
+                        tempCard.type = Card.Type.Resilient;
                         break;
 
                     case "Malicious":
                         tempCard.type = Card.Type.Malicious;
-                        Debug.Log("MALGIVEN");
+                        break;
+
+                    case "Red":
+                        tempCard.type = Card.Type.Malicious;
                         break;
 
                     case "GlobalModifier":
@@ -82,41 +92,23 @@ public class CardReader : MonoBehaviour
 
                 tempCard.percentSuccess = float.Parse(individualCSVObjects[3]);
 
-                tempCard.potentcy = float.Parse(individualCSVObjects[4]);
+                if (individualCSVObjects[4].Contains("|") == false)
+                {
+                    tempCard.potentcy = float.Parse(individualCSVObjects[4]);
+                }
 
                 tempCard.duration = int.Parse(individualCSVObjects[5]);
 
                 tempCard.cost = int.Parse(individualCSVObjects[6]);
 
                 Debug.Log(individualCSVObjects[7]);
-                for(int j = 0; j < icons.Length; j++)
-                {
-                    if (icons[j].Contains(individualCSVObjects[7]))
-                    {
-                        Texture2D tex = new Texture2D(1, 1);
-                        Debug.Log("FOUND");
-                        byte[] tempBytes = File.ReadAllBytes(individualCSVObjects[7]);
-                        //Debug.Log(Directory.GetFiles(individualCSVObjects[7]));
-                        //byte[] tempBytes2 = File.ReadAllBytes(Directory.GetFiles(individualCSVObjects[7])[0]);
-                        //Directory.GetFiles(individualCSVObjects[7]);
-                        tex.LoadImage(tempBytes);
-                        //tex.LoadImage(tempBytes2);
-                        tempCardObj.GetComponent<RawImage>().texture = tex;
-                    }
-                }
-                
-                //if (File.Exists(individualCSVObjects[7]))
-                //{
-                //    Texture2D tex = new Texture2D(1, 1);
-                //    Debug.Log("FOUND");
-                //    byte[] tempBytes = File.ReadAllBytes(individualCSVObjects[7]);
-                //    //Debug.Log(Directory.GetFiles(individualCSVObjects[7]));
-                //    //byte[] tempBytes2 = File.ReadAllBytes(Directory.GetFiles(individualCSVObjects[7])[0]);
-                //    //Directory.GetFiles(individualCSVObjects[7]);
-                //    tex.LoadImage(tempBytes);
-                //    //tex.LoadImage(tempBytes2);
-                //    tempCardObj.GetComponent<RawImage>().texture = tex;
-                //}
+
+                Texture2D tex = new Texture2D(1, 1);
+
+                byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName);
+
+                tex.LoadImage(tempBytes);
+                tempCardObj.GetComponent<RawImage>().texture = tex;
 
 
 
