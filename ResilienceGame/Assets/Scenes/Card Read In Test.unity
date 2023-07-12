@@ -36351,12 +36351,11 @@ MonoBehaviour:
   allCards: []
   resilientCards: []
   maliciousCards: []
-  cardFileLoc: Z:\IGMProfile\Desktop\testCards.csv
   globalModifiers: []
+  cardFileLoc: Z:\IGMProfile\Desktop\testCards.csv
   players: []
-  actor: {fileID: 276892438}
+  maliciousActor: {fileID: 0}
   cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
-  icons: []
 --- !u!4 &1269387673
 Transform:
   m_ObjectHideFlags: 0

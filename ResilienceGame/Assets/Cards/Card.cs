@@ -17,6 +17,8 @@ public class Card : MonoBehaviour
     public string title;
     public string description;
     public RawImage img;
+
+    // Separate these
     public float percentSuccess;
     public float potentcy;
     public int duration;

@@ -98,7 +98,14 @@ public class Commodity : FacilityV3
         city_resource = Random.Range(1, 101);
 
         electricity = FindClosestFacilityElectricity().output_flow;
-        fuel = FindClosestFacilityFuel().output_flow;
+        if(FindClosestFacilityFuel() != null)
+        {
+            fuel = FindClosestFacilityFuel().output_flow;
+        }
+        else
+        {
+
+        }
         communications = FindClosestFacilityComms().output_flow;
 
         if (FindClosestFacilityElectricity().output_flow <= 0 || FindClosestFacilityFuel().output_flow <= 0 || FindClosestFacilityComms().output_flow <= 0)
@@ -116,7 +123,10 @@ public class Commodity : FacilityV3
     void SearchAgain()
     {
         electricity = FindClosestFacilityElectricity().output_flow;
-        fuel = FindClosestFacilityFuel().output_flow;
+        if(FindClosestFacilityFuel() != null)
+        {
+            fuel = FindClosestFacilityFuel().output_flow;
+        }
         communications = FindClosestFacilityComms().output_flow;
     }
 }
