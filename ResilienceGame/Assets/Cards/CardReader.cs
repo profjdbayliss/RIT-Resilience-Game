@@ -37,7 +37,7 @@ public class CardReader : MonoBehaviour
     }
 
 
-
+    // Reformat to an SOA style 
     public void CSVRead()
     {
         // Check to see if the file exists
@@ -56,7 +56,7 @@ public class CardReader : MonoBehaviour
             byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName); // This gets the entire atlast right now.
             tex.LoadImage(tempBytes);
 
-            for (int i = 0; i < allCSVObjects.Length; i++)
+            for (int i = 0; i < allCSVObjects.Length; i++) 
             {
                 // Then in each of the lines of csv data, split them based on commas to get the different pieces of information on each object
                 // and instantiate a base card object to then fill in with data.
@@ -93,9 +93,9 @@ public class CardReader : MonoBehaviour
 
                 // Then assign the necessary values to each card based off of their csv input.
                 tempCardObj.name = individualCSVObjects[1];
-                tempCard.title = individualCSVObjects[1];
+                //tempCard.title = individualCSVObjects[1]; NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
-                tempCard.description = individualCSVObjects[2];
+                //tempCard.description = individualCSVObjects[2]; NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
                 tempCard.percentSuccess = float.Parse(individualCSVObjects[3]); // Parse bc it is a percent
 
@@ -124,7 +124,9 @@ public class CardReader : MonoBehaviour
 
                         Texture2D tex3 = new Texture2D(128, 128); // This needs to match the textureatlas pixel width
 
-                        tempCardObj.GetComponent<RawImage>().texture = tex3;
+                        //tempCardObj.GetComponent<RawImage>().texture = tex3;
+                        tempCard.img.texture = tex3;
+
                         Color[] tempColors = tex.GetPixels(texUV.column * 128, texUV.row * 128, 128, 128); // This needs to match the textureatlas pixel width
                         tex3.SetPixels(tempColors);
                         tex3.Apply();

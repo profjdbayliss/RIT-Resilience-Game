@@ -57,17 +57,17 @@ public class FacilityEvents : MonoBehaviour
             {
                 fac.isDown = true;
 
-                if(rng >= (70 + fac.maintenence))
+                if(rng >= (70 + fac.maintenance))
                 {
-                    fac.maintenence -= 1;
+                    fac.maintenance -= 1;
                 }
             }
             else
             {
                 fac.isDown = true;
-                if(rng >= (70 + fac.maintenence) || rng >= (70 + fac.phys_security) || rng >= (70 + fac.ot_level))
+                if(rng >= (70 + fac.maintenance) || rng >= (70 + fac.phys_security) || rng >= (70 + fac.ot_level))
                 {
-                    fac.maintenence -= 1;
+                    fac.maintenance -= 1;
                     fac.phys_security -= 1;
                     fac.ot_level -= 1;
                 }

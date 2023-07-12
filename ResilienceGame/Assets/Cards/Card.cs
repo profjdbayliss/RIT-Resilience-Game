@@ -13,16 +13,19 @@ public class Card : MonoBehaviour
     };
 
     // Establish necessary fields
+
+    // Static fields that are only utilized on spawn and cardloading.
     public Type type;
-    public string title;
-    public string description;
+    public static string title;
+    public static string description;
     public RawImage img;
 
-    // Separate these
+    // Separate these -- As they will change more often, will need type
     public float percentSuccess;
     public float potentcy;
     public int duration;
     public int cost;
+    // Need to add Target
 
     // Start is called before the first frame update
     void Start()

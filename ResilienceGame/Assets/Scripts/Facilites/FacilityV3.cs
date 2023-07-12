@@ -37,7 +37,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public int feedback;
     public int hardness;
-    public int maintenence;
+    public int maintenance;
 
     //internal dependencies
     //treat these as a scale 1-10

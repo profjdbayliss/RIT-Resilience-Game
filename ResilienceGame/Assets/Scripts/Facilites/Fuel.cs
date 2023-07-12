@@ -38,7 +38,7 @@ public class Fuel : FacilityV3
     {
         feedback = Random.Range(1, 11);
         hardness = Random.Range(1, 11); //hardness vulnerability to cyber
-        maintenence = Random.Range(1, 11); //Maintenence(Age) vulnerability to natural disaster or physical threat
+        maintenance = Random.Range(1, 11); //maintenance(Age) vulnerability to natural disaster or physical threat
         type = Type.Fuel;
 
         //internal

@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour, IDragHandler
     public int commsInputCount = 1;
     public int commoditiesInputCount;
     public int elecDistInputCount = 1;
-    public int fuelInputCount;
+    public int fuelInputCount = 1;
 
 
     public List<GameObject> allFacilities;

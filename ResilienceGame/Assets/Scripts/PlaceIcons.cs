@@ -336,8 +336,8 @@ public class PlaceIcons : MonoBehaviour
 
         if (police)
         {
-            //SpawnVariableFacilities(police, gameManager.policeInputCount, poli)
-            spawnFacility(Police, PoliceLoc, "Police (Clone)");
+            SpawnVariableFacilities(Police, gameManager.policeInputCount, new List<float2>(), new List<GameObject>(), "Police(Clone)");
+            //spawnFacility(Police, PoliceLoc, "Police (Clone)");
         }
         else
         {
