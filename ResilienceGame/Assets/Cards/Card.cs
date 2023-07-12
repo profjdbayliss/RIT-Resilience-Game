@@ -11,6 +11,7 @@ public class Card : MonoBehaviour
         Malicious,
         GlobalModifier
     };
+
     // Establish necessary fields
     public Type type;
     public string title;

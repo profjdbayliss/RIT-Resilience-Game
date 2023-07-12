@@ -12,25 +12,21 @@ public class CardReader : MonoBehaviour
     public List<Card> allCards;
     public List<Card> resilientCards;
     public List<Card> maliciousCards;
+    public List<Card> globalModifiers;
 
     public string cardFileLoc;
 
-    public List<Card> globalModifiers;
 
     public List<Player> players;
 
-    public MaliciousActor actor;
+    public MaliciousActor maliciousActor;
 
     public GameObject cardPrefab;
 
-    public string[] icons;
-
-    bool called;
 
     // Start is called before the first frame update
     void Start()
     {
-        icons = Directory.GetFiles("Assets/Icons/EmilyIcons/Game Icons");
         CSVRead();
     }
 
@@ -51,16 +47,26 @@ public class CardReader : MonoBehaviour
             TextReader reader = new StreamReader(stream);
 
             string allCardText = reader.ReadToEnd();
+
+            // Split the read in CSV file into seperate objects at the new line character
             string[] allCSVObjects = allCardText.Split("\n");
 
-            Debug.Log(allCSVObjects.Length);
-            for(int i = 0; i < allCSVObjects.Length; i++)
+            // Make sure to get the atlas first, as we only need to query it once.
+            Texture2D tex = new Texture2D(1, 1);
+            byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName); // This gets the entire atlast right now.
+            tex.LoadImage(tempBytes);
+
+            for (int i = 0; i < allCSVObjects.Length; i++)
             {
+                // Then in each of the lines of csv data, split them based on commas to get the different pieces of information on each object
+                // and instantiate a base card object to then fill in with data.
                 string[] individualCSVObjects = allCSVObjects[i].Split(",");
                 GameObject tempCardObj = Instantiate(cardPrefab);
-                //Card tempCard = new Card();
+
+                // Get a reference to the Card component on the card gameobject.
                 Card tempCard = tempCardObj.GetComponent<Card>();
 
+                // Assign the cards type based on a switch statement of either Resilient, Malicious, or a Global Modifier
                 switch (individualCSVObjects[0])
                 {
                     case "Resilient":
@@ -85,13 +91,15 @@ public class CardReader : MonoBehaviour
 
                 }
 
+                // Then assign the necessary values to each card based off of their csv input.
                 tempCardObj.name = individualCSVObjects[1];
                 tempCard.title = individualCSVObjects[1];
 
                 tempCard.description = individualCSVObjects[2];
 
-                tempCard.percentSuccess = float.Parse(individualCSVObjects[3]);
+                tempCard.percentSuccess = float.Parse(individualCSVObjects[3]); // Parse bc it is a percent
 
+                // Check to make sure that this is actually a number, but if it has text in it then we don't parse it.
                 if (individualCSVObjects[4].Contains("|") == false)
                 {
                     tempCard.potentcy = float.Parse(individualCSVObjects[4]);
@@ -101,36 +109,33 @@ public class CardReader : MonoBehaviour
 
                 tempCard.cost = int.Parse(individualCSVObjects[6]);
 
-                //Debug.Log(individualCSVObjects[7]);
 
-                Texture2D tex = new Texture2D(1, 1);
 
-                byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName); // This gets the entire atlast right now.
 
-                tex.LoadImage(tempBytes);
+                // Then we use a for loop to check the image location of the current CSV and the textureUVs
+                // made when the atlas is made. If it is the matching image, then we take a sub-section of the atlas
+                // and add it to the card.
+                // ** VERY IMPORTANT ** The texture2D width and Height need to match what is in the TextureAtlas.cs file and all images for cards need to adhere to this size for this to work properly.
                 for(int j = 0; j < TextureAtlas.textureUVs.Count; j++)
                 {
                     TextureUV texUV = TextureAtlas.textureUVs[j];
-                    if (texUV.location.Trim() == individualCSVObjects[7].Trim())
+                    if (texUV.location.Trim() == individualCSVObjects[7].Trim()) // Check to make sure that the TextureUV and the current CSV objects image are the same
                     {
-                        Debug.Log("SUCCESSFUL TUV: " + texUV.location + " SUCC CSV: " + individualCSVObjects[7]);
 
-                        //Texture2D tex3 = new Texture2D((int)(texUV.pixelEndX - texUV.pixelStartX), (int)(texUV.pixelEndY - texUV.pixelStartY));
-                        Texture2D tex3 = new Texture2D(128, 128);
-                        Debug.Log("X: " + (texUV.pixelEndX) + " Y : " + (texUV.pixelEndY));
+                        Texture2D tex3 = new Texture2D(128, 128); // This needs to match the textureatlas pixel width
+
                         tempCardObj.GetComponent<RawImage>().texture = tex3;
-                        Color[] tempColors = tex.GetPixels(texUV.column * 128, texUV.row * 128, 128, 128);
+                        Color[] tempColors = tex.GetPixels(texUV.column * 128, texUV.row * 128, 128, 128); // This needs to match the textureatlas pixel width
                         tex3.SetPixels(tempColors);
                         tex3.Apply();
+
                         break;
                     }
                 }
 
-                //Texture2D tex2 = TextureAtlas.textureUVs[i];
-                //tempCardObj.GetComponent<RawImage>().texture = tex;
 
 
-
+                // Add the card to all card list and then based off a switch on the cards type we add it to a list of all resilient, malicious, or global modifier cards.
                 allCards.Add(tempCard);
                 switch (tempCard.type)
                 {
