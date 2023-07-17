@@ -93,9 +93,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public Image Funding_img;
 
     public GameObject feedbackPanel;
-    public GameObject actionPanel;
 
-
+    // Remove the meshrenderer and material[]
     MeshRenderer meshRenderer;
     public Material[] material;
 
@@ -177,6 +176,27 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         //meshRenderer = GetComponent<MeshRenderer>();
         //meshRenderer.material = material[0];
+    }
+
+    public FacilityV3 FindClosestFacility<T>()
+    {
+        FacilityV3[] gos;
+        gos = (FacilityV3[])GameObject.FindObjectsOfType(typeof(T));
+        FacilityV3 closest = null;
+        float distance = Mathf.Infinity;
+        Vector3 position = transform.position;
+        foreach (FacilityV3 go in gos)
+        {
+            Vector3 diff = go.transform.position - position;
+            float curDistance = diff.sqrMagnitude;
+            if (curDistance < distance)
+            {
+                closest = go;
+                distance = curDistance;
+            }
+        }
+        connectedFacilities.Add(closest);
+        return closest;
     }
 
 

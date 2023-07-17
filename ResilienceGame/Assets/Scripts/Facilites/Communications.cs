@@ -59,9 +59,9 @@ public class Communications : FacilityV3
         public_goods = Random.Range(1, 101); 
         city_resource = Random.Range(1, 101);
 
-        electricity = FindClosestFacilityElectricity().output_flow;
+        electricity = FindClosestFacility<ElectricityDistribution>().output_flow;
 
-        if (FindClosestFacilityElectricity().output_flow <= 0)
+        if (FindClosestFacility<ElectricityDistribution>().output_flow <= 0)
         {
             Invoke("SearchAgain", 3);
         }
@@ -74,6 +74,6 @@ public class Communications : FacilityV3
 
     void SearchAgain()
     {
-        electricity = FindClosestFacilityElectricity().output_flow;
+        electricity = FindClosestFacility<ElectricityDistribution>().output_flow;
     }
 }

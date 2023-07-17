@@ -5,6 +5,7 @@ public class CreateTextureAtlas : MonoBehaviour
     // Name of directory to get files from
     public string mDirectoryName = "blocks";
     public string mOutputFileName = "../atlas.png";
+    public CardReader mReader;
     public void Start()
     {
 
@@ -13,6 +14,9 @@ public class CreateTextureAtlas : MonoBehaviour
         TextureAtlas.instance.CreateAtlasComponentData(mDirectoryName, mOutputFileName);
 
         UnityEngine.Debug.Log("Done with creation of texture atlas.");
+
+        mReader = GetComponent<CardReader>();
+        mReader.CSVRead();
     }
 
 

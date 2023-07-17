@@ -59,7 +59,8 @@ public class ElectricityGeneration : FacilityV3
         public_goods = Random.Range(1, 101);
         city_resource = Random.Range(1, 101);
         //CalculateFlow();
-        FindClosestFacilityElectricity();
+        FindClosestFacility<ElectricityDistribution>();
+        //FindClosestFacilityElectricity();
         Update();
     }
 

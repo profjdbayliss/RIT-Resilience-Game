@@ -27,13 +27,13 @@ public class CardReader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        CSVRead();
+        //CSVRead();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
 
@@ -93,9 +93,9 @@ public class CardReader : MonoBehaviour
 
                 // Then assign the necessary values to each card based off of their csv input.
                 tempCardObj.name = individualCSVObjects[1];
-                //tempCard.title = individualCSVObjects[1]; NEED THESE JUST COMMENTING TO DROP ERRORS RN
+                //tempCard.title = individualCSVObjects[1]; //NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
-                //tempCard.description = individualCSVObjects[2]; NEED THESE JUST COMMENTING TO DROP ERRORS RN
+                //tempCard.description = individualCSVObjects[2]; // NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
                 tempCard.percentSuccess = float.Parse(individualCSVObjects[3]); // Parse bc it is a percent
 
@@ -124,8 +124,9 @@ public class CardReader : MonoBehaviour
 
                         Texture2D tex3 = new Texture2D(128, 128); // This needs to match the textureatlas pixel width
 
-                        //tempCardObj.GetComponent<RawImage>().texture = tex3;
-                        tempCard.img.texture = tex3;
+
+                        tempCardObj.GetComponent<RawImage>().texture = tex3;
+                        //tempCard.img.texture = tex3;
 
                         Color[] tempColors = tex.GetPixels(texUV.column * 128, texUV.row * 128, 128, 128); // This needs to match the textureatlas pixel width
                         tex3.SetPixels(tempColors);

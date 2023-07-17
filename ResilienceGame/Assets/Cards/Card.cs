@@ -31,6 +31,7 @@ public class Card : MonoBehaviour
     void Start()
     {
         img = this.gameObject.GetComponent<RawImage>();
+        Debug.Log("Card Made");
     }
 
     // Update is called once per frame
