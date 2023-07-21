@@ -35,10 +35,6 @@ public class TextureAtlas
     {
         // Get all file names in this directory
         names = Directory.GetFiles(directoryName);
-        for (int i = 0; i < names.Length; i++)
-        {
-            UnityEngine.Debug.Log(names[i]);
-        }
 
         // make the list of uvs
         textureUVs = new List<TextureUV>(names.Length);
@@ -120,7 +116,7 @@ public class TextureAtlas
 
         }
 
-        atlas.alphaIsTransparency = true;
+        //atlas.alphaIsTransparency = true;
         atlas.Apply();
 
         // write the atlas out to a file

@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -9,9 +10,8 @@ using Unity.VectorGraphics;
 public class GameManager : MonoBehaviour, IDragHandler
 {
     // Establish necessary fields
-    public Player player;
-    public Player player2;
     public GameObject[] allPlayers;
+    public NativeArray<int> playerIDs;
 
     public MaliciousActor maliciousActor;
     public bool playerActive;
@@ -81,6 +81,7 @@ public class GameManager : MonoBehaviour, IDragHandler
     void Start()
     {
         startScreen.SetActive(true);
+        Debug.Log("Test Start");
     }
 
 
@@ -429,6 +430,7 @@ public class GameManager : MonoBehaviour, IDragHandler
         //SpawnPlayers(6); // <-- Need to change this to an input
 
         maliciousActor = GetComponent<MaliciousActor>();
+        maliciousActor.SpawnDeck();
         activePlayerNumber = 0;
 
         playerActive = true;
@@ -449,6 +451,23 @@ public class GameManager : MonoBehaviour, IDragHandler
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
+            foreach(GameObject players in allPlayers)
+            {
+                if(players != allPlayers[activePlayerNumber])
+                {
+                    foreach(GameObject card in players.GetComponent<Player>().HandList)
+                    {
+                        card.SetActive(false);
+                    }
+                }
+                else
+                {
+                    foreach (GameObject card in players.GetComponent<Player>().HandList)
+                    {
+                        card.SetActive(true);
+                    }
+                }
+            }
             foreach (GameObject fac in allFacilities)
             {
                 if (fac.GetComponent<FacilityV3>().type == allPlayers[activePlayerNumber].GetComponent<Player>().type)
@@ -516,6 +535,23 @@ public class GameManager : MonoBehaviour, IDragHandler
             }
             activePlayerText.text = allPlayers[activePlayerNumber].GetComponent<Player>().type + " Player";
             fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
+            foreach (GameObject players in allPlayers)
+            {
+                if (players != allPlayers[activePlayerNumber])
+                {
+                    foreach (GameObject card in players.GetComponent<Player>().HandList)
+                    {
+                        card.SetActive(false);
+                    }
+                }
+                else
+                {
+                    foreach (GameObject card in players.GetComponent<Player>().HandList)
+                    {
+                        card.SetActive(true);
+                    }
+                }
+            }
             foreach (GameObject fac in allFacilities)
             {
                 if (fac.GetComponent<FacilityV3>().type == allPlayers[activePlayerNumber].GetComponent<Player>().type)

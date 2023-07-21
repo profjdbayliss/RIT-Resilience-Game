@@ -27,6 +27,8 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public Type type;
 
+    public int facID;
+
     public bool isOver;
     public bool isDown;
     public bool hasChanged;

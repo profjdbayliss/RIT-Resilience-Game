@@ -6,16 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/FakeMapTest.unity
-    guid: d1c3109bdb54ad54c8a2b2838528e640
-  - enabled: 0
     path: Assets/Scenes/Combined Scene.unity
     guid: 9d21964f272f3b8409ae1df42484b8b0
   - enabled: 0
-    path: Assets/Scenes/YarnSpinnerDemo.unity
-    guid: 961e3608dcc5ed5438a46d1da690eb08
-  - enabled: 1
     path: Assets/Scenes/Slippy Map Test.unity
     guid: cc2d9dae691566442923badee95ba3ea
+  - enabled: 1
+    path: Assets/Scenes/Card Read In Test.unity
+    guid: 5517bfc2a7fae9f46a7387e668a7e008
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 8e32c805cf1b84242b648b152a6963bf, type: 2}

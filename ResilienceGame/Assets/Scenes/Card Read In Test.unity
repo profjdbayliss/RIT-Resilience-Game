@@ -1766,6 +1766,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 3
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -1774,7 +1775,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -1818,7 +1819,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -7129,8 +7129,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8f6d54f3722f524290f07c6e2695f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  player2: {fileID: 0}
   allPlayers: []
   maliciousActor: {fileID: 276892438}
   playerActive: 1
@@ -7192,6 +7190,8 @@ MonoBehaviour:
   manager: {fileID: 0}
   ransomwareTurn: 0
   randomEventChance: 0
+  cardReader: {fileID: 0}
+  Deck: 
 --- !u!114 &276892439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7671,6 +7671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 6
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -7679,7 +7680,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -7723,7 +7724,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -13246,6 +13246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 7
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -13254,7 +13255,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -13298,7 +13299,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -18406,6 +18406,82 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 655828877}
   m_CullTransparentMesh: 1
+--- !u!1 &657800786
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 657800787}
+  - component: {fileID: 657800789}
+  - component: {fileID: 657800788}
+  m_Layer: 5
+  m_Name: Card Drop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &657800787
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657800786}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1448016501}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 763, y: 0}
+  m_SizeDelta: {x: 330, y: 330}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &657800788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657800786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &657800789
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657800786}
+  m_CullTransparentMesh: 1
 --- !u!1 &658006552
 GameObject:
   m_ObjectHideFlags: 0
@@ -18888,6 +18964,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 9
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -18896,7 +18973,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -18940,7 +19017,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -19288,6 +19364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 5
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -19296,7 +19373,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -19340,7 +19417,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -20494,6 +20570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 10
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -20502,7 +20579,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -20546,7 +20623,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -21864,6 +21940,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 4
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -21872,7 +21949,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -21916,7 +21993,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -34593,6 +34669,13 @@ MonoBehaviour:
   fundsText: {fileID: 914873565}
   type: 10
   gameManager: {fileID: 276892436}
+  cardReader: {fileID: 0}
+  Deck: 
+  HandList: []
+  handSize: 0
+  maxHandSize: 0
+  cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
+  cardDropZone: {fileID: 657800786}
 --- !u!1 &1202495920
 GameObject:
   m_ObjectHideFlags: 0
@@ -35304,6 +35387,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 2
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -35312,7 +35396,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -35356,7 +35440,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -36352,7 +36435,7 @@ MonoBehaviour:
   resilientCards: []
   maliciousCards: []
   globalModifiers: []
-  cardFileLoc: Z:\IGMProfile\Desktop\testCards.csv
+  cardFileLoc: D:\Profiles\sbb7355\Downloads\Cards - Sheet1 (1).csv
   players: []
   maliciousActor: {fileID: 0}
   cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
@@ -36385,6 +36468,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mDirectoryName: SamTemp
   mOutputFileName: ../atlas.png
+  mReader: {fileID: 0}
 --- !u!1 &1271643113
 GameObject:
   m_ObjectHideFlags: 0
@@ -42196,6 +42280,7 @@ RectTransform:
   - {fileID: 1781302874}
   - {fileID: 2118055920}
   - {fileID: 1196016917}
+  - {fileID: 657800787}
   m_Father: {fileID: 342662961}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -50708,6 +50793,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -50716,7 +50802,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -50760,7 +50846,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -52436,6 +52521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 11
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -52444,7 +52530,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -52488,7 +52574,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -55938,6 +56023,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
+  facID: 0
   isOver: 0
   isDown: 0
   hasChanged: 0
@@ -55946,7 +56032,7 @@ MonoBehaviour:
   external_flow: 0
   feedback: 0
   hardness: 0
-  maintenence: 0
+  maintenance: 0
   workers: 0
   it_level: 0
   ot_level: 0
@@ -55990,7 +56076,6 @@ MonoBehaviour:
   Phys_Security_img: {fileID: 0}
   Funding_img: {fileID: 0}
   feedbackPanel: {fileID: 0}
-  actionPanel: {fileID: 0}
   material: []
   facilities: []
   connectedFacilities: []
@@ -62239,7 +62324,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 3e-45, y: 0, z: 0, w: 1e-45}
+  m_BoundingSphereOverride: {x: 4.5904e-41, y: -61707456, z: 4.5904e-41, w: 9.403955e-38}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0

@@ -12,18 +12,36 @@ public class MaliciousActor : MonoBehaviour
     public GameManager manager;
     public float ransomwareTurn;
     public float randomEventChance;
+    public CardReader cardReader;
+    public List<int> Deck;
 
     // Start is called before the first frame update
     void Start()
     {
         funds = 750.0f;
         manager = gameObject.GetComponent<GameManager>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void SpawnDeck()
+    {
+        cardReader = GameObject.FindObjectOfType<CardReader>();
+        for (int i = 0; i < cardReader.CardIDs.Length; i++)
+        {
+            if (cardReader.CardTeam[i] == (int)(Card.Type.Malicious)) // Uncomment to build the deck
+            {
+                for (int j = 0; j < cardReader.CardCount[i]; j++)
+                {
+                    Deck.Add(i);
+                }
+            }
+        }
     }
 
     public void CompromiseWorkers()
