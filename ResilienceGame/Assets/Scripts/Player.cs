@@ -16,7 +16,9 @@ public class Player : MonoBehaviour
     public GameManager gameManager;
     public CardReader cardReader;
     public List<int> Deck;
+    public List<int> CardCountList;
     public List<GameObject> HandList;
+    public List<GameObject> ActiveCardList;
     public int handSize;
     public int maxHandSize = 5;
     public GameObject cardPrefab;
@@ -36,6 +38,7 @@ public class Player : MonoBehaviour
             {
                 Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
                 Deck.Add(i);
+                CardCountList.Add(cardReader.CardCount[i]);
             }
 
             //if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
@@ -95,16 +98,36 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        foreach(GameObject card in HandList)
+        {
+            if(card.GetComponent<Card>().state == Card.CardState.CardInPlay)
+            {
+                HandList.Remove(card);
+                ActiveCardList.Add(card);
+                card.GetComponent<Card>().duration = cardReader.CardDuration[card.GetComponent<Card>().cardID] + gameManager.turnCount;
+                break;
+            }
+        }
+        foreach (GameObject card in ActiveCardList)
+        {
+            if (gameManager.turnCount  >= card.GetComponent<Card>().duration)
+            {
+                ActiveCardList.Remove(card);
+                card.SetActive(false);
+                break;
+            }
+        }
     }
 
-    void DrawCard()
+    public void DrawCard()
     {
         int rng = Random.Range(0, Deck.Count);
-        Debug.Log("ID: " + Deck[rng] + " TYPE: " + cardReader.CardTeam[Deck[rng]]);
-        if (cardReader.CardCount[Deck[rng]] > 0)
+        Debug.Log("ID: " + Deck[rng] + " TYPE: " + cardReader.CardTeam[Deck[rng]] + " " + CardCountList[rng]);
+        //if (cardReader.CardCount[Deck[rng]] > 0)
+        if (CardCountList[rng] > 0)
         {
-            cardReader.CardCount[Deck[rng]]--;
+            CardCountList[rng]--;
+            //cardReader.CardCount[Deck[rng]]--;
             GameObject tempCardObj = Instantiate(cardPrefab);
             Card tempCard = tempCardObj.GetComponent<Card>();
             tempCard.cardDropZone = cardDropZone;
@@ -147,8 +170,8 @@ public class Player : MonoBehaviour
 
     public void PlayCard(int cardID, int targetID)
     {
-        Debug.Log("Card Play Call");
-        if (funds - cardReader.CardCost[cardID] >= 0 && cardReader.CardCount[cardID] > 0)
+        Debug.Log("Card Play Call" + cardReader.CardCount[cardID] + CardCountList[Deck.IndexOf(cardID)]);
+        if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID >= 0) // cardReader.CardCount[cardID] >= 0
         {
             // Check to make sure that the CardID's target type is the same as the targetID's facility type
             if (true) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type
@@ -156,12 +179,14 @@ public class Player : MonoBehaviour
                 Card tempCard = new Card();
                 float rng = Random.Range(0.0f, 1.0f);
                 // Determine ranges for the percent chance to allow for super success, success, failure, super failure
-                if (rng >= cardReader.CardPercentChance[cardID])
+                if (rng >= (1.0 - cardReader.CardPercentChance[cardID]))
                 {
                     // Success
                     // Get the facility based off of the target ID
                     cardReader.CardTarget[cardID] = targetID;
                     // Apply the impact, activate these things locally and then the results will be transferred through the network at the end of the turn
+
+                    // Apply the duration to be Current turn count + duration
 
                     
                 }
@@ -171,8 +196,10 @@ public class Player : MonoBehaviour
                 }
                 // Reduce the size of the hand
                 handSize--;
+
                 // Regardless of success or not, we remove the card from play.
-                cardReader.CardCount[cardID] -= 1; // This doesn't work as we want, as it would potentially reduce card count for other players if networked, if we don't network this it is not an issue.
+                //cardReader.CardCount[cardID] -= 1; // This doesn't work as we want, as it would potentially reduce card count for other players if networked, if we don't network this it is not an issue.
+                //Debug.Log(cardReader.CardCount[cardID]);
                 // Deck.Remove(cardID);
 
                 // Store the information of CardID played and Target Facility ID to be sent over the network
@@ -185,8 +212,40 @@ public class Player : MonoBehaviour
         }
         else
         {
-            Debug.Log("You do not have enough action points to play this.");
+            Debug.Log("You do not have enough action points to play this. You have " + funds + " remaining " + cardReader.CardCount[cardID] + " " + CardCountList[Deck.IndexOf(cardID)]);
+            Debug.Log("ID: " + cardID + " DECK ID " + Deck.IndexOf(cardID) + " CARDREADER COUNT: " + cardReader.CardCount[cardID] + " CARDCOUNTLIST: " + CardCountList[Deck.IndexOf(cardID)]);
         }
+    }
+
+    public bool SelectFacility(int cardID)
+    {
+        int targetID = -1;
+        // Intention is to have it like hearthstone where player plays a targeted card, they then select the target which is passed into playcard
+
+
+        //if (seletedFacility == null)
+        //{
+        //    Debug.Log("PICK A CARD");
+        //}
+        //else
+        //{
+        //    targetID = seletedFacility.GetComponent<FacilityV3>().facID;
+        //    PlayCard(cardID, targetID);
+        //}
+        if(seletedFacility != null)
+        {
+            targetID = seletedFacility.GetComponent<FacilityV3>().facID;
+            PlayCard(cardID, targetID);
+            return true;
+        }
+        else
+        {
+
+            Debug.Log("Select a facility by double clicking it");
+            return false;
+        }
+
+
     }
 
 

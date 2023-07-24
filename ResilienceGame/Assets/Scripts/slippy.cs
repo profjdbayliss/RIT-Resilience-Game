@@ -27,10 +27,21 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
     {
         maxScale = 3.0f;
         minScale = 0.5f;
-        if(this.gameObject.GetComponentInParent<Player>() == false)
+        if(this.gameObject.GetComponentInParent<Player>() == null)
         {
-            resetScale = playerInput.actions["Reset Scale"];
+            if (this.gameObject.GetComponentInParent<MaliciousActor>() == null)
+            {
+                Debug.Log("GOT Slippy");
+                resetScale = playerInput.actions["Reset Scale"];
+            }
         }
+
+        //if(this.gameObject.GetComponentInParent<Player>().isActiveAndEnabled == false && this.gameObject.GetComponentInParent<MaliciousActor>().isActiveAndEnabled == false)
+        //{
+        //    resetScale = playerInput.actions["Reset Scale"];
+
+        //}
+
     }
 
     // Update is called once per frame

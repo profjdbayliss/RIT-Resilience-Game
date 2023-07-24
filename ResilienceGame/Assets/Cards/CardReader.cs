@@ -205,6 +205,7 @@ public class CardReader : MonoBehaviour
 
 
                 CardCount[i] = int.Parse(individualCSVObjects[10]);
+                Debug.Log("Card Count for " + i + ": " + CardCount[i]);
 
 
 

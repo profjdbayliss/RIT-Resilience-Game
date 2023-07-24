@@ -1266,7 +1266,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: DataBreach
         m_Mode: 1
@@ -3957,7 +3957,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseHealth
         m_Mode: 1
@@ -6965,7 +6965,6 @@ GameObject:
   - component: {fileID: 276892435}
   - component: {fileID: 276892434}
   - component: {fileID: 276892436}
-  - component: {fileID: 276892438}
   - component: {fileID: 276892439}
   m_Layer: 0
   m_Name: FakeMapTest
@@ -7130,7 +7129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allPlayers: []
-  maliciousActor: {fileID: 276892438}
+  maliciousActor: {fileID: 0}
   playerActive: 1
   playerMenu: {fileID: 1357449874}
   maliciousActorMenu: {fileID: 2006741261}
@@ -7172,26 +7171,6 @@ MonoBehaviour:
   tiles: {fileID: 0}
   facilityEvents: {fileID: 276892439}
   criticalEnabled: 0
---- !u!114 &276892438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 276892433}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddf88332d978d0c45894fe099bd85dc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  funds: 0
-  targetFacility: {fileID: 0}
-  ransomwaredFacility: {fileID: 0}
-  manager: {fileID: 0}
-  ransomwareTurn: 0
-  randomEventChance: 0
-  cardReader: {fileID: 0}
-  Deck: 
 --- !u!114 &276892439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7537,7 +7516,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: RansomwareEvent
         m_Mode: 1
@@ -16136,7 +16115,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromisePhysSec
         m_Mode: 1
@@ -19121,7 +19100,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: GasLineEvent
         m_Mode: 1
@@ -20348,7 +20327,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: ComprpomiseElectricity
         m_Mode: 1
@@ -22383,7 +22362,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: ElectricityFlowEvent
         m_Mode: 1
@@ -29004,7 +28983,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseFunding
         m_Mode: 1
@@ -34671,7 +34650,9 @@ MonoBehaviour:
   gameManager: {fileID: 276892436}
   cardReader: {fileID: 0}
   Deck: 
+  CardCountList: 
   HandList: []
+  ActiveCardList: []
   handSize: 0
   maxHandSize: 0
   cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
@@ -37304,7 +37285,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseFuel
         m_Mode: 1
@@ -37590,7 +37571,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseOT
         m_Mode: 1
@@ -38974,7 +38955,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseIT
         m_Mode: 1
@@ -39592,7 +39573,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseCommunications
         m_Mode: 1
@@ -41523,7 +41504,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseWorkers
         m_Mode: 1
@@ -42281,6 +42262,7 @@ RectTransform:
   - {fileID: 2118055920}
   - {fileID: 1196016917}
   - {fileID: 657800787}
+  - {fileID: 1780177396}
   m_Father: {fileID: 342662961}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -52332,6 +52314,71 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1 &1780177395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1780177396}
+  - component: {fileID: 1780177397}
+  m_Layer: 5
+  m_Name: Base Malicious Actor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1780177396
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780177395}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1448016501}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1780177397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780177395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddf88332d978d0c45894fe099bd85dc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  funds: 0
+  targetFacility: {fileID: 0}
+  ransomwaredFacility: {fileID: 0}
+  manager: {fileID: 276892436}
+  ransomwareTurn: 0
+  randomEventChance: 0
+  cardReader: {fileID: 0}
+  Deck: 
+  CardCountList: 
+  HandList: []
+  ActiveCardList: []
+  handSize: 0
+  maxHandSize: 5
+  cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
+  cardDropZone: {fileID: 657800786}
+  map: {fileID: 1448016500}
 --- !u!1 &1780273138
 GameObject:
   m_ObjectHideFlags: 0
@@ -55075,7 +55122,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 276892438}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MaliciousActor, Assembly-CSharp
         m_MethodName: CompromiseWater
         m_Mode: 1

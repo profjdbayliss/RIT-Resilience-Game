@@ -38,7 +38,7 @@ public class Card : MonoBehaviour, IDropHandler
     public float potentcy;
     public int cardID;
     public int teamID;
-    public int duration;
+    public float duration;
     public int cost;
     public CardFront front;
     public CardState state;
@@ -79,10 +79,26 @@ public class Card : MonoBehaviour, IDropHandler
                     {
                         if(this.transform.localPosition.y < cardDropMax.y)
                         {
-                            int rng = Random.Range(0, 5);
-                            this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
-                            this.state = CardState.CardInPlay;
-                            this.gameObject.GetComponentInParent<slippy>().enabled = false;
+                            if(this.teamID == 0)
+                            {
+                                if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
+                                {
+                                    //int rng = Random.Range(0, 5);
+                                    //this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
+                                    this.state = CardState.CardInPlay;
+                                    this.gameObject.GetComponentInParent<slippy>().enabled = false;
+                                    // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
+                                }
+                            }
+                            else if(this.teamID == 1)
+                            {
+                                if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
+                                {
+                                    this.state = CardState.CardInPlay;
+                                    this.gameObject.GetComponentInParent<slippy>().enabled = false;
+                                }
+                            } 
+
                         }
                     }
                 }

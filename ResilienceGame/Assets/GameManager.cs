@@ -334,6 +334,14 @@ public class GameManager : MonoBehaviour, IDragHandler
                 yarnSpinner.SetActive(true);
                 facilityEvents.SpawnEvent();
                 ChangePlayers();
+                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                {
+                    card.SetActive(false);
+                }
+                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                {
+                    card.SetActive(false);
+                }
             }
             else
             {
@@ -347,6 +355,30 @@ public class GameManager : MonoBehaviour, IDragHandler
                     Color tempColor = fac.GetComponent<SVGImage>().color;
                     tempColor.a = 1.0f;
                     fac.GetComponent<SVGImage>().color = tempColor;
+                }
+                Debug.Log(maliciousActor.handSize);
+                if (maliciousActor.handSize < 5)
+                {
+                    maliciousActor.DrawCard();
+                }
+                foreach (GameObject players in allPlayers)
+                {
+                    foreach (GameObject card in players.GetComponent<Player>().HandList)
+                    {
+                        card.SetActive(false);
+                    }
+                    foreach (GameObject card in players.GetComponent<Player>().ActiveCardList)
+                    {
+                        card.SetActive(false);
+                    }
+                }
+                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                {
+                    card.SetActive(true);
+                }
+                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                {
+                    card.SetActive(true);
                 }
             }
         }
@@ -428,9 +460,13 @@ public class GameManager : MonoBehaviour, IDragHandler
         SpawnPlayers(playerCount);
 
         //SpawnPlayers(6); // <-- Need to change this to an input
+        SpawnMaliciousActor();
 
-        maliciousActor = GetComponent<MaliciousActor>();
-        maliciousActor.SpawnDeck();
+        //maliciousActor.SpawnDeck();
+        //for (int i = 0; i < maliciousActor.maxHandSize; i++)
+        //{
+        //    maliciousActor.DrawCard();
+        //}
         activePlayerNumber = 0;
 
         playerActive = true;
@@ -521,6 +557,26 @@ public class GameManager : MonoBehaviour, IDragHandler
             activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(false);
+
+            foreach (GameObject players in allPlayers)
+            {
+                foreach (GameObject card in players.GetComponent<Player>().HandList)
+                {
+                    card.SetActive(false);
+                }
+                foreach (GameObject card in players.GetComponent<Player>().ActiveCardList)
+                {
+                    card.SetActive(false);
+                }
+            }
+            foreach(GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+            {
+                card.SetActive(true);
+            }
+            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+            {
+                card.SetActive(true);
+            }
         }
     }
 
@@ -542,11 +598,25 @@ public class GameManager : MonoBehaviour, IDragHandler
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
                     {
                         card.SetActive(false);
+
+                    }
+                    foreach (GameObject card in players.GetComponent<Player>().ActiveCardList)
+                    {
+                        card.SetActive(false);
                     }
                 }
                 else
                 {
+                    if (allPlayers[activePlayerNumber].GetComponent<Player>().handSize < 5)
+                    {
+                        allPlayers[activePlayerNumber].GetComponent<Player>().DrawCard();
+                    }
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
+                    {
+                        card.SetActive(true);
+
+                    }
+                    foreach (GameObject card in players.GetComponent<Player>().ActiveCardList)
                     {
                         card.SetActive(true);
                     }
@@ -597,10 +667,19 @@ public class GameManager : MonoBehaviour, IDragHandler
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
+            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+            {
+                card.SetActive(false);
+            }
+            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+            {
+                card.SetActive(false);
+            }
             DisableAllOutline();
         }
         else
         {
+
             foreach (GameObject fac in allFacilities)
             {
                 Color tempColor = fac.GetComponent<SVGImage>().color;
@@ -652,6 +731,15 @@ public class GameManager : MonoBehaviour, IDragHandler
             allPlayers[i] = newPlayer;
         }
         basePlayer.SetActive(false);
+    }
+    public void SpawnMaliciousActor()
+    {
+        GameObject baseMalPlayer = GameObject.Find("Base Malicious Actor");
+        GameObject newPlayer = Instantiate(baseMalPlayer);
+        newPlayer.transform.SetParent(map.transform, false);
+        newPlayer.name = "Malicious Actor";
+        maliciousActor = newPlayer.GetComponent<MaliciousActor>();
+        baseMalPlayer.SetActive(false);
     }
 
 
