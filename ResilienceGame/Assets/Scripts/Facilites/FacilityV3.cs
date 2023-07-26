@@ -25,7 +25,16 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         Transportation
     };
 
+    public enum FacilityState
+    {
+        Normal = 0,
+        Informed = 1,
+        Accessed = 2,
+    };
+
     public Type type;
+
+    public FacilityState state;
 
     public int facID;
 

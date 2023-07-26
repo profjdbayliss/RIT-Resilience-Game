@@ -5,6 +5,8 @@ using Unity.Collections;
 using System.IO;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using System;
+using System.Text;
 
 public class CardReader : MonoBehaviour
 {
@@ -19,19 +21,14 @@ public class CardReader : MonoBehaviour
     public CardFront[] CardFronts;
     public NativeArray<int> CardIDs;
     public NativeArray<int> CardTeam;
-    //public NativeArray<CardFront> CardFronts;
-    // public NativeArray<CardFront> cardFronts;
-    // public NativeArray<char[]> cardTitle; // Need to figure this out
     public NativeArray<int> CardCost;
-    // public NativeArray<Texture2D> Image;
-    // public NativeArray<char[]> cardDescription; // Need to figure this out
-    public NativeArray<float> CardImpact;
-    public NativeArray<float> CardSpreadChance;
-    public NativeArray<float> CardPercentChance;
     public NativeArray<int> CardDuration;
     public NativeArray<int> CardTarget;
     public NativeArray<int> CardCount;
-
+    public NativeArray<int> CardFacilityStateReqs;
+    public NativeArray<float> CardImpact;
+    public NativeArray<float> CardSpreadChance;
+    public NativeArray<float> CardPercentChance;
     public string cardFileLoc;
 
 
@@ -74,15 +71,14 @@ public class CardReader : MonoBehaviour
             // Allocate the space in memory for the Cards data
             CardIDs = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardTeam = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
-            //CardFronts = new NativeArray<CardFront>(allCSVObjects.Length, Allocator.Persistent); //Need to figure out how to handle these without throwing erros due to unmanaged type
             CardCost = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
-            CardImpact = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
-            CardSpreadChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
-            CardPercentChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
             CardDuration = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardTarget = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardCount = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
-
+            CardFacilityStateReqs = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
+            CardImpact = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
+            CardSpreadChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
+            CardPercentChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
 
             // Make sure to get the atlas first, as we only need to query it once.
             Texture2D tex = new Texture2D(1, 1);
@@ -99,7 +95,8 @@ public class CardReader : MonoBehaviour
 
                 // Get a reference to the Card component on the card gameobject.
                 Card tempCard = tempCardObj.GetComponent<Card>();
-                CardFront tempCardFront = new CardFront();
+
+                CardFront tempCardFront = tempCardObj.GetComponent<CardFront>();
 
                 // Assign the cards type based on a switch statement of either Resilient, Malicious, or a Global Modifier
                 switch (individualCSVObjects[0].Trim())
@@ -144,19 +141,22 @@ public class CardReader : MonoBehaviour
 
                 // Then assign the necessary values to each card based off of their csv input.
                 tempCardObj.name = individualCSVObjects[1];
+                byte[] temp = Encoding.ASCII.GetBytes(individualCSVObjects[1]);
+                tempCardFront.title = temp;
+                byte[] temp2 = Encoding.ASCII.GetBytes(individualCSVObjects[4]);
+                tempCardFront.description = temp2;
 
                 //tempCardFront.title = individualCSVObjects[1];
                 //tempCardFront.description = individualCSVObjects[2];
-
-                tempCardFront.title = individualCSVObjects[1];
-                tempCardFront.description = individualCSVObjects[4];
+                //tempCardFront.title = individualCSVObjects[1].ToCharArray();
+                //tempCardFront.description = individualCSVObjects[4];
 
                 //tempCard.title = individualCSVObjects[1]; //NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
                 //tempCard.description = individualCSVObjects[2]; // NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
 
-                
+
 
                 if (individualCSVObjects[6].Contains("|") == false)
                 {
@@ -207,7 +207,30 @@ public class CardReader : MonoBehaviour
                 CardCount[i] = int.Parse(individualCSVObjects[10]);
                 Debug.Log("Card Count for " + i + ": " + CardCount[i]);
 
+                // Assign the cards facility state requirements so that when the csv is read in, we can assign the cards the proper requirement
+                switch (individualCSVObjects[0].Trim()) // Change this to the correct column for the CSV for the Fac State reqs
+                {
+                    case "Normal":
+                        CardFacilityStateReqs[i] = 0;
+                        break;
 
+                    case "Any":
+                        CardFacilityStateReqs[i] = 0;
+                        break;
+
+                    case "Informed":
+                        CardFacilityStateReqs[i] = 1;
+                        break;
+
+                    case "Accessed":
+                        CardFacilityStateReqs[i] = 2;
+                        break;
+
+                    case "Down":
+                        CardFacilityStateReqs[i] = 3;
+                        break;
+
+                }
 
 
                 // Then we use a for loop to check the image location of the current CSV and the textureUVs
@@ -267,13 +290,13 @@ public class CardReader : MonoBehaviour
         // Must dispose of the allocated memory
         CardIDs.Dispose();
         CardTeam.Dispose();
-        //CardFronts.Dispose();
         CardCost.Dispose();
+        CardDuration.Dispose();
+        CardTarget.Dispose();
+        CardFacilityStateReqs.Dispose();
+        CardCount.Dispose();
         CardImpact.Dispose();
         CardSpreadChance.Dispose();
         CardPercentChance.Dispose();
-        CardDuration.Dispose();
-        CardTarget.Dispose();
-        CardCount.Dispose();
     }
 }

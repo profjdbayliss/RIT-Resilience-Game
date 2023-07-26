@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
+using System.Text;
 
 public class Player : MonoBehaviour
 {
@@ -121,8 +123,12 @@ public class Player : MonoBehaviour
 
     public void DrawCard()
     {
-        int rng = Random.Range(0, Deck.Count);
-        Debug.Log("ID: " + Deck[rng] + " TYPE: " + cardReader.CardTeam[Deck[rng]] + " " + CardCountList[rng]);
+        int rng = UnityEngine.Random.Range(0, Deck.Count);
+        if(CardCountList.Count <= 0) // Check to ensure the deck is actually built before trying to draw a card
+        {
+            return;
+        }
+        //Debug.Log("ID: " + Deck[rng] + " TYPE: " + cardReader.CardTeam[Deck[rng]] + " " + CardCountList[rng]);
         //if (cardReader.CardCount[Deck[rng]] > 0)
         if (CardCountList[rng] > 0)
         {
@@ -145,7 +151,34 @@ public class Player : MonoBehaviour
                     tempRaws[i].color = new Color(0.8067818f, 0.8568867f, 0.9245283f, 1.0f);
                 }
             }
-            tempCardObj.GetComponentInChildren<TextMeshProUGUI>().text = tempCard.front.title;
+            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>();
+            for (int i = 0; i < tempTexts.Length; i++)
+            {
+                if (tempTexts[i].name == "Title Text")
+                {
+                    tempTexts[i].text = Encoding.ASCII.GetString(tempCard.front.title);
+                }
+                else if (tempTexts[i].name == "Description Text")
+                {
+                    tempTexts[i].text = Encoding.ASCII.GetString(tempCard.front.description);
+                }
+            }
+            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponent<CardFront>().innerTexts.GetComponentsInChildren<TextMeshProUGUI>();
+            for (int i = 0; i < tempInnerText.Length; i++)
+            {
+                if (tempInnerText[i].name == "Percent Chance Text")
+                {
+                    tempInnerText[i].text = "Percent Chance: " + cardReader.CardPercentChance[Deck[rng]] + "%"; // Need to fix this 07/25
+                }
+                else if (tempInnerText[i].name == "Impact Text")
+                {
+                    tempInnerText[i].text = "Pop. Impacted: " + cardReader.CardImpact[Deck[rng]] + "%";
+                }
+                else if (tempInnerText[i].name == "Spread Text")
+                {
+                    tempInnerText[i].text = "Spread Chance: " + cardReader.CardSpreadChance[Deck[rng]] + "%";
+                }
+            }
             tempCard.percentSuccess = cardReader.CardPercentChance[Deck[rng]];
             tempCard.percentSpread = cardReader.CardSpreadChance[Deck[rng]];
             tempCard.potentcy = cardReader.CardImpact[Deck[rng]];
@@ -177,7 +210,7 @@ public class Player : MonoBehaviour
             if (true) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type
             {
                 Card tempCard = new Card();
-                float rng = Random.Range(0.0f, 1.0f);
+                float rng = UnityEngine.Random.Range(0.0f, 1.0f);
                 // Determine ranges for the percent chance to allow for super success, success, failure, super failure
                 if (rng >= (1.0 - cardReader.CardPercentChance[cardID]))
                 {

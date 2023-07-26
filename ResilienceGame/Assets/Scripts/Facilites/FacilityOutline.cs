@@ -81,7 +81,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
                 outline.GetComponent<RawImage>().color = Color.cyan;
 
             }
-            else if ((maliciousActor.targetFacility == this.gameObject) && (gameManager.playerActive == false))
+            else if ((maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
             {
                 outline.GetComponent<RawImage>().color = Color.magenta;
             }
@@ -133,18 +133,28 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
             }
             else
             {
-                if (maliciousActor.targetFacility == null)
+                if(maliciousActor.targetFacilities.Contains(this.gameObject) == false)
                 {
-                    maliciousActor.targetFacility = this.gameObject;
-                }
-                else if (maliciousActor.targetFacility == this.gameObject)
-                {
-                    maliciousActor.targetFacility = null;
+                    maliciousActor.targetFacilities.Add(this.gameObject);
+
                 }
                 else
                 {
                     outline.SetActive(false);
+                    maliciousActor.targetFacilities.Remove(this.gameObject);
                 }
+                //if (maliciousActor.targetFacility == null)
+                //{
+                //    maliciousActor.targetFacility = this.gameObject;
+                //}
+                //else if (maliciousActor.targetFacility == this.gameObject)
+                //{
+                //    maliciousActor.targetFacility = null;
+                //}
+                //else
+                //{
+                //    outline.SetActive(false);
+                //}
             }
 
         }

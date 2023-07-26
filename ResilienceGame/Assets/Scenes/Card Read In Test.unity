@@ -36416,6 +36416,7 @@ MonoBehaviour:
   resilientCards: []
   maliciousCards: []
   globalModifiers: []
+  CardFronts: []
   cardFileLoc: D:\Profiles\sbb7355\Downloads\Cards - Sheet1 (1).csv
   players: []
   maliciousActor: {fileID: 0}
@@ -52376,7 +52377,7 @@ MonoBehaviour:
   ActiveCardList: []
   handSize: 0
   maxHandSize: 5
-  cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
+  cardPrefab: {fileID: 4414296153637361319, guid: a2c3476d28b0c1044933890958b65f85, type: 3}
   cardDropZone: {fileID: 657800786}
   map: {fileID: 1448016500}
 --- !u!1 &1780273138
@@ -62371,7 +62372,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 4.5904e-41, y: -61707456, z: 4.5904e-41, w: 9.403955e-38}
+  m_BoundingSphereOverride: {x: 5.18e-43, y: 1.16e-43, z: 0, w: 19850.484}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0

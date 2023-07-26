@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using Unity.Collections;
 
 public class Card : MonoBehaviour, IDropHandler
 {
@@ -26,6 +27,14 @@ public class Card : MonoBehaviour, IDropHandler
         CardDiscarded
     };
 
+    // Enum to the state of the facility required by the card
+    public enum FacilityStateRequirements
+    {
+        Normal = 0,
+        Informed = 1,
+        Accessed = 2,
+    };
+
     // Establish necessary fields
 
     // Static fields that are only utilized on spawn and cardloading.
@@ -38,10 +47,12 @@ public class Card : MonoBehaviour, IDropHandler
     public float potentcy;
     public int cardID;
     public int teamID;
-    public float duration;
     public int cost;
+    public int targetCount;
+    public float duration;
     public CardFront front;
     public CardState state;
+    public FacilityStateRequirements facilityStateRequirements;
     public GameObject cardDropZone;
 
     public CardReader reader;
@@ -97,6 +108,7 @@ public class Card : MonoBehaviour, IDropHandler
                                     this.state = CardState.CardInPlay;
                                     this.gameObject.GetComponentInParent<slippy>().enabled = false;
                                 }
+
                             } 
 
                         }
@@ -129,10 +141,20 @@ public class Card : MonoBehaviour, IDropHandler
     //    }
     //}
 }
-public struct CardFront
+public struct CardFront2
 {
     public Card.Type type;
-    public string title;
-    public string description;
+    //public NativeArray<byte> title;
+    public byte[] title;
+    public byte[] description;
+    //public NativeArray<byte> description;
     public Texture2D img;
+
+
+    public void OnDestroy()
+    {
+        // Must dispose of the allocated memory
+        //title.Dispose();
+        //description.Dispose();
+    }
 };

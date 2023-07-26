@@ -322,7 +322,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                 obj.GetComponent<Player>().seletedFacility = null;
             }
             //allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
-            maliciousActor.targetFacility = null;
+            maliciousActor.targetFacilities.Clear();
             turnCount += 0.5f;
             if (playerActive)
             {
@@ -478,7 +478,7 @@ public class GameManager : MonoBehaviour, IDragHandler
         {
             allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
         }
-        maliciousActor.targetFacility = null;
+        maliciousActor.targetFacilities.Clear();
 
         if (playerActive)
         {
