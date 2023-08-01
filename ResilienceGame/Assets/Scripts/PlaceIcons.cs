@@ -321,7 +321,7 @@ public class PlaceIcons : MonoBehaviour
     }
 
 
-    public void spawnAllFacilities(bool police = true, bool hospital = true, bool firedpt = true, bool elecGen = true, bool water = true, bool comms = true, bool cityHall = true, bool commodities = true, bool elecDist = true, bool fuel = true)
+    public void spawnAllFacilities(bool police = true, bool hospital = true, bool firedpt = true, bool elecGen = true, bool water = true, bool comms = true, bool cityHall = true, bool commodities = true, bool elecDist = true, bool fuel = true, bool transportation = true)
     {
 
         // Spawn the Hospitals
@@ -425,8 +425,14 @@ public class PlaceIcons : MonoBehaviour
         {
             Fuel.SetActive(false);
         }
-
-        SpawnVariableFacilities(Transportation, gameManager.TransportationInputCount, TransportationLocations, TransportationFacilities, "Transportation (Clone)");
+        if (transportation)
+        {
+            SpawnVariableFacilities(Transportation, gameManager.TransportationInputCount, TransportationLocations, TransportationFacilities, "Transportation (Clone)");
+        }
+        else
+        {
+            Transportation.SetActive(false);
+        }
     }
 
     void SpawnVariableFacilities(GameObject baseFacility, int amount, List<float2> locations, List<GameObject> output, string name)

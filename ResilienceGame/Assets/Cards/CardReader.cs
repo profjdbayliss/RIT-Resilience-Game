@@ -25,6 +25,7 @@ public class CardReader : MonoBehaviour
     public NativeArray<int> CardDuration;
     public NativeArray<int> CardTarget;
     public NativeArray<int> CardCount;
+    public NativeArray<int> CardTargetCount;
     public NativeArray<int> CardFacilityStateReqs;
     public NativeArray<float> CardImpact;
     public NativeArray<float> CardSpreadChance;
@@ -75,6 +76,7 @@ public class CardReader : MonoBehaviour
             CardDuration = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardTarget = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardCount = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
+            CardTargetCount = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardFacilityStateReqs = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardImpact = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
             CardSpreadChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
@@ -85,7 +87,7 @@ public class CardReader : MonoBehaviour
             byte[] tempBytes = File.ReadAllBytes(GetComponent<CreateTextureAtlas>().mOutputFileName); // This gets the entire atlast right now.
             tex.LoadImage(tempBytes);
 
-            for (int i = 0; i < allCSVObjects.Length; i++) 
+            for (int i = 0; i < allCSVObjects.Length; i++)
             {
                 // Then in each of the lines of csv data, split them based on commas to get the different pieces of information on each object
                 // and instantiate a base card object to then fill in with data.
@@ -143,8 +145,7 @@ public class CardReader : MonoBehaviour
                 tempCardObj.name = individualCSVObjects[1];
                 byte[] temp = Encoding.ASCII.GetBytes(individualCSVObjects[1]);
                 tempCardFront.title = temp;
-                byte[] temp2 = Encoding.ASCII.GetBytes(individualCSVObjects[4]);
-                tempCardFront.description = temp2;
+
 
                 //tempCardFront.title = individualCSVObjects[1];
                 //tempCardFront.description = individualCSVObjects[2];
@@ -155,8 +156,78 @@ public class CardReader : MonoBehaviour
 
                 //tempCard.description = individualCSVObjects[2]; // NEED THESE JUST COMMENTING TO DROP ERRORS RN
 
+                if (individualCSVObjects[2].Length > 0)
+                {
+                    tempCard.cost = int.Parse(individualCSVObjects[2]);
+                    CardCost[i] = int.Parse(individualCSVObjects[2]);
+                }
+
+                byte[] temp2 = Encoding.ASCII.GetBytes(individualCSVObjects[4]);
+                tempCardFront.description = temp2;
 
 
+
+                // Check to make sure that this is actually a number, but if it has text in it then we don't parse it.
+                if (CardTeam[i] == 1)
+                {
+                    if (individualCSVObjects[5].Contains("|") == false)
+                    {
+                        if (individualCSVObjects[5].Contains(" ") == false)
+                        {
+                            if (individualCSVObjects[5].Contains("e") == false)
+                            {
+                                if (individualCSVObjects[5].Length > 1)
+                                {
+                                    tempCard.potentcy = float.Parse(individualCSVObjects[5]);
+                                    CardImpact[i] = float.Parse(individualCSVObjects[5]);
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    string[] tempPot = individualCSVObjects[5].Split('&'); // This is used for blue cards which have a potency like this "phishing -40% & browser session hijacking -40% & Infect with Removable Media -40%" so we split to find the different impacts between & and then split once more based off :
+                    if(tempPot.Length > 1)
+                    {
+                        string toBePrinted = "";
+                        for (int j = 0; j < tempPot.Length; j++)
+                        {
+                            string[] tempIndPot = tempPot[j].Split(':');
+                            if(tempIndPot.Length > 1)
+                            {
+                                tempIndPot[1] = tempIndPot[1].Trim();
+                                if (tempIndPot[1].Contains("-") == true)
+                                {
+                                    tempIndPot[1].Remove(tempIndPot[1].IndexOf('-'));
+                                }
+                            }
+                            toBePrinted += tempPot[j] + '\n';
+                            Debug.Log(toBePrinted);
+                        }
+                        byte[] temp3 = Encoding.ASCII.GetBytes(toBePrinted);
+                        tempCardFront.impact = temp3;
+                    }
+                    else
+                    {
+                        if (tempPot[0].Contains("cancel"))
+                        {
+                            string tempString = tempPot[0].Trim();
+                            Debug.Log(tempString);
+                        }
+                        else if (tempPot[0].Contains("-"))
+                        {
+                            tempPot[0].Remove(tempPot[0].IndexOf('-'));
+                            Debug.Log(tempPot[0]);
+                        }
+                        byte[] temp3 = Encoding.ASCII.GetBytes(tempPot[0]);
+                        tempCardFront.impact = temp3;
+                    }
+
+                }
+               
 
                 if (individualCSVObjects[6].Contains("|") == false)
                 {
@@ -175,40 +246,34 @@ public class CardReader : MonoBehaviour
 
                 }
 
+                CardSpreadChance[i] = int.Parse(individualCSVObjects[7]);
+                tempCard.percentSpread = int.Parse(individualCSVObjects[7]);
 
-                // Check to make sure that this is actually a number, but if it has text in it then we don't parse it.
-                if (individualCSVObjects[5].Contains("|") == false)
-                {
-                    if(individualCSVObjects[5].Contains(" ") == false)
-                    {
-                        if (individualCSVObjects[5].Contains("e") == false)
-                        {
-                            if(individualCSVObjects[5].Length > 1)
-                            {
-                                tempCard.potentcy = float.Parse(individualCSVObjects[5]);
-                                CardImpact[i] = float.Parse(individualCSVObjects[5]);
-                            }
-
-                        }
-                    }
-
-                }
 
                 tempCard.duration = int.Parse(individualCSVObjects[8]);
                 CardDuration[i] = int.Parse(individualCSVObjects[8]);
-
-                if(individualCSVObjects[2].Length > 0)
+                if (individualCSVObjects[10].Contains("All") == false)
                 {
-                    tempCard.cost = int.Parse(individualCSVObjects[2]);
-                    CardCost[i] = int.Parse(individualCSVObjects[2]);
+                    if (individualCSVObjects[10].Length > 0)
+                    {
+                        tempCard.targetCount = int.Parse(individualCSVObjects[10]);
+                        CardTargetCount[i] = int.Parse(individualCSVObjects[10]);
+                    }
+
+
+                }
+                else
+                {
+                    Debug.Log("READ IN AMOUNT FAIL: " + individualCSVObjects[10]);
+                    tempCard.targetCount = int.MaxValue;
+                    CardTargetCount[i] = int.MaxValue;
                 }
 
-
-                CardCount[i] = int.Parse(individualCSVObjects[10]);
-                Debug.Log("Card Count for " + i + ": " + CardCount[i]);
+                CardCount[i] = int.Parse(individualCSVObjects[12]);
+                //Debug.Log("Card Count for " + i + ": " + CardCount[i]);
 
                 // Assign the cards facility state requirements so that when the csv is read in, we can assign the cards the proper requirement
-                switch (individualCSVObjects[0].Trim()) // Change this to the correct column for the CSV for the Fac State reqs
+                switch (individualCSVObjects[11].Trim()) // Change this to the correct column for the CSV for the Fac State reqs
                 {
                     case "Normal":
                         CardFacilityStateReqs[i] = 0;
@@ -256,7 +321,7 @@ public class CardReader : MonoBehaviour
                         break;
                     }
                 }
-                Debug.Log("CARD FRONT: " + tempCardFront);
+                //Debug.Log("CARD FRONT: " + tempCardFront);
                 CardFronts[i] = tempCardFront;
                 tempCardObj.SetActive(false);
 
@@ -295,6 +360,7 @@ public class CardReader : MonoBehaviour
         CardTarget.Dispose();
         CardFacilityStateReqs.Dispose();
         CardCount.Dispose();
+        CardTargetCount.Dispose();
         CardImpact.Dispose();
         CardSpreadChance.Dispose();
         CardPercentChance.Dispose();

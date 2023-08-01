@@ -149,6 +149,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         Phys_Security_img = GameObject.Find("Phys_Sec_T").GetComponentInChildren<Image>(true);
         Funding_img = GameObject.Find("Funding_T").GetComponentInChildren<Image>(true);
         hasChanged = false;
+        state = FacilityState.Normal;
     }
 
     virtual public void Update()

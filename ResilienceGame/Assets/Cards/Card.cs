@@ -35,6 +35,23 @@ public class Card : MonoBehaviour, IDropHandler
         Accessed = 2,
     };
 
+    public enum MalCardType
+    {
+        Reconnaissance,
+        InitialAccess,
+        Collection,
+        Impact,
+        Exfiltration,
+        LateralMovement
+    }
+
+    public enum ResCardType
+    {
+        Detection,
+        Prevention,
+        Mitigation
+    }
+
     // Establish necessary fields
 
     // Static fields that are only utilized on spawn and cardloading.
@@ -53,6 +70,8 @@ public class Card : MonoBehaviour, IDropHandler
     public CardFront front;
     public CardState state;
     public FacilityStateRequirements facilityStateRequirements;
+    public ResCardType resCardType;
+    public MalCardType malCardType;
     public GameObject cardDropZone;
 
     public CardReader reader;

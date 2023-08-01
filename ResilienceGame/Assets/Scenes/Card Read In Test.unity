@@ -1766,6 +1766,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 3
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -3117,7 +3118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &150633614
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7154,6 +7155,7 @@ MonoBehaviour:
   elecDistToggle: {fileID: 1434454564}
   cityHallToggle: {fileID: 1195285440}
   fuelToggle: {fileID: 610960516}
+  transportationToggle: {fileID: 706572130}
   transportationInputCount: 0
   policeInputCount: 0
   hospitalInputCount: 0
@@ -7650,6 +7652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 6
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -7739,7 +7742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &293916592
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7802,7 +7805,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 150633615}
   toggleTransition: 1
   graphic: {fileID: 349527563}
@@ -8581,7 +8584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &306918497
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9014,7 +9017,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &313187525
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11536,7 +11539,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &393466077
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13225,6 +13228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 7
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -16934,7 +16938,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 130, y: 65}
+  m_AnchoredPosition: {x: 130, y: -170}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &610960516
@@ -18040,7 +18044,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &652799725
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18103,7 +18107,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1503050525}
   toggleTransition: 1
   graphic: {fileID: 511943076}
@@ -18943,6 +18947,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 9
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -19343,6 +19348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 5
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -19915,7 +19921,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &706572129
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20549,6 +20555,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 10
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -21919,6 +21926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 4
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -25515,7 +25523,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &863608587
 RectTransform:
   m_ObjectHideFlags: 0
@@ -34644,13 +34652,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   funds: 1000
   Facilities: []
-  seletedFacility: {fileID: 0}
+  seletedFacilities: []
   fundsText: {fileID: 914873565}
   type: 10
   gameManager: {fileID: 276892436}
   cardReader: {fileID: 0}
   Deck: 
   CardCountList: 
+  targetIDList: 
   HandList: []
   ActiveCardList: []
   handSize: 0
@@ -35368,6 +35377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 2
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -36417,7 +36427,7 @@ MonoBehaviour:
   maliciousCards: []
   globalModifiers: []
   CardFronts: []
-  cardFileLoc: D:\Profiles\sbb7355\Downloads\Cards - Sheet1 (1).csv
+  cardFileLoc: D:\Profiles\sbb7355\Downloads\Cards - Sheet1 (2).csv
   players: []
   maliciousActor: {fileID: 0}
   cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
@@ -42145,7 +42155,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1437216762
 RectTransform:
   m_ObjectHideFlags: 0
@@ -43461,7 +43471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1497892345
 RectTransform:
   m_ObjectHideFlags: 0
@@ -43837,7 +43847,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1503050524
 RectTransform:
   m_ObjectHideFlags: 0
@@ -45574,7 +45584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1557137171
 RectTransform:
   m_ObjectHideFlags: 0
@@ -50776,6 +50786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -52365,7 +52376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   funds: 0
-  targetFacility: {fileID: 0}
+  targetFacilities: []
   ransomwaredFacility: {fileID: 0}
   manager: {fileID: 276892436}
   ransomwareTurn: 0
@@ -52373,6 +52384,7 @@ MonoBehaviour:
   cardReader: {fileID: 0}
   Deck: 
   CardCountList: 
+  targetIDList: 
   HandList: []
   ActiveCardList: []
   handSize: 0
@@ -52569,6 +52581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 11
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -56071,6 +56084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
+  state: 0
   facID: 0
   isOver: 0
   isDown: 0
@@ -57128,7 +57142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1924744912
 RectTransform:
   m_ObjectHideFlags: 0

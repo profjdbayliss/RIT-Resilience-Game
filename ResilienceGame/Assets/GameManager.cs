@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour, IDragHandler
     public Toggle elecDistToggle;
     public Toggle cityHallToggle;
     public Toggle fuelToggle;
+    public Toggle transportationToggle;
 
 
     // Utilize if you want to incorporate player input to determine the number of facilities of each type
@@ -319,10 +320,11 @@ public class GameManager : MonoBehaviour, IDragHandler
             DisableAllOutline();
             foreach(GameObject obj in allPlayers)
             {
-                obj.GetComponent<Player>().seletedFacility = null;
+                obj.GetComponent<Player>().seletedFacilities.Clear();
             }
             //allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
             maliciousActor.targetFacilities.Clear();
+            maliciousActor.targetIDList.Clear();
             turnCount += 0.5f;
             if (playerActive)
             {
@@ -341,6 +343,14 @@ public class GameManager : MonoBehaviour, IDragHandler
                 foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
                 {
                     card.SetActive(false);
+                }
+                foreach (GameObject obj in allPlayers)
+                {
+                    obj.GetComponent<Player>().seletedFacilities.Clear();
+                }
+                foreach (GameObject obj in allPlayers)
+                {
+                    obj.GetComponent<Player>().targetIDList.Clear();
                 }
             }
             else
@@ -380,6 +390,8 @@ public class GameManager : MonoBehaviour, IDragHandler
                 {
                     card.SetActive(true);
                 }
+                maliciousActor.targetIDList.Clear();
+                maliciousActor.targetFacilities.Clear();
             }
         }
 
@@ -417,9 +429,9 @@ public class GameManager : MonoBehaviour, IDragHandler
     {
 
         gameCanvas.SetActive(true);
-        //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn);
+        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, transportationToggle.isOn);
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(true, true, true, true, true, true, true, true, true, true);
-        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, true, true, true, cityHallToggle.isOn, commoditiesToggle.isOn, true, fuelToggle.isOn); // The trues are requried facilities
+        //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, true, true, true, cityHallToggle.isOn, commoditiesToggle.isOn, true, fuelToggle.isOn); // The trues are requried facilities
 
         startScreen.SetActive(false); // DUsable the start menu where you determine how many of each facility you would like
 
@@ -442,6 +454,22 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerCount++;
 
         }
+        if (elecGenToggle.isOn)
+        {
+            playerCount++;
+        }
+        if (waterToggle.isOn)
+        {
+            playerCount++;
+        }
+        if (commToggle.isOn)
+        {
+            playerCount++;
+        }
+        if (elecDistToggle.isOn)
+        {
+            playerCount++;
+        }
         if (cityHallToggle.isOn)
         {
             playerCount++;
@@ -452,7 +480,7 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerCount++;
 
         }
-        if (fuelToggle.isOn)
+        if (transportationToggle.isOn)
         {
             playerCount++;
 
@@ -476,7 +504,7 @@ public class GameManager : MonoBehaviour, IDragHandler
 
         for (int i = 0; i < allPlayers.Length; i++)
         {
-            allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
+            allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacilities.Clear();
         }
         maliciousActor.targetFacilities.Clear();
 
@@ -512,36 +540,36 @@ public class GameManager : MonoBehaviour, IDragHandler
                     tempColor.a = 1.0f;
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
                 else
                 {
                     Color tempColor = fac.GetComponent<SVGImage>().color;
@@ -630,36 +658,36 @@ public class GameManager : MonoBehaviour, IDragHandler
                     tempColor.a = 1.0f;
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
-                else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
-                {
-                    Color tempColor = fac.GetComponent<SVGImage>().color;
-                    tempColor.a = 1.0f;
-                    fac.GetComponent<SVGImage>().color = tempColor;
-                }
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
+                //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+                //{
+                //    Color tempColor = fac.GetComponent<SVGImage>().color;
+                //    tempColor.a = 1.0f;
+                //    fac.GetComponent<SVGImage>().color = tempColor;
+                //}
                 else
                 {
                     Color tempColor = fac.GetComponent<SVGImage>().color;
@@ -725,6 +753,19 @@ public class GameManager : MonoBehaviour, IDragHandler
                 case 6:
                     newPlayer.GetComponent<Player>().type = FacilityV3.Type.PublicGoods;
                     break;
+
+                case 7:
+                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.ElectricityGeneration;
+                    break;
+                case 8:
+                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.ElectricityDistribution;
+                    break;
+                case 9:
+                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.Water;
+                    break;
+                case 10:
+                    newPlayer.GetComponent<Player>().type = FacilityV3.Type.Transportation;
+                    break;
             }
             newPlayer.transform.SetParent(map.transform, false);
             newPlayer.name = newPlayer.GetComponent<Player>().type + " Player";
@@ -765,75 +806,75 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
-    public void ActivePlayerIncreaseOneFeedback()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseOneFeedback();
-    }
+    //public void ActivePlayerIncreaseOneFeedback()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseOneFeedback();
+    //}
 
-    public void ActivePlayerAllFeedback()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseAllFeedback();
+    //public void ActivePlayerAllFeedback()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseAllFeedback();
 
-    }
+    //}
 
-    public void ActivePlayerHireWorkers()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().HireWorkers();
-
-
-    }
-    public void ActivePlayerBoostIT()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostIT();
-
-    }
-    public void ActivePlayerBoostOT()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostOT();
+    //public void ActivePlayerHireWorkers()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().HireWorkers();
 
 
-    }
-    public void ActivePlayerImprovePhysSec()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().ImprovePhysSec();
+    //}
+    //public void ActivePlayerBoostIT()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostIT();
+
+    //}
+    //public void ActivePlayerBoostOT()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostOT();
 
 
-    }
-    public void ActivePlayerIncreaseFunding()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseFunding();
+    //}
+    //public void ActivePlayerImprovePhysSec()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().ImprovePhysSec();
 
 
-    }
-
-    public void ActivePlayerBoostElectricity()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostElectricity();
-
-
-    }
-    public void ActivePlayerBoostWater()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostWater();
+    //}
+    //public void ActivePlayerIncreaseFunding()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseFunding();
 
 
-    }
-    public void ActivePlayerBoostFuel()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostFuel();
+    //}
+
+    //public void ActivePlayerBoostElectricity()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostElectricity();
 
 
-    }
-    public void ActivePlayerBoostComms()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostCommunications();
+    //}
+    //public void ActivePlayerBoostWater()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostWater();
 
 
-    }
-    public void ActivePlayerBoostHealth()
-    {
-        allPlayers[activePlayerNumber].GetComponent<Player>().BoostHealth();
+    //}
+    //public void ActivePlayerBoostFuel()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostFuel();
 
 
-    }
+    //}
+    //public void ActivePlayerBoostComms()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostCommunications();
+
+
+    //}
+    //public void ActivePlayerBoostHealth()
+    //{
+    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostHealth();
+
+
+    //}
 }

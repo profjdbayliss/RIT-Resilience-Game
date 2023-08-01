@@ -9,6 +9,7 @@ public class CardFront : MonoBehaviour
     //public NativeArray<byte> title;
     public byte[] title;
     public byte[] description;
+    public byte[] impact;
     public GameObject innerTexts;
     //public NativeArray<byte> description;
     public Texture2D img;

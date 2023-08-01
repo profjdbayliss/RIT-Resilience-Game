@@ -36,12 +36,12 @@ public class MaliciousActor : MonoBehaviour
         funds = 750.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
         manager = GameObject.FindObjectOfType<GameManager>();
-        Debug.Log("TEST MAL START");
+        //Debug.Log("TEST MAL START");
         for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Malicious)) // Uncomment to build the deck
             {
-                Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
+               // Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
                 Deck.Add(i);
                 CardCountList.Add(cardReader.CardCount[i]);
             }
@@ -130,6 +130,18 @@ public class MaliciousActor : MonoBehaviour
                 else if (tempRaws[i].name == "Background")
                 {
                     tempRaws[i].color = new Color(1.0f, 0.5801887f, 0.5801887f, 1.0f);
+                    // Change this based off of what type of card it is (either recon, initial access, or impact)
+                    //switch (tempCard.malCardType)
+                    //{
+                    //    // Recon (Lightest)
+                        
+
+                    //    // Initial Access (darker)
+
+                    //    // Impact (darkest)
+
+                    //    // What about for colors of things like exfil? Maybe green?
+                    //}
                 }
             }
             //tempCardObj.GetComponentInChildren<TextMeshProUGUI>().text = BitConverter.ToString(tempCard.front.title);
@@ -161,6 +173,33 @@ public class MaliciousActor : MonoBehaviour
                 {
                     tempInnerText[i].text = "Spread Chance: " + cardReader.CardSpreadChance[Deck[rng]] + "%";
                 }
+                else if(tempInnerText[i].name == "Target Text")
+                {
+                    if (cardReader.CardTargetCount[Deck[rng]] == int.MaxValue)
+                    {
+                        tempInnerText[i].text = "Target: All ";
+                    }
+                    else
+                    {
+                        tempInnerText[i].text = "Target: " + cardReader.CardTargetCount[Deck[rng]] + " ";
+                    }
+                    switch (cardReader.CardFacilityStateReqs[Deck[rng]])
+                    {
+                        case 0:
+                            tempInnerText[i].text +=  " uninformed, and unaccessed facilities.";
+                            break;
+
+                        case 1:
+                            tempInnerText[i].text += Card.FacilityStateRequirements.Informed + " facilities.";
+                            break;
+
+                        case 2:
+                            tempInnerText[i].text += Card.FacilityStateRequirements.Accessed + " facilities.";
+                            break;
+
+                    }
+                    
+                }
             }
 
             tempCard.percentSuccess = cardReader.CardPercentChance[Deck[rng]];
@@ -169,6 +208,16 @@ public class MaliciousActor : MonoBehaviour
             tempCard.duration = cardReader.CardDuration[Deck[rng]];
             tempCard.cost = cardReader.CardCost[Deck[rng]];
             tempCard.teamID = cardReader.CardTeam[Deck[rng]];
+            if(cardReader.CardTargetCount[Deck[rng]] == int.MaxValue)
+            {
+                tempCard.targetCount = manager.allFacilities.Count;
+
+            }
+            else
+            {
+                tempCard.targetCount = cardReader.CardTargetCount[Deck[rng]];
+            }
+
             tempCardObj.GetComponent<slippy>().map = tempCardObj;
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
@@ -261,11 +310,39 @@ public class MaliciousActor : MonoBehaviour
         //    targetID = seletedFacility.GetComponent<FacilityV3>().facID;
         //    PlayCard(cardID, targetID);
         //}
-        if(targetFacilities.Count > 0) //  && targetFacilities.Count <= cardReader.targetCount[cardID]
+        if(cardReader.CardTargetCount[cardID] == int.MaxValue)
+        {
+            if(targetIDList.Count > 0)
+            {
+                Debug.Log("You can't play this card, because you have already targetted a facility and this card requries all facilities");
+                return false;
+            }
+            else
+            {
+                foreach(GameObject obj in manager.allFacilities)
+                {
+                    Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
+                    if((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
+                    {
+                        targetFacilities.Add(obj);
+                    }
+                }
+            }
+            int[] tempTargets = new int[targetFacilities.Count];
+            List<GameObject> removableObj = new List<GameObject>();
+            for (int i = 0; i < targetFacilities.Count; i++)
+            {
+                tempTargets[i] = targetFacilities[i].GetComponent<FacilityV3>().facID;
+            }
+            Debug.Log("No overlap " + tempTargets.Length);
+            PlayCard(cardID, tempTargets);
+            targetFacilities.Clear(); // After every successful run, clear the list
+            return true;
+        }
+        else if(targetFacilities.Count > 0 && targetFacilities.Count == cardReader.CardTargetCount[cardID]) 
         {
             int[] tempTargets = new int[targetFacilities.Count];
             List<GameObject> removableObj = new List<GameObject>();
-            //List<int> tempTargets = new List<int>();
             bool tempFailed = false;
             for (int i = 0; i < targetFacilities.Count; i++)
             {
@@ -275,28 +352,11 @@ public class MaliciousActor : MonoBehaviour
                 }
                 else
                 {
-                    //targetFacilities.RemoveAt(i);
                     Debug.Log("The " + targetFacilities[i].GetComponent<FacilityV3>().type + " you selected is already being targetted by another card this turn, so please choose another one");
-                    removableObj.Add(targetFacilities[i]);
-                    //targetFacilities[i] = null;
-                    //Debug.Log("The " + targetFacilities[i].GetComponent<FacilityV3>().type + " you selected is already being targetted by another card this turn, so please choose another one");
-                    tempFailed = true;
+                    removableObj.Add(targetFacilities[i]); // Add the object that we already have targetted to the list to be removed
+                    tempFailed = true; // If it failed, we want to save that it failed
                 }
-                //targetID = targetFacilities[i].GetComponent<FacilityV3>().facID;
             }
-            //foreach(GameObject obj in targetFacilities)
-            //{
-            //    if (targetIDList.Contains(obj.GetComponent<FacilityV3>().facID) == false)
-            //    {
-            //        tempTargets.Add(obj.GetComponent<FacilityV3>().facID);
-            //    }
-            //    else
-            //    {
-            //        targetFacilities.Remove(obj);
-            //        Debug.Log("The " + obj.GetComponent<FacilityV3>().type + " you selected is already being targetted by another card this turn, so please choose another one");
-            //        tempFailed = true;
-            //    }
-            //}
             if(tempFailed)
             {
                 targetFacilities.RemoveAll(x => removableObj.Contains(x));
@@ -304,14 +364,22 @@ public class MaliciousActor : MonoBehaviour
             }
             Debug.Log("No overlap " + tempTargets.Length);
             PlayCard(cardID, tempTargets);
-            targetFacilities.Clear();
+            targetFacilities.Clear(); // After every successful run, clear the list
             return true;
 
         }
         else
         {
-
-            Debug.Log("Select a facility by double clicking it");
+            if(targetFacilities.Count > cardReader.CardTargetCount[cardID])
+            {
+                Debug.Log("You have selected too many facilities, please deselect " + (targetFacilities.Count - cardReader.CardTargetCount[cardID]) + " facilities.");
+                Debug.Log("Deselect a facility by clicking it again.");
+            }
+            else if(targetFacilities.Count < cardReader.CardTargetCount[cardID])
+            {
+                Debug.Log("You have not selected enough facilities, please select " + (cardReader.CardTargetCount[cardID] - targetFacilities.Count) + " more facilities.");
+                Debug.Log("Select a facility by double clicking it.");
+            }
             return false;
         }
 

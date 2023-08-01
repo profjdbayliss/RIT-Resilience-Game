@@ -12,13 +12,14 @@ public class Player : MonoBehaviour
     // Establish necessary fields
     public float funds = 1000.0f;
     public List<GameObject> Facilities;
-    public GameObject seletedFacility;
+    public List<GameObject> seletedFacilities;
     public TextMeshProUGUI fundsText;
     public FacilityV3.Type type;
     public GameManager gameManager;
     public CardReader cardReader;
     public List<int> Deck;
     public List<int> CardCountList;
+    public List<int> targetIDList;
     public List<GameObject> HandList;
     public List<GameObject> ActiveCardList;
     public int handSize;
@@ -33,12 +34,12 @@ public class Player : MonoBehaviour
         maxHandSize = 5;
         funds = 1000.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
-        Debug.Log("INT PARSE: " + (int)(Card.Type.Resilient));
+        //Debug.Log("INT PARSE: " + (int)(Card.Type.Resilient));
         for(int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
             {
-                Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
+                //Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
                 Deck.Add(i);
                 CardCountList.Add(cardReader.CardCount[i]);
             }
@@ -67,33 +68,33 @@ public class Player : MonoBehaviour
             {
                 Facilities.Add(fac);
             }
-            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
-            {
-                Facilities.Add(fac);
-            }
-            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
-            {
-                Facilities.Add(fac);
+            //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+            //{
+            //    Facilities.Add(fac);
+            //}
+            //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+            //{
+            //    Facilities.Add(fac);
 
-            }
-            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
-            {
-                Facilities.Add(fac);
+            //}
+            //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+            //{
+            //    Facilities.Add(fac);
 
-            }
-            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
-            {
-                Facilities.Add(fac);
+            //}
+            //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+            //{
+            //    Facilities.Add(fac);
 
-            }
-            else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
-            {
-                Facilities.Add(fac);
-            }
-            else
-            {
-                // Do nothing
-            }
+            //}
+            //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+            //{
+            //    Facilities.Add(fac);
+            //}
+            //else
+            //{
+            //    // Do nothing
+            //}
         }
     }
 
@@ -128,7 +129,6 @@ public class Player : MonoBehaviour
         {
             return;
         }
-        //Debug.Log("ID: " + Deck[rng] + " TYPE: " + cardReader.CardTeam[Deck[rng]] + " " + CardCountList[rng]);
         //if (cardReader.CardCount[Deck[rng]] > 0)
         if (CardCountList[rng] > 0)
         {
@@ -172,12 +172,9 @@ public class Player : MonoBehaviour
                 }
                 else if (tempInnerText[i].name == "Impact Text")
                 {
-                    tempInnerText[i].text = "Pop. Impacted: " + cardReader.CardImpact[Deck[rng]] + "%";
+                    tempInnerText[i].text = Encoding.ASCII.GetString(tempCard.front.impact);
                 }
-                else if (tempInnerText[i].name == "Spread Text")
-                {
-                    tempInnerText[i].text = "Spread Chance: " + cardReader.CardSpreadChance[Deck[rng]] + "%";
-                }
+
             }
             tempCard.percentSuccess = cardReader.CardPercentChance[Deck[rng]];
             tempCard.percentSpread = cardReader.CardSpreadChance[Deck[rng]];
@@ -185,6 +182,14 @@ public class Player : MonoBehaviour
             tempCard.duration = cardReader.CardDuration[Deck[rng]];
             tempCard.cost = cardReader.CardCost[Deck[rng]];
             tempCard.teamID = cardReader.CardTeam[Deck[rng]];
+            if (cardReader.CardTargetCount[Deck[rng]] == int.MaxValue)
+            {
+                tempCard.targetCount = gameManager.allFacilities.Count;
+            }
+            else
+            {
+                tempCard.targetCount = cardReader.CardTargetCount[Deck[rng]];
+            }
             tempCardObj.GetComponent<slippy>().map = tempCardObj;
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
@@ -201,46 +206,57 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void PlayCard(int cardID, int targetID)
+    public void PlayCard(int cardID, int[] targetID, int targetCount = 3)
     {
         Debug.Log("Card Play Call" + cardReader.CardCount[cardID] + CardCountList[Deck.IndexOf(cardID)]);
-        if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID >= 0) // cardReader.CardCount[cardID] >= 0
+        if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID.Length >= 0) // Check the mal actor has enough action points to play the card, there are still enough of this card to play, and that there is actually a target. Also make sure that the player hasn't already played a card against it this turn
         {
-            // Check to make sure that the CardID's target type is the same as the targetID's facility type
-            if (true) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type
+            for (int i = 0; i < targetID.Length; i++)
             {
-                Card tempCard = new Card();
-                float rng = UnityEngine.Random.Range(0.0f, 1.0f);
-                // Determine ranges for the percent chance to allow for super success, success, failure, super failure
-                if (rng >= (1.0 - cardReader.CardPercentChance[cardID]))
+                // Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
+                if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
+
+                //if (((int)manager.allFacilities[targetID].GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
                 {
-                    // Success
-                    // Get the facility based off of the target ID
-                    cardReader.CardTarget[cardID] = targetID;
-                    // Apply the impact, activate these things locally and then the results will be transferred through the network at the end of the turn
+                    // Then store all necessary information to be calculated and transferred over the network
+                    cardReader.CardTarget[cardID] = targetID[i];
+                    targetIDList.Add(targetID[i]);
 
-                    // Apply the duration to be Current turn count + duration
 
-                    
+                    //Card tempCard = new Card();
+                    //float rng = UnityEngine.Random.Range(0.0f, 1.0f);
+                    //// Determine ranges for the percent chance to allow for super success, success, failure, super failure
+                    //if (rng >= (1.0 - cardReader.CardPercentChance[cardID]))
+                    //{
+                    //    // Success
+                    //    // Get the facility based off of the target ID
+
+                    //    // Apply the impact, activate these things locally and then the results will be transferred through the network at the end of the turn
+
+                    //    // Apply the duration to be Current turn count + duration
+
+
+                    //}
+                    //else
+                    //{
+                    //    Debug.Log("Attack fizzled");
+                    //}
+
+
+                    // Regardless of success or not, we remove the card from play.
+                    //cardReader.CardCount[cardID] -= 1; // This doesn't work as we want, as it would potentially reduce card count for other players if networked, if we don't network this it is not an issue.
+                    //Debug.Log(cardReader.CardCount[cardID]);
+                    // Deck.Remove(cardID);
+
+                    // Store the information of CardID played and Target Facility ID to be sent over the network
                 }
                 else
                 {
-                    Debug.Log("Attack fizzled");
+                    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
                 }
-                // Reduce the size of the hand
-                handSize--;
-
-                // Regardless of success or not, we remove the card from play.
-                //cardReader.CardCount[cardID] -= 1; // This doesn't work as we want, as it would potentially reduce card count for other players if networked, if we don't network this it is not an issue.
-                //Debug.Log(cardReader.CardCount[cardID]);
-                // Deck.Remove(cardID);
-
-                // Store the information of CardID played and Target Facility ID to be sent over the network
             }
-            else
-            {
-                Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
-            }
+            // Reduce the size of the hand
+            handSize--;
 
         }
         else
@@ -252,29 +268,77 @@ public class Player : MonoBehaviour
 
     public bool SelectFacility(int cardID)
     {
-        int targetID = -1;
         // Intention is to have it like hearthstone where player plays a targeted card, they then select the target which is passed into playcard
-
-
-        //if (seletedFacility == null)
-        //{
-        //    Debug.Log("PICK A CARD");
-        //}
-        //else
-        //{
-        //    targetID = seletedFacility.GetComponent<FacilityV3>().facID;
-        //    PlayCard(cardID, targetID);
-        //}
-        if(seletedFacility != null)
+        if (cardReader.CardTargetCount[cardID] == int.MaxValue)
         {
-            targetID = seletedFacility.GetComponent<FacilityV3>().facID;
-            PlayCard(cardID, targetID);
+            if (targetIDList.Count > 0)
+            {
+                Debug.Log("You can't play this card, because you have already targetted a facility and this card requries all facilities");
+                return false;
+            }
+            else
+            {
+                foreach (GameObject obj in gameManager.allFacilities)
+                {
+                    Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
+                    if ((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
+                    {
+                        seletedFacilities.Add(obj);
+                    }
+                }
+            }
+            int[] tempTargets = new int[seletedFacilities.Count];
+            List<GameObject> removableObj = new List<GameObject>();
+            for (int i = 0; i < seletedFacilities.Count; i++)
+            {
+                tempTargets[i] = seletedFacilities[i].GetComponent<FacilityV3>().facID;
+            }
+            Debug.Log("No overlap " + tempTargets.Length);
+            PlayCard(cardID, tempTargets);
+            seletedFacilities.Clear(); // After every successful run, clear the list
             return true;
+        }
+        else if (seletedFacilities.Count > 0 && seletedFacilities.Count == cardReader.CardTargetCount[cardID]) //  && targetFacilities.Count == cardReader.targetCount[cardID]
+        {
+            int[] tempTargets = new int[seletedFacilities.Count];
+            List<GameObject> removableObj = new List<GameObject>();
+            bool tempFailed = false;
+            for (int i = 0; i < seletedFacilities.Count; i++)
+            {
+                if (targetIDList.Contains(seletedFacilities[i].GetComponent<FacilityV3>().facID) == false)
+                {
+                    tempTargets[i] = seletedFacilities[i].GetComponent<FacilityV3>().facID;
+                }
+                else
+                {
+                    Debug.Log("The " + seletedFacilities[i].GetComponent<FacilityV3>().type + " you selected is already being targetted by another card this turn, so please choose another one");
+                    removableObj.Add(seletedFacilities[i]); // Add the object that we already have targetted to the list to be removed
+                    tempFailed = true; // If it failed, we want to save that it failed
+                }
+            }
+            if (tempFailed)
+            {
+                seletedFacilities.RemoveAll(x => removableObj.Contains(x));
+                return false;
+            }
+            Debug.Log("No overlap " + tempTargets.Length);
+            PlayCard(cardID, tempTargets);
+            seletedFacilities.Clear(); // After every successful run, clear the list
+            return true;
+
         }
         else
         {
-
-            Debug.Log("Select a facility by double clicking it");
+            if (seletedFacilities.Count > cardReader.CardTargetCount[cardID])
+            {
+                Debug.Log("You have selected too many facilities, please deselect " + (seletedFacilities.Count - cardReader.CardTargetCount[cardID]) + " facilities.");
+                Debug.Log("Deselect a facility by clicking it again.");
+            }
+            else if (seletedFacilities.Count < cardReader.CardTargetCount[cardID])
+            {
+                Debug.Log("You have not selected enough facilities, please select " + (cardReader.CardTargetCount[cardID] - seletedFacilities.Count) + " facilities.");
+                Debug.Log("Select a facility by double clicking it.");
+            }
             return false;
         }
 
@@ -288,173 +352,173 @@ public class Player : MonoBehaviour
 
     }
 
-    public void IncreaseOneFeedback()
-    {
-        // Need to determine how to select
-        if (funds - 50.0f > 0.0f)
-        {
-            seletedFacility.GetComponent<FacilityV3>().feedback += 1;
-            funds -= 50.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void IncreaseOneFeedback()
+    //{
+    //    // Need to determine how to select
+    //    if (funds - 50.0f > 0.0f)
+    //    {
+    //        seletedFacility.GetComponent<FacilityV3>().feedback += 1;
+    //        funds -= 50.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void IncreaseAllFeedback()
-    {
-        if (funds - 50.0f > 0.0f)
-        {
-            foreach (GameObject obj in Facilities)
-            {
-                obj.GetComponent<FacilityV3>().feedback += 1;
-            }
-            funds -= 50.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void IncreaseAllFeedback()
+    //{
+    //    if (funds - 50.0f > 0.0f)
+    //    {
+    //        foreach (GameObject obj in Facilities)
+    //        {
+    //            obj.GetComponent<FacilityV3>().feedback += 1;
+    //        }
+    //        funds -= 50.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void HireWorkers()
-    {
-        if (funds - 100.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().workers += 5.0f;
-            funds -= 100.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void HireWorkers()
+    //{
+    //    if (funds - 100.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().workers += 5.0f;
+    //        funds -= 100.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostIT()
-    {
-        if (funds - 50.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().it_level += 5.0f;
-            funds -= 50.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostIT()
+    //{
+    //    if (funds - 50.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().it_level += 5.0f;
+    //        funds -= 50.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostOT()
-    {
-        if (funds - 50.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().ot_level += 5.0f;
-            funds -= 50.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostOT()
+    //{
+    //    if (funds - 50.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().ot_level += 5.0f;
+    //        funds -= 50.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void ImprovePhysSec()
-    {
-        if (funds - 70.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().phys_security += 7.0f;
-            funds -= 70.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void ImprovePhysSec()
+    //{
+    //    if (funds - 70.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().phys_security += 7.0f;
+    //        funds -= 70.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void IncreaseFunding()
-    {
-        if (funds - 150.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().funding += 2.0f;
-            funds -= 150.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void IncreaseFunding()
+    //{
+    //    if (funds - 150.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().funding += 2.0f;
+    //        funds -= 150.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostElectricity()
-    {
-        if (funds - 50.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().electricity += 5.0f;
-            funds -= 50.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostElectricity()
+    //{
+    //    if (funds - 50.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().electricity += 5.0f;
+    //        funds -= 50.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostWater()
-    {
-        if (funds - 75.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().water += 7.5f;
-            funds -= 75.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostWater()
+    //{
+    //    if (funds - 75.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().water += 7.5f;
+    //        funds -= 75.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostFuel()
-    {
-        if (funds - 75.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().fuel += 7.5f;
-            funds -= 75.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostFuel()
+    //{
+    //    if (funds - 75.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().fuel += 7.5f;
+    //        funds -= 75.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostCommunications()
-    {
-        if (funds - 90.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().communications += 9.0f;
-            funds -= 90.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostCommunications()
+    //{
+    //    if (funds - 90.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().communications += 9.0f;
+    //        funds -= 90.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 
-    public void BoostHealth()
-    {
-        if (funds - 150.0f > 0.0f)
-        {
-            // Do something
-            seletedFacility.GetComponent<FacilityV3>().health += 15.0f;
-            funds -= 150.0f;
-        }
-        else
-        {
-            // Show they are broke
-        }
-    }
+    //public void BoostHealth()
+    //{
+    //    if (funds - 150.0f > 0.0f)
+    //    {
+    //        // Do something
+    //        seletedFacility.GetComponent<FacilityV3>().health += 15.0f;
+    //        funds -= 150.0f;
+    //    }
+    //    else
+    //    {
+    //        // Show they are broke
+    //    }
+    //}
 }
