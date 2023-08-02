@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour, IDragHandler
 {
     // Establish necessary fields
     public GameObject[] allPlayers;
+    public GameObject MalActorObject;
     public NativeArray<int> playerIDs;
 
     public MaliciousActor maliciousActor;
@@ -360,6 +361,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                 activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(false);
+                MalActorObject.SetActive(true);
                 foreach (GameObject fac in allFacilities)
                 {
                     Color tempColor = fac.GetComponent<SVGImage>().color;
@@ -515,22 +517,29 @@ public class GameManager : MonoBehaviour, IDragHandler
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
+            Debug.Log("Starting player: " + allPlayers[activePlayerNumber].name);
             foreach(GameObject players in allPlayers)
             {
-                if(players != allPlayers[activePlayerNumber])
+                if(players == allPlayers[activePlayerNumber])
                 {
+                    players.SetActive(true);
                     foreach(GameObject card in players.GetComponent<Player>().HandList)
                     {
-                        card.SetActive(false);
+                        card.SetActive(true);
                     }
                 }
                 else
                 {
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
                     {
-                        card.SetActive(true);
+                        card.SetActive(false);
                     }
+                    players.SetActive(false);
                 }
+            }
+            foreach(GameObject cards in maliciousActor.HandList)
+            {
+                cards.SetActive(false);
             }
             foreach (GameObject fac in allFacilities)
             {
@@ -577,6 +586,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
+            MalActorObject.SetActive(false);
         }
         else
         {
@@ -619,6 +629,7 @@ public class GameManager : MonoBehaviour, IDragHandler
             }
             activePlayerText.text = allPlayers[activePlayerNumber].GetComponent<Player>().type + " Player";
             fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
+            allPlayers[activePlayerNumber].SetActive(true);
             foreach (GameObject players in allPlayers)
             {
                 if (players != allPlayers[activePlayerNumber])
@@ -780,6 +791,7 @@ public class GameManager : MonoBehaviour, IDragHandler
         newPlayer.transform.SetParent(map.transform, false);
         newPlayer.name = "Malicious Actor";
         maliciousActor = newPlayer.GetComponent<MaliciousActor>();
+        MalActorObject = maliciousActor.gameObject;
         baseMalPlayer.SetActive(false);
     }
 

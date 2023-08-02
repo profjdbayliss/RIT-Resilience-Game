@@ -187,19 +187,46 @@ public class MaliciousActor : MonoBehaviour
                     {
                         case 0:
                             tempInnerText[i].text +=  " uninformed, and unaccessed facilities.";
+                            tempCard.facilityStateRequirements = Card.FacilityStateRequirements.Normal;
                             break;
 
                         case 1:
                             tempInnerText[i].text += Card.FacilityStateRequirements.Informed + " facilities.";
+                            tempCard.facilityStateRequirements = Card.FacilityStateRequirements.Informed;
                             break;
 
                         case 2:
                             tempInnerText[i].text += Card.FacilityStateRequirements.Accessed + " facilities.";
+                            tempCard.facilityStateRequirements = Card.FacilityStateRequirements.Accessed;
                             break;
 
                     }
                     
                 }
+            }
+            switch (cardReader.CardSubType[Deck[rng]])
+            {
+                case 3:
+                    tempCard.malCardType = Card.MalCardType.Reconnaissance;
+                    break;
+
+                case 4:
+                    tempCard.malCardType = Card.MalCardType.InitialAccess;
+
+                    break;
+
+                case 5:
+                    tempCard.malCardType = Card.MalCardType.Impact;
+
+                    break;
+
+                case 6:
+                    tempCard.malCardType = Card.MalCardType.LateralMovement;
+                    break;
+
+                case 7:
+                    tempCard.malCardType = Card.MalCardType.Exfiltration;
+                    break;
             }
 
             tempCard.percentSuccess = cardReader.CardPercentChance[Deck[rng]];
@@ -241,17 +268,19 @@ public class MaliciousActor : MonoBehaviour
         Debug.Log("Card Play Call" + cardReader.CardCount[cardID] + CardCountList[Deck.IndexOf(cardID)]);
         if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID.Length >= 0) // Check the mal actor has enough action points to play the card, there are still enough of this card to play, and that there is actually a target. Also make sure that the player hasn't already played a card against it this turn
         {
+            List<int> cardTargets = new List<int>();
+            cardTargets.Add(cardID);
             for(int i = 0; i < targetID.Length; i++)
             {
                 // Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
-                if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
+                if ((int)manager.allFacilities[targetID[i]].GetComponent<FacilityV3>().state >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
 
                 //if (((int)manager.allFacilities[targetID].GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
                 {
                     // Then store all necessary information to be calculated and transferred over the network
                     cardReader.CardTarget[cardID] = targetID[i];
                     targetIDList.Add(targetID[i]);
-
+                    cardTargets.Add(targetID[i]);
 
                     //Card tempCard = new Card();
                     //float rng = UnityEngine.Random.Range(0.0f, 1.0f);

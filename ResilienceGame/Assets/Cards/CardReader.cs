@@ -18,6 +18,8 @@ public class CardReader : MonoBehaviour
     public List<Card> maliciousCards;
     public List<Card> globalModifiers;
 
+    public Hashtable blueCardTargets;
+    public Hashtable blueMitMods;
     public CardFront[] CardFronts;
     public NativeArray<int> CardIDs;
     public NativeArray<int> CardTeam;
@@ -27,6 +29,7 @@ public class CardReader : MonoBehaviour
     public NativeArray<int> CardCount;
     public NativeArray<int> CardTargetCount;
     public NativeArray<int> CardFacilityStateReqs;
+    public NativeArray<int> CardSubType;
     public NativeArray<float> CardImpact;
     public NativeArray<float> CardSpreadChance;
     public NativeArray<float> CardPercentChance;
@@ -69,6 +72,11 @@ public class CardReader : MonoBehaviour
 
             CardFronts = new CardFront[allCSVObjects.Length];
 
+
+            blueCardTargets = new Hashtable();
+
+            blueMitMods = new Hashtable();
+
             // Allocate the space in memory for the Cards data
             CardIDs = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardTeam = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
@@ -78,6 +86,7 @@ public class CardReader : MonoBehaviour
             CardCount = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardTargetCount = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardFacilityStateReqs = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
+            CardSubType = new NativeArray<int>(allCSVObjects.Length, Allocator.Persistent);
             CardImpact = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
             CardSpreadChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
             CardPercentChance = new NativeArray<float>(allCSVObjects.Length, Allocator.Persistent);
@@ -170,64 +179,237 @@ public class CardReader : MonoBehaviour
                 // Check to make sure that this is actually a number, but if it has text in it then we don't parse it.
                 if (CardTeam[i] == 1)
                 {
-                    if (individualCSVObjects[5].Contains("|") == false)
+                    string temp3 = individualCSVObjects[13].Trim();
+                    switch (temp3)
                     {
-                        if (individualCSVObjects[5].Contains(" ") == false)
-                        {
-                            if (individualCSVObjects[5].Contains("e") == false)
-                            {
-                                if (individualCSVObjects[5].Length > 1)
-                                {
-                                    tempCard.potentcy = float.Parse(individualCSVObjects[5]);
-                                    CardImpact[i] = float.Parse(individualCSVObjects[5]);
-                                }
+                        case "Reconnaissance":
+                            tempCard.malCardType = Card.MalCardType.Reconnaissance;
+                            CardSubType[i] = 3;
+                            break;
 
+                        case "Inital Access":
+                            tempCard.malCardType = Card.MalCardType.InitialAccess;
+                            CardSubType[i] = 4;
+
+                            break;
+
+                        case "Impact":
+                            tempCard.malCardType = Card.MalCardType.Impact;
+                            CardSubType[i] = 5;
+                            if (individualCSVObjects[5].Length > 1)
+                            {
+                                tempCard.potentcy = float.Parse(individualCSVObjects[5]);
+                                CardImpact[i] = float.Parse(individualCSVObjects[5]);
                             }
-                        }
+                            break;
+                        
+                        case "Lateral Movement":
+                            tempCard.malCardType = Card.MalCardType.LateralMovement;
+                            CardSubType[i] = 6;
+                            break;
+
+                        case "Exfiltration":
+                            tempCard.malCardType = Card.MalCardType.Exfiltration;
+                            CardSubType[i] = 7;
+                            break;
 
                     }
+
+                    //if (individualCSVObjects[5].Contains("|") == false)
+                    //{
+                    //    if (individualCSVObjects[5].Contains(" ") == false)
+                    //    {
+                    //        if (individualCSVObjects[5].Contains("e") == false)
+                    //        {
+                    //            if (individualCSVObjects[5].Length > 1)
+                    //            {
+                    //                tempCard.potentcy = float.Parse(individualCSVObjects[5]);
+                    //                CardImpact[i] = float.Parse(individualCSVObjects[5]);
+                    //            }
+
+                    //        }
+                    //    }
+
+                    //}
                 }
                 else
                 {
-                    string[] tempPot = individualCSVObjects[5].Split('&'); // This is used for blue cards which have a potency like this "phishing -40% & browser session hijacking -40% & Infect with Removable Media -40%" so we split to find the different impacts between & and then split once more based off :
-                    if(tempPot.Length > 1)
+                    string temp4 = individualCSVObjects[13].Trim();
+                    switch (temp4)
                     {
-                        string toBePrinted = "";
-                        for (int j = 0; j < tempPot.Length; j++)
-                        {
-                            string[] tempIndPot = tempPot[j].Split(':');
-                            if(tempIndPot.Length > 1)
+                        case "Detection":
+                            tempCard.resCardType = Card.ResCardType.Detection;
+                            CardSubType[i] = 0;
+                            string[] detectPot = individualCSVObjects[5].Split('&'); // This is used for blue cards which have a potency like this "phishing -40% & browser session hijacking -40% & Infect with Removable Media -40%" so we split to find the different impacts between & and then split once more based off :
+                            if (detectPot.Length > 1)
                             {
-                                tempIndPot[1] = tempIndPot[1].Trim();
-                                if (tempIndPot[1].Contains("-") == true)
+                                string toBePrinted = "";
+                                int[] targets = new int[detectPot.Length];
+                                for (int j = 0; j < detectPot.Length; j++)
                                 {
-                                    tempIndPot[1].Remove(tempIndPot[1].IndexOf('-'));
+                                    string[] tempIndPot = detectPot[j].Split(':');
+                                    if (tempIndPot.Length > 1)
+                                    {
+                                        tempIndPot[1] = tempIndPot[1].Trim();
+                                        for(int k = 0; k < CardFronts.Length; k++)
+                                        {
+                                            if(CardFronts[k].name == tempIndPot[1])
+                                            {
+                                                targets[j] = k;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    toBePrinted += detectPot[j] + '\n';
                                 }
+                                blueCardTargets.Add(i, targets);
+
+                                byte[] temp3 = Encoding.ASCII.GetBytes(toBePrinted);
+                                tempCardFront.impact = temp3;
                             }
-                            toBePrinted += tempPot[j] + '\n';
-                            Debug.Log(toBePrinted);
-                        }
-                        byte[] temp3 = Encoding.ASCII.GetBytes(toBePrinted);
-                        tempCardFront.impact = temp3;
+                            else
+                            {
+                                if (detectPot[0].Contains("cancel"))
+                                {
+                                    string tempString = detectPot[0].Trim();
+                                    Debug.Log(tempString);
+                                }
+                                else if (detectPot[0].Contains("-"))
+                                {
+                                    detectPot[0].Remove(detectPot[0].IndexOf('-'));
+                                    Debug.Log(detectPot[0]);
+                                }
+                                byte[] temp3 = Encoding.ASCII.GetBytes(detectPot[0]);
+                                tempCardFront.impact = temp3;
+                            }
+                            break;
+
+                        case "Mitigation":
+                            tempCard.resCardType = Card.ResCardType.Mitigation;
+                            CardSubType[i] = 1;
+                            
+                            break;
+
+                        case "Prevention":
+                            tempCard.resCardType = Card.ResCardType.Prevention;
+                            CardSubType[i] = 2;
+                            string[] tempPot4 = individualCSVObjects[5].Split('&'); // This is used for blue cards which have a potency like this "phishing -40% & browser session hijacking -40% & Infect with Removable Media -40%" so we split to find the different impacts between & and then split once more based off :
+                            List<int> tempImpList = new List<int>();
+                            Hashtable tempTable = new Hashtable();
+                            if (tempPot4.Length > 1)
+                            {
+                                string toBePrinted = "";
+                                int potency = 0;
+                                for (int j = 0; j < tempPot4.Length; j++)
+                                {
+                                    string[] tempIndPot = tempPot4[j].Split(':');
+                                    if (tempIndPot.Length > 1)
+                                    {
+                                        tempIndPot[0] = tempIndPot[0].Trim();
+                                        tempIndPot[1] = tempIndPot[1].Trim();
+                                        if (tempIndPot[1].Contains("-") == true)
+                                        {
+                                            tempIndPot[1] = tempIndPot[1].Substring(tempIndPot[1].IndexOf('-') + 1, 2);
+                                            //tempImpList.Add(int.Parse(tempIndPot[1]));
+                                            potency = int.Parse(tempIndPot[1]);
+                                            for (int k = 0; k < CardFronts.Length; k++)
+                                            {
+                                                if (CardFronts[k].name.ToLower().Trim() == tempIndPot[0].Trim().ToLower())
+                                                {
+                                                    //tempIndPot[1] = tempIndPot[1].Remove(tempIndPot[1].IndexOf('-'));
+                                                    //tempIndPot[1] = tempIndPot[1].Remove(tempIndPot[1].IndexOf('%'));
+                                                    tempImpList.Add(k);
+                                                    //tempTable.Add(k, float.Parse(tempIndPot[1]));
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    toBePrinted += tempPot4[j] + '\n';
+                                    Debug.Log(toBePrinted);
+                                }
+                                tempImpList.Insert(0, potency);
+                                blueMitMods.Add(i, tempImpList);
+                                //blueMitMods.Add(i, tempTable);
+                                byte[] temp3 = Encoding.ASCII.GetBytes(toBePrinted);
+                                tempCardFront.impact = temp3;
+                            }
+                            else
+                            {
+                                tempPot4 = individualCSVObjects[5].Split(':');
+                                if (tempPot4.Length > 1)
+                                {
+                                    tempPot4[0] = tempPot4[0].Trim();
+                                    //tempPot4[1].Remove(tempPot4[1].IndexOf('-'));
+                                    //tempPot4[1].Remove(tempPot4[1].IndexOf('%'));
+                                    tempPot4[1] = tempPot4[1].Substring(tempPot4[1].IndexOf('-') + 1, 2);
+                                    List<int> tempImpactList = new List<int>();
+                                    tempImpactList.Add(int.Parse(tempPot4[1]));
+                                    Hashtable tempIndTable = new Hashtable();
+                                    for (int k = 0; k < CardFronts.Length; k++)
+                                    {
+                                        if (CardFronts[k].name.ToLower().Trim() == tempPot4[0].Trim().ToLower())
+                                        {
+                                            tempImpactList.Add(k);
+                                            //tempIndTable.Add(k, float.Parse(tempPot4[1]));
+                                            break;
+                                        }
+                                    }
+                                    blueMitMods.Add(i, tempImpactList);
+                                    //blueMitMods.Add(i, tempIndTable);
+                                }
+
+                                //Debug.Log(tempPot4[0]);
+                                byte[] temp3 = Encoding.ASCII.GetBytes(tempPot4[0]);
+                                tempCardFront.impact = temp3;
+                            }
+                            break;
+
+                        default:
+                            string[] tempPot = individualCSVObjects[5].Split('&'); // This is used for blue cards which have a potency like this "phishing -40% & browser session hijacking -40% & Infect with Removable Media -40%" so we split to find the different impacts between & and then split once more based off :
+                            if (tempPot.Length > 1)
+                            {
+                                string toBePrinted = "";
+                                for (int j = 0; j < tempPot.Length; j++)
+                                {
+                                    string[] tempIndPot = tempPot[j].Split(':');
+                                    if (tempIndPot.Length > 1)
+                                    {
+                                        tempIndPot[1] = tempIndPot[1].Trim();
+                                        if (tempIndPot[1].Contains("-") == true)
+                                        {
+                                            tempIndPot[1].Remove(tempIndPot[1].IndexOf('-'));
+                                        }
+                                    }
+                                    toBePrinted += tempPot[j] + '\n';
+                                    Debug.Log(toBePrinted);
+                                }
+                                byte[] temp3 = Encoding.ASCII.GetBytes(toBePrinted);
+                                tempCardFront.impact = temp3;
+                            }
+                            else
+                            {
+                                if (tempPot[0].Contains("cancel"))
+                                {
+                                    string tempString = tempPot[0].Trim();
+                                    Debug.Log(tempString);
+                                }
+                                else if (tempPot[0].Contains("-"))
+                                {
+                                    tempPot[0].Remove(tempPot[0].IndexOf('-'));
+                                    Debug.Log(tempPot[0]);
+                                }
+                                byte[] temp3 = Encoding.ASCII.GetBytes(tempPot[0]);
+                                tempCardFront.impact = temp3;
+                            }
+                            break;
+
+
                     }
-                    else
-                    {
-                        if (tempPot[0].Contains("cancel"))
-                        {
-                            string tempString = tempPot[0].Trim();
-                            Debug.Log(tempString);
-                        }
-                        else if (tempPot[0].Contains("-"))
-                        {
-                            tempPot[0].Remove(tempPot[0].IndexOf('-'));
-                            Debug.Log(tempPot[0]);
-                        }
-                        byte[] temp3 = Encoding.ASCII.GetBytes(tempPot[0]);
-                        tempCardFront.impact = temp3;
-                    }
+                    
 
                 }
-               
+
 
                 if (individualCSVObjects[6].Contains("|") == false)
                 {
@@ -298,6 +480,8 @@ public class CardReader : MonoBehaviour
                 }
 
 
+
+
                 // Then we use a for loop to check the image location of the current CSV and the textureUVs
                 // made when the atlas is made. If it is the matching image, then we take a sub-section of the atlas
                 // and add it to the card.
@@ -360,6 +544,7 @@ public class CardReader : MonoBehaviour
         CardTarget.Dispose();
         CardFacilityStateReqs.Dispose();
         CardCount.Dispose();
+        CardSubType.Dispose();
         CardTargetCount.Dispose();
         CardImpact.Dispose();
         CardSpreadChance.Dispose();

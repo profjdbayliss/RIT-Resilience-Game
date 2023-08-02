@@ -36427,7 +36427,7 @@ MonoBehaviour:
   maliciousCards: []
   globalModifiers: []
   CardFronts: []
-  cardFileLoc: D:\Profiles\sbb7355\Downloads\Cards - Sheet1 (2).csv
+  cardFileLoc: D:\Profiles\sbb7355\Downloads\Cards - Sheet1 (4).csv
   players: []
   maliciousActor: {fileID: 0}
   cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}

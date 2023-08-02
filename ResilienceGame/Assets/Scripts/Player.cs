@@ -34,29 +34,13 @@ public class Player : MonoBehaviour
         maxHandSize = 5;
         funds = 1000.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
-        //Debug.Log("INT PARSE: " + (int)(Card.Type.Resilient));
         for(int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
             {
-                //Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
                 Deck.Add(i);
                 CardCountList.Add(cardReader.CardCount[i]);
             }
-
-            //if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
-            //{
-            //    for(int j = 0; j < cardReader.CardCount[i]; j++)
-            //    {
-            //        Deck.Add(i);
-            //    }
-            //}
-
-            // Gets facility specific cards which we don't have yet
-            //if (cardReader.CardTeam[i] == ((int)type)) // Uncomment to build the deck
-            //{
-            //    Deck.Add(i);
-            //}
         }
         for(int i = 0; i < maxHandSize; i++)
         {
@@ -129,16 +113,46 @@ public class Player : MonoBehaviour
         {
             return;
         }
-        //if (cardReader.CardCount[Deck[rng]] > 0)
         if (CardCountList[rng] > 0)
         {
             CardCountList[rng]--;
-            //cardReader.CardCount[Deck[rng]]--;
             GameObject tempCardObj = Instantiate(cardPrefab);
             Card tempCard = tempCardObj.GetComponent<Card>();
             tempCard.cardDropZone = cardDropZone;
             tempCard.cardID = Deck[rng];
             tempCard.front = cardReader.CardFronts[Deck[rng]];
+            if(cardReader.CardSubType[Deck[rng]] == 0)
+            {
+                tempCard.resCardType = Card.ResCardType.Detection;
+                foreach(DictionaryEntry entry in cardReader.blueCardTargets)
+                {
+                    if((int)entry.Key == Deck[rng]) // check to make sure that the key (CardID) is the same as this Card's ID
+                    {
+                        tempCard.blueCardTargets = (int[])entry.Value; // If so, give us the right values attached (target card IDs)
+                        break;
+                    }
+                }
+
+            }
+            else if(cardReader.CardSubType[Deck[rng]] == 2)
+            {
+                tempCard.resCardType = Card.ResCardType.Prevention;
+                foreach (DictionaryEntry entry in cardReader.blueMitMods)
+                {
+                    if ((int)entry.Key == Deck[rng]) // check to make sure that the key (CardID) is the same as this Card's ID
+                    {
+                        tempCard.blueTargetMits = (List<int>)entry.Value;
+                        tempCard.blueCardTargets = new int[tempCard.blueTargetMits.Count-1];
+                        //Debug.Log("MITS: " + tempCard.blueTargetMits.Count + " TARGS: " + tempCard.blueCardTargets.Length);
+                        tempCard.potentcy = tempCard.blueTargetMits[0];
+                        for (int i = 1; i < tempCard.blueTargetMits.Count; i++)
+                        {
+                            tempCard.blueCardTargets[i-1] = tempCard.blueTargetMits[i];
+                        }
+                        break;
+                    }
+                }
+            }
             RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
             for (int i = 0; i < tempRaws.Length; i++)
             {
@@ -178,7 +192,7 @@ public class Player : MonoBehaviour
             }
             tempCard.percentSuccess = cardReader.CardPercentChance[Deck[rng]];
             tempCard.percentSpread = cardReader.CardSpreadChance[Deck[rng]];
-            tempCard.potentcy = cardReader.CardImpact[Deck[rng]];
+            //tempCard.potentcy = cardReader.CardImpact[Deck[rng]];
             tempCard.duration = cardReader.CardDuration[Deck[rng]];
             tempCard.cost = cardReader.CardCost[Deck[rng]];
             tempCard.teamID = cardReader.CardTeam[Deck[rng]];
@@ -208,55 +222,35 @@ public class Player : MonoBehaviour
 
     public void PlayCard(int cardID, int[] targetID, int targetCount = 3)
     {
-        Debug.Log("Card Play Call" + cardReader.CardCount[cardID] + CardCountList[Deck.IndexOf(cardID)]);
+        List<int> cardsPlayed = new List<int>();
         if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID.Length >= 0) // Check the mal actor has enough action points to play the card, there are still enough of this card to play, and that there is actually a target. Also make sure that the player hasn't already played a card against it this turn
         {
+            cardsPlayed.Add(cardID);
             for (int i = 0; i < targetID.Length; i++)
             {
-                // Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
-                if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
+                cardReader.CardTarget[cardID] = targetID[i];
+                targetIDList.Add(targetID[i]); // Make sure we don't double target something
+                cardsPlayed.Add(targetID[i]); // Make sure to track the card play to send across
+                //// Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
+                //if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
+                //{
+                //    // Then store all necessary information to be calculated and transferred over the network
+                //    cardReader.CardTarget[cardID] = targetID[i];
+                //    targetIDList.Add(targetID[i]);
+                //    cardsPlayed.Add(targetID[i]);
 
-                //if (((int)manager.allFacilities[targetID].GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
-                {
-                    // Then store all necessary information to be calculated and transferred over the network
-                    cardReader.CardTarget[cardID] = targetID[i];
-                    targetIDList.Add(targetID[i]);
-
-
-                    //Card tempCard = new Card();
-                    //float rng = UnityEngine.Random.Range(0.0f, 1.0f);
-                    //// Determine ranges for the percent chance to allow for super success, success, failure, super failure
-                    //if (rng >= (1.0 - cardReader.CardPercentChance[cardID]))
-                    //{
-                    //    // Success
-                    //    // Get the facility based off of the target ID
-
-                    //    // Apply the impact, activate these things locally and then the results will be transferred through the network at the end of the turn
-
-                    //    // Apply the duration to be Current turn count + duration
-
-
-                    //}
-                    //else
-                    //{
-                    //    Debug.Log("Attack fizzled");
-                    //}
-
-
-                    // Regardless of success or not, we remove the card from play.
-                    //cardReader.CardCount[cardID] -= 1; // This doesn't work as we want, as it would potentially reduce card count for other players if networked, if we don't network this it is not an issue.
-                    //Debug.Log(cardReader.CardCount[cardID]);
-                    // Deck.Remove(cardID);
-
-                    // Store the information of CardID played and Target Facility ID to be sent over the network
-                }
-                else
-                {
-                    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
-                }
+                //    // Store the information of CardID played and Target Facility ID to be sent over the network
+                //}
+                //else
+                //{
+                //    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
+                //}
             }
             // Reduce the size of the hand
             handSize--;
+
+            // Pass over CardsPlayed to network
+
 
         }
         else
@@ -278,13 +272,17 @@ public class Player : MonoBehaviour
             }
             else
             {
-                foreach (GameObject obj in gameManager.allFacilities)
+                foreach (GameObject obj in Facilities)
                 {
                     Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
-                    if ((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
+                    if (obj.GetComponent<FacilityV3>().state != FacilityV3.FacilityState.Down)
                     {
                         seletedFacilities.Add(obj);
                     }
+                    //if ((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
+                    //{
+                    //    seletedFacilities.Add(obj);
+                    //}
                 }
             }
             int[] tempTargets = new int[seletedFacilities.Count];

@@ -66,6 +66,9 @@ public class Card : MonoBehaviour, IDropHandler
     public int teamID;
     public int cost;
     public int targetCount;
+    //public Hashtable blueTargetMits;
+    public List<int> blueTargetMits;
+    public int[] blueCardTargets;
     public float duration;
     public CardFront front;
     public CardState state;

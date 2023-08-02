@@ -21,7 +21,8 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         {
             players = GameObject.FindObjectsOfType<Player>();
         }
-        maliciousActor = GameObject.FindObjectOfType<MaliciousActor>();
+        //maliciousActor = GameObject.FindObjectOfType<MaliciousActor>();
+        maliciousActor = gameManager.maliciousActor;
     }
 
     // Update is called once per frame
@@ -86,9 +87,12 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
                 outline.GetComponent<RawImage>().color = Color.cyan;
 
             }
-            else if ((maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+            else if ((maliciousActor.gameObject.activeSelf))
             {
-                outline.GetComponent<RawImage>().color = Color.magenta;
+                if ((maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+                {
+                    outline.GetComponent<RawImage>().color = Color.magenta;
+                }
             }
             else if (facility.isDown)
             {

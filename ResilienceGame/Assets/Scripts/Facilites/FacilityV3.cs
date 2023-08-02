@@ -30,6 +30,7 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         Normal = 0,
         Informed = 1,
         Accessed = 2,
+        Down = 3,
     };
 
     public Type type;
