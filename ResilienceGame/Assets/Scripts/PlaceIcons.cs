@@ -315,7 +315,7 @@ public class PlaceIcons : MonoBehaviour
         tempFacility.name = name;
         //player.Facilities.Add(tempFacility);
         gameManager.allFacilities.Add(tempFacility);
-        tempFacility.GetComponent<FacilityV3>().facID = gameManager.allFacilities.Count;
+        tempFacility.GetComponent<FacilityV3>().facID = gameManager.allFacilities.Count-1;
         baseFacility.SetActive(false);
 
     }
@@ -496,7 +496,7 @@ public class PlaceIcons : MonoBehaviour
 
             // Set the material then parent it to the Map
             //fire.GetComponent<MeshRenderer>().material = HexMaterials[10]; <-- Only needed when utilizing hexes
-            tempFacility.GetComponent<FacilityV3>().facID = gameManager.allFacilities.Count;
+            tempFacility.GetComponent<FacilityV3>().facID = gameManager.allFacilities.Count-1;
 
             tempFacility.transform.SetParent(Map.transform, false);
             tempFacility.name = name;

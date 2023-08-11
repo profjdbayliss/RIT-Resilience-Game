@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
     public int maxHandSize = 5;
     public GameObject cardPrefab;
     public GameObject cardDropZone;
+    public GameObject handDropZone;
 
     // Start is called before the first frame update
     void Start()
@@ -198,7 +199,7 @@ public class Player : MonoBehaviour
             tempCard.teamID = cardReader.CardTeam[Deck[rng]];
             if (cardReader.CardTargetCount[Deck[rng]] == int.MaxValue)
             {
-                tempCard.targetCount = gameManager.allFacilities.Count;
+                tempCard.targetCount = Facilities.Count;
             }
             else
             {
@@ -207,11 +208,27 @@ public class Player : MonoBehaviour
             tempCardObj.GetComponent<slippy>().map = tempCardObj;
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
-            tempPos.x += handSize * 8;
+            //Vector3 tempPos = cardDropZone.transform.position;
+            //tempPos.x += handSize * 8;
             tempCardObj.transform.position = tempPos;
-            tempCardObj.transform.SetParent(this.transform, false);
+            //tempCardObj.transform.SetParent(this.transform, false);
+            tempCardObj.transform.SetParent(handDropZone.transform, false);
 
+            Vector3 tempPos2 = handDropZone.transform.position;
+            //tempPos2.x += handSize * 8;
             handSize++;
+            if (handSize % 2 == 0)
+            {
+                tempPos2.x += (int)(handSize / 2);
+            }
+            else
+            {
+                tempPos2.x -= (int)(handSize / 2);
+
+            }
+            tempCardObj.transform.position = tempPos2;
+
+            //handSize++;
             HandList.Add(tempCardObj);
         }
         else
@@ -231,6 +248,52 @@ public class Player : MonoBehaviour
                 cardReader.CardTarget[cardID] = targetID[i];
                 targetIDList.Add(targetID[i]); // Make sure we don't double target something
                 cardsPlayed.Add(targetID[i]); // Make sure to track the card play to send across
+                if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Detection)
+                {
+                    int[] tempBlueCardTargs = new int[5];
+                    foreach (DictionaryEntry ent in cardReader.blueCardTargets)
+                    {
+                        if((int)ent.Key == cardID)
+                        {
+                            tempBlueCardTargs = (int[])ent.Value; // If so, give us the right values attached (target card IDs)
+                            break;
+                        }
+
+                    }
+                    for (int j = 0; j < tempBlueCardTargs.Length; j++)
+                    {
+
+                        int indexToCheck = gameManager.maliciousActor.activeCardIDs.BinarySearch(tempBlueCardTargs[j]);
+                        Debug.Log(cardID + " : " + tempBlueCardTargs[j] + " : " +  indexToCheck);
+                        if(indexToCheck >= 0)
+                        {
+                            Debug.Log("CARD IND: " + tempBlueCardTargs[j] + "CARD READER TARG: " + cardReader.CardTarget[tempBlueCardTargs[j]]);
+
+                            foreach (GameObject facs in Facilities)
+                            {
+                                if (cardReader.CardTarget[tempBlueCardTargs[indexToCheck]] == facs.GetComponent<FacilityV3>().facID)
+                                {
+                                    Debug.Log("Found the culprit: " + cardReader.CardTarget[tempBlueCardTargs[indexToCheck]] + " " + facs.GetComponent<FacilityV3>().facID);
+                                    cardReader.CardTarget[tempBlueCardTargs[indexToCheck]] = -1;
+                                    break;
+                                }
+                                else
+                                {
+                                    Debug.Log(cardReader.CardTarget[tempBlueCardTargs[indexToCheck]] + " Wrong culp: " + cardReader.CardTarget[tempBlueCardTargs[indexToCheck]] + " OR TARG: " + facs.GetComponent<FacilityV3>().facID);
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+                else if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Mitigation)
+                {
+
+                }
+                else if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Prevention)
+                {
+
+                }
                 //// Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
                 //if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
                 //{
@@ -239,12 +302,12 @@ public class Player : MonoBehaviour
                 //    targetIDList.Add(targetID[i]);
                 //    cardsPlayed.Add(targetID[i]);
 
-                //    // Store the information of CardID played and Target Facility ID to be sent over the network
-                //}
-                //else
-                //{
-                //    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
-                //}
+                    //    // Store the information of CardID played and Target Facility ID to be sent over the network
+                    //}
+                    //else
+                    //{
+                    //    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
+                    //}
             }
             // Reduce the size of the hand
             handSize--;
@@ -275,7 +338,7 @@ public class Player : MonoBehaviour
                 foreach (GameObject obj in Facilities)
                 {
                     Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
-                    if (obj.GetComponent<FacilityV3>().state != FacilityV3.FacilityState.Down)
+                    if (obj.GetComponent<FacilityV3>().state != FacilityV3.FacilityState.Down && obj.GetComponent<FacilityV3>().type == type)
                     {
                         seletedFacilities.Add(obj);
                     }
@@ -349,6 +412,7 @@ public class Player : MonoBehaviour
         // Check to see if the card has expired and if so, then discard it from play and disable the game object.
 
     }
+
 
     //public void IncreaseOneFeedback()
     //{

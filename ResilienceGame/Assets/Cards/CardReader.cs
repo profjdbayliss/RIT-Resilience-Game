@@ -107,6 +107,7 @@ public class CardReader : MonoBehaviour
                 // Get a reference to the Card component on the card gameobject.
                 Card tempCard = tempCardObj.GetComponent<Card>();
 
+                //CardFront tempCardFront = new CardFront();
                 CardFront tempCardFront = tempCardObj.GetComponent<CardFront>();
 
                 // Assign the cards type based on a switch statement of either Resilient, Malicious, or a Global Modifier

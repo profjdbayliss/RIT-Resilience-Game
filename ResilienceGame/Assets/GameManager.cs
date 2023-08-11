@@ -353,6 +353,9 @@ public class GameManager : MonoBehaviour, IDragHandler
                 {
                     obj.GetComponent<Player>().targetIDList.Clear();
                 }
+                maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(false);
+                maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(false);
+
             }
             else
             {
@@ -375,6 +378,8 @@ public class GameManager : MonoBehaviour, IDragHandler
                 }
                 foreach (GameObject players in allPlayers)
                 {
+                    players.GetComponent<Player>().cardDropZone.SetActive(false);
+                    players.GetComponent<Player>().handDropZone.SetActive(false);
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
                     {
                         card.SetActive(false);
@@ -394,6 +399,8 @@ public class GameManager : MonoBehaviour, IDragHandler
                 }
                 maliciousActor.targetIDList.Clear();
                 maliciousActor.targetFacilities.Clear();
+                maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(true);
+                maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(true);
             }
         }
 
@@ -634,6 +641,8 @@ public class GameManager : MonoBehaviour, IDragHandler
             {
                 if (players != allPlayers[activePlayerNumber])
                 {
+                    players.GetComponent<Player>().cardDropZone.SetActive(false);
+                    players.GetComponent<Player>().handDropZone.SetActive(false);
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
                     {
                         card.SetActive(false);
@@ -646,6 +655,8 @@ public class GameManager : MonoBehaviour, IDragHandler
                 }
                 else
                 {
+                    players.GetComponent<Player>().cardDropZone.SetActive(true);
+                    players.GetComponent<Player>().handDropZone.SetActive(true);
                     if (allPlayers[activePlayerNumber].GetComponent<Player>().handSize < 5)
                     {
                         allPlayers[activePlayerNumber].GetComponent<Player>().DrawCard();

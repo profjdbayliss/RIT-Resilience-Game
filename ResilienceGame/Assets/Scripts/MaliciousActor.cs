@@ -23,10 +23,12 @@ public class MaliciousActor : MonoBehaviour
     public List<int> targetIDList;
     public List<GameObject> HandList;
     public List<GameObject> ActiveCardList;
+    public List<int> activeCardIDs;
     public int handSize;
     public int maxHandSize = 5;
     public GameObject cardPrefab;
     public GameObject cardDropZone;
+    public GameObject handDropZone;
     public GameObject map;
 
 
@@ -60,9 +62,12 @@ public class MaliciousActor : MonoBehaviour
             //    Deck.Add(i);
             //}
         }
-        for (int i = 0; i < maxHandSize; i++)
+        if(HandList.Count < maxHandSize)
         {
-            DrawCard();
+            for (int i = 0; i < maxHandSize; i++)
+            {
+                DrawCard();
+            }
         }
     }
 
@@ -248,16 +253,44 @@ public class MaliciousActor : MonoBehaviour
             tempCardObj.GetComponent<slippy>().map = tempCardObj;
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
-
-            tempPos.x += handSize * 8;
+            //Vector3 tempPos = cardDropZone.transform.position;
+            //tempPos.x += handSize * 8;
             tempCardObj.transform.position = tempPos;
-            tempCardObj.transform.SetParent(this.transform, false);
+            //tempCardObj.transform.SetParent(this.transform, false);
+            tempCardObj.transform.SetParent(handDropZone.transform, false);
 
+            Vector3 tempPos2 = handDropZone.transform.position;
+            //tempPos2.x += (tempCardObj.GetComponent<RectTransform>().rect.width / (handSize+1.0f));
+            //float handSeparationWidth = handDropZone.GetComponent<RectTransform>().rect.width / 5.0f;
+            //Debug.Log("Width: " + handSeparationWidth);
+            //tempPos2.x += handSeparationWidth;
+            //if (handSize > 0)
+            //{
+            //    float handSeparationWidth = handDropZone.GetComponent<RectTransform>().rect.width / handSize;
+            //    Debug.Log("Width: " + handSeparationWidth);
+            //    tempPos2.x += handSeparationWidth;
+            //}
             handSize++;
+            //if (handSize % 2 == 0)
+            //{
+            //    tempPos2.x += (int)(handSize/2);
+            //}
+            //else
+            //{
+            //    tempPos2.x -= (int)(handSize/2);
+
+            //}
+            tempCardObj.transform.position = tempPos2;
+            tempCardObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
+            tempCardObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
+            //Vector3 tempPos3 = tempCardObj.transform.position;
+            //tempPos3.x = tempPos3.x + handSize;
+            //tempCardObj.transform.position = tempPos3;
             HandList.Add(tempCardObj);
         }
         else
         {
+            Debug.Log("not enough");
             DrawCard();
         }
     }
@@ -268,19 +301,21 @@ public class MaliciousActor : MonoBehaviour
         Debug.Log("Card Play Call" + cardReader.CardCount[cardID] + CardCountList[Deck.IndexOf(cardID)]);
         if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID.Length >= 0) // Check the mal actor has enough action points to play the card, there are still enough of this card to play, and that there is actually a target. Also make sure that the player hasn't already played a card against it this turn
         {
-            List<int> cardTargets = new List<int>();
+            List<int> cardTargets = new List<int>(); // Format: First Index: Card being played, Every other index is the facilities being targetted by this card
             cardTargets.Add(cardID);
-            for(int i = 0; i < targetID.Length; i++)
+            activeCardIDs.Add(cardID);
+            Debug.Log(cardID);
+            for (int i = 0; i < targetID.Length; i++)
             {
                 // Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
                 if ((int)manager.allFacilities[targetID[i]].GetComponent<FacilityV3>().state >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
-
                 //if (((int)manager.allFacilities[targetID].GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
                 {
                     // Then store all necessary information to be calculated and transferred over the network
-                    cardReader.CardTarget[cardID] = targetID[i];
+                    cardReader.CardTarget[cardID] = targetID[i]; // Right now, will only store 1 target facility accurately
                     targetIDList.Add(targetID[i]);
-                    cardTargets.Add(targetID[i]);
+                    cardTargets.Add(targetID[i]); // Ideally want to pass this list to the network somehow
+                    activeCardIDs.Add(cardID);
 
                     //Card tempCard = new Card();
                     //float rng = UnityEngine.Random.Range(0.0f, 1.0f);
@@ -311,6 +346,8 @@ public class MaliciousActor : MonoBehaviour
                 }
                 else
                 {
+                    Debug.Log(manager.allFacilities[targetID[i]].GetComponent<FacilityV3>().facID);
+                    Debug.Log("Attempted FAC STATE: " + manager.allFacilities[targetID[i]].GetComponent<FacilityV3>().state + " CARD REQ STATE: " + cardReader.CardFacilityStateReqs[cardID]);
                     Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
                 }
             }
@@ -350,7 +387,7 @@ public class MaliciousActor : MonoBehaviour
             {
                 foreach(GameObject obj in manager.allFacilities)
                 {
-                    Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
+                    //Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
                     if((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
                     {
                         targetFacilities.Add(obj);
@@ -363,7 +400,7 @@ public class MaliciousActor : MonoBehaviour
             {
                 tempTargets[i] = targetFacilities[i].GetComponent<FacilityV3>().facID;
             }
-            Debug.Log("No overlap " + tempTargets.Length);
+            //Debug.Log("No overlap " + tempTargets.Length);
             PlayCard(cardID, tempTargets);
             targetFacilities.Clear(); // After every successful run, clear the list
             return true;
