@@ -31,7 +31,6 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Debug.Log("TEST P START: " + ((int)type));
         maxHandSize = 5;
         funds = 1000.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
@@ -144,7 +143,6 @@ public class Player : MonoBehaviour
                     {
                         tempCard.blueTargetMits = (List<int>)entry.Value;
                         tempCard.blueCardTargets = new int[tempCard.blueTargetMits.Count-1];
-                        //Debug.Log("MITS: " + tempCard.blueTargetMits.Count + " TARGS: " + tempCard.blueCardTargets.Length);
                         tempCard.potentcy = tempCard.blueTargetMits[0];
                         for (int i = 1; i < tempCard.blueTargetMits.Count; i++)
                         {
@@ -208,27 +206,11 @@ public class Player : MonoBehaviour
             tempCardObj.GetComponent<slippy>().map = tempCardObj;
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
-            //Vector3 tempPos = cardDropZone.transform.position;
-            //tempPos.x += handSize * 8;
             tempCardObj.transform.position = tempPos;
-            //tempCardObj.transform.SetParent(this.transform, false);
             tempCardObj.transform.SetParent(handDropZone.transform, false);
-
             Vector3 tempPos2 = handDropZone.transform.position;
-            //tempPos2.x += handSize * 8;
             handSize++;
-            if (handSize % 2 == 0)
-            {
-                tempPos2.x += (int)(handSize / 2);
-            }
-            else
-            {
-                tempPos2.x -= (int)(handSize / 2);
-
-            }
             tempCardObj.transform.position = tempPos2;
-
-            //handSize++;
             HandList.Add(tempCardObj);
         }
         else
@@ -288,11 +270,11 @@ public class Player : MonoBehaviour
                 }
                 else if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Mitigation)
                 {
-
+                    // Still need to implement
                 }
                 else if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Prevention)
                 {
-
+                    // Still need to implement
                 }
                 //// Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
                 //if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
@@ -342,10 +324,6 @@ public class Player : MonoBehaviour
                     {
                         seletedFacilities.Add(obj);
                     }
-                    //if ((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
-                    //{
-                    //    seletedFacilities.Add(obj);
-                    //}
                 }
             }
             int[] tempTargets = new int[seletedFacilities.Count];

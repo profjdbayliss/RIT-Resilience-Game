@@ -35,6 +35,7 @@ public class Card : MonoBehaviour, IDropHandler
         Accessed = 2,
     };
 
+    // Enum to the specific type of card a malicious card is
     public enum MalCardType
     {
         Reconnaissance,
@@ -45,6 +46,7 @@ public class Card : MonoBehaviour, IDropHandler
         LateralMovement
     }
 
+    // Enum to the specific type of card a resilient card is
     public enum ResCardType
     {
         Detection,
@@ -103,15 +105,19 @@ public class Card : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-        if(cardDropZone != null && this.state == CardState.CardDrawn)
+        if(cardDropZone != null && this.state == CardState.CardDrawn) // Make sure that the card actually has a reference to the card drop location where it will be dropped and that it is currently in the players hand
         {
+            // Get the bounds of the card Drop Zone
             Vector2 cardDropMin = new Vector2();
             cardDropMin.x = cardDropZone.GetComponent<RectTransform>().localPosition.x - (cardDropZone.GetComponent<RectTransform>().rect.width/2);
             cardDropMin.y = cardDropZone.GetComponent<RectTransform>().localPosition.y - (cardDropZone.GetComponent<RectTransform>().rect.height / 2);
             Vector2 cardDropMax = new Vector2();
+
             cardDropMax.x = cardDropZone.GetComponent<RectTransform>().localPosition.x + (cardDropZone.GetComponent<RectTransform>().rect.width / 2);
             cardDropMax.y = cardDropZone.GetComponent<RectTransform>().localPosition.y + (cardDropZone.GetComponent<RectTransform>().rect.height / 2);
-            this.gameObject.transform.SetParent(originalParent.transform, true);
+            this.gameObject.transform.SetParent(originalParent.transform, true); // Now set the card's parent to be the player they are attached to instead of the hand zone
+
+            // DO a AABB collision test to see if the card is on the card drop
             if (this.transform.localPosition.x > cardDropMin.x)
             {
                 if(this.transform.localPosition.x < cardDropMax.x)
@@ -120,13 +126,11 @@ public class Card : MonoBehaviour, IDropHandler
                     {
                         if(this.transform.localPosition.y < cardDropMax.y)
                         {
-                            //this.transform.SetParent(originalParent.transform, false);
+                            // check the cards teamID to see which team they belong to so they can call the proper Select facility method to then see if they have met all conditions to play the card
                             if(this.teamID == 0)
                             {
                                 if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
                                 {
-                                    //int rng = Random.Range(0, 5);
-                                    //this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
                                     this.state = CardState.CardInPlay;
                                     this.gameObject.GetComponentInParent<slippy>().enabled = false;
                                     // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
@@ -152,108 +156,47 @@ public class Card : MonoBehaviour, IDropHandler
                         }
                         else
                         {
+                            // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
                             this.gameObject.transform.SetParent(handDropZone.transform, false);
                             if (this.teamID == 0)
                             {
-                                
                                 this.state = CardState.CardDrawn;
                                 this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                                // Move it back to the handLoc
-
-                                //if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
-                                //{
-                                //    //int rng = Random.Range(0, 5);
-                                //    //this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
-                                //    this.state = CardState.CardInPlay;
-                                //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                                //    // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
-                                //}
                             }
                             else if (this.teamID == 1)
                             {
                                 this.state = CardState.CardDrawn;
                                 this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                                // Move it back to the handLoc
-
-
-                                //if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
-                                //{
-                                //    this.state = CardState.CardInPlay;
-                                //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                                //}
-
                             }
                         }
                     }
                     else
                     {
                         this.gameObject.transform.SetParent(handDropZone.transform, false);
-
                         if (this.teamID == 0)
                         {
-
                             this.state = CardState.CardDrawn;
                             this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                            // Move it back to the handLoc
-
-                            //if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
-                            //{
-                            //    //int rng = Random.Range(0, 5);
-                            //    //this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
-                            //    this.state = CardState.CardInPlay;
-                            //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                            //    // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
-                            //}
                         }
                         else if (this.teamID == 1)
                         {
                             this.state = CardState.CardDrawn;
                             this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                            // Move it back to the handLoc
-
-
-                            //if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
-                            //{
-                            //    this.state = CardState.CardInPlay;
-                            //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                            //}
-
                         }
                     }
                 }
                 else
                 {
                     this.gameObject.transform.SetParent(handDropZone.transform, false);
-
                     if (this.teamID == 0)
                     {
-
                         this.state = CardState.CardDrawn;
                         this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                        // Move it back to the handLoc
-
-                        //if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
-                        //{
-                        //    //int rng = Random.Range(0, 5);
-                        //    //this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
-                        //    this.state = CardState.CardInPlay;
-                        //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                        //    // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
-                        //}
                     }
                     else if (this.teamID == 1)
                     {
                         this.state = CardState.CardDrawn;
                         this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                        // Move it back to the handLoc
-
-
-                        //if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
-                        //{
-                        //    this.state = CardState.CardInPlay;
-                        //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                        //}
-
                     }
                 }
             }
@@ -263,60 +206,18 @@ public class Card : MonoBehaviour, IDropHandler
 
                 if (this.teamID == 0)
                 {
-
                     this.state = CardState.CardDrawn;
                     this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                    // Move it back to the handLoc
-
-                    //if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
-                    //{
-                    //    //int rng = Random.Range(0, 5);
-                    //    //this.gameObject.GetComponentInParent<Player>().PlayCard(this.cardID, rng);
-                    //    this.state = CardState.CardInPlay;
-                    //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                    //    // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
-                    //}
                 }
                 else if (this.teamID == 1)
                 {
                     this.state = CardState.CardDrawn;
                     this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                    // Move it back to the handLoc
-
-
-                    //if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
-                    //{
-                    //    this.state = CardState.CardInPlay;
-                    //    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                    //}
-
                 }
             }
 
         }
     }
-
-    //public void OnDrag(PointerEventData pointer)
-    //{
-    //    if (map.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
-    //    {
-    //        // Create a vector2 to hold the previous position of the element and also set our target of what we want to actually drag.
-    //        Vector2 tempVec2 = default(Vector2);
-    //        RectTransform target = map.gameObject.GetComponent<RectTransform>();
-    //        Vector2 tempPos = target.transform.localPosition;
-
-    //        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(target, pointer.position - pointer.delta, pointer.pressEventCamera, out tempVec2) == true) // Check the older position of the element and see if it was previously
-    //        {
-    //            Vector2 tempNewVec = default(Vector2); // Create a new Vec2 to track the current position of the object
-    //            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(target, pointer.position, pointer.pressEventCamera, out tempNewVec) == true)
-    //            {
-    //                tempPos.x += tempNewVec.x - tempVec2.x;
-    //                tempPos.y += tempNewVec.y - tempVec2.y;
-    //                map.transform.localPosition = tempPos;
-    //            }
-    //        }
-    //    }
-    //}
 }
 public struct CardFront2
 {

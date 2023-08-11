@@ -253,39 +253,14 @@ public class MaliciousActor : MonoBehaviour
             tempCardObj.GetComponent<slippy>().map = tempCardObj;
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
-            //Vector3 tempPos = cardDropZone.transform.position;
-            //tempPos.x += handSize * 8;
             tempCardObj.transform.position = tempPos;
-            //tempCardObj.transform.SetParent(this.transform, false);
             tempCardObj.transform.SetParent(handDropZone.transform, false);
-
             Vector3 tempPos2 = handDropZone.transform.position;
-            //tempPos2.x += (tempCardObj.GetComponent<RectTransform>().rect.width / (handSize+1.0f));
-            //float handSeparationWidth = handDropZone.GetComponent<RectTransform>().rect.width / 5.0f;
-            //Debug.Log("Width: " + handSeparationWidth);
-            //tempPos2.x += handSeparationWidth;
-            //if (handSize > 0)
-            //{
-            //    float handSeparationWidth = handDropZone.GetComponent<RectTransform>().rect.width / handSize;
-            //    Debug.Log("Width: " + handSeparationWidth);
-            //    tempPos2.x += handSeparationWidth;
-            //}
+        
             handSize++;
-            //if (handSize % 2 == 0)
-            //{
-            //    tempPos2.x += (int)(handSize/2);
-            //}
-            //else
-            //{
-            //    tempPos2.x -= (int)(handSize/2);
-
-            //}
             tempCardObj.transform.position = tempPos2;
             tempCardObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
             tempCardObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
-            //Vector3 tempPos3 = tempCardObj.transform.position;
-            //tempPos3.x = tempPos3.x + handSize;
-            //tempCardObj.transform.position = tempPos3;
             HandList.Add(tempCardObj);
         }
         else
@@ -365,17 +340,6 @@ public class MaliciousActor : MonoBehaviour
     public bool SelectFacility(int cardID)
     {
         // Intention is to have it like hearthstone where player plays a targeted card, they then select the target which is passed into playcard
-
-
-        //if (seletedFacility == null)
-        //{
-        //    Debug.Log("PICK A CARD");
-        //}
-        //else
-        //{
-        //    targetID = seletedFacility.GetComponent<FacilityV3>().facID;
-        //    PlayCard(cardID, targetID);
-        //}
         if(cardReader.CardTargetCount[cardID] == int.MaxValue)
         {
             if(targetIDList.Count > 0)
@@ -387,7 +351,6 @@ public class MaliciousActor : MonoBehaviour
             {
                 foreach(GameObject obj in manager.allFacilities)
                 {
-                    //Debug.Log((int)(obj.GetComponent<FacilityV3>().state) + " VS " + cardReader.CardFacilityStateReqs[cardID]);
                     if((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
                     {
                         targetFacilities.Add(obj);
@@ -400,7 +363,6 @@ public class MaliciousActor : MonoBehaviour
             {
                 tempTargets[i] = targetFacilities[i].GetComponent<FacilityV3>().facID;
             }
-            //Debug.Log("No overlap " + tempTargets.Length);
             PlayCard(cardID, tempTargets);
             targetFacilities.Clear(); // After every successful run, clear the list
             return true;
