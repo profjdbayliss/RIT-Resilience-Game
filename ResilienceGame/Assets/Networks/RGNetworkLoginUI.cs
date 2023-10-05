@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class RGNetworkLoginUI : MonoBehaviour
 {
@@ -23,5 +24,10 @@ public class RGNetworkLoginUI : MonoBehaviour
     {
         hostButton.interactable = !string.IsNullOrWhiteSpace(username);
         clientButton.interactable = !string.IsNullOrWhiteSpace(username);
+    }
+
+    public void LoadScene(int index)
+    {
+        SceneManager.LoadScene(index);
     }
 }

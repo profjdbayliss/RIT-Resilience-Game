@@ -1,6 +1,7 @@
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,15 +11,22 @@ public class RGGameExampleUI : NetworkBehaviour
     [Header("UI Elements")]
     [SerializeField] TMP_Text cardHistory;
     [SerializeField] Scrollbar scrollbar;
+    [SerializeField] TMP_Text waitingText;
+    [SerializeField] Canvas cardCanvas;
+    [SerializeField] Button endTurnButton;
     [SerializeField] Button[] cards;
 
     // This is only set on client to the name of the local player
     internal static string localPlayerName;
+    internal static int localPlayerID;
 
     // Server-only cross-reference of connections to player names
     internal static readonly Dictionary<NetworkConnectionToClient, string> connNames = new Dictionary<NetworkConnectionToClient, string>();
 
+
     int red_or_blue = 1;
+
+    [SyncVar] public int turn = 0; //The player whose id = turn will play this turn. turn will cycle between 0 to # of player.
 
     string[] red_name = { "System Shutdown", "Disk Wipe", "Ransom", "Phishing", "Brute Force", "Input Capture" };
     string[] blue_name = { "Access Processes", "User Training", "Restrict Web-Based Content", "Pay Ransom", "Data Backup", "User Acount Management" };
@@ -32,6 +40,7 @@ public class RGGameExampleUI : NetworkBehaviour
             card.GetComponent<Image>().color = Color.red;
         }
         red_or_blue = 0;
+        
     }
 
     public override void OnStartClient()
@@ -41,6 +50,14 @@ public class RGGameExampleUI : NetworkBehaviour
         for (int i = 0; i < cards.Length; i++)
         {
             GetNewCard(i);
+        }
+        if (isServer)
+        {
+            ShowPlayUI();
+        }
+        else
+        {
+            HidePlayUI();
         }
     }
 
@@ -61,6 +78,41 @@ public class RGGameExampleUI : NetworkBehaviour
             $"<color=red>{playerName}:</color> {message}" :
             $"<color=blue>{playerName}:</color> {message}";
         AppendMessage(prettyMessage);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdAskNextTurn()
+    {
+        RGNetworkPlayerList playerList = RGNetworkPlayerList.instance;
+        if(playerList == null)
+        {
+            Debug.LogError("Can't find playerList object!");
+        }
+        turn += 1;
+        if (turn >= playerList.playerIDs.Count)
+        {
+            turn = 0;
+        }
+        RpcNextTurn(turn); //Update the turn value to the clients
+    }
+
+    [ClientRpc]
+    public void RpcNextTurn(int newTurn)
+    {
+        int turn = newTurn;
+        RGNetworkPlayerList playerList = RGNetworkPlayerList.instance;
+        if (playerList == null)
+        {
+            Debug.LogError("Can't find playerList object!");
+        }
+        if(playerList.playerIDs[turn] == localPlayerID)
+        {
+            ShowPlayUI();
+        }
+        else
+        {
+            HidePlayUI();
+        }
     }
 
     void AppendMessage(string message)
@@ -116,4 +168,19 @@ public class RGGameExampleUI : NetworkBehaviour
 
         GetNewCard(0);
     }
+
+    public void ShowPlayUI()
+    {
+        endTurnButton.gameObject.SetActive(true);
+        cardCanvas.gameObject.SetActive(true);
+        waitingText.gameObject.SetActive(false);
+    }
+
+    public void HidePlayUI()
+    {
+        endTurnButton.gameObject.SetActive(false);
+        cardCanvas.gameObject.SetActive(false);
+        waitingText.gameObject.SetActive(true);
+    }
+
 }

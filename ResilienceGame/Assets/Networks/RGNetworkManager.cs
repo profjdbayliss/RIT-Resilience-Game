@@ -6,6 +6,23 @@ using Mirror.Examples.Chat;
 
 public class RGNetworkManager : NetworkManager
 {
+    public GameObject playerListPrefab;
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        GameObject obj = Instantiate(playerListPrefab);
+        NetworkServer.Spawn(obj);
+    }
+
+    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
+    {
+        base.OnServerAddPlayer(conn);
+        int playerID = conn.connectionId;
+        RGNetworkPlayerList.instance.AddPlayer(playerID);
+    }
+
     // Called by UI element NetworkAddressInput.OnValueChanged
     public void SetHostname(string hostname)
     {
@@ -20,6 +37,8 @@ public class RGNetworkManager : NetworkManager
 
         // remove connection from Dictionary of conn > names
         RGGameExampleUI.connNames.Remove(conn);
+
+        RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId);
 
         base.OnServerDisconnect(conn);
     }
