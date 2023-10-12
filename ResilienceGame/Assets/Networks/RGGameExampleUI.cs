@@ -24,7 +24,8 @@ public class RGGameExampleUI : NetworkBehaviour
     internal static readonly Dictionary<NetworkConnectionToClient, string> connNames = new Dictionary<NetworkConnectionToClient, string>();
 
 
-    int red_or_blue = 1;
+    private int localPlayerTeamID = 1; // 0 = red, 1 = blue
+    private int teamNum = 2; // The number of teams
 
     public int turn = 0; //The player whose id = turn will play this turn. turn will cycle between 0 to # of player.
 
@@ -39,7 +40,7 @@ public class RGGameExampleUI : NetworkBehaviour
         {
             card.GetComponent<Image>().color = Color.red;
         }
-        red_or_blue = 0;
+        localPlayerTeamID = 0;
         
     }
 
@@ -61,6 +62,7 @@ public class RGGameExampleUI : NetworkBehaviour
         }
     }
 
+
     [Command(requiresAuthority = false)]
     void CmdSend(string message, NetworkConnectionToClient sender = null)
     {
@@ -80,32 +82,39 @@ public class RGGameExampleUI : NetworkBehaviour
         AppendMessage(prettyMessage);
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdAskNextTurn()
+    public void AskNextTurn() // Called by the current client
     {
-        RGNetworkPlayerList playerList = RGNetworkPlayerList.instance;
-        if(playerList == null)
-        {
-            Debug.LogError("Can't find playerList object!");
-        }
-        turn += 1;
-        if (turn >= playerList.playerIDs.Count)
-        {
-            turn = 0;
-        }
-        RpcNextTurn(turn); //Update the turn value to the clients
+        CmdAskNextTurn(localPlayerID); // Send a request to the server and pass the local player ID to the server;
+        HidePlayUI(); // Disable the UI of the current player
     }
 
-    [ClientRpc]
-    public void RpcNextTurn(int newTurn)
+    [Command(requiresAuthority = false)]
+    public void CmdAskNextTurn(int playerID) // Cmd functions are only called on the host
     {
-        int turn = newTurn;
         RGNetworkPlayerList playerList = RGNetworkPlayerList.instance;
         if (playerList == null)
         {
             Debug.LogError("Can't find playerList object!");
         }
-        if(playerList.playerIDs[turn] == localPlayerID)
+        playerList.ChangeReadyFlag(playerID, true); // Change the isReady flag of the current player on the server
+        bool isAllPlayersFinish = playerList.IsTeamReady(turn); // Check if all the player on the "turn" team is ready
+        if (isAllPlayersFinish)
+        {
+            playerList.CleanReadyFlag(); // Clean the isReady flags
+            turn += 1; // Update the "turn"
+            if (turn >= teamNum)
+            {
+                turn = 0;
+            }
+            RpcNextTurn(turn); //Update the turn value to the clients
+        }
+    }
+
+    [ClientRpc]
+    public void RpcNextTurn(int newTurn) // Rpc functions are called on all the clients (including host)
+    {
+        turn = newTurn;
+        if (turn == localPlayerTeamID) // if the current "turn" belongs to the local player's team, enable the local player's UI
         {
             ShowPlayUI();
         }
@@ -144,7 +153,7 @@ public class RGGameExampleUI : NetworkBehaviour
     {
         TMP_Text tex = cards[index].transform.Find("CardName").GetComponent<TMP_Text>();
 
-        if (red_or_blue == 0)
+        if (localPlayerTeamID == 0)
         {
             int ri = Random.Range(0, red_name.Length);
             tex.text = red_name[ri];
@@ -159,7 +168,7 @@ public class RGGameExampleUI : NetworkBehaviour
     public void PlayCard(int index)
     {
         string message = "plays the <color=";
-        if (red_or_blue == 0)
+        if (localPlayerTeamID == 0)
             message += "red";
         else
             message += "blue";

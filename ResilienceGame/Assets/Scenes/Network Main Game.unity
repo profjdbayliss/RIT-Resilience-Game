@@ -285,7 +285,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 28609805}
         m_TargetAssemblyTypeName: RGGameExampleUI, Assembly-CSharp
-        m_MethodName: CmdAskNextTurn
+        m_MethodName: AskNextTurn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

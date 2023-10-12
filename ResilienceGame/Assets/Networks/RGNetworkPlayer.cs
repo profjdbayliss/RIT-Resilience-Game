@@ -1,4 +1,6 @@
-
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using Mirror;
 
 public class RGNetworkPlayer : NetworkBehaviour
@@ -17,7 +19,6 @@ public class RGNetworkPlayer : NetworkBehaviour
     {
         RGGameExampleUI.localPlayerName = playerName;
         RGGameExampleUI.localPlayerID = playerID;
-
     }
 
 }

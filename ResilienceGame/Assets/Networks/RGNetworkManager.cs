@@ -19,8 +19,16 @@ public class RGNetworkManager : NetworkManager
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
+
         int playerID = conn.connectionId;
-        RGNetworkPlayerList.instance.AddPlayer(playerID);
+        if (conn.identity.isLocalPlayer) // if the player is host, join red team
+        {
+            RGNetworkPlayerList.instance.AddPlayer(playerID, 0);
+        }
+        else // if the player is client, join blue team
+        {
+            RGNetworkPlayerList.instance.AddPlayer(playerID, 1);
+        }
     }
 
     // Called by UI element NetworkAddressInput.OnValueChanged
