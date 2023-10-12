@@ -26,7 +26,7 @@ public class RGGameExampleUI : NetworkBehaviour
 
     int red_or_blue = 1;
 
-    [SyncVar] public int turn = 0; //The player whose id = turn will play this turn. turn will cycle between 0 to # of player.
+    public int turn = 0; //The player whose id = turn will play this turn. turn will cycle between 0 to # of player.
 
     string[] red_name = { "System Shutdown", "Disk Wipe", "Ransom", "Phishing", "Brute Force", "Input Capture" };
     string[] blue_name = { "Access Processes", "User Training", "Restrict Web-Based Content", "Pay Ransom", "Data Backup", "User Acount Management" };
