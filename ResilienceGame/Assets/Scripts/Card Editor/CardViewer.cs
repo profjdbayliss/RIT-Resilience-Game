@@ -9,14 +9,45 @@ public class CardViewer : MonoBehaviour
     public FileBrowser filebrowser;
     public List<CardForEditor> cards = new List<CardForEditor>();
 
+    [Header("UI Objects")]
+    public GameObject fileSelectionObject;
+    public GameObject cardViewerObject;
+    public GameObject cardEditorObject;
+    [Header("Card View")]
+    public GameObject cardViewPrefab;
+    public GameObject cardViewContentParent;
+
+
 
     public void OpenFile()
     {
         cards = LoadCsv(filebrowser.filePath);
 
-        for(int i = 0; i < cards.Count; i++)
+        if(cards.Count > 0)
         {
-            Debug.Log(cards[i].ToString());
+            //Go to the viewer panel
+            fileSelectionObject.SetActive(false);
+            cardViewerObject.SetActive(true);
+
+            //Clear the content
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate cards
+            for (int i = 0; i < cards.Count; i++)
+            {
+                GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
+                string imageFullPath = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\" + cards[i].image;
+                cardViewObject.GetComponent<CardObjectForView>().Initialize(cards[i].team, cards[i].title, imageFullPath, cards[i].impact, cards[i].description, cards[i].cost);
+            }
+
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+        }
+        else
+        {
+            Debug.LogError("Error File: " + filebrowser.filePath);
         }
     }
 
@@ -110,5 +141,8 @@ public class CardViewer : MonoBehaviour
             return false;
         }
     }
-
+    public string GetDirectoryFromFilePath(string filePath)
+    {
+        return Path.GetDirectoryName(filePath);
+    }
 }
