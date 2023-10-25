@@ -15,31 +15,37 @@ public class CardObjectForView : MonoBehaviour
     public TMP_Text descriptionText;
     public TMP_Text costText;
 
-    [Header("Color Setting For Teams")]
-    public Color redTeamColor;
-    public Color blueTeamColor;
+    public Button selectButton;
 
-    public void Initialize(string team, string title, string cardImagePath, string impact, string description, int cost)
+    private CardForEditor cardInfo;
+
+    private void Start()
     {
-        if (team.Equals("Red"))
+        selectButton.onClick.AddListener(SelectThisCard);
+    }
+
+    public void Initialize(CardForEditor card, string imageFolderDirectory)
+    {
+        cardInfo = card;
+        if (cardInfo.team.Equals("Red"))
         {
-            titleBackground.color = redTeamColor;
+            titleBackground.color = CardViewer.instance.redTeamColor;
         }
-        else if (team.Equals("Blue"))
+        else if (cardInfo.team.Equals("Blue"))
         {
-            titleBackground.color = blueTeamColor;
+            titleBackground.color = CardViewer.instance.blueTeamColor;
         }
         else
         {
             titleBackground.color = Color.white;
-            Debug.LogError("Undefined Team: " + team);
+            Debug.LogError("Undefined Team: " + cardInfo.team);
         }
 
-        titleText.text = title;
-        LoadImageIntoRawImage(cardImagePath);
-        impactText.text = impact;
-        descriptionText.text = description;
-        costText.text = cost.ToString();
+        titleText.text = cardInfo.title;
+        LoadImageIntoRawImage(imageFolderDirectory + cardInfo.image);
+        impactText.text = cardInfo.impact;
+        descriptionText.text = cardInfo.description;
+        costText.text = cardInfo.cost.ToString();
     }
 
     public void LoadImageIntoRawImage(string imagePath)
@@ -58,5 +64,11 @@ public class CardObjectForView : MonoBehaviour
         {
             Debug.LogError("Failed to load image at path: " + imagePath);
         }
+    }
+
+    public void SelectThisCard()
+    {
+        CardViewer.instance.UpdateSelectedCard(cardInfo);
+        CardViewer.instance.ShowCardEditor();
     }
 }

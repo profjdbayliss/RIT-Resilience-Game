@@ -18,6 +18,35 @@ public class CardForEditor
     public int cardCount { get; set; }
     public string type { get; set; }
 
+    public CardForEditor()
+    {
+        team = "";
+        title = "";
+        image = "";
+        description = "";
+        impact = "";
+        targetType = "";
+        type = "";
+    }
+
+    public CardForEditor(CardForEditor other)
+    {
+        this.team = other.team;
+        this.title = other.title;
+        this.cost = other.cost;
+        this.image = other.image;
+        this.description = other.description;
+        this.impact = other.impact;
+        this.percent = other.percent;
+        this.spreadChange = other.spreadChange;
+        this.duration = other.duration;
+        this.delay = other.delay;
+        this.targetCount = other.targetCount;
+        this.targetType = other.targetType;
+        this.cardCount = other.cardCount;
+        this.type = other.type;
+    }
+
     public override string ToString()
     {
         return $"CardForEditor: {{\n" +
