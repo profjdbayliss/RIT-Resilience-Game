@@ -754,8 +754,12 @@ public class CardViewer : MonoBehaviour
         // Build the target file path
         string targetFilePath = Path.Combine(imageFolderDirectory, fileNameWithExtension);
 
-        // Copy the file
-        File.Copy(imagePath, targetFilePath, true);
+        if (!imagePath.Equals(targetFilePath))
+        {
+            // Copy the file
+            File.Copy(imagePath, targetFilePath, true);
+        }
+
 
         return fileNameWithExtension;
     }
