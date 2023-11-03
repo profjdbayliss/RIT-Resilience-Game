@@ -35,6 +35,10 @@ public class CardObjectForView : MonoBehaviour
         {
             titleBackground.color = CardViewer.instance.blueTeamColor;
         }
+        else if (cardInfo.team.Equals("Global"))
+        {
+            titleBackground.color = CardViewer.instance.globalCardColor;
+        }
         else
         {
             titleBackground.color = Color.white;
@@ -57,6 +61,13 @@ public class CardObjectForView : MonoBehaviour
         Texture2D texture = new Texture2D(2, 2);
         if (texture.LoadImage(imageBytes))
         {
+            // Check if the texture is larger than 256x256
+            if (texture.width > 256 || texture.height > 256)
+            {
+                // If so, crop it
+                texture = CropTexture(texture, 256, 256);
+            }
+
             // If successfully loaded, assign the texture to the RawImage
             cardImage.texture = texture;
         }
@@ -64,6 +75,18 @@ public class CardObjectForView : MonoBehaviour
         {
             Debug.LogError("Failed to load image at path: " + imagePath);
         }
+    }
+
+    Texture2D CropTexture(Texture2D originalTexture, int width, int height)
+    {
+        int x = (originalTexture.width - width) / 2;
+        int y = (originalTexture.height - height) / 2;
+
+        Color[] pixels = originalTexture.GetPixels(x, y, width, height);
+        Texture2D croppedTexture = new Texture2D(width, height);
+        croppedTexture.SetPixels(pixels);
+        croppedTexture.Apply();
+        return croppedTexture;
     }
 
     public void SelectThisCard()

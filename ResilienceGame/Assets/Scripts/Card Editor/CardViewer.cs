@@ -12,6 +12,7 @@ public class CardViewer : MonoBehaviour
 
     public FileBrowser filebrowser;
     public List<CardForEditor> cards = new List<CardForEditor>();
+    public TMP_Text fileWarningText;
 
     [Header("UI Objects")]
     public GameObject fileSelectionObject;
@@ -22,6 +23,7 @@ public class CardViewer : MonoBehaviour
     public GameObject cardViewPrefab;
     public GameObject cardViewContentParent;
     public GameObject addNewCardButtonPrefab;
+    public TMP_InputField searchInput;
 
     [Header("Card Preview")]
     public Image titleBackground;
@@ -32,9 +34,11 @@ public class CardViewer : MonoBehaviour
     public TMP_Text costText;
 
     [Header("Card Editor Inputs")]
-    public TMP_InputField teamInput;
+    //public TMP_InputField teamInput;
+    public TMP_Dropdown teamDropDown;
     public TMP_InputField titleInput;
     public TMP_InputField costInput;
+    public Slider costSlider;
     public TMP_InputField imageInput;
     public Button imageSelectionButton;
     public TMP_InputField descriptionInput;
@@ -48,11 +52,15 @@ public class CardViewer : MonoBehaviour
     public TMP_InputField cardCountInput;
     public TMP_InputField typeInput;
 
-    public TMP_Text warningText;
+    public TMP_Text editingWarningText;
+
+    public int minCost;
+    public int maxCost;
 
     [Header("Color Setting For Teams")]
     public Color redTeamColor;
     public Color blueTeamColor;
+    public Color globalCardColor;
 
     private CardForEditor selectedCard;
     private CardForEditor editingCard = new CardForEditor();
@@ -71,9 +79,11 @@ public class CardViewer : MonoBehaviour
 
     private void Start()
     {
-        teamInput.onEndEdit.AddListener(UpdateTeam);
+        //teamInput.onEndEdit.AddListener(UpdateTeam);
+        teamDropDown.onValueChanged.AddListener(UpdateTeam);
         titleInput.onEndEdit.AddListener(UpdateTitle);
         costInput.onEndEdit.AddListener(UpdateCost);
+        costSlider.onValueChanged.AddListener(UpdateCostSlider);
         imageInput.onEndEdit.AddListener(UpdateImage);
         descriptionInput.onEndEdit.AddListener(UpdateDescription);
         impactInput.onEndEdit.AddListener(UpdateImpact);
@@ -85,18 +95,58 @@ public class CardViewer : MonoBehaviour
         targetTypeInput.onEndEdit.AddListener(UpdateTargetType);
         cardCountInput.onEndEdit.AddListener(UpdateCardCount);
         typeInput.onEndEdit.AddListener(UpdateType);
+
+        searchInput.onEndEdit.AddListener(ShowCardsBySearch);
     }
 
     public void OpenFile()
     {
+        // Ensure the file exists
+        if (!File.Exists(filebrowser.filePath))
+        {
+            fileWarningText.text = "File does not exist: " + filebrowser.filePath;
+            Debug.LogError("File does not exist: " + filebrowser.filePath);
+            return;
+        }
+
+        if (!IsValidCsvFile(filebrowser.filePath))
+        {
+            fileWarningText.text = "File is not correct: " + filebrowser.filePath;
+            Debug.LogError("File is not correct: " + filebrowser.filePath);
+            return;
+        }
+
+        ShowCardViewer();
+
         cards = LoadCsv(filebrowser.filePath);
 
         if(cards.Count > 0)
         {
-            //Go to the viewer panel
-            fileSelectionObject.SetActive(false);
-            cardViewerObject.SetActive(true);
+            ShowCardsBySearch();
+        }
+        else
+        {
+            ShowCardsBySearch();
+        }
+    }
 
+    public void ShowCardsBySearch()
+    {
+        if (cards.Count == 0)
+        {
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+            return;
+        }
+
+        if (searchInput.text.Equals(""))//Show all cards
+        {
             //Clear the content
             foreach (Transform child in cardViewContentParent.transform)
             {
@@ -116,9 +166,87 @@ public class CardViewer : MonoBehaviour
 
             cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
         }
-        else
+        else //Show cards by search keywords
         {
-            Debug.LogError("Error File: " + filebrowser.filePath);
+            //Clear the content
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+
+            //Generate cards
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if(cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text) 
+                    || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text) 
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text))
+                {
+                    GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
+                    string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
+                    cardViewObject.GetComponent<CardObjectForView>().Initialize(cards[i], imageFolderDirectory);
+                }
+            }
+
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+        }
+    }
+
+    public void ShowCardsBySearch(string value)
+    {
+        if (cards.Count == 0)
+        {
+            return;
+        }
+
+        if (value.Equals(""))//Show all cards
+        {
+            //Clear the content
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+
+            //Generate cards
+            for (int i = 0; i < cards.Count; i++)
+            {
+                GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
+                string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
+                cardViewObject.GetComponent<CardObjectForView>().Initialize(cards[i], imageFolderDirectory);
+            }
+
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+        }
+        else //Show cards by search keywords
+        {
+            //Clear the content
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+
+            //Generate cards
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (cards[i].team.Contains(value) || cards[i].title.Contains(value)
+                    || cards[i].description.Contains(value) || cards[i].impact.Contains(value)
+                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value))
+                {
+                    GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
+                    string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
+                    cardViewObject.GetComponent<CardObjectForView>().Initialize(cards[i], imageFolderDirectory);
+                }
+            }
+
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
         }
     }
 
@@ -221,13 +349,28 @@ public class CardViewer : MonoBehaviour
     {
         cardViewerObject.SetActive(false);
         cardEditorObject.SetActive(true);
-        warningText.text = "";
+        fileSelectionObject.SetActive(false);
+        editingWarningText.text = "";
     }
 
     public void ShowCardViewer()
     {
         cardViewerObject.SetActive(true);
         cardEditorObject.SetActive(false);
+        fileSelectionObject.SetActive(false);
+    }
+
+    public void ShowFileSelection()
+    {
+        cardViewerObject.SetActive(false);
+        cardEditorObject.SetActive(false);
+        fileSelectionObject.SetActive(true);
+        fileWarningText.text = "";
+    }
+
+    public void ClearSearch()
+    {
+        searchInput.text = "";
     }
 
     public void ClearSelectedCard()
@@ -247,7 +390,7 @@ public class CardViewer : MonoBehaviour
     public void ClearPreviewCard()
     {
         //Preview card
-        titleBackground.color = Color.white;
+        titleBackground.color = Color.red;
         titleText.text = "Title";
         cardImage.texture = null;
         impactText.text = "Impact";
@@ -255,9 +398,10 @@ public class CardViewer : MonoBehaviour
         costText.text = "0";
 
         //InputFields
-        teamInput.text = "";
+        teamDropDown.value = 0;
         titleInput.text = "";
         costInput.text = "";
+        costSlider.value = 0;
         imageInput.text = "";
         descriptionInput.text = "";
         impactInput.text = "";
@@ -282,6 +426,10 @@ public class CardViewer : MonoBehaviour
         {
             titleBackground.color = blueTeamColor;
         }
+        else if (editingCard.team.Equals("Global"))
+        {
+            titleBackground.color = globalCardColor;
+        }
         else
         {
             titleBackground.color = Color.white;
@@ -296,9 +444,39 @@ public class CardViewer : MonoBehaviour
         costText.text = editingCard.cost.ToString();
 
         //InputFields
-        teamInput.text = editingCard.team;
+        if (editingCard.team.Equals("Red"))
+        {
+            teamDropDown.value = 0;
+        }
+        else if (editingCard.team.Equals("Blue"))
+        {
+            teamDropDown.value = 1;
+        }
+        else if (editingCard.team.Equals("Global"))
+        {
+            teamDropDown.value = 2;
+        }
+        else
+        {
+            teamDropDown.value = 0;
+            Debug.LogError("Undefined Team: " + editingCard.team);
+        }
+        //teamInput.text = editingCard.team;
         titleInput.text = editingCard.title;
         costInput.text = editingCard.cost.ToString();
+        if (editingCard.cost < minCost)
+        {
+            costSlider.value = 0;
+        }
+        else if(editingCard.cost > maxCost)
+        {
+            costSlider.value = 1;
+        }
+        else
+        {
+            float percentage = (float)(editingCard.cost - minCost) / (maxCost - minCost);
+            costSlider.value = percentage;
+        }
         imageInput.text = editingCard.image;
         descriptionInput.text = editingCard.description;
         impactInput.text = editingCard.impact;
@@ -323,6 +501,10 @@ public class CardViewer : MonoBehaviour
         {
             titleBackground.color = blueTeamColor;
         }
+        else if (editingCard.team.Equals("Global"))
+        {
+            titleBackground.color = globalCardColor;
+        }
 
         titleText.text = editingCard.title;
         if(titleText.text.Equals(""))
@@ -335,7 +517,7 @@ public class CardViewer : MonoBehaviour
             bool isFoundImage = LoadImageIntoRawImage(imageFolderDirectory + editingCard.image);
             if (!isFoundImage)
             {
-                warningText.text = "Can't find the image.";
+                editingWarningText.text = "Can't find the image.";
             }
         }
         impactText.text = editingCard.impact;
@@ -379,6 +561,13 @@ public class CardViewer : MonoBehaviour
         Texture2D texture = new Texture2D(2, 2);
         if (texture.LoadImage(imageBytes))
         {
+            // Check if the texture is larger than 256x256
+            if (texture.width > 256 || texture.height > 256)
+            {
+                // If so, crop it
+                texture = CropTexture(texture, 256, 256);
+            }
+
             // If successfully loaded, assign the texture to the RawImage
             cardImage.texture = texture;
             return true;
@@ -390,11 +579,23 @@ public class CardViewer : MonoBehaviour
         }
     }
 
+    Texture2D CropTexture(Texture2D originalTexture, int width, int height)
+    {
+        int x = (originalTexture.width - width) / 2;
+        int y = (originalTexture.height - height) / 2;
+
+        Color[] pixels = originalTexture.GetPixels(x, y, width, height);
+        Texture2D croppedTexture = new Texture2D(width, height);
+        croppedTexture.SetPixels(pixels);
+        croppedTexture.Apply();
+        return croppedTexture;
+    }
+
     public void DeleteCard()
     {
         if(selectedCard == null)
         {
-            warningText.text = "You can only delete an existing card.";
+            editingWarningText.text = "You can only delete an existing card.";
             return;
         }
 
@@ -407,13 +608,13 @@ public class CardViewer : MonoBehaviour
     {
         if (!AreRequiredFieldsFilled())
         {
-            warningText.text = "All the fields need to be filled except for the Type.";
+            editingWarningText.text = "All the fields need to be filled except for the Type.";
             return;
         }
 
         if(selectedCard == null && CheckIfCardExists(filebrowser.filePath, editingCard.title))
         {
-            warningText.text = "Card with same title already exists.";
+            editingWarningText.text = "Card with same title already exists.";
             return;
         }
 
@@ -421,7 +622,7 @@ public class CardViewer : MonoBehaviour
         {
             if(!selectedCard.title.Equals(editingCard.title) && CheckIfCardExists(filebrowser.filePath, editingCard.title))
             {
-                warningText.text = "Card with same title already exists.";
+                editingWarningText.text = "Card with same title already exists.";
                 return;
             }
             RemoveCardFromCsv(filebrowser.filePath, selectedCard.title);
@@ -433,9 +634,26 @@ public class CardViewer : MonoBehaviour
         OpenFile();
     }
 
-    private void UpdateTeam(string value)
+    private void UpdateTeam(int value)
     {
-        editingCard.team = value;
+        //editingCard.team = value;
+        if (value == 0)
+        {
+            editingCard.team = "Red";
+        }
+        else if (value == 1)
+        {
+            editingCard.team = "Blue";
+        }
+        else if (value == 2)
+        {
+            editingCard.team = "Global";
+        }
+        else
+        {
+            editingCard.team = "Red";
+            Debug.LogError("Undefined Team: " + editingCard.team);
+        }
         UpdatePreviewCard();
     }
 
@@ -450,12 +668,40 @@ public class CardViewer : MonoBehaviour
         if (int.TryParse(value, out int result))
         {
             editingCard.cost = result;
+            if (editingCard.cost < minCost)
+            {
+                costSlider.value = 0;
+            }
+            else if (editingCard.cost > maxCost)
+            {
+                costSlider.value = 1;
+            }
+            else
+            {
+                float percentage = (float)(editingCard.cost - minCost) / (maxCost - minCost);
+                costSlider.value = percentage;
+            }
             UpdatePreviewCard();
         }
         else
         {
             Debug.LogWarning("Cost must be an integer.");
         }
+    }
+
+    private void UpdateCostSlider(float percentage)
+    {
+        if (percentage < 0f || percentage > 1f)
+        {
+            Debug.LogError("Percentage value should be between 0 and 1.");
+            return;
+        }
+
+        int cost = (int)Mathf.Lerp(minCost, maxCost, percentage);
+
+        editingCard.cost = cost;
+        costInput.text = editingCard.cost.ToString();
+        UpdatePreviewCard();
     }
 
     private void UpdateImage(string value)
@@ -575,7 +821,7 @@ public class CardViewer : MonoBehaviour
 
     public bool AreRequiredFieldsFilled()
     {
-        if (string.IsNullOrEmpty(teamInput.text)) return false;
+        //if (string.IsNullOrEmpty(teamInput.text)) return false;
         if (string.IsNullOrEmpty(titleInput.text)) return false;
         if (string.IsNullOrEmpty(costInput.text)) return false;
         if (string.IsNullOrEmpty(imageInput.text)) return false;
@@ -612,12 +858,24 @@ public class CardViewer : MonoBehaviour
 
         try
         {
-            // Open the file in append mode
-            using (StreamWriter sw = new StreamWriter(path, true))
+            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
             {
+                // Ensure the file ends with a new line
+                if (fs.Length > 0)
+                {
+                    fs.Seek(-1, SeekOrigin.End);
+                    if (fs.ReadByte() != '\n')
+                    {
+                        fs.WriteByte((byte)'\n');
+                    }
+                }
+
                 // Convert the card to a CSV line and write it to the file
-                string line = CardToCsvLine(card);
-                sw.WriteLine(line);
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    string line = CardToCsvLine(card);
+                    sw.WriteLine(line);
+                }
             }
         }
         catch (System.Exception e)
@@ -762,6 +1020,13 @@ public class CardViewer : MonoBehaviour
 
 
         return fileNameWithExtension;
+    }
+
+
+
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 
 }

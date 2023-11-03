@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -12,6 +13,11 @@ public class FileBrowser : MonoBehaviour
 
     public string imagePath;
     public string imageFileName;
+
+    private void Start()
+    {
+        inputField.onEndEdit.AddListener(UpdateFilePathByInputField);
+    }
 
     public void OpenCSVFileBrowser()
     {
@@ -45,6 +51,38 @@ public class FileBrowser : MonoBehaviour
     public void UpdateFilePathByInputField()
     {
         filePath = inputField.text;
+    }
+
+    public void UpdateFilePathByInputField(string value)
+    {
+        filePath = value;
+    }
+
+    public void SaveCSVFileBrowser()
+    {
+        string defaultFileName = "NewFile.csv";
+        string extension = "csv";
+        string[] filters = { "CSV files", extension, "All files", ".*" };
+        ExtensionFilter[] extensions = { new ExtensionFilter(filters[0], filters[1]), new ExtensionFilter(filters[2], filters[3]) };
+
+        string path = StandaloneFileBrowser.SaveFilePanel("Save File", "", defaultFileName, extensions);
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            if (!Path.HasExtension(path) || Path.GetExtension(path).ToLower() != "." + extension)
+            {
+                path += "." + extension;
+            }
+
+            File.WriteAllText(path, "");
+
+            if (inputField != null)
+            {
+                inputField.text = path;
+            }
+
+            filePath = path;
+        }
     }
 
 }
