@@ -23,7 +23,9 @@ public class CardViewer : MonoBehaviour
     public GameObject cardViewPrefab;
     public GameObject cardViewContentParent;
     public GameObject addNewCardButtonPrefab;
+    public TMP_Dropdown searchDropDown;
     public TMP_InputField searchInput;
+    public TMP_Text searchPlaceholder;
 
     [Header("Card Preview")]
     public Image titleBackground;
@@ -96,6 +98,7 @@ public class CardViewer : MonoBehaviour
         cardCountInput.onEndEdit.AddListener(UpdateCardCount);
         typeInput.onEndEdit.AddListener(UpdateType);
 
+        searchDropDown.onValueChanged.AddListener(ShowCardsBySearch);
         searchInput.onEndEdit.AddListener(ShowCardsBySearch);
     }
 
@@ -180,9 +183,182 @@ public class CardViewer : MonoBehaviour
             //Generate cards
             for (int i = 0; i < cards.Count; i++)
             {
-                if(cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text) 
-                    || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text) 
-                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text))
+                bool isShow = false;
+                switch (searchDropDown.value)
+                {
+                    case 0:
+                        isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
+                    || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                        break;
+                    case 1:
+                        isShow = cards[i].team.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team";
+                        break;
+                    case 2:
+                        isShow = cards[i].title.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by title";
+                        break;
+                    case 3:
+                        isShow = cards[i].description.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by description";
+                        break;
+                    case 4:
+                        isShow = cards[i].impact.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by impact";
+                        break;
+                    case 5:
+                        isShow = cards[i].targetType.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by target type";
+                        break;
+                    case 6:
+                        isShow = cards[i].type.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by type";
+                        break;
+                    default:
+                        isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
+                    || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                        break;
+
+                }
+
+                if(isShow)
+                {
+                    GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
+                    string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
+                    cardViewObject.GetComponent<CardObjectForView>().Initialize(cards[i], imageFolderDirectory);
+                }
+            }
+
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+        }
+    }
+
+    public void ShowCardsBySearch(int keyValue)
+    {
+        switch (keyValue)
+        {
+            case 0:
+                searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                break;
+            case 1:
+                searchPlaceholder.text = "Search cards by team";
+                break;
+            case 2:
+                searchPlaceholder.text = "Search cards by title";
+                break;
+            case 3:
+                searchPlaceholder.text = "Search cards by description";
+                break;
+            case 4:
+                searchPlaceholder.text = "Search cards by impact";
+                break;
+            case 5:
+                searchPlaceholder.text = "Search cards by target type";
+                break;
+            case 6:
+                searchPlaceholder.text = "Search cards by type";
+                break;
+            default:
+                searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                break;
+
+        }
+
+        if (cards.Count == 0)
+        {
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+            return;
+        }
+
+        if (searchInput.text.Equals(""))//Show all cards
+        {
+            //Clear the content
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+
+            //Generate cards
+            for (int i = 0; i < cards.Count; i++)
+            {
+                GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
+                string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
+                cardViewObject.GetComponent<CardObjectForView>().Initialize(cards[i], imageFolderDirectory);
+            }
+
+            cardViewContentParent.GetComponent<DynamicContentAdjuster>().AdjustContentSize();
+        }
+        else //Show cards by search keywords
+        {
+            //Clear the content
+            foreach (Transform child in cardViewContentParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            //Generate "Add new card" button
+            Instantiate(addNewCardButtonPrefab, cardViewContentParent.transform);
+
+            //Generate cards
+            for (int i = 0; i < cards.Count; i++)
+            {
+                bool isShow = false;
+                switch (keyValue)
+                {
+                    case 0:
+                        isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
+                    || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                        break;
+                    case 1:
+                        isShow = cards[i].team.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team";
+                        break;
+                    case 2:
+                        isShow = cards[i].title.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by title";
+                        break;
+                    case 3:
+                        isShow = cards[i].description.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by description";
+                        break;
+                    case 4:
+                        isShow = cards[i].impact.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by impact";
+                        break;
+                    case 5:
+                        isShow = cards[i].targetType.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by target type";
+                        break;
+                    case 6:
+                        isShow = cards[i].type.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by type";
+                        break;
+                    default:
+                        isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
+                    || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                        break;
+
+                }
+
+                if (isShow)
                 {
                     GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
                     string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
@@ -236,9 +412,49 @@ public class CardViewer : MonoBehaviour
             //Generate cards
             for (int i = 0; i < cards.Count; i++)
             {
-                if (cards[i].team.Contains(value) || cards[i].title.Contains(value)
+                bool isShow = false;
+                switch (searchDropDown.value)
+                {
+                    case 0:
+                        isShow = cards[i].team.Contains(value) || cards[i].title.Contains(value)
                     || cards[i].description.Contains(value) || cards[i].impact.Contains(value)
-                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value))
+                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                        break;
+                    case 1:
+                        isShow = cards[i].team.Contains(value);
+                        searchPlaceholder.text = "Search cards by team";
+                        break;
+                    case 2:
+                        isShow = cards[i].title.Contains(value);
+                        searchPlaceholder.text = "Search cards by title";
+                        break;
+                    case 3:
+                        isShow = cards[i].description.Contains(value);
+                        searchPlaceholder.text = "Search cards by description";
+                        break;
+                    case 4:
+                        isShow = cards[i].impact.Contains(value);
+                        searchPlaceholder.text = "Search cards by impact";
+                        break;
+                    case 5:
+                        isShow = cards[i].targetType.Contains(value);
+                        searchPlaceholder.text = "Search cards by target type";
+                        break;
+                    case 6:
+                        isShow = cards[i].type.Contains(value);
+                        searchPlaceholder.text = "Search cards by type";
+                        break;
+                    default:
+                        isShow = cards[i].team.Contains(value) || cards[i].title.Contains(value)
+                    || cards[i].description.Contains(value) || cards[i].impact.Contains(value)
+                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                        break;
+
+                }
+
+                if (isShow)
                 {
                     GameObject cardViewObject = Instantiate(cardViewPrefab, cardViewContentParent.transform);
                     string imageFolderDirectory = GetDirectoryFromFilePath(filebrowser.filePath) + "\\Images\\";
