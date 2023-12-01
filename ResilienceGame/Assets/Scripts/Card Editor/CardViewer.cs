@@ -606,7 +606,7 @@ public class CardViewer : MonoBehaviour
     public void ClearPreviewCard()
     {
         //Preview card
-        titleBackground.color = Color.red;
+        titleBackground.color = redTeamColor;
         titleText.text = "Title";
         cardImage.texture = null;
         impactText.text = "Impact";
