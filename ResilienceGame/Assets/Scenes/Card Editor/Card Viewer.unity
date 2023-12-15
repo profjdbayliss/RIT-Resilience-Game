@@ -14425,6 +14425,7 @@ GameObject:
   - component: {fileID: 1597711089}
   - component: {fileID: 1597711088}
   - component: {fileID: 1597711091}
+  - component: {fileID: 1597711093}
   - component: {fileID: 1597711092}
   m_Layer: 5
   m_Name: Description InputField
@@ -14502,7 +14503,7 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
+  m_ContentType: 9
   m_InputType: 0
   m_AsteriskChar: 42
   m_KeyboardType: 0
@@ -14622,6 +14623,18 @@ MonoBehaviour:
   padding: {x: 10, y: 10}
   hoverDelay: 0.5
   maxWidth: 500
+--- !u!114 &1597711093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1597711086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a576c856bd2d91841b623abde9e31f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1599022364
 GameObject:
   m_ObjectHideFlags: 0
