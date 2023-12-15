@@ -20,7 +20,7 @@ public class CardForEditor
 
     public CardForEditor()
     {
-        team = "";
+        team = "Red";
         title = "";
         image = "";
         description = "";
