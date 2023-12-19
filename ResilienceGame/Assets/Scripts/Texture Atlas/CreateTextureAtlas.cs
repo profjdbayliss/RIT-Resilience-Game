@@ -9,6 +9,18 @@ public class CreateTextureAtlas : MonoBehaviour
     public void Start()
     {
 
+        //UnityEngine.Debug.Log("Starting");
+
+        //TextureAtlas.instance.CreateAtlasComponentData(mDirectoryName, mOutputFileName); // Not generating the atlas in build rn
+
+        //UnityEngine.Debug.Log("Done with creation of texture atlas.");
+
+        //mReader = GetComponent<CardReader>();
+        //mReader.CSVRead();
+    }
+
+    public void DelayedStart()
+    {
         UnityEngine.Debug.Log("Starting");
 
         TextureAtlas.instance.CreateAtlasComponentData(mDirectoryName, mOutputFileName); // Not generating the atlas in build rn
@@ -18,6 +30,4 @@ public class CreateTextureAtlas : MonoBehaviour
         mReader = GetComponent<CardReader>();
         mReader.CSVRead();
     }
-
-
 }

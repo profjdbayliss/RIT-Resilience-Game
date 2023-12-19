@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour, IDragHandler
     public NativeArray<int> playerIDs;
 
     public MaliciousActor maliciousActor;
-    public bool playerActive;
+    public bool playerActive = false;
     public GameObject playerMenu;
     public GameObject maliciousActorMenu;
 
@@ -438,7 +438,12 @@ public class GameManager : MonoBehaviour, IDragHandler
     {
 
         gameCanvas.SetActive(true);
-        this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, transportationToggle.isOn);
+
+        this.GetComponent<PlaceIcons>().spawnAllFacilities(true, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, true);
+
+        //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, true);
+
+        //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, transportationToggle.isOn);
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(true, true, true, true, true, true, true, true, true, true);
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, true, true, true, cityHallToggle.isOn, commoditiesToggle.isOn, true, fuelToggle.isOn); // The trues are requried facilities
 
@@ -449,7 +454,7 @@ public class GameManager : MonoBehaviour, IDragHandler
 
 
         // Spawn the players
-        int playerCount = 0;
+        int playerCount = 1;
         if (policeToggle.isOn)
         {
             playerCount++;
@@ -489,15 +494,15 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerCount++;
 
         }
-        if (transportationToggle.isOn)
-        {
-            playerCount++;
-
-        }
-        SpawnPlayers(playerCount);
-
-        //SpawnPlayers(6); // <-- Need to change this to an input
-        SpawnMaliciousActor();
+        //if (transportationToggle.isOn)
+        //{
+        //    playerCount++;
+        //
+        //}
+        //SpawnPlayers(playerCount);
+        //
+        ////SpawnPlayers(6); // <-- Need to change this to an input
+        //SpawnMaliciousActor();
 
         //maliciousActor.SpawnDeck();
         //for (int i = 0; i < maliciousActor.maxHandSize; i++)
@@ -506,11 +511,11 @@ public class GameManager : MonoBehaviour, IDragHandler
         //}
         activePlayerNumber = 0;
 
-        playerActive = true;
+        playerActive = false;
 
         turnCount = 0;
-
-
+        //allPlayers = new GameObject[1];
+        //allPlayers[0] = maliciousActor.gameObject;
         for (int i = 0; i < allPlayers.Length; i++)
         {
             allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacilities.Clear();

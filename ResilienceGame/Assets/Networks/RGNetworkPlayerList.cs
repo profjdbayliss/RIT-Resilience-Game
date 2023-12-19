@@ -10,6 +10,8 @@ public class RGNetworkPlayerList : NetworkBehaviour
     public SyncList<int> playerIDs = new SyncList<int>();
     public SyncList<int> playerTeamIDs = new SyncList<int>();
     public SyncList<bool> playerReadyFlags = new SyncList<bool>();
+    public SyncList<List<int>> playerDecks = new SyncList<List<int>>();
+    public SyncList<List<int>> playerCardCounts = new SyncList<List<int>>();
 
 
     private void Awake()
@@ -31,6 +33,8 @@ public class RGNetworkPlayerList : NetworkBehaviour
         playerIDs.Add(id);
         playerTeamIDs.Add(teamID);
         playerReadyFlags.Add(true);
+        //playerDecks.Add(playerDeck);
+        //playerCardCounts.Add(playerCardCount);
     }
 
     public void RemovePlayer(int id)

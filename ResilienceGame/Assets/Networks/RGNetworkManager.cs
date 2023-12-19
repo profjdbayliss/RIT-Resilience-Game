@@ -7,6 +7,9 @@ using Mirror.Examples.Chat;
 public class RGNetworkManager : NetworkManager
 {
     public GameObject playerListPrefab;
+    public CardReader cardReader;
+    public CreateTextureAtlas textAtlas;
+    public CreateTextureAtlas atlasMaker;
 
     public override void OnStartServer()
     {
@@ -14,6 +17,8 @@ public class RGNetworkManager : NetworkManager
 
         GameObject obj = Instantiate(playerListPrefab);
         NetworkServer.Spawn(obj);
+        textAtlas.DelayedStart();
+        //cardReader.CSVRead();
     }
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
@@ -24,10 +29,14 @@ public class RGNetworkManager : NetworkManager
         if (conn.identity.isLocalPlayer) // if the player is host, join red team
         {
             RGNetworkPlayerList.instance.AddPlayer(playerID, 0);
+            // Add their cards to the player
+
         }
         else // if the player is client, join blue team
         {
             RGNetworkPlayerList.instance.AddPlayer(playerID, 1);
+            // Add their cards to the blue players
+
         }
     }
 

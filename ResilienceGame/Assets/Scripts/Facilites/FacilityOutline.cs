@@ -114,6 +114,35 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
             }
         }
+        else if (maliciousActor != null)
+        {
+            if ((maliciousActor.gameObject.activeSelf))
+            {
+                if ((maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+                {
+                    outline.GetComponent<RawImage>().color = Color.magenta;
+                }
+            }
+            else if (facility.isDown)
+            {
+                outline.GetComponent<RawImage>().color = Color.black;
+
+            }
+            else if (facility.output_flow > 75.0f)
+            {
+                outline.GetComponent<RawImage>().color = Color.green;
+            }
+            else if (facility.output_flow > 50.0f)
+            {
+                outline.GetComponent<RawImage>().color = Color.yellow;
+
+            }
+            else
+            {
+                outline.GetComponent<RawImage>().color = Color.red;
+
+            }
+        }
 
     }
 

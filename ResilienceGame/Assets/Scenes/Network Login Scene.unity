@@ -2621,6 +2621,8 @@ GameObject:
   - component: {fileID: 2107780628}
   - component: {fileID: 2107780627}
   - component: {fileID: 2107780626}
+  - component: {fileID: 2107780629}
+  - component: {fileID: 2107780630}
   m_Layer: 0
   m_Name: Network Manager
   m_TagString: Untagged
@@ -2735,6 +2737,46 @@ MonoBehaviour:
   connectionQualityInterval: 3
   timeInterpolationGui: 0
   playerListPrefab: {fileID: 4942807824831339288, guid: 8973b49dc5494744299fb38eb03854c4, type: 3}
+  cardReader: {fileID: 2107780629}
+  textAtlas: {fileID: 2107780630}
+  atlasMaker: {fileID: 2107780630}
+--- !u!114 &2107780629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107780624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2403c2ce18016fb4fa5fea33776ebb3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allCards: []
+  resilientCards: []
+  maliciousCards: []
+  globalModifiers: []
+  CardFronts: []
+  cardFileLoc: D:\Profiles\sbb7355\source\repos\RIT-Resilience-Game\ResilienceGame\Assets\Cards\Cards
+    - Sheet1 (4).csv
+  players: []
+  maliciousActor: {fileID: 0}
+  cardPrefab: {fileID: 4414296153637361319, guid: 51d7bb6c891606b47917ad3e2a6c1a3b, type: 3}
+--- !u!114 &2107780630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107780624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 183a85d4eb1a2224b98d1e6d513cab8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mDirectoryName: SamTemp
+  mOutputFileName: ../atlas.png
+  mReader: {fileID: 2107780629}
 --- !u!1 &2143458411
 GameObject:
   m_ObjectHideFlags: 0

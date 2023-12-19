@@ -30,20 +30,61 @@ public class MaliciousActor : MonoBehaviour
     public GameObject cardDropZone;
     public GameObject handDropZone;
     public GameObject map;
+    public RGGameExampleUI gameExampleUI;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        // funds = 750.0f;
+        // cardReader = GameObject.FindObjectOfType<CardReader>();
+        // manager = GameObject.FindObjectOfType<GameManager>();
+        // 
+        // //Debug.Log("TEST MAL START");
+        // for (int i = 0; i < cardReader.CardIDs.Length; i++)
+        // {
+        //     if (cardReader.CardTeam[i] == (int)(Card.Type.Malicious)) // Uncomment to build the deck
+        //     {
+        //        // Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
+        //         Deck.Add(i);
+        //         CardCountList.Add(cardReader.CardCount[i]);
+        //     }
+        // 
+        //     //if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
+        //     //{
+        //     //    for(int j = 0; j < cardReader.CardCount[i]; j++)
+        //     //    {
+        //     //        Deck.Add(i);
+        //     //    }
+        //     //}
+        // 
+        //     // Gets facility specific cards which we don't have yet
+        //     //if (cardReader.CardTeam[i] == ((int)type)) // Uncomment to build the deck
+        //     //{
+        //     //    Deck.Add(i);
+        //     //}
+        // }
+        // if (HandList.Count < maxHandSize)
+        // {
+        //     for (int i = 0; i < maxHandSize; i++)
+        //     {
+        //         DrawCard();
+        //     }
+        // }
+    }
+
+    public void DelayedStart()
+    {
         funds = 750.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
         manager = GameObject.FindObjectOfType<GameManager>();
+
         //Debug.Log("TEST MAL START");
         for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Malicious)) // Uncomment to build the deck
             {
-               // Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
+                // Debug.Log("CARD ID: " + i + " CARD TEAM: " + cardReader.CardTeam[i]);
                 Deck.Add(i);
                 CardCountList.Add(cardReader.CardCount[i]);
             }
@@ -62,7 +103,7 @@ public class MaliciousActor : MonoBehaviour
             //    Deck.Add(i);
             //}
         }
-        if(HandList.Count < maxHandSize)
+        if (HandList.Count < maxHandSize)
         {
             for (int i = 0; i < maxHandSize; i++)
             {
@@ -291,7 +332,7 @@ public class MaliciousActor : MonoBehaviour
                     targetIDList.Add(targetID[i]);
                     cardTargets.Add(targetID[i]); // Ideally want to pass this list to the network somehow
                     activeCardIDs.Add(cardID);
-
+                    gameExampleUI.PlayCard(cardID); // Potentially only need to call it once
                     //Card tempCard = new Card();
                     //float rng = UnityEngine.Random.Range(0.0f, 1.0f);
                     //// Determine ranges for the percent chance to allow for super success, success, failure, super failure

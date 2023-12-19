@@ -13,6 +13,8 @@ public class RGGameExampleUI : NetworkBehaviour
     [SerializeField] Scrollbar scrollbar;
     [SerializeField] TMP_Text waitingText;
     [SerializeField] Canvas cardCanvas;
+    [SerializeField] GameObject cardHolder;
+    [SerializeField] GameObject cardPlayedHolder;
     [SerializeField] Button endTurnButton;
     [SerializeField] Button[] cards;
 
@@ -165,6 +167,7 @@ public class RGGameExampleUI : NetworkBehaviour
         }
     }
 
+    // Need to call this upon card play
     public void PlayCard(int index)
     {
         string message = "plays the <color=";
@@ -182,13 +185,17 @@ public class RGGameExampleUI : NetworkBehaviour
     {
         endTurnButton.gameObject.SetActive(true);
         cardCanvas.gameObject.SetActive(true);
+        cardHolder.SetActive(true);
+        cardPlayedHolder.SetActive(true);
         waitingText.gameObject.SetActive(false);
     }
 
     public void HidePlayUI()
     {
         endTurnButton.gameObject.SetActive(false);
+        cardHolder.SetActive(false);
         cardCanvas.gameObject.SetActive(false);
+        cardPlayedHolder.SetActive(false);
         waitingText.gameObject.SetActive(true);
     }
 
