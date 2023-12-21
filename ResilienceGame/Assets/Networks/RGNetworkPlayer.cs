@@ -11,6 +11,7 @@ public class RGNetworkPlayer : NetworkBehaviour
     [SyncVar] public int playerID;
 
     public MaliciousActor malActor;
+    public Player resActor;
     //[SyncVar] public GameObject centralMap;
     //[SyncVar] public GameObject cardDrop;
     //[SyncVar] public GameObject cardHandLoc;
@@ -73,8 +74,35 @@ public class RGNetworkPlayer : NetworkBehaviour
         }
         else
         {
-            this.gameObject.AddComponent<Player>();
+            resActor = this.gameObject.AddComponent<Player>();
+            Player baseRes = GameObject.FindObjectOfType<Player>();
+            baseRes.DelayedStart();
+            //malActor = baseMal;
+            resActor.Deck = baseRes.Deck;
+            rgDeck = baseRes.Deck;
+            resActor.Deck = rgDeck;
+            rgCardCount = baseRes.CardCountList;
+            resActor.CardCountList = baseRes.CardCountList;
+            resActor.cardReader = baseRes.cardReader;
+            resActor.cardDropZone = baseRes.cardDropZone;
+            baseRes.cardDropZone.transform.parent = resActor.transform;
+            resActor.handDropZone = baseRes.handDropZone;
+            baseRes.handDropZone.transform.parent = resActor.transform;
+            resActor.cardPrefab = baseRes.cardPrefab;
+            resActor.HandList = baseRes.HandList;
+            resActor.ActiveCardList = baseRes.ActiveCardList;
+            resActor.activeCardIDs = baseRes.activeCardIDs;
+            resActor.gameManager = baseRes.gameManager;
+            //resActor.gameManager. = resActor;
+            resActor.seletedFacilities = baseRes.seletedFacilities;
+            resActor.targetIDList = baseRes.targetIDList;
+            //resActor.gameExampleUI = baseRes.gameExampleUI;
+            baseRes.gameObject.SetActive(false);
+            centralMap = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(centralMap.transform);
 
+            Debug.Log(this.gameObject.name);
+            Debug.Log(malActor.Deck.Count);
         }
     }
 

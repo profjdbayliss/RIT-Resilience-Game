@@ -26,7 +26,7 @@ public class RGNetworkManager : NetworkManager
         base.OnServerAddPlayer(conn);
 
         int playerID = conn.connectionId;
-        if (conn.identity.isLocalPlayer) // if the player is host, join red team
+        if (conn.identity.isLocalPlayer && (RGNetworkPlayerList.instance.playerIDs.Contains(0) == false)) // if the player is host, join red team
         {
             RGNetworkPlayerList.instance.AddPlayer(playerID, 0);
             // Add their cards to the player

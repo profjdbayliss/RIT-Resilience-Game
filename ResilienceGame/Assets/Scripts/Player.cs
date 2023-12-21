@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     public List<int> targetIDList;
     public List<GameObject> HandList;
     public List<GameObject> ActiveCardList;
+    public List<int> activeCardIDs;
     public int handSize;
     public int maxHandSize = 5;
     public GameObject cardPrefab;
@@ -31,10 +32,63 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //maxHandSize = 5;
+        //funds = 1000.0f;
+        //cardReader = GameObject.FindObjectOfType<CardReader>();
+        //for(int i = 0; i < cardReader.CardIDs.Length; i++)
+        //{
+        //    if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
+        //    {
+        //        Deck.Add(i);
+        //        CardCountList.Add(cardReader.CardCount[i]);
+        //    }
+        //}
+        //for(int i = 0; i < maxHandSize; i++)
+        //{
+        //    DrawCard();
+        //}
+        //foreach (GameObject fac in gameManager.allFacilities)
+        //{
+        //    if (fac.GetComponent<FacilityV3>().type == type)
+        //    {
+        //        Facilities.Add(fac);
+        //    }
+        //    //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration)
+        //    //{
+        //    //    Facilities.Add(fac);
+        //    //}
+        //    //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution)
+        //    //{
+        //    //    Facilities.Add(fac);
+
+        //    //}
+        //    //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Water)
+        //    //{
+        //    //    Facilities.Add(fac);
+
+        //    //}
+        //    //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation)
+        //    //{
+        //    //    Facilities.Add(fac);
+
+        //    //}
+        //    //else if (fac.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
+        //    //{
+        //    //    Facilities.Add(fac);
+        //    //}
+        //    //else
+        //    //{
+        //    //    // Do nothing
+        //    //}
+        //}
+    }
+
+    public void DelayedStart()
+    {
         maxHandSize = 5;
         funds = 1000.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
-        for(int i = 0; i < cardReader.CardIDs.Length; i++)
+        for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
             {
@@ -42,7 +96,7 @@ public class Player : MonoBehaviour
                 CardCountList.Add(cardReader.CardCount[i]);
             }
         }
-        for(int i = 0; i < maxHandSize; i++)
+        for (int i = 0; i < maxHandSize; i++)
         {
             DrawCard();
         }
@@ -91,6 +145,7 @@ public class Player : MonoBehaviour
             {
                 HandList.Remove(card);
                 ActiveCardList.Add(card);
+                activeCardIDs.Add(card.GetComponent<Card>().cardID);
                 card.GetComponent<Card>().duration = cardReader.CardDuration[card.GetComponent<Card>().cardID] + gameManager.turnCount;
                 break;
             }
@@ -100,6 +155,7 @@ public class Player : MonoBehaviour
             if (gameManager.turnCount  >= card.GetComponent<Card>().duration)
             {
                 ActiveCardList.Remove(card);
+                activeCardIDs.Remove(card.GetComponent<Card>().cardID);
                 card.SetActive(false);
                 break;
             }
