@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Unity.Collections;
+using TMPro;
 
 public class RGNetworkPlayer : NetworkBehaviour
 {
@@ -40,6 +41,7 @@ public class RGNetworkPlayer : NetworkBehaviour
         //this.gameObject.AddComponent<Player>();
         if (RGNetworkPlayerList.instance.playerTeamIDs[playerID] == 0)
         {
+
             MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
             baseMal.DelayedStart();
             malActor = this.gameObject.AddComponent<MaliciousActor>();
@@ -66,7 +68,8 @@ public class RGNetworkPlayer : NetworkBehaviour
             baseMal.gameObject.SetActive(false);
             centralMap = GameObject.Find("Central Map");
             this.gameObject.transform.SetParent(centralMap.transform);
-            
+            GameObject obj = GameObject.Find("RGTitle");
+            obj.GetComponent<TextMeshProUGUI>().text = "M " + malActor.Deck.Count;
             Debug.Log(this.gameObject.name);
             Debug.Log(malActor.Deck.Count);
             //malActor.DelayedStart();
@@ -74,9 +77,9 @@ public class RGNetworkPlayer : NetworkBehaviour
         }
         else
         {
-            resActor = this.gameObject.AddComponent<Player>();
             Player baseRes = GameObject.FindObjectOfType<Player>();
             baseRes.DelayedStart();
+            resActor = this.gameObject.AddComponent<Player>();
             //malActor = baseMal;
             resActor.Deck = baseRes.Deck;
             rgDeck = baseRes.Deck;
@@ -100,9 +103,11 @@ public class RGNetworkPlayer : NetworkBehaviour
             baseRes.gameObject.SetActive(false);
             centralMap = GameObject.Find("Central Map");
             this.gameObject.transform.SetParent(centralMap.transform);
-
+            GameObject obj = GameObject.Find("RGTitle");
+            obj.GetComponent<TextMeshProUGUI>().text = "R " + resActor.Deck.Count;
+            //this.syncDirection = SyncDirection.ClientToServer;
             Debug.Log(this.gameObject.name);
-            Debug.Log(malActor.Deck.Count);
+            Debug.Log(resActor.Deck.Count);
         }
     }
 

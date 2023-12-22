@@ -1194,7 +1194,7 @@ namespace Mirror
 
         void OnServerAddPlayerInternal(NetworkConnectionToClient conn, AddPlayerMessage msg)
         {
-            //Debug.Log("NetworkManager.OnServerAddPlayer");
+            Debug.Log("NetworkManager.OnServerAddPlayer " + msg);
 
             if (autoCreatePlayer && playerPrefab == null)
             {
@@ -1208,12 +1208,17 @@ namespace Mirror
                 return;
             }
 
+            // FOR SOME FUCKING REASON IT IS CALLING THIS TIWCE
             if (conn.identity != null)
             {
                 Debug.LogError("There is already a player for this connection.");
                 return;
             }
-
+            // FOR SOME FUCKING REASON IT IS CALLING THIS TIWCE
+            //if (conn.identity == null)
+            //{
+            //    OnServerAddPlayer(conn);
+            //}
             OnServerAddPlayer(conn);
         }
 
@@ -1236,7 +1241,7 @@ namespace Mirror
         // called after successful authentication
         void OnClientAuthenticated()
         {
-            //Debug.Log("NetworkManager.OnClientAuthenticated");
+            Debug.Log("NetworkManager.OnClientAuthenticated");
 
             // set connection to authenticated
             NetworkClient.connection.isAuthenticated = true;
@@ -1374,6 +1379,7 @@ namespace Mirror
             // instantiating a "Player" prefab gives it the name "Player(clone)"
             // => appending the connectionId is WAY more useful for debugging!
             player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
+            //conn.identity.isLocalPlayer = true;
             NetworkServer.AddPlayerForConnection(conn, player);
         }
 

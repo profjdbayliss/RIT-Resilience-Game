@@ -33,11 +33,25 @@ public class TextureAtlas
 
     public void CreateAtlasComponentData(string directoryName, string outputFileName)
     {
+
+
         // Get all file names in this directory
+        directoryName = Application.streamingAssetsPath + "\\" + directoryName;
         names = Directory.GetFiles(directoryName);
+
+        List<string> tempNames = new List<string>();
+        for (int i = 0; i < names.Length; i++)
+        {
+            if (!names[i].Contains(".meta"))
+            {
+                tempNames.Add(names[i]);
+            }
+        }
+        names = tempNames.ToArray();
 
         // make the list of uvs
         textureUVs = new List<TextureUV>(names.Length);
+
 
         // Debug: make sure we see the files
         //foreach(string s in images)
@@ -47,6 +61,7 @@ public class TextureAtlas
 
         // we're going to assume our images are a power of 2 so we just
         // need to get the sqrt of the number of images and round up
+
         int squareRoot = Mathf.CeilToInt(Mathf.Sqrt(names.Length));
         int squareRootH = squareRoot;
         atlasWidth = squareRoot * pixelWidth;
@@ -66,7 +81,10 @@ public class TextureAtlas
         Parallel.For(0, names.Length,
             index =>
         {
-            fileData[index] = File.ReadAllBytes(names[index]);
+            if (names[index].Contains("meta") == false)
+            {
+                fileData[index] = File.ReadAllBytes(names[index]);
+            }
         });
 
         // Put all the images into the image file and write

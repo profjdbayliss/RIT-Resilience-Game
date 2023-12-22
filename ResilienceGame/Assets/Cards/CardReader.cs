@@ -36,6 +36,7 @@ public class CardReader : MonoBehaviour
     public string cardFileLoc;
 
 
+
     public List<Player> players;
 
     public MaliciousActor maliciousActor;
@@ -60,6 +61,7 @@ public class CardReader : MonoBehaviour
     public void CSVRead()
     {
         // Check to see if the file exists
+        cardFileLoc = Application.streamingAssetsPath + "\\Cards - Sheet1 (4).csv";
         if (File.Exists(cardFileLoc))
         {
             FileStream stream = File.OpenRead(cardFileLoc);
@@ -531,6 +533,11 @@ public class CardReader : MonoBehaviour
             reader.Close();
             stream.Close();
         
+        }
+        else
+        {
+            Application.Quit();
+            
         }
 
     }

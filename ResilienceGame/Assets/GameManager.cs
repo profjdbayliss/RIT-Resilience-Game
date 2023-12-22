@@ -79,11 +79,15 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public bool criticalEnabled;
 
+    public TextMeshProUGUI titlee;
+
     // Start is called before the first frame update
     void Start()
     {
         startScreen.SetActive(true);
         Debug.Log("Test Start");
+        //titlee.GetComponent<TextMeshProUGUI>().text = "T: ";
+        //titlee.GetComponent<TextMeshProUGUI>().text = "T: " + maliciousActor.Deck.Count;
     }
 
 

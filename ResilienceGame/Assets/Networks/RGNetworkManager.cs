@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Mirror.Examples.Chat;
+using TMPro;
 
 public class RGNetworkManager : NetworkManager
 {

@@ -29,7 +29,7 @@ public class RGNetworkPlayerList : NetworkBehaviour
 
     public void AddPlayer(int id, int teamID)
     {
-        if (!isServer) return;
+        //if (!isServer) return;
         playerIDs.Add(id);
         playerTeamIDs.Add(teamID);
         playerReadyFlags.Add(true);
