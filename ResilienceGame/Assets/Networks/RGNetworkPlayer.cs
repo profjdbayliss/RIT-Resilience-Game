@@ -37,11 +37,28 @@ public class RGNetworkPlayer : NetworkBehaviour
     {
         RGGameExampleUI.localPlayerName = playerName;
         RGGameExampleUI.localPlayerID = playerID;
-        
+
         //this.gameObject.AddComponent<Player>();
         //if(playerID < RGNetworkPlayerList.instance.playerTeamIDs.Count)
         //{
-        if (playerID == 0)
+
+        //}
+        StartCoroutine(WaitForPlayerListUpdate());
+    }
+
+
+    private IEnumerator WaitForPlayerListUpdate()
+    {
+        RGNetworkPlayerList.instance.CmdUpdateInfo();
+
+        while (!RGNetworkPlayerList.instance.isUpdated)
+        {
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        RGNetworkPlayerList.instance.isUpdated = false;
+
+        if (RGNetworkPlayerList.instance.playerTeamIDs[playerID] == 0)
         {
             Player baseRes = GameObject.FindObjectOfType<Player>();
             baseRes.gameObject.SetActive(false);
@@ -116,8 +133,5 @@ public class RGNetworkPlayer : NetworkBehaviour
             Debug.Log(this.gameObject.name);
             Debug.Log(resActor.Deck.Count);
         }
-        //}
-        
     }
-
 }

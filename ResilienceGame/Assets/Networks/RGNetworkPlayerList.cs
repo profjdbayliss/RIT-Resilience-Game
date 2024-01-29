@@ -7,12 +7,13 @@ public class RGNetworkPlayerList : NetworkBehaviour
 {
     public static RGNetworkPlayerList instance;
 
-    public SyncList<int> playerIDs = new SyncList<int>();
-    public SyncList<int> playerTeamIDs = new SyncList<int>();
-    public SyncList<bool> playerReadyFlags = new SyncList<bool>();
-    public SyncList<List<int>> playerDecks = new SyncList<List<int>>();
-    public SyncList<List<int>> playerCardCounts = new SyncList<List<int>>();
+    public List<int> playerIDs = new List<int>();
+    public List<int> playerTeamIDs = new List<int>();
+    public List<bool> playerReadyFlags = new List<bool>();
+    public List<List<int>> playerDecks = new List<List<int>>();
+    public List<List<int>> playerCardCounts = new List<List<int>>();
 
+    public bool isUpdated = false;
 
     private void Awake()
     {
@@ -25,6 +26,34 @@ public class RGNetworkPlayerList : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateInfo()
+    {
+        RpcUpdateInfo(playerIDs, playerTeamIDs, playerReadyFlags);
+    }
+
+
+    [ClientRpc]
+    public void RpcUpdateInfo(List<int> playerIDs, List<int> playerTeamIDs, List<bool> playerReadyFlags)
+    {
+        this.playerIDs.Clear();
+        this.playerTeamIDs.Clear();
+        this.playerReadyFlags.Clear();
+        for (int i = 0; i < playerIDs.Count; i++)
+        {
+            this.playerIDs.Add(playerIDs[i]);
+        }
+        for (int i = 0; i < playerTeamIDs.Count; i++)
+        {
+            this.playerTeamIDs.Add(playerTeamIDs[i]);
+        }
+        for (int i = 0; i < playerReadyFlags.Count; i++)
+        {
+            this.playerReadyFlags.Add(playerReadyFlags[i]);
+        }
+        isUpdated = true;
     }
 
     public void AddPlayer(int id, int teamID)
