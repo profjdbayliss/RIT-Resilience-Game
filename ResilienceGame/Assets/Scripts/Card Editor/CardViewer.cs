@@ -34,6 +34,7 @@ public class CardViewer : MonoBehaviour
     public TMP_Text impactText;
     public TMP_Text descriptionText;
     public TMP_Text costText;
+    public Tooltip metaDataTip;
 
     [Header("Card Editor Inputs")]
     //public TMP_InputField teamInput;
@@ -53,6 +54,8 @@ public class CardViewer : MonoBehaviour
     public TMP_InputField targetTypeInput;
     public TMP_InputField cardCountInput;
     public TMP_InputField typeInput;
+    public TMP_InputField metaDataInput;
+
 
     public TMP_Text editingWarningText;
 
@@ -97,6 +100,7 @@ public class CardViewer : MonoBehaviour
         targetTypeInput.onEndEdit.AddListener(UpdateTargetType);
         cardCountInput.onEndEdit.AddListener(UpdateCardCount);
         typeInput.onEndEdit.AddListener(UpdateType);
+        metaDataInput.onEndEdit.AddListener(UpdateMetaData);
 
         searchDropDown.onValueChanged.AddListener(ShowCardsBySearch);
         searchInput.onEndEdit.AddListener(ShowCardsBySearch);
@@ -189,8 +193,8 @@ public class CardViewer : MonoBehaviour
                     case 0:
                         isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
                     || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
-                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
-                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text) || cards[i].metaData.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                         break;
                     case 1:
                         isShow = cards[i].team.Contains(searchInput.text);
@@ -216,11 +220,15 @@ public class CardViewer : MonoBehaviour
                         isShow = cards[i].type.Contains(searchInput.text);
                         searchPlaceholder.text = "Search cards by type";
                         break;
+                    case 7:
+                        isShow = cards[i].metaData.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by meta data";
+                        break;
                     default:
                         isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
                     || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
-                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
-                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text) || cards[i].metaData.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                         break;
 
                 }
@@ -242,7 +250,7 @@ public class CardViewer : MonoBehaviour
         switch (keyValue)
         {
             case 0:
-                searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                 break;
             case 1:
                 searchPlaceholder.text = "Search cards by team";
@@ -262,8 +270,11 @@ public class CardViewer : MonoBehaviour
             case 6:
                 searchPlaceholder.text = "Search cards by type";
                 break;
+            case 7:
+                searchPlaceholder.text = "Search cards by meta data";
+                break;
             default:
-                searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                 break;
 
         }
@@ -322,8 +333,8 @@ public class CardViewer : MonoBehaviour
                     case 0:
                         isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
                     || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
-                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
-                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text) || cards[i].metaData.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                         break;
                     case 1:
                         isShow = cards[i].team.Contains(searchInput.text);
@@ -349,11 +360,15 @@ public class CardViewer : MonoBehaviour
                         isShow = cards[i].type.Contains(searchInput.text);
                         searchPlaceholder.text = "Search cards by type";
                         break;
+                    case 7:
+                        isShow = cards[i].metaData.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by meta data";
+                        break;
                     default:
                         isShow = cards[i].team.Contains(searchInput.text) || cards[i].title.Contains(searchInput.text)
                     || cards[i].description.Contains(searchInput.text) || cards[i].impact.Contains(searchInput.text)
-                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text);
-                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                    || cards[i].targetType.Contains(searchInput.text) || cards[i].type.Contains(searchInput.text) || cards[i].metaData.Contains(searchInput.text);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                         break;
 
                 }
@@ -418,8 +433,8 @@ public class CardViewer : MonoBehaviour
                     case 0:
                         isShow = cards[i].team.Contains(value) || cards[i].title.Contains(value)
                     || cards[i].description.Contains(value) || cards[i].impact.Contains(value)
-                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value);
-                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value) || cards[i].metaData.Contains(value);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                         break;
                     case 1:
                         isShow = cards[i].team.Contains(value);
@@ -445,11 +460,15 @@ public class CardViewer : MonoBehaviour
                         isShow = cards[i].type.Contains(value);
                         searchPlaceholder.text = "Search cards by type";
                         break;
+                    case 7:
+                        isShow = cards[i].metaData.Contains(value);
+                        searchPlaceholder.text = "Search cards by meta data";
+                        break;
                     default:
                         isShow = cards[i].team.Contains(value) || cards[i].title.Contains(value)
                     || cards[i].description.Contains(value) || cards[i].impact.Contains(value)
-                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value);
-                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type or type";
+                    || cards[i].targetType.Contains(value) || cards[i].type.Contains(value) || cards[i].metaData.Contains(value);
+                        searchPlaceholder.text = "Search cards by team, title, description, impact, target type, type or meta data";
                         break;
 
                 }
@@ -490,7 +509,7 @@ public class CardViewer : MonoBehaviour
             string[] entries = lines[i].Split(',');
 
             // Ensure the row has enough entries
-            if (entries.Length >= 14)
+            if (entries.Length >= 15)
             {
                 CardForEditor card = new CardForEditor
                 {
@@ -507,7 +526,8 @@ public class CardViewer : MonoBehaviour
                     targetCount = int.Parse(entries[10]),
                     targetType = entries[11],
                     cardCount = int.Parse(entries[12]),
-                    type = entries[13]
+                    type = entries[13],
+                    metaData = entries[14]
                 };
 
                 cards.Add(card);
@@ -629,6 +649,7 @@ public class CardViewer : MonoBehaviour
         targetTypeInput.text = "";
         cardCountInput.text = "";
         typeInput.text = "";
+        metaDataInput.text = "";
     }
 
     public void InitPreviewCard()
@@ -704,6 +725,8 @@ public class CardViewer : MonoBehaviour
         targetTypeInput.text = editingCard.targetType;
         cardCountInput.text = editingCard.cardCount.ToString();
         typeInput.text = editingCard.type;
+        metaDataInput.text = editingCard.metaData;
+        metaDataTip.tooltipText = editingCard.metaData;
     }
 
     public void UpdatePreviewCard()
@@ -751,6 +774,7 @@ public class CardViewer : MonoBehaviour
         {
             costText.text = "0";
         }
+        metaDataTip.tooltipText = editingCard.metaData;
     }
 
     public bool LoadImageIntoRawImage(string imagePath)
@@ -1038,6 +1062,12 @@ public class CardViewer : MonoBehaviour
         UpdatePreviewCard();
     }
 
+    private void UpdateMetaData(string value)
+    {
+        editingCard.metaData = value;
+        UpdatePreviewCard();
+    }
+
     public bool AreRequiredFieldsFilled()
     {
         //if (string.IsNullOrEmpty(teamInput.text)) return false;
@@ -1106,7 +1136,7 @@ public class CardViewer : MonoBehaviour
     private string CardToCsvLine(CardForEditor card)
     {
         // Convert the card properties to a CSV line (assuming no commas in the string values)
-        return $"{card.team},{card.title},{card.cost},{card.image},{card.description},{card.impact},{card.percent},{card.spreadChange},{card.duration},{card.delay},{card.targetCount},{card.targetType},{card.cardCount},{card.type}";
+        return $"{card.team},{card.title},{card.cost},{card.image},{card.description},{card.impact},{card.percent},{card.spreadChange},{card.duration},{card.delay},{card.targetCount},{card.targetType},{card.cardCount},{card.type},{card.metaData}";
     }
 
     public void RemoveCardFromCsv(string path, string title)

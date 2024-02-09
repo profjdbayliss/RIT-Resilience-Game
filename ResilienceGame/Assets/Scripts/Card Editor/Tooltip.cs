@@ -85,9 +85,13 @@ public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private IEnumerator ShowTooltip()
     {
         yield return new WaitForSeconds(hoverDelay);
-        tooltipInstance.SetActive(true);
-        UpdateTooltipPosition();
-        showRoutine = null;
+        textComponent.text = tooltipText;
+        if (!tooltipText.Equals(""))
+        {
+            tooltipInstance.SetActive(true);
+            UpdateTooltipPosition();
+            showRoutine = null;
+        }
     }
 
     private IEnumerator HideTooltip()

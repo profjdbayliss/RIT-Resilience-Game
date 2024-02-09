@@ -1,6 +1,6 @@
-Red,Overclock A/C Unit,5,overclockAC.png,Hack into the A/C controls and overlock the A/C unit. This causes it to overheat and the crankshaft to break.,A/C is broken,100,0,4,0,1,Any,5,Initial Access,,
-Red,Post Spoofed Messages on Reddit,6,real-spoofed-messages.jpg,"Go to the RIT subreddit and begin posting fake messages that ""RIT does not care about their students or well-beings""",Students begin complaining,100,0,4,0,1,Any,5,Initial Access,,
-Red,Fake Spare Part,7,scam-post.png,Create and post a fake part for the University to buy.,Delayed A/C Repair,100,0,4,0,1,Any,5,Initial Access,,
-Blue,File FMS Request,5,FMS.png,File an FMS Request to have the crankshaft repaired,Elevate the incident,100,0,4,0,1,Any,5,,,
-Blue,Send Follow-up Emails,6,alert-superior.png,Alert the head of the department of the AC being broken and no response from your request.,Discover who to contact,100,0,4,0,1,Any,5,,,
-Blue,Order New Crankshaft,7,ordered-crankshaft.png,Place an order for a new crankshaft to be manufactured,Begin repair process,100,0,4,0,1,Any,5,,,
+Red,Fake Spare Part,7,scam-post.png,Create and post a fake part for the University to buy.,Delayed A/C Repair,100,0,4,0,1,Any,5,Initial Access,,,
+Blue,File FMS Request,5,FMS.png,File an FMS Request to have the crankshaft repaired,Elevate the incident,100,0,4,0,1,Any,5,,,,
+Blue,Send Follow-up Emails,6,alert-superior.png,Alert the head of the department of the AC being broken and no response from your request.,Discover who to contact,100,0,4,0,1,Any,5,,,,
+Blue,Order New Crankshaft,7,ordered-crankshaft.png,Place an order for a new crankshaft to be manufactured,Begin repair process,100,0,4,0,1,Any,5,,,,
+Red,Overclock A/C Unit,5,overclockAC.png,Hack into the A/C controls and overlock the A/C unit. This causes it to overheat and the crankshaft to break.,A/C is broken,100,0,4,0,1,Any,5,Initial Access
+Red,Post Spoofed Messages on Reddit,6,real-spoofed-messages.jpg,"Go to the RIT subreddit and begin posting fake messages that ""RIT does not care about their students or well-beings""",Students begin complaining,100,0,4,0,1,Any,5,Initial Access,Meta Data
