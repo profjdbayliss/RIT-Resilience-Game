@@ -88,6 +88,7 @@ public class Player : MonoBehaviour
         maxHandSize = 5;
         funds = 1000.0f;
         cardReader = GameObject.FindObjectOfType<CardReader>();
+        cardReader.CSVRead();
         for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Resilient)) // Uncomment to build the deck
