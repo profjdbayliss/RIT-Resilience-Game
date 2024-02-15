@@ -18,10 +18,16 @@ public class RGNetworkManager : NetworkManager
 
         GameObject obj = Instantiate(playerListPrefab);
         NetworkServer.Spawn(obj);
-        textAtlas.DelayedStart();
         //cardReader.CSVRead();
     }
 
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        textAtlas.DelayedStart();
+
+    }
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
