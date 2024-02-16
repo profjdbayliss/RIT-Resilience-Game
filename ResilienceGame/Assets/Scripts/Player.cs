@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
     public GameObject cardPrefab;
     public GameObject cardDropZone;
     public GameObject handDropZone;
+    public bool redoCardRead = false;
 
     // Start is called before the first frame update
     void Start()
@@ -140,27 +141,34 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach(GameObject card in HandList)
+        if(HandList != null)
         {
-            if(card.GetComponent<Card>().state == Card.CardState.CardInPlay)
+            foreach (GameObject card in HandList)
             {
-                HandList.Remove(card);
-                ActiveCardList.Add(card);
-                activeCardIDs.Add(card.GetComponent<Card>().cardID);
-                card.GetComponent<Card>().duration = cardReader.CardDuration[card.GetComponent<Card>().cardID] + gameManager.turnCount;
-                break;
+                if (card.GetComponent<Card>().state == Card.CardState.CardInPlay)
+                {
+                    HandList.Remove(card);
+                    ActiveCardList.Add(card);
+                    activeCardIDs.Add(card.GetComponent<Card>().cardID);
+                    card.GetComponent<Card>().duration = cardReader.CardDuration[card.GetComponent<Card>().cardID] + gameManager.turnCount;
+                    break;
+                }
             }
         }
-        foreach (GameObject card in ActiveCardList)
+        if(ActiveCardList != null)
         {
-            if (gameManager.turnCount  >= card.GetComponent<Card>().duration)
+            foreach (GameObject card in ActiveCardList)
             {
-                ActiveCardList.Remove(card);
-                activeCardIDs.Remove(card.GetComponent<Card>().cardID);
-                card.SetActive(false);
-                break;
+                if (gameManager.turnCount >= card.GetComponent<Card>().duration)
+                {
+                    ActiveCardList.Remove(card);
+                    activeCardIDs.Remove(card.GetComponent<Card>().cardID);
+                    card.SetActive(false);
+                    break;
+                }
             }
         }
+
     }
 
     public void DrawCard()
@@ -177,6 +185,12 @@ public class Player : MonoBehaviour
             Card tempCard = tempCardObj.GetComponent<Card>();
             tempCard.cardDropZone = cardDropZone;
             tempCard.cardID = Deck[rng];
+            if (cardReader.CardFronts[Deck[rng]] == null && redoCardRead == false)
+            {
+                cardReader.CSVRead();
+                redoCardRead = true;
+            }
+
             tempCard.front = cardReader.CardFronts[Deck[rng]];
             if(cardReader.CardSubType[Deck[rng]] == 0)
             {
