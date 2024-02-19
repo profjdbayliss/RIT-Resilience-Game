@@ -116,7 +116,8 @@ public class GameManager : MonoBehaviour, IDragHandler
                 resPlayer = ntwrkPLayers[i].gameObject;
                 Player temp = resPlayer.AddComponent<Player>();
                 temp = ntwrkPLayers[i].GetComponent<Player>();
-                
+                activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
+                fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
                 //allPlayers[i] = ntwrkPLayers[i].gameObject;
             }
             else
