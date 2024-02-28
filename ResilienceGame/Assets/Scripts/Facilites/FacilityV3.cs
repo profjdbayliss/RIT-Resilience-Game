@@ -35,41 +35,41 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public Type type;
 
-    public FacilityState state;
+    public FacilityState state; // Need Sync
 
-    public int facID;
+    public int facID; // Need Sync
 
     public bool isOver;
-    public bool isDown;
+    public bool isDown; // Need Sync
     public bool hasChanged;
 
     public  float output_flow;
     public float internal_flow;
     public float external_flow;
 
-    public int feedback;
-    public int hardness;
-    public int maintenance;
+    public int feedback; // Need Sync
+    public int hardness; // Need Sync
+    public int maintenance; // Need Sync
 
     //internal dependencies
     //treat these as a scale 1-10
-    public float workers;
-    public float it_level;
-    public float ot_level;
-    public float phys_security;
-    public float funding;
+    public float workers; // Need Sync
+    public float it_level; // Need Sync
+    public float ot_level; // Need Sync
+    public float phys_security; // Need Sync
+    public float funding; // Need Sync
 
     //float percentages
     //external dependencies
-    public  float electricity;
-    public  float water;
-    public  float fuel;
-    public  float communications;
-    public  float commodities;
-    public  float health;
-    public  float security;
-    public  float public_goods;
-    public  float city_resource;
+    public  float electricity; // Need Sync
+    public  float water; // Need Sync
+    public  float fuel; // Need Sync
+    public  float communications; // Need Sync
+    public  float commodities; // Need Sync
+    public  float health; // Need Sync
+    public  float security; // Need Sync
+    public  float public_goods; // Need Sync
+    public  float city_resource; // Need Sync
 
     public TextMeshProUGUI FacilityType;
     public TextMeshProUGUI Flow;

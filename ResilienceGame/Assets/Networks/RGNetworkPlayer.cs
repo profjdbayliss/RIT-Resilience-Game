@@ -105,6 +105,7 @@ public class RGNetworkPlayer : NetworkBehaviour
             resActor = this.gameObject.AddComponent<Player>();
             //malActor = baseMal;
             resActor.Deck = baseRes.Deck;
+            resActor.type = (FacilityV3.Type)(playerID - 1);
             rgDeck = baseRes.Deck;
             resActor.Deck = rgDeck;
             rgCardCount = baseRes.CardCountList;
