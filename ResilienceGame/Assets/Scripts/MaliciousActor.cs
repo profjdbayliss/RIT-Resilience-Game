@@ -332,7 +332,7 @@ public class MaliciousActor : MonoBehaviour
                     targetIDList.Add(targetID[i]);
                     cardTargets.Add(targetID[i]); // Ideally want to pass this list to the network somehow
                     activeCardIDs.Add(cardID);
-                    gameExampleUI.PlayCard(cardID); // Potentially only need to call it once
+                    //gameExampleUI.PlayCard(cardID); // Potentially only need to call it once
                     //Card tempCard = new Card();
                     //float rng = UnityEngine.Random.Range(0.0f, 1.0f);
                     //// Determine ranges for the percent chance to allow for super success, success, failure, super failure

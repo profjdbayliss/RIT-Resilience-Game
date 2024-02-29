@@ -118,7 +118,11 @@ public class RGGameExampleUI : NetworkBehaviour
         turn = newTurn;
         if (turn == localPlayerTeamID) // if the current "turn" belongs to the local player's team, enable the local player's UI
         {
-            ShowPlayUI();
+            ShowPlayUI(); 
+            if (FindObjectOfType<GameManager>()) // Add funds for the local player that starts their turn
+            {
+                FindObjectOfType<GameManager>().AddFunds(100);
+            }
         }
         else
         {

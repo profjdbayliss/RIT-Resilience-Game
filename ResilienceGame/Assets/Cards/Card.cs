@@ -127,10 +127,14 @@ public class Card : MonoBehaviour, IDropHandler
                         if(this.transform.localPosition.y < cardDropMax.y)
                         {
                             // check the cards teamID to see which team they belong to so they can call the proper Select facility method to then see if they have met all conditions to play the card
-                            if(this.teamID == 0)
+                            if (this.teamID == 0)
                             {
                                 if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
                                 {
+                                    if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
+                                    {
+                                        FindObjectOfType<GameManager>().AddFunds(-100);
+                                    }
                                     this.state = CardState.CardInPlay;
                                     this.gameObject.GetComponentInParent<slippy>().enabled = false;
                                     // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
@@ -144,6 +148,10 @@ public class Card : MonoBehaviour, IDropHandler
                             {
                                 if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
                                 {
+                                    if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
+                                    {
+                                        FindObjectOfType<GameManager>().AddFunds(-100);
+                                    }
                                     this.state = CardState.CardInPlay;
                                     this.gameObject.GetComponentInParent<slippy>().enabled = false;
                                 }

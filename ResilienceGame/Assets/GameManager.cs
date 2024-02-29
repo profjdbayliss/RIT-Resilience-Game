@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                     resPlayer = ntwrkPLayers[i].gameObject;
                     Player temp = resPlayer.AddComponent<Player>();
                     temp = ntwrkPLayers[i].GetComponent<Player>();
-                    Debug.LogError(resPlayer.GetComponent<Player>().type);
+                    //Debug.LogError(resPlayer.GetComponent<Player>().type);
                     activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
                     fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
                     //allPlayers[i] = ntwrkPLayers[i].gameObject;
@@ -1014,4 +1014,38 @@ public class GameManager : MonoBehaviour, IDragHandler
 
 
     //}
+
+    public void AddFunds(int count)
+    {
+
+        RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
+        RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
+        Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
+        //allPlayers = new GameObject[playerList.playerIDs.Count];
+        for (int i = 0; i < ntwrkPLayers.Length; i++)
+        {
+            //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
+            //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
+            if (RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
+            {
+                if (ntwrkPLayers[i].playerID != 0)
+                {
+                    resPlayer = ntwrkPLayers[i].gameObject;
+                    Player temp = resPlayer.AddComponent<Player>();
+                    temp = ntwrkPLayers[i].GetComponent<Player>();
+                    resPlayer.GetComponent<Player>().funds += count;
+                    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+                    //allPlayers[i] = ntwrkPLayers[i].gameObject;
+                }
+                else
+                {
+                    maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
+                    maliciousActor.funds += count;
+                    fundText.text = "Funds: " + maliciousActor.funds;
+
+                }
+            }
+
+        }
+    }
 }
