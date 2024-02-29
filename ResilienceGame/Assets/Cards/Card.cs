@@ -133,7 +133,14 @@ public class Card : MonoBehaviour, IDropHandler
                                 {
                                     if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
                                     {
-                                        FindObjectOfType<GameManager>().AddFunds(-100);
+                                        GameManager gm = FindObjectOfType<GameManager>();
+                                        gm.AddFunds(-100);
+                                        List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
+                                        for (int i = 0; i < gm.allFacilities.Count; i++)
+                                        {
+                                            tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
+                                        }
+                                        RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
                                     }
                                     this.state = CardState.CardInPlay;
                                     this.gameObject.GetComponentInParent<slippy>().enabled = false;
@@ -150,7 +157,14 @@ public class Card : MonoBehaviour, IDropHandler
                                 {
                                     if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
                                     {
-                                        FindObjectOfType<GameManager>().AddFunds(-100);
+                                        GameManager gm = FindObjectOfType<GameManager>();
+                                        gm.AddFunds(-100);
+                                        List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
+                                        for (int i = 0; i < gm.allFacilities.Count; i++)
+                                        {
+                                            tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
+                                        }
+                                        RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
                                     }
                                     this.state = CardState.CardInPlay;
                                     this.gameObject.GetComponentInParent<slippy>().enabled = false;

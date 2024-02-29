@@ -57,6 +57,31 @@ public class RGNetworkPlayerList : NetworkBehaviour
         isUpdated = true;
     }
 
+    public void AskUpdateFacilities(List<FacilityV3Info> facilities) // Called by the client who wants to update
+    {
+        CmdUpdateFacilities(facilities);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateFacilities(List<FacilityV3Info> facilities) // Server receives the updated info
+    {
+        RpcUpdateFacilities(facilities);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateFacilities(List<FacilityV3Info> facilities) // Update the info to clients
+    {
+        if (FindObjectOfType<GameManager>() != null)
+        {
+            GameManager gm = FindObjectOfType<GameManager>();
+            for(int i = 0; i < gm.allFacilities.Count; i++)
+            {
+                gm.allFacilities[i].GetComponent<FacilityV3>().UpdateFacilityData(facilities[i]);
+            }
+
+        }
+    }
+
     public void AddPlayer(int id, int teamID)
     {
         if (!isServer) return;

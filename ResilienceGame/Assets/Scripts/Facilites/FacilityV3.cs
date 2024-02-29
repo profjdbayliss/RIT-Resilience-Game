@@ -6,6 +6,39 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
+public class FacilityV3Info
+{
+    public int state; // Need Sync
+
+    public int facID; // Need Sync
+
+    public bool isDown; // Need Sync
+
+    public int feedback; // Need Sync
+    public int hardness; // Need Sync
+    public int maintenance; // Need Sync
+
+    //internal dependencies
+    //treat these as a scale 1-10
+    public float workers; // Need Sync
+    public float it_level; // Need Sync
+    public float ot_level; // Need Sync
+    public float phys_security; // Need Sync
+    public float funding; // Need Sync
+
+    //float percentages
+    //external dependencies
+    public float electricity; // Need Sync
+    public float water; // Need Sync
+    public float fuel; // Need Sync
+    public float communications; // Need Sync
+    public float commodities; // Need Sync
+    public float health; // Need Sync
+    public float security; // Need Sync
+    public float public_goods; // Need Sync
+    public float city_resource; // Need Sync
+}
+
 public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 
@@ -680,5 +713,72 @@ public class FacilityV3 : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             Funding_img.color = Color.red;
         }
         //////////////////////////////////////////////
+    }
+
+    public void UpdateFacilityData(FacilityV3Info data)
+    {
+        state = (FacilityState)data.state; // Need Sync
+
+        facID = data.facID; // Need Sync
+        isDown = data.isDown; // Need Sync
+
+        feedback = data.feedback; // Need Sync
+        hardness = data.hardness; // Need Sync
+        maintenance = data.maintenance; // Need Sync
+
+    //internal dependencies
+    //treat these as a scale 1-10
+        workers = data.workers; // Need Sync
+        it_level = data.it_level; // Need Sync
+        ot_level = data.ot_level; // Need Sync
+        phys_security = data.phys_security; // Need Sync
+        funding = data.funding; // Need Sync
+
+        //float percentages
+        //external dependencies
+        electricity = data.electricity; // Need Sync
+        water = data.water; // Need Sync
+        fuel = data.fuel; // Need Sync
+        communications = data.communications; // Need Sync
+        commodities = data.commodities; // Need Sync
+        health = data.health; // Need Sync
+        security = data.security; // Need Sync
+        public_goods = data.public_goods; // Need Sync
+        city_resource = data.city_resource; // Need Sync
+    }
+
+    public FacilityV3Info ToFacilityV3Info()
+    {
+        FacilityV3Info info = new FacilityV3Info();
+        info.state = (int)state; // Need Sync
+
+        info.facID = facID; // Need Sync
+        info.isDown = isDown; // Need Sync
+
+        info.feedback = feedback; // Need Sync
+        info.hardness = hardness; // Need Sync
+        info.maintenance = maintenance; // Need Sync
+
+        //internal dependencies
+        //treat these as a scale 1-10
+        info.workers = workers; // Need Sync
+        info.it_level = it_level; // Need Sync
+        info.ot_level = ot_level; // Need Sync
+        info.phys_security = phys_security; // Need Sync
+        info.funding = funding; // Need Sync
+
+        //float percentages
+        //external dependencies
+        info.electricity = electricity; // Need Sync
+        info.water = water; // Need Sync
+        info.fuel = fuel; // Need Sync
+        info.communications = communications; // Need Sync
+        info.commodities = commodities; // Need Sync
+        info.health = health; // Need Sync
+        info.security = security; // Need Sync
+        info.public_goods = public_goods; // Need Sync
+        info.city_resource = city_resource; // Need Sync
+
+        return info;
     }
 }
