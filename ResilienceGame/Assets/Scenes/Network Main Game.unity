@@ -21926,6 +21926,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
   cardDropZone: {fileID: 632497712}
   handDropZone: {fileID: 913412235}
+  redoCardRead: 0
 --- !u!1 &1115758217
 GameObject:
   m_ObjectHideFlags: 0
@@ -37175,6 +37176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allPlayers: []
   MalActorObject: {fileID: 0}
+  resPlayer: {fileID: 0}
   maliciousActor: {fileID: 0}
   playerActive: 0
   playerMenu: {fileID: 1994165387}

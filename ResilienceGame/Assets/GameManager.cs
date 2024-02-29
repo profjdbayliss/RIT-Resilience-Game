@@ -110,21 +110,28 @@ public class GameManager : MonoBehaviour, IDragHandler
         //allPlayers = new GameObject[playerList.playerIDs.Count];
         for (int i = 0; i < ntwrkPLayers.Length; i++)
         {
+            //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
             //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
-            if (ntwrkPLayers[i].playerID != 0)
+            if(RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
             {
-                resPlayer = ntwrkPLayers[i].gameObject;
-                Player temp = resPlayer.AddComponent<Player>();
-                temp = ntwrkPLayers[i].GetComponent<Player>();
-                activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
-                fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                //allPlayers[i] = ntwrkPLayers[i].gameObject;
+                if (ntwrkPLayers[i].playerID != 0)
+                {
+                    resPlayer = ntwrkPLayers[i].gameObject;
+                    Player temp = resPlayer.AddComponent<Player>();
+                    temp = ntwrkPLayers[i].GetComponent<Player>();
+                    Debug.LogError(resPlayer.GetComponent<Player>().type);
+                    activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
+                    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+                    //allPlayers[i] = ntwrkPLayers[i].gameObject;
+                }
+                else
+                {
+                    maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
+                }
             }
-            else
-            {
-                maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
-            }
+            
         }
+
     }
 
 
@@ -254,39 +261,39 @@ public class GameManager : MonoBehaviour, IDragHandler
     // Update is called once per frame
     void Update()
     {
-        if (gameStarted)
-        {
-           if(maliciousActor != null)
-            {
-                // Malicious actor
-                playerMenu.SetActive(false);
-                maliciousActorMenu.SetActive(true);
-                yarnSpinner.SetActive(false);
-                fundText.text = "Funds: " + maliciousActor.funds;
-            }
-            else
-            {
-                playerActive = true;
-                // Player
-                playerMenu.SetActive(true);
-                maliciousActorMenu.SetActive(false);
-                yarnSpinner.SetActive(true);
-                //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
-                fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                // If enough of the facilites are down, trigger response from the govt
-            }
-            //if (playerActive)
-            //{
-            //
-            //
-            //
-            //}
-            //else
-            //{
-            //
-            //
-            //}
-        }
+        //if (gameStarted)
+        //{
+        //   if(maliciousActor != null)
+        //    {
+        //        // Malicious actor
+        //        playerMenu.SetActive(false);
+        //        maliciousActorMenu.SetActive(true);
+        //        yarnSpinner.SetActive(false);
+        //        fundText.text = "Funds: " + maliciousActor.funds;
+        //    }
+        //    else
+        //    {
+        //        playerActive = true;
+        //        // Player
+        //        playerMenu.SetActive(true);
+        //        maliciousActorMenu.SetActive(false);
+        //        yarnSpinner.SetActive(true);
+        //        //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
+        //        fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+        //        // If enough of the facilites are down, trigger response from the govt
+        //    }
+        //    //if (playerActive)
+        //    //{
+        //    //
+        //    //
+        //    //
+        //    //}
+        //    //else
+        //    //{
+        //    //
+        //    //
+        //    //}
+        //}
 
     }
 

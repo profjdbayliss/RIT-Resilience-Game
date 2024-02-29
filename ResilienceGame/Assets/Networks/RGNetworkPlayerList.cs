@@ -7,6 +7,7 @@ public class RGNetworkPlayerList : NetworkBehaviour
 {
     public static RGNetworkPlayerList instance;
 
+    public int localPlayerID;
     public List<int> playerIDs = new List<int>();
     public List<int> playerTeamIDs = new List<int>();
     public List<bool> playerReadyFlags = new List<bool>();

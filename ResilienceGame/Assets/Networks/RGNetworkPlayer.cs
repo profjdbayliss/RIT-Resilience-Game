@@ -37,6 +37,7 @@ public class RGNetworkPlayer : NetworkBehaviour
     {
         RGGameExampleUI.localPlayerName = playerName;
         RGGameExampleUI.localPlayerID = playerID;
+        RGNetworkPlayerList.instance.localPlayerID = playerID;
 
         //this.gameObject.AddComponent<Player>();
         //if(playerID < RGNetworkPlayerList.instance.playerTeamIDs.Count)
@@ -57,7 +58,7 @@ public class RGNetworkPlayer : NetworkBehaviour
         }
 
         RGNetworkPlayerList.instance.isUpdated = false;
-
+        //Debug.LogError("PlayerID: " + playerID);
         if (RGNetworkPlayerList.instance.playerTeamIDs[playerID] == 0)
         {
             Player baseRes = GameObject.FindObjectOfType<Player>();
