@@ -317,6 +317,7 @@ public class MaliciousActor : MonoBehaviour
         Debug.Log("Card Play Call" + cardReader.CardCount[cardID] + CardCountList[Deck.IndexOf(cardID)]);
         if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID.Length >= 0) // Check the mal actor has enough action points to play the card, there are still enough of this card to play, and that there is actually a target. Also make sure that the player hasn't already played a card against it this turn
         {
+           funds -= cardReader.CardCost[cardID];
             List<int> cardTargets = new List<int>(); // Format: First Index: Card being played, Every other index is the facilities being targetted by this card
             cardTargets.Add(cardID);
             activeCardIDs.Add(cardID);

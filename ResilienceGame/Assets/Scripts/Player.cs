@@ -295,6 +295,8 @@ public class Player : MonoBehaviour
         List<int> cardsPlayed = new List<int>();
         if (funds - cardReader.CardCost[cardID] >= 0 && CardCountList[Deck.IndexOf(cardID)] >= 0 && targetID.Length >= 0) // Check the mal actor has enough action points to play the card, there are still enough of this card to play, and that there is actually a target. Also make sure that the player hasn't already played a card against it this turn
         {
+            funds -= cardReader.CardCost[cardID];
+
             cardsPlayed.Add(cardID);
             for (int i = 0; i < targetID.Length; i++)
             {
@@ -342,10 +344,15 @@ public class Player : MonoBehaviour
                 else if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Mitigation)
                 {
                     // Still need to implement
+                    funds -= cardReader.CardCost[cardID];
+
                 }
                 else if (cardReader.CardSubType[cardID] == (int)Card.ResCardType.Prevention)
                 {
                     // Still need to implement
+                    funds -= cardReader.CardCost[cardID];
+
+
                 }
                 //// Check to make sure that the CardID's target type is the same as the targetID's facility type && the state of the facility is at least the same (higher number, worse state, as the attack)
                 //if (3 >= cardReader.CardFacilityStateReqs[cardID]) //^^ cardReader.card[cardID] == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().type && cardReader.cardReq(informed,accessed, etc.) == gameManager.allFacilities[targetID].GetComponent<FacilityV3>().state
@@ -355,12 +362,12 @@ public class Player : MonoBehaviour
                 //    targetIDList.Add(targetID[i]);
                 //    cardsPlayed.Add(targetID[i]);
 
-                    //    // Store the information of CardID played and Target Facility ID to be sent over the network
-                    //}
-                    //else
-                    //{
-                    //    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
-                    //}
+                //    // Store the information of CardID played and Target Facility ID to be sent over the network
+                //}
+                //else
+                //{
+                //    Debug.Log("This card can not be played on that facility. Please target a : " + targetID + " type.");// PUT THE TARGET ID Facility type in here.
+                //}
             }
             // Reduce the size of the hand
             handSize--;

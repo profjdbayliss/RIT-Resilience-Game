@@ -599,6 +599,7 @@ public class GameManager : MonoBehaviour, IDragHandler
             {
                 resPlayer.GetComponent<Player>().seletedFacilities.Clear();
             }
+            playerActive = true;
 
         }
         if (maliciousActor != null)
@@ -616,7 +617,7 @@ public class GameManager : MonoBehaviour, IDragHandler
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             yarnSpinner.SetActive(true);
-            Debug.Log("Starting player: " + allPlayers[activePlayerNumber].name);
+            Debug.Log("Starting player: " + resPlayer.name);
             //foreach(GameObject players in allPlayers)
             //{
             //    if(players == allPlayers[activePlayerNumber])
@@ -636,15 +637,15 @@ public class GameManager : MonoBehaviour, IDragHandler
             //        players.SetActive(false);
             //    }
             //}
-            foreach(GameObject card in resPlayer.GetComponent<Player>().HandList)
-            {
-                card.SetActive(false);
-            }
-
-            foreach(GameObject cards in maliciousActor.HandList)
-            {
-                cards.SetActive(false);
-            }
+            //foreach(GameObject card in resPlayer.GetComponent<Player>().HandList)
+            //{
+            //    card.SetActive(false);
+            //}
+            //
+            //foreach(GameObject cards in maliciousActor.HandList)
+            //{
+            //    cards.SetActive(false);
+            //}
             foreach (GameObject fac in allFacilities)
             {
                 //if (fac.GetComponent<FacilityV3>().type == allPlayers[activePlayerNumber].GetComponent<Player>().type)
@@ -691,7 +692,11 @@ public class GameManager : MonoBehaviour, IDragHandler
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
-            MalActorObject.SetActive(false);
+            if(MalActorObject != null)
+            {
+                MalActorObject.SetActive(false);
+
+            }
         }
         else
         {

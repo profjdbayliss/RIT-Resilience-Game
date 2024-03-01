@@ -28,7 +28,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
     // Update is called once per frame
     void Update()
     {
-        if (gameManager.allPlayers.Length > 0)
+        if (gameManager.resPlayer != null)
         {
             // Depending on how healthy the output flow of the facility is, change the color.
             if (gameManager.criticalEnabled && outline.activeSelf)
@@ -90,9 +90,9 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
                 outline.GetComponent<RawImage>().color = Color.cyan;
 
             }
-            else if ((maliciousActor.gameObject.activeSelf))
+            else if ((gameManager.maliciousActor != null)) // gameManager.maliciousActor.gameObject.activeSelf
             {
-                if ((maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+                if ((gameManager.maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
                 {
                     outline.GetComponent<RawImage>().color = Color.magenta;
                 }
@@ -117,11 +117,11 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
             }
         }
-        else if (maliciousActor != null)
+        else if (gameManager.maliciousActor != null)
         {
-            if ((maliciousActor.gameObject.activeSelf))
+            if ((gameManager.maliciousActor.gameObject.activeSelf))
             {
-                if ((maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+                if ((gameManager.maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
                 {
                     outline.GetComponent<RawImage>().color = Color.magenta;
                 }
@@ -180,15 +180,15 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
             }
             else
             {
-                if(maliciousActor.targetFacilities.Contains(this.gameObject) == false)
+                if(gameManager.maliciousActor.targetFacilities.Contains(this.gameObject) == false)
                 {
-                    maliciousActor.targetFacilities.Add(this.gameObject);
+                    gameManager.maliciousActor.targetFacilities.Add(this.gameObject);
 
                 }
                 else
                 {
                     outline.SetActive(false);
-                    maliciousActor.targetFacilities.Remove(this.gameObject);
+                    gameManager.maliciousActor.targetFacilities.Remove(this.gameObject);
                 }
                 //if (maliciousActor.targetFacility == null)
                 //{
