@@ -685,13 +685,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0164fa3f67e3c844b4657610799a7ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 0
+  type: 1
   title: 
   description: 
   impact: 
-  cost: 0
   innerTexts: {fileID: 5488460805215900739}
-  costText: {fileID: 1326201496797007914}
   img: {fileID: 0}
 --- !u!1 &5095766209116527554
 GameObject:

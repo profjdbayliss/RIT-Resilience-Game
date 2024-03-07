@@ -175,7 +175,7 @@ public class MaliciousActor : MonoBehaviour
                 }
                 else if (tempRaws[i].name == "Background")
                 {
-                    tempRaws[i].color = new Color(1.0f, 0.5801887f, 0.5801887f, 1.0f);
+                    //tempRaws[i].color = new Color(1.0f, 0.5801887f, 0.5801887f, 1.0f);
                     // Change this based off of what type of card it is (either recon, initial access, or impact)
                     //switch (tempCard.malCardType)
                     //{

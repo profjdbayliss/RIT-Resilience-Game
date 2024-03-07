@@ -21923,7 +21923,7 @@ MonoBehaviour:
   activeCardIDs: 
   handSize: 0
   maxHandSize: 0
-  cardPrefab: {fileID: 4414296153637361319, guid: 8ab5ba09ab10a0a4987bed9214caeafd, type: 3}
+  cardPrefab: {fileID: 4414296153637361319, guid: 1d2415a2587148c46b6da6a63fa33432, type: 3}
   cardDropZone: {fileID: 632497712}
   handDropZone: {fileID: 913412235}
   redoCardRead: 0
@@ -22262,7 +22262,7 @@ MonoBehaviour:
   activeCardIDs: 
   handSize: 0
   maxHandSize: 5
-  cardPrefab: {fileID: 4414296153637361319, guid: a2c3476d28b0c1044933890958b65f85, type: 3}
+  cardPrefab: {fileID: 4414296153637361319, guid: 51d7bb6c891606b47917ad3e2a6c1a3b, type: 3}
   cardDropZone: {fileID: 180208928}
   handDropZone: {fileID: 2036154772}
   map: {fileID: 26810534}

@@ -232,7 +232,7 @@ public class Player : MonoBehaviour
                 }
                 else if(tempRaws[i].name == "Background")
                 {
-                    tempRaws[i].color = new Color(0.8067818f, 0.8568867f, 0.9245283f, 1.0f);
+                    //tempRaws[i].color = new Color(0.8067818f, 0.8568867f, 0.9245283f, 1.0f);
                 }
             }
             TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>();
