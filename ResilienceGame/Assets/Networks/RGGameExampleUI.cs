@@ -43,7 +43,7 @@ public class RGGameExampleUI : NetworkBehaviour
             card.GetComponent<Image>().color = Color.red;
         }
         localPlayerTeamID = 0;
-        
+        turn = 0;
     }
 
     public override void OnStartClient()

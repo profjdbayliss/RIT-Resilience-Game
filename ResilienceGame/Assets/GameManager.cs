@@ -6,6 +6,8 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Unity.VectorGraphics;
+using UnityEngine.SceneManagement;
+using Mirror;
 
 public class GameManager : MonoBehaviour, IDragHandler
 {
@@ -41,6 +43,9 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public GameObject maliciousPlayerEndMenu;
     public GameObject resilientPlayerEndMenu;
+
+    public GameObject endGameCanvas;
+    public TMP_Text endGameText;
 
     // Utilize if you want to have a set number of facilities and have it be toggled on and off
     public Toggle policeToggle;
@@ -1052,5 +1057,43 @@ public class GameManager : MonoBehaviour, IDragHandler
             }
 
         }
+    }
+
+    public void ShowEndGameCanvas(int gameState)
+    {
+        endGameCanvas.SetActive(true);
+        if(gameState == 1)
+        {
+            endGameText.text = "Malicious Player Win";
+        }
+        else if(gameState == 2)
+        {
+            endGameText.text = "Resilience Player(s) Win";
+        }
+    }
+
+    public void BackToMenu()
+    {
+
+        if (NetworkServer.active && NetworkClient.isConnected)
+        {
+            NetworkManager.singleton.StopHost();
+        }
+        else if (NetworkServer.active)
+        {
+            NetworkManager.singleton.StopServer();
+        }
+        else if (NetworkClient.isConnected)
+        {
+            NetworkManager.singleton.StopClient();
+        }
+        Destroy(RGNetworkManager.singleton.gameObject);
+       // SceneManager.LoadScene(0);
+
+    }
+
+    public void TestEndGame()
+    {
+        RGNetworkPlayerList.instance.CmdEndGame(2);
     }
 }

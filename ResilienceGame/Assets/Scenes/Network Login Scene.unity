@@ -2739,7 +2739,7 @@ MonoBehaviour:
   playerListPrefab: {fileID: 4942807824831339288, guid: 8973b49dc5494744299fb38eb03854c4, type: 3}
   cardReader: {fileID: 2107780629}
   textAtlas: {fileID: 2107780630}
-  atlasMaker: {fileID: 2107780630}
+  atlasMaker: {fileID: 0}
 --- !u!114 &2107780629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2776,7 +2776,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mDirectoryName: SamTemp
   mOutputFileName: ../atlas.png
-  mReader: {fileID: 2107780629}
+  mReader: {fileID: 0}
 --- !u!1 &2143458411
 GameObject:
   m_ObjectHideFlags: 0

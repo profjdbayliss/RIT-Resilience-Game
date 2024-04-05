@@ -15,6 +15,7 @@ public class RGNetworkPlayerList : NetworkBehaviour
     public List<List<int>> playerCardCounts = new List<List<int>>();
 
     public bool isUpdated = false;
+    public int gameState = 0; // 0 = ongoing, 1 = red win, 2 = blue win
 
     private void Awake()
     {
@@ -27,6 +28,20 @@ public class RGNetworkPlayerList : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdEndGame(int gameState)
+    {
+        RpcEndGame(gameState);
+    }
+
+    [ClientRpc]
+    public void RpcEndGame(int gameState)
+    {
+        this.gameState = gameState;
+        GameManager gm = FindObjectOfType<GameManager>();
+        gm.ShowEndGameCanvas(gameState);
     }
 
     [Command(requiresAuthority = false)]
