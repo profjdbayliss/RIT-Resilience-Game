@@ -302,6 +302,14 @@ public class MaliciousActor : MonoBehaviour
             tempCardObj.transform.position = tempPos2;
             tempCardObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
             tempCardObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
+            //Add target count into impact description of the card
+            foreach (var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
+            {
+                if (item.gameObject.name.Contains("Impact"))
+                {
+                    item.text = "Target Count: " + tempCard.targetCount;
+                }
+            }
             HandList.Add(tempCardObj);
         }
         else
@@ -406,7 +414,7 @@ public class MaliciousActor : MonoBehaviour
                 tempTargets[i] = targetFacilities[i].GetComponent<FacilityV3>().facID;
             }
             PlayCard(cardID, tempTargets);
-            targetFacilities.Clear(); // After every successful run, clear the list
+            //targetFacilities.Clear(); // After every successful run, clear the list
             return true;
         }
         else if(targetFacilities.Count > 0 && targetFacilities.Count == cardReader.CardTargetCount[cardID]) 
@@ -434,7 +442,7 @@ public class MaliciousActor : MonoBehaviour
             }
             Debug.Log("No overlap " + tempTargets.Length);
             PlayCard(cardID, tempTargets);
-            targetFacilities.Clear(); // After every successful run, clear the list
+            //targetFacilities.Clear(); // After every successful run, clear the list
             return true;
 
         }

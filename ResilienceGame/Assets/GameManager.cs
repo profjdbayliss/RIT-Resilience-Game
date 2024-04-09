@@ -1064,11 +1064,11 @@ public class GameManager : MonoBehaviour, IDragHandler
         endGameCanvas.SetActive(true);
         if(gameState == 1)
         {
-            endGameText.text = "Malicious Player Win";
+            endGameText.text = "One of the facilities is down.\nMalicious Player Win";
         }
         else if(gameState == 2)
         {
-            endGameText.text = "Resilience Player(s) Win";
+            endGameText.text = "Out of time.\nResilience Player(s) Win";
         }
     }
 

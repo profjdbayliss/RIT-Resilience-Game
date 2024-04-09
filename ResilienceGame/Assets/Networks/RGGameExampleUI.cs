@@ -30,6 +30,7 @@ public class RGGameExampleUI : NetworkBehaviour
     private int teamNum = 2; // The number of teams
 
     public int turn = 0; //The player whose id = turn will play this turn. turn will cycle between 0 to # of player.
+    public int totalTurn = 0;
 
     string[] red_name = { "System Shutdown", "Disk Wipe", "Ransom", "Phishing", "Brute Force", "Input Capture" };
     string[] blue_name = { "Access Processes", "User Training", "Restrict Web-Based Content", "Pay Ransom", "Data Backup", "User Acount Management" };
@@ -44,6 +45,7 @@ public class RGGameExampleUI : NetworkBehaviour
         }
         localPlayerTeamID = 0;
         turn = 0;
+        totalTurn = 0;
     }
 
     public override void OnStartClient()
@@ -104,18 +106,24 @@ public class RGGameExampleUI : NetworkBehaviour
         {
             playerList.CleanReadyFlag(); // Clean the isReady flags
             turn += 1; // Update the "turn"
+            totalTurn += 1;
+            if(totalTurn >= 6)
+            {
+                RGNetworkPlayerList.instance.CmdEndGame(2);
+            }
             if (turn >= teamNum)
             {
                 turn = 0;
             }
-            RpcNextTurn(turn); //Update the turn value to the clients
+            RpcNextTurn(turn, totalTurn); //Update the turn value to the clients
         }
     }
 
     [ClientRpc]
-    public void RpcNextTurn(int newTurn) // Rpc functions are called on all the clients (including host)
+    public void RpcNextTurn(int newTurn, int totalTurn) // Rpc functions are called on all the clients (including host)
     {
         turn = newTurn;
+        this.totalTurn = totalTurn;
         if (turn == localPlayerTeamID) // if the current "turn" belongs to the local player's team, enable the local player's UI
         {
             ShowPlayUI(); 

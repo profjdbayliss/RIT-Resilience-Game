@@ -135,7 +135,17 @@ public class Card : MonoBehaviour, IDropHandler
                                     {
                                         GameManager gm = FindObjectOfType<GameManager>();
                                         gm.AddFunds(-100);
+                                        foreach (var facility in this.gameObject.GetComponentInParent<Player>().seletedFacilities)
+                                        {
+                                            facility.GetComponent<FacilityV3>().health += 20;
+                                            if(facility.GetComponent<FacilityV3>().health > 100)
+                                            {
+                                                facility.GetComponent<FacilityV3>().health = 100;
+                                            }
+                                            facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
+                                        }
                                         List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
+                                        Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
                                         for (int i = 0; i < gm.allFacilities.Count; i++)
                                         {
                                             tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
@@ -159,7 +169,18 @@ public class Card : MonoBehaviour, IDropHandler
                                     {
                                         GameManager gm = FindObjectOfType<GameManager>();
                                         gm.AddFunds(-100);
+                                        foreach(var facility in this.gameObject.GetComponentInParent<MaliciousActor>().targetFacilities)
+                                        {
+                                            facility.GetComponent<FacilityV3>().health -= 30;
+                                            if(facility.GetComponent<FacilityV3>().health <= 0)
+                                            {
+                                                RGNetworkPlayerList.instance.CmdEndGame(1);
+                                            }
+                                            facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
+                                        }
+
                                         List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
+                                        Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
                                         for (int i = 0; i < gm.allFacilities.Count; i++)
                                         {
                                             tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());

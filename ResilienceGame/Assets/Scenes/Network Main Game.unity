@@ -471,6 +471,7 @@ MonoBehaviour:
   - {fileID: 2050826592}
   - {fileID: 440667160}
   turn: 0
+  totalTurn: 0
 --- !u!4 &28609806
 Transform:
   m_ObjectHideFlags: 0
@@ -23740,7 +23741,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1184471548
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29467,6 +29468,7 @@ MonoBehaviour:
   - {fileID: 2050826592}
   - {fileID: 440667160}
   turn: 0
+  totalTurn: 0
 --- !u!114 &1535215971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31031,8 +31033,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278190270
+  m_fontColor: {r: 0.745283, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -31055,7 +31057,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 14
   m_fontSizeMax: 18
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535

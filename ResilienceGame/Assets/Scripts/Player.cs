@@ -282,6 +282,14 @@ public class Player : MonoBehaviour
             Vector3 tempPos2 = handDropZone.transform.position;
             handSize++;
             tempCardObj.transform.position = tempPos2;
+            //Add target count into impact description of the card
+            foreach (var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
+            {
+                if (item.gameObject.name.Contains("Impact"))
+                {
+                    item.text = "Target Count: " + tempCard.targetCount;
+                }
+            }
             HandList.Add(tempCardObj);
         }
         else
@@ -412,7 +420,7 @@ public class Player : MonoBehaviour
             }
             Debug.Log("No overlap " + tempTargets.Length);
             PlayCard(cardID, tempTargets);
-            seletedFacilities.Clear(); // After every successful run, clear the list
+            //seletedFacilities.Clear(); // After every successful run, clear the list
             return true;
         }
         else if (seletedFacilities.Count > 0 && seletedFacilities.Count == cardReader.CardTargetCount[cardID]) //  && targetFacilities.Count == cardReader.targetCount[cardID]
@@ -440,7 +448,7 @@ public class Player : MonoBehaviour
             }
             Debug.Log("No overlap " + tempTargets.Length);
             PlayCard(cardID, tempTargets);
-            seletedFacilities.Clear(); // After every successful run, clear the list
+            //seletedFacilities.Clear(); // After every successful run, clear the list
             return true;
 
         }

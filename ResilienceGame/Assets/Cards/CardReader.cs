@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Collections;
 using System.IO;
 using UnityEngine.UI;
+using TMPro;
 using System.Threading.Tasks;
 using System;
 using System.Text;
@@ -511,6 +512,15 @@ public class CardReader : MonoBehaviour
                 //Debug.Log("CARD FRONT: " + tempCardFront);
                 CardFronts[i] = tempCardFront;
                 tempCardObj.SetActive(false);
+
+                //Add target count into impact description of the card
+                foreach(var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
+                {
+                    if (item.gameObject.name.Contains("Impact"))
+                    {
+                        item.text = "Target Count: " + tempCard.targetCount;
+                    }
+                }
 
                 // Add the card to all card list and then based off a switch on the cards type we add it to a list of all resilient, malicious, or global modifier cards.
                 allCards.Add(tempCard);
