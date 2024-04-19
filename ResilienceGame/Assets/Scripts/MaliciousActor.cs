@@ -191,7 +191,7 @@ public class MaliciousActor : MonoBehaviour
                 }
             }
             //tempCardObj.GetComponentInChildren<TextMeshProUGUI>().text = BitConverter.ToString(tempCard.front.title);
-            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
             for (int i = 0; i < tempTexts.Length; i++)
             {
                 if (tempTexts[i].name == "Title Text")
@@ -204,7 +204,7 @@ public class MaliciousActor : MonoBehaviour
                 }
 
             }
-            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
             //TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponent<CardFront>().innerTexts.GetComponentsInChildren<TextMeshProUGUI>();
             for (int i = 0; i < tempInnerText.Length; i++)
             {

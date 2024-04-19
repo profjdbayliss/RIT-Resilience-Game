@@ -17,13 +17,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Network Example.unity
     guid: c97dd75a61a378749bfaa364c6fa5f59
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Network Login Scene.unity
     guid: 14cd8a62bc91c25418aa3e46e7567260
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Network Main Game.unity
     guid: 27a6a516e8dec3e408b2135d355a24c8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Card Editor/Card Viewer.unity
     guid: 91a4392605227234082d7a22d7767e1f
   m_configObjects:

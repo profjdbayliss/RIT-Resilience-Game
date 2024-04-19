@@ -235,7 +235,7 @@ public class Player : MonoBehaviour
                     //tempRaws[i].color = new Color(0.8067818f, 0.8568867f, 0.9245283f, 1.0f);
                 }
             }
-            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
             for (int i = 0; i < tempTexts.Length; i++)
             {
                 if (tempTexts[i].name == "Title Text")
@@ -247,7 +247,8 @@ public class Player : MonoBehaviour
                     tempTexts[i].text = Encoding.ASCII.GetString(tempCard.front.description);
                 }
             }
-            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponent<CardFront>().innerTexts.GetComponentsInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
+            //TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponent<CardFront>().innerTexts.GetComponentsInChildren<TextMeshProUGUI>();
             for (int i = 0; i < tempInnerText.Length; i++)
             {
                 if (tempInnerText[i].name == "Percent Chance Text")
