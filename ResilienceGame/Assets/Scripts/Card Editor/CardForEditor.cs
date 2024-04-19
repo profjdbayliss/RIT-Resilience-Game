@@ -17,16 +17,18 @@ public class CardForEditor
     public string targetType { get; set; }
     public int cardCount { get; set; }
     public string type { get; set; }
+    public string metaData { get; set; }
 
     public CardForEditor()
     {
-        team = "";
+        team = "Red";
         title = "";
         image = "";
         description = "";
         impact = "";
         targetType = "";
         type = "";
+        metaData = "";
     }
 
     public CardForEditor(CardForEditor other)
@@ -45,6 +47,7 @@ public class CardForEditor
         this.targetType = other.targetType;
         this.cardCount = other.cardCount;
         this.type = other.type;
+        this.metaData = other.metaData;
     }
 
     public override string ToString()
@@ -64,6 +67,7 @@ public class CardForEditor
                $"\tTargetType: {targetType},\n" +
                $"\tCardCount: {cardCount},\n" +
                $"\tType: {type}\n" +
+               $"\tType: {metaData}\n" +
                "}";
     }
 }

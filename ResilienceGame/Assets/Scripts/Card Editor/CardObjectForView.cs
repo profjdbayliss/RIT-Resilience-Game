@@ -79,6 +79,9 @@ public class CardObjectForView : MonoBehaviour
 
     Texture2D CropTexture(Texture2D originalTexture, int width, int height)
     {
+        width = Mathf.Min(width, originalTexture.width);
+        height = Mathf.Min(height, originalTexture.height);
+
         int x = (originalTexture.width - width) / 2;
         int y = (originalTexture.height - height) / 2;
 
