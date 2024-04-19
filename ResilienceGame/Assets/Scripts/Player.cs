@@ -258,7 +258,44 @@ public class Player : MonoBehaviour
                 {
                     tempInnerText[i].text = Encoding.ASCII.GetString(tempCard.front.impact);
                 }
+                else if (tempInnerText[i].name == "Spread Text")
+                {
+                    tempInnerText[i].text = "Spread Chance: " + cardReader.CardSpreadChance[Deck[rng]] + "%";
+                }
+                else if (tempInnerText[i].name == "Cost Text")
+                {
+                    tempInnerText[i].text = cardReader.CardCost[Deck[rng]].ToString();
+                }
+                else if (tempInnerText[i].name == "Target Text")
+                {
+                    if (cardReader.CardTargetCount[Deck[rng]] == int.MaxValue)
+                    {
+                        tempInnerText[i].text = "Target: All ";
+                    }
+                    else
+                    {
+                        tempInnerText[i].text = "Target: " + cardReader.CardTargetCount[Deck[rng]] + " ";
+                    }
+                    switch (cardReader.CardFacilityStateReqs[Deck[rng]])
+                    {
+                        case 0:
+                            tempInnerText[i].text += " uninformed, and unaccessed facilities.";
+                            tempCard.facilityStateRequirements = Card.FacilityStateRequirements.Normal;
+                            break;
 
+                        case 1:
+                            tempInnerText[i].text += Card.FacilityStateRequirements.Informed + " facilities.";
+                            tempCard.facilityStateRequirements = Card.FacilityStateRequirements.Informed;
+                            break;
+
+                        case 2:
+                            tempInnerText[i].text += Card.FacilityStateRequirements.Accessed + " facilities.";
+                            tempCard.facilityStateRequirements = Card.FacilityStateRequirements.Accessed;
+                            break;
+
+                    }
+
+                }
             }
             tempCard.percentSuccess = cardReader.CardPercentChance[Deck[rng]];
             tempCard.percentSpread = cardReader.CardSpreadChance[Deck[rng]];
@@ -282,14 +319,14 @@ public class Player : MonoBehaviour
             Vector3 tempPos2 = handDropZone.transform.position;
             handSize++;
             tempCardObj.transform.position = tempPos2;
-            //Add target count into impact description of the card
-            foreach (var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
-            {
-                if (item.gameObject.name.Contains("Impact"))
-                {
-                    item.text = "Target Count: " + tempCard.targetCount;
-                }
-            }
+            ////Add target count into impact description of the card
+            //foreach (var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
+            //{
+            //    if (item.gameObject.name.Contains("Impact Text"))
+            //    {
+            //        item.text = "Target Count: " + tempCard.targetCount;
+            //    }
+            //}
             HandList.Add(tempCardObj);
         }
         else

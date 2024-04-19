@@ -204,7 +204,8 @@ public class MaliciousActor : MonoBehaviour
                 }
 
             }
-            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponent<CardFront>().innerTexts.GetComponentsInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>();
+            //TextMeshProUGUI[] tempInnerText = tempCardObj.GetComponent<CardFront>().innerTexts.GetComponentsInChildren<TextMeshProUGUI>();
             for (int i = 0; i < tempInnerText.Length; i++)
             {
                 if (tempInnerText[i].name == "Percent Chance Text")
@@ -218,6 +219,10 @@ public class MaliciousActor : MonoBehaviour
                 else if (tempInnerText[i].name == "Spread Text")
                 {
                     tempInnerText[i].text = "Spread Chance: " + cardReader.CardSpreadChance[Deck[rng]] + "%";
+                }
+                else if (tempInnerText[i].name == "Cost Text")
+                {
+                    tempInnerText[i].text = cardReader.CardCost[Deck[rng]].ToString();
                 }
                 else if(tempInnerText[i].name == "Target Text")
                 {
@@ -302,14 +307,14 @@ public class MaliciousActor : MonoBehaviour
             tempCardObj.transform.position = tempPos2;
             tempCardObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
             tempCardObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
-            //Add target count into impact description of the card
-            foreach (var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
-            {
-                if (item.gameObject.name.Contains("Impact"))
-                {
-                    item.text = "Target Count: " + tempCard.targetCount;
-                }
-            }
+            ////Add target count into impact description of the card
+            //foreach (var item in tempCardObj.GetComponentsInChildren<TMP_Text>())
+            //{
+            //    if (item.gameObject.name.Contains("Impact"))
+            //    {
+            //        item.text = "Target Count: " + tempCard.targetCount;
+            //    }
+            //}
             HandList.Add(tempCardObj);
         }
         else
