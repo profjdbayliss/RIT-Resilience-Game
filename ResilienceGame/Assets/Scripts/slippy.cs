@@ -52,6 +52,22 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
             ResetScale();
         }
 
+        //forces a cap in case anything gets too large or small accidentally 
+        if(map.transform.localScale.x > maxScale)
+        {
+            Vector2 tempScale = map.transform.localScale;
+            tempScale.x = maxScale;
+            tempScale.y = maxScale;
+            map.transform.localScale = tempScale;
+        }
+        else if (map.transform.localScale.x < minScale)
+        {
+            Vector2 tempScale = map.transform.localScale;
+            tempScale.x = minScale;
+            tempScale.y = minScale;
+            map.transform.localScale = tempScale;
+        }
+
     }
     public void OnScroll(PointerEventData pointer)
     {
@@ -71,8 +87,6 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
                 tempScale.y = maxScale;
                 map.transform.localScale = tempScale;
             }
-
-
         }
         else
         {
@@ -90,7 +104,6 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
                 tempScale.y = minScale;
                 map.transform.localScale = tempScale;
             }
-
         }
     }
 
