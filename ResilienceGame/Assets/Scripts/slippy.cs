@@ -18,6 +18,8 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 
     public float minScale;
 
+    public Vector2 originalScale;
+
     public InputAction resetScale;
 
     public PlayerInput playerInput;
@@ -35,7 +37,7 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
                 resetScale = playerInput.actions["Reset Scale"];
             }
         }
-
+        originalScale = map.transform.localScale;
         //if(this.gameObject.GetComponentInParent<Player>().isActiveAndEnabled == false && this.gameObject.GetComponentInParent<MaliciousActor>().isActiveAndEnabled == false)
         //{
         //    resetScale = playerInput.actions["Reset Scale"];
@@ -131,6 +133,6 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 
     public void ResetScale()
     {
-        map.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        map.transform.localScale = originalScale;
     }
 }
