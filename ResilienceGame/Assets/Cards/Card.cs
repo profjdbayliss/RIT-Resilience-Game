@@ -205,12 +205,13 @@ public class Card : MonoBehaviour, IDropHandler
                             {
                                 this.state = CardState.CardDrawn;
                                 this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                                this.gameObject.GetComponentInParent<slippy>().ResetScale();
+                               this.gameObject.GetComponentInParent<slippy>().ResetScale();
                             }
                             else if (this.teamID == 1)
                             {
                                 this.state = CardState.CardDrawn;
                                 this.gameObject.GetComponentInParent<slippy>().enabled = true;
+                               
                                 this.gameObject.GetComponentInParent<slippy>().ResetScale();
                             }
                         }
@@ -248,7 +249,7 @@ public class Card : MonoBehaviour, IDropHandler
                     {
                         this.state = CardState.CardDrawn;
                         this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                        this.gameObject.GetComponentInParent<slippy>().ResetScale();
+                      this.gameObject.GetComponentInParent<slippy>().ResetScale();
 
                     }
                 }
@@ -261,14 +262,14 @@ public class Card : MonoBehaviour, IDropHandler
                 {
                     this.state = CardState.CardDrawn;
                     this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                    this.gameObject.GetComponentInParent<slippy>().ResetScale();
+                   this.gameObject.GetComponentInParent<slippy>().ResetScale();
 
                 }
                 else if (this.teamID == 1)
                 {
                     this.state = CardState.CardDrawn;
                     this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                    this.gameObject.GetComponentInParent<slippy>().ResetScale();
+                   this.gameObject.GetComponentInParent<slippy>().ResetScale();
 
                 }
             }

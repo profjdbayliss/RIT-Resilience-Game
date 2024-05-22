@@ -18,7 +18,7 @@ public class RGNetworkPlayer : NetworkBehaviour
     //[SyncVar] public GameObject cardHandLoc;
     //[SyncVar] public List<int> rgDeck;
     //[SyncVar] public List<int> rgCardCount;
-    public GameObject centralMap;
+    public GameObject canvas;
     public GameObject cardDrop;
     public GameObject cardHandLoc;
     public List<int> rgDeck;
@@ -74,9 +74,9 @@ public class RGNetworkPlayer : NetworkBehaviour
             malActor.CardCountList = baseMal.CardCountList;
             malActor.cardReader = baseMal.cardReader;
             malActor.cardDropZone = baseMal.cardDropZone;
-            baseMal.cardDropZone.transform.parent = malActor.transform;
+            baseMal.cardDropZone.transform.SetParent(malActor.transform, true);
             malActor.handDropZone = baseMal.handDropZone;
-            baseMal.handDropZone.transform.parent = malActor.transform;
+            baseMal.handDropZone.transform.SetParent(malActor.transform, true);
             malActor.cardPrefab = baseMal.cardPrefab;
             malActor.HandList = baseMal.HandList;
             malActor.ActiveCardList = baseMal.ActiveCardList;
@@ -87,8 +87,8 @@ public class RGNetworkPlayer : NetworkBehaviour
             malActor.targetIDList = baseMal.targetIDList;
             malActor.gameExampleUI = baseMal.gameExampleUI;
             baseMal.gameObject.SetActive(false);
-            centralMap = GameObject.Find("Central Map");
-            this.gameObject.transform.SetParent(centralMap.transform);
+            canvas = GameObject.Find("Canvas");
+            this.gameObject.transform.SetParent(canvas.transform);
             GameObject obj = GameObject.Find("RGTitle");
             obj.GetComponent<TextMeshProUGUI>().text = "M " + malActor.Deck.Count;
             Debug.Log(this.gameObject.name);
@@ -113,9 +113,9 @@ public class RGNetworkPlayer : NetworkBehaviour
             resActor.CardCountList = baseRes.CardCountList;
             resActor.cardReader = baseRes.cardReader;
             resActor.cardDropZone = baseRes.cardDropZone;
-            baseRes.cardDropZone.transform.parent = resActor.transform;
+            baseRes.cardDropZone.transform.SetParent(resActor.transform,false);
             resActor.handDropZone = baseRes.handDropZone;
-            baseRes.handDropZone.transform.parent = resActor.transform;
+            baseRes.handDropZone.transform.SetParent(resActor.transform, false);
             resActor.cardPrefab = baseRes.cardPrefab;
             resActor.HandList = baseRes.HandList;
             resActor.ActiveCardList = baseRes.ActiveCardList;
@@ -129,8 +129,8 @@ public class RGNetworkPlayer : NetworkBehaviour
             resActor.targetIDList = baseRes.targetIDList;
             //resActor.gameExampleUI = baseRes.gameExampleUI;
             baseRes.gameObject.SetActive(false);
-            centralMap = GameObject.Find("Central Map");
-            this.gameObject.transform.SetParent(centralMap.transform);
+            canvas = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(canvas.transform);
             GameObject obj = GameObject.Find("RGTitle");
             obj.GetComponent<TextMeshProUGUI>().text = "R " + resActor.Deck.Count;
             //this.syncDirection = SyncDirection.ClientToServer;

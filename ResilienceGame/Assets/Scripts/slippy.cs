@@ -62,13 +62,13 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
             tempScale.y = maxScale;
             map.transform.localScale = tempScale;
         }
-        else if (map.transform.localScale.x < minScale)
-        {
-            Vector2 tempScale = map.transform.localScale;
-            tempScale.x = minScale;
-            tempScale.y = minScale;
-            map.transform.localScale = tempScale;
-        }
+        //else if (map.transform.localScale.x < minScale)
+        //{
+        //    Vector2 tempScale = map.transform.localScale;
+        //    tempScale.x = minScale;
+        //    tempScale.y = minScale;
+        //    map.transform.localScale = tempScale;
+        //}
 
     }
     public void OnScroll(PointerEventData pointer)
@@ -133,6 +133,10 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 
     public void ResetScale()
     {
-        map.transform.localScale = originalScale;
+        Transform parent = this.gameObject.transform.parent;
+        this.gameObject.transform.SetParent(null,true);
+        map.transform.localScale = new Vector2(1,1);
+        map.transform.SetParent(parent, true);
+        //map.transform.localScale = originalScale;
     }
 }

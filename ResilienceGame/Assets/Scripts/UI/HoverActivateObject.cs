@@ -34,7 +34,6 @@ public class HoverActivateObject : MonoBehaviour, IPointerEnterHandler, IPointer
         Vector2 tempScale = targetObject.transform.parent.localScale;
         tempScale.x = (float)(targetObject.transform.parent.localScale.x + scaleAmount);
         tempScale.y = (float)(targetObject.transform.parent.localScale.y + scaleAmount);
-        Debug.Log("scaling from: " + targetObject.transform.parent.localScale + "to " + tempScale);
         targetObject.transform.parent.localScale = tempScale;
         isScaled = !isScaled;
 
