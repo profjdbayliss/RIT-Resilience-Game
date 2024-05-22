@@ -38,7 +38,8 @@ public class RGNetworkPlayer : NetworkBehaviour
         RGGameExampleUI.localPlayerName = playerName;
         RGGameExampleUI.localPlayerID = playerID;
         RGNetworkPlayerList.instance.localPlayerID = playerID;
-
+        this.gameObject.transform.localScale = new Vector3(2,2,2);
+        Debug.Log("RGNETWORKPLAYER SIZE:"+this.gameObject.transform.localScale);
         //this.gameObject.AddComponent<Player>();
         //if(playerID < RGNetworkPlayerList.instance.playerTeamIDs.Count)
         //{
@@ -66,6 +67,12 @@ public class RGNetworkPlayer : NetworkBehaviour
             MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
             baseMal.DelayedStart();
             malActor = this.gameObject.AddComponent<MaliciousActor>();
+
+
+            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            baseMal.handDropZone.transform.localScale = new Vector3(1,1,1);
+            Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
+
             //malActor = baseMal;
             malActor.Deck = baseMal.Deck;
             rgDeck = baseMal.Deck;
@@ -86,11 +93,19 @@ public class RGNetworkPlayer : NetworkBehaviour
             malActor.targetFacilities = baseMal.targetFacilities;
             malActor.targetIDList = baseMal.targetIDList;
             malActor.gameExampleUI = baseMal.gameExampleUI;
+
             baseMal.gameObject.SetActive(false);
             canvas = GameObject.Find("Canvas");
             this.gameObject.transform.SetParent(canvas.transform);
             GameObject obj = GameObject.Find("RGTitle");
             obj.GetComponent<TextMeshProUGUI>().text = "M " + malActor.Deck.Count;
+
+            //forcing the networkplayer to be 1 by 1 by 1 to make future calculations easier
+            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            malActor.handDropZone.transform.localScale = new Vector3(1,1,1);
+            baseMal.handDropZone.transform.localScale = new Vector3(1,1,1);
+            Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
+
             Debug.Log(this.gameObject.name);
             Debug.Log(malActor.Deck.Count);
             //malActor.DelayedStart();

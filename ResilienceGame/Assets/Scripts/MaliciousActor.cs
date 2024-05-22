@@ -79,7 +79,8 @@ public class MaliciousActor : MonoBehaviour
         cardReader = GameObject.FindObjectOfType<CardReader>();
         manager = GameObject.FindObjectOfType<GameManager>();
 
-        //Debug.Log("TEST MAL START");
+        handDropZone = GameObject.Find("Mal Hand Location");
+
         for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)(Card.Type.Malicious)) // Uncomment to build the deck
@@ -300,7 +301,7 @@ public class MaliciousActor : MonoBehaviour
             tempCard.state = Card.CardState.CardDrawn;
             Vector3 tempPos = tempCardObj.transform.position;
             tempCardObj.transform.position = tempPos;
-            tempCardObj.transform.SetParent(handDropZone.transform, false);
+            tempCardObj.transform.SetParent(handDropZone.transform, true);
             Vector3 tempPos2 = handDropZone.transform.position;
         
             handSize++;

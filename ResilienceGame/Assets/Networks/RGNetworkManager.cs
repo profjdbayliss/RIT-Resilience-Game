@@ -17,6 +17,7 @@ public class RGNetworkManager : NetworkManager
         base.OnStartServer();
 
         GameObject obj = Instantiate(playerListPrefab);
+        playerListPrefab.transform.localScale = Vector3.one;
         NetworkServer.Spawn(obj);
         //cardReader.CSVRead();
     }

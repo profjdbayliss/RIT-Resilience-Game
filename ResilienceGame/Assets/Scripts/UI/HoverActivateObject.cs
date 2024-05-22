@@ -32,9 +32,13 @@ public class HoverActivateObject : MonoBehaviour, IPointerEnterHandler, IPointer
     public void ScaleCard(float scaleAmount)
     {
         Vector2 tempScale = targetObject.transform.parent.localScale;
+        Vector2 offset = targetObject.transform.parent.localPosition;
         tempScale.x = (float)(targetObject.transform.parent.localScale.x + scaleAmount);
         tempScale.y = (float)(targetObject.transform.parent.localScale.y + scaleAmount);
+        offset.y = offset.y + scaleAmount * 100;
         targetObject.transform.parent.localScale = tempScale;
+        targetObject.transform.parent.localPosition = offset;
+
         isScaled = !isScaled;
 
     }
