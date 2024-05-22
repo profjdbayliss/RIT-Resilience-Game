@@ -382,13 +382,13 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerActive = !playerActive;
 
             DisableAllOutline();
-            resPlayer.GetComponent<Player>().seletedFacilities.Clear();
+            resPlayer.GetComponent<Player>().facilitiesActedUpon.Clear();
             //foreach(GameObject obj in allPlayers)
             //{
             //    obj.GetComponent<Player>().seletedFacilities.Clear();
             //}
             //allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacility = null;
-            maliciousActor.targetFacilities.Clear();
+            maliciousActor.facilitiesActedUpon.Clear();
             maliciousActor.targetIDList.Clear();
             turnCount += 0.5f;
             if (playerActive)
@@ -414,7 +414,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                 }
                 foreach (GameObject obj in allPlayers)
                 {
-                    obj.GetComponent<Player>().seletedFacilities.Clear();
+                    obj.GetComponent<Player>().facilitiesActedUpon.Clear();
                 }
                 foreach (GameObject obj in allPlayers)
                 {
@@ -475,7 +475,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                     card.SetActive(true);
                 }
                 maliciousActor.targetIDList.Clear();
-                maliciousActor.targetFacilities.Clear();
+                maliciousActor.facilitiesActedUpon.Clear();
                 maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(true);
                 maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(true);
             }
@@ -600,16 +600,16 @@ public class GameManager : MonoBehaviour, IDragHandler
         //}
         if(resPlayer != null)
         {
-            if(resPlayer.GetComponent<Player>().seletedFacilities != null)
+            if(resPlayer.GetComponent<Player>().facilitiesActedUpon != null)
             {
-                resPlayer.GetComponent<Player>().seletedFacilities.Clear();
+                resPlayer.GetComponent<Player>().facilitiesActedUpon.Clear();
             }
             playerActive = true;
 
         }
         if (maliciousActor != null)
         {
-            maliciousActor.targetFacilities.Clear();
+            maliciousActor.facilitiesActedUpon.Clear();
 
         }
 

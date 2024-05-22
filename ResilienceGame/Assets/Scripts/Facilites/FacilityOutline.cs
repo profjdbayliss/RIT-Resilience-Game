@@ -73,7 +73,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
                 //}
                 //outline.GetComponent<RawImage>().color = new Color(1.0f, 0.8431372549f, 0.0f, 1.0f);
-                if (gameManager.resPlayer.GetComponent<Player>().seletedFacilities.Contains(this.gameObject) == true)
+                if (gameManager.resPlayer.GetComponent<Player>().facilitiesActedUpon.Contains(this.gameObject) == true)
                 //if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacilities.Contains(this.gameObject) == true)
                 {
                     outline.GetComponent<RawImage>().color = Color.cyan;
@@ -84,7 +84,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
 
                 }
             }
-            else if ((gameManager.resPlayer.GetComponent<Player>().seletedFacilities.Contains(this.gameObject) == true) && (gameManager.playerActive))
+            else if ((gameManager.resPlayer.GetComponent<Player>().facilitiesActedUpon.Contains(this.gameObject) == true) && (gameManager.playerActive))
             //else if ((gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacilities.Contains(this.gameObject) == true) && (gameManager.playerActive))
             {
                 outline.GetComponent<RawImage>().color = Color.cyan;
@@ -92,7 +92,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
             }
             else if ((gameManager.maliciousActor != null)) // gameManager.maliciousActor.gameObject.activeSelf
             {
-                if ((gameManager.maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+                if ((gameManager.maliciousActor.facilitiesActedUpon.Contains(this.gameObject)) && (gameManager.playerActive == false))
                 {
                     outline.GetComponent<RawImage>().color = Color.magenta;
                 }
@@ -121,7 +121,7 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
         {
             if ((gameManager.maliciousActor.gameObject.activeSelf))
             {
-                if ((gameManager.maliciousActor.targetFacilities.Contains(this.gameObject)) && (gameManager.playerActive == false))
+                if ((gameManager.maliciousActor.facilitiesActedUpon.Contains(this.gameObject)) && (gameManager.playerActive == false))
                 {
                     outline.GetComponent<RawImage>().color = Color.magenta;
                 }
@@ -157,13 +157,13 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
             if (gameManager.playerActive)
             {
                 //if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacilities.Contains(this.gameObject) == false)
-                if (gameManager.resPlayer.GetComponent<Player>().seletedFacilities.Contains(this.gameObject) == false)
+                if (gameManager.resPlayer.GetComponent<Player>().facilitiesActedUpon.Contains(this.gameObject) == false)
                 {
                     //if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().type == this.gameObject.GetComponent<FacilityV3>().type)
                     if (gameManager.resPlayer.GetComponent<Player>().type == this.gameObject.GetComponent<FacilityV3>().type)
                     {
                         //gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacilities.Add(this.gameObject);
-                        gameManager.resPlayer.GetComponent<Player>().seletedFacilities.Add(this.gameObject);
+                        gameManager.resPlayer.GetComponent<Player>().facilitiesActedUpon.Add(this.gameObject);
 
                     }
                     //if (gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().type == this.gameObject.GetComponent<FacilityV3>().type || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityGeneration || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Water || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Transportation || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.ElectricityDistribution || this.gameObject.GetComponent<FacilityV3>().type == FacilityV3.Type.Communications)
@@ -174,21 +174,21 @@ public class FacilityOutline : MonoBehaviour, IPointerClickHandler
                 else
                 {
                     outline.SetActive(false);
-                    gameManager.resPlayer.GetComponent<Player>().seletedFacilities.Remove(this.gameObject);
+                    gameManager.resPlayer.GetComponent<Player>().facilitiesActedUpon.Remove(this.gameObject);
                     //gameManager.allPlayers[gameManager.activePlayerNumber].GetComponent<Player>().seletedFacilities.Remove(this.gameObject);
                 }
             }
             else
             {
-                if(gameManager.maliciousActor.targetFacilities.Contains(this.gameObject) == false)
+                if(gameManager.maliciousActor.facilitiesActedUpon.Contains(this.gameObject) == false)
                 {
-                    gameManager.maliciousActor.targetFacilities.Add(this.gameObject);
+                    gameManager.maliciousActor.facilitiesActedUpon.Add(this.gameObject);
 
                 }
                 else
                 {
                     outline.SetActive(false);
-                    gameManager.maliciousActor.targetFacilities.Remove(this.gameObject);
+                    gameManager.maliciousActor.facilitiesActedUpon.Remove(this.gameObject);
                 }
                 //if (maliciousActor.targetFacility == null)
                 //{

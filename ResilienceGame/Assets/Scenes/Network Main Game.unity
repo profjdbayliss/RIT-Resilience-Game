@@ -326,6 +326,7 @@ MonoBehaviour:
   tiles: {fileID: 0}
   maxScale: 0
   minScale: 0
+  originalScale: {x: 0, y: 0}
   resetScale:
     m_Name: Reset Scale
     m_Type: 0
@@ -22829,12 +22830,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3c72b9ea8564cb48863d04053039808, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerType: 0
   funds: 1000
-  Facilities: []
-  seletedFacilities: []
-  fundsText: {fileID: 1193838876}
-  type: 10
-  gameManager: {fileID: 2133546051}
+  manager: {fileID: 0}
   cardReader: {fileID: 0}
   Deck: 
   CardCountList: 
@@ -22842,11 +22840,15 @@ MonoBehaviour:
   HandList: []
   ActiveCardList: []
   activeCardIDs: 
-  handSize: 0
-  maxHandSize: 0
+  handSize: 5
+  maxHandSize: 5
   cardPrefab: {fileID: 4414296153637361319, guid: 1d2415a2587148c46b6da6a63fa33432, type: 3}
   cardDropZone: {fileID: 632497712}
   handDropZone: {fileID: 913412235}
+  Facilities: []
+  seletedFacilities: []
+  fundsText: {fileID: 1193838876}
+  type: 10
   redoCardRead: 0
 --- !u!1 &1115758217
 GameObject:
@@ -23168,12 +23170,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf88332d978d0c45894fe099bd85dc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  funds: 0
-  targetFacilities: []
-  ransomwaredFacility: {fileID: 0}
+  playerType: 1
+  funds: 750
   manager: {fileID: 2133546051}
-  ransomwareTurn: 0
-  randomEventChance: 0
   cardReader: {fileID: 0}
   Deck: 
   CardCountList: 
@@ -23186,8 +23185,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 4414296153637361319, guid: 51d7bb6c891606b47917ad3e2a6c1a3b, type: 3}
   cardDropZone: {fileID: 180208928}
   handDropZone: {fileID: 2036154772}
-  map: {fileID: 26810534}
-  gameExampleUI: {fileID: 1535215970}
+  targetFacilities: []
 --- !u!1 &1126549848
 GameObject:
   m_ObjectHideFlags: 0

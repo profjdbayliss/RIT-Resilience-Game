@@ -135,7 +135,7 @@ public class Card : MonoBehaviour, IDropHandler
                                     {
                                         GameManager gm = FindObjectOfType<GameManager>();
                                         gm.AddFunds(-100);
-                                        foreach (var facility in this.gameObject.GetComponentInParent<Player>().seletedFacilities)
+                                        foreach (var facility in this.gameObject.GetComponentInParent<Player>().facilitiesActedUpon)
                                         {
                                             facility.GetComponent<FacilityV3>().health += 20;
                                             if(facility.GetComponent<FacilityV3>().health > 100)
@@ -169,7 +169,7 @@ public class Card : MonoBehaviour, IDropHandler
                                     {
                                         GameManager gm = FindObjectOfType<GameManager>();
                                         gm.AddFunds(-100);
-                                        foreach(var facility in this.gameObject.GetComponentInParent<MaliciousActor>().targetFacilities)
+                                        foreach(var facility in this.gameObject.GetComponentInParent<MaliciousActor>().facilitiesActedUpon)
                                         {
                                             facility.GetComponent<FacilityV3>().health -= 30;
                                             if(facility.GetComponent<FacilityV3>().health <= 0)

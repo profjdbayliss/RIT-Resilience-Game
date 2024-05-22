@@ -64,9 +64,10 @@ public class RGNetworkPlayer : NetworkBehaviour
             Player baseRes = GameObject.FindObjectOfType<Player>();
             baseRes.gameObject.SetActive(false);
             MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
-            baseMal.DelayedStart();
+            baseMal.InitializeCards();
             malActor = this.gameObject.AddComponent<MaliciousActor>();
             //malActor = baseMal;
+            malActor.funds = baseMal.funds;
             malActor.Deck = baseMal.Deck;
             rgDeck = baseMal.Deck;
             malActor.Deck = rgDeck;
@@ -83,9 +84,9 @@ public class RGNetworkPlayer : NetworkBehaviour
             malActor.activeCardIDs = baseMal.activeCardIDs;
             malActor.manager = baseMal.manager;
             malActor.manager.maliciousActor = malActor;
-            malActor.targetFacilities = baseMal.targetFacilities;
+            malActor.facilitiesActedUpon = baseMal.facilitiesActedUpon;
             malActor.targetIDList = baseMal.targetIDList;
-            malActor.gameExampleUI = baseMal.gameExampleUI;
+            //malActor.gameExampleUI = baseMal.gameExampleUI;
             baseMal.gameObject.SetActive(false);
             centralMap = GameObject.Find("Central Map");
             this.gameObject.transform.SetParent(centralMap.transform);
@@ -102,9 +103,11 @@ public class RGNetworkPlayer : NetworkBehaviour
             baseMal.gameObject.SetActive(false);
 
             Player baseRes = GameObject.FindObjectOfType<Player>();
-            baseRes.DelayedStart();
+            baseRes.InitializeCards();
+            baseRes.InitializeFacilities();
             resActor = this.gameObject.AddComponent<Player>();
             //malActor = baseMal;
+            resActor.funds = baseRes.funds;
             resActor.Deck = baseRes.Deck;
             resActor.type = (FacilityV3.Type)(playerID - 1);
             rgDeck = baseRes.Deck;
@@ -120,12 +123,12 @@ public class RGNetworkPlayer : NetworkBehaviour
             resActor.HandList = baseRes.HandList;
             resActor.ActiveCardList = baseRes.ActiveCardList;
             resActor.activeCardIDs = baseRes.activeCardIDs;
-            resActor.gameManager = baseRes.gameManager;
-            resActor.gameManager.resPlayer = resActor.gameObject;
+            resActor.manager = baseRes.manager;
+            resActor.manager.resPlayer = resActor.gameObject;
             //resActor.gameManager.allPlayers[0] = resActor.gameObject;
             //resActor.gameManager. = resActor;
             resActor.Facilities = baseRes.Facilities;
-            resActor.seletedFacilities = baseRes.seletedFacilities;
+            resActor.facilitiesActedUpon = baseRes.facilitiesActedUpon;
             resActor.targetIDList = baseRes.targetIDList;
             //resActor.gameExampleUI = baseRes.gameExampleUI;
             baseRes.gameObject.SetActive(false);
