@@ -93,23 +93,23 @@ public class Card : MonoBehaviour, IDropHandler
         //reader = GameObject.Find("Card Reader").GetComponent<CardReader>();
         handDropZone = this.gameObject.transform.parent.gameObject;
         originalParent = this.gameObject.transform.parent.transform.parent.gameObject;
-        
+
         gameCanvas = GameObject.Find("Central Map");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void OnDrop(PointerEventData eventData)
     {
-        if(cardDropZone != null && this.state == CardState.CardDrawn) // Make sure that the card actually has a reference to the card drop location where it will be dropped and that it is currently in the players hand
+        if (cardDropZone != null && this.state == CardState.CardDrawn) // Make sure that the card actually has a reference to the card drop location where it will be dropped and that it is currently in the players hand
         {
             // Get the bounds of the card Drop Zone
             Vector2 cardDropMin = new Vector2();
-            cardDropMin.x = cardDropZone.GetComponent<RectTransform>().localPosition.x - (cardDropZone.GetComponent<RectTransform>().rect.width/2);
+            cardDropMin.x = cardDropZone.GetComponent<RectTransform>().localPosition.x - (cardDropZone.GetComponent<RectTransform>().rect.width / 2);
             cardDropMin.y = cardDropZone.GetComponent<RectTransform>().localPosition.y - (cardDropZone.GetComponent<RectTransform>().rect.height / 2);
             Vector2 cardDropMax = new Vector2();
 
@@ -118,161 +118,91 @@ public class Card : MonoBehaviour, IDropHandler
             this.gameObject.transform.SetParent(originalParent.transform, true); // Now set the card's parent to be the player they are attached to instead of the hand zone
 
             // DO a AABB collision test to see if the card is on the card drop
-            if (this.transform.localPosition.x > cardDropMin.x)
+
+            if (this.transform.localPosition.y < cardDropMax.y &&
+               this.transform.localPosition.y > cardDropMin.y &&
+               this.transform.localPosition.x < cardDropMax.x &&
+               this.transform.localPosition.x > cardDropMin.x)
             {
-                if(this.transform.localPosition.x < cardDropMax.x)
+                // check the cards teamID to see which team they belong to so they can call the proper Select facility method to then see if they have met all conditions to play the card
+                if (this.teamID == 0)
                 {
-                    if(this.transform.localPosition.y > cardDropMin.y)
+                    if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
                     {
-                        if(this.transform.localPosition.y < cardDropMax.y)
+                        if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
                         {
-                            // check the cards teamID to see which team they belong to so they can call the proper Select facility method to then see if they have met all conditions to play the card
-                            if (this.teamID == 0)
+                            GameManager gm = FindObjectOfType<GameManager>();
+                            gm.AddFunds(-100);
+                            foreach (var facility in this.gameObject.GetComponentInParent<Player>().facilitiesActedUpon)
                             {
-                                if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
+                                facility.GetComponent<FacilityV3>().health += 20;
+                                if (facility.GetComponent<FacilityV3>().health > 100)
                                 {
-                                    if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
-                                    {
-                                        GameManager gm = FindObjectOfType<GameManager>();
-                                        gm.AddFunds(-100);
-                                        foreach (var facility in this.gameObject.GetComponentInParent<Player>().facilitiesActedUpon)
-                                        {
-                                            facility.GetComponent<FacilityV3>().health += 20;
-                                            if(facility.GetComponent<FacilityV3>().health > 100)
-                                            {
-                                                facility.GetComponent<FacilityV3>().health = 100;
-                                            }
-                                            facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
-                                        }
-                                        List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
-                                        Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
-                                        for (int i = 0; i < gm.allFacilities.Count; i++)
-                                        {
-                                            tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
-                                        }
-                                        RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
-                                    }
-                                    this.state = CardState.CardInPlay;
-                                    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                                    // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
+                                    facility.GetComponent<FacilityV3>().health = 100;
                                 }
-                                else
-                                {
-                                    this.gameObject.transform.SetParent(handDropZone.transform, true);
-                                }
+                                facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
                             }
-                            else if(this.teamID == 1)
+                            List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
+                            Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
+                            for (int i = 0; i < gm.allFacilities.Count; i++)
                             {
-                                if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
-                                {
-                                    if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
-                                    {
-                                        GameManager gm = FindObjectOfType<GameManager>();
-                                        gm.AddFunds(-100);
-                                        foreach(var facility in this.gameObject.GetComponentInParent<MaliciousActor>().facilitiesActedUpon)
-                                        {
-                                            facility.GetComponent<FacilityV3>().health -= 30;
-                                            if(facility.GetComponent<FacilityV3>().health <= 0)
-                                            {
-                                                RGNetworkPlayerList.instance.CmdEndGame(1);
-                                            }
-                                            facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
-                                        }
-
-                                        List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
-                                        Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
-                                        for (int i = 0; i < gm.allFacilities.Count; i++)
-                                        {
-                                            tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
-                                        }
-                                        RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
-                                    }
-                                    this.state = CardState.CardInPlay;
-                                    this.gameObject.GetComponentInParent<slippy>().enabled = false;
-                                }
-                                else
-                                {
-                                    this.gameObject.transform.SetParent(handDropZone.transform, true);
-                                }
-                            } 
-
+                                tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
+                            }
+                            RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
                         }
-                        else
-                        {
-                            // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
-                            this.gameObject.transform.SetParent(handDropZone.transform, false);
-                            if (this.teamID == 0)
-                            {
-                                this.state = CardState.CardDrawn;
-                                this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                                this.gameObject.GetComponentInParent<slippy>().ResetScale();
-                            }
-                            else if (this.teamID == 1)
-                            {
-                                this.state = CardState.CardDrawn;
-                                this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                                this.gameObject.GetComponentInParent<slippy>().ResetScale();
-                            }
-                        }
+                        this.state = CardState.CardInPlay;
+                        this.gameObject.GetComponentInParent<slippy>().enabled = false;
+                        // Set the time the card is to be disposed of by adding the duration of the card to the current turn count
                     }
                     else
                     {
                         this.gameObject.transform.SetParent(handDropZone.transform, false);
-                        if (this.teamID == 0)
-                        {
-                            this.state = CardState.CardDrawn;
-                            this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                            this.gameObject.GetComponentInParent<slippy>().ResetScale();
-
-                        }
-                        else if (this.teamID == 1)
-                        {
-                            this.state = CardState.CardDrawn;
-                            this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                            this.gameObject.GetComponentInParent<slippy>().ResetScale();
-
-                        }
                     }
                 }
-                else
+                else if (this.teamID == 1)
                 {
-                    this.gameObject.transform.SetParent(handDropZone.transform, false);
-                    if (this.teamID == 0)
+                    if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
                     {
-                        this.state = CardState.CardDrawn;
-                        this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                        this.gameObject.GetComponentInParent<slippy>().ResetScale();
+                        if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
+                        {
+                            GameManager gm = FindObjectOfType<GameManager>();
+                            gm.AddFunds(-100);
+                            foreach (var facility in this.gameObject.GetComponentInParent<MaliciousActor>().facilitiesActedUpon)
+                            {
+                                facility.GetComponent<FacilityV3>().health -= 30;
+                                if (facility.GetComponent<FacilityV3>().health <= 0)
+                                {
+                                    RGNetworkPlayerList.instance.CmdEndGame(1);
+                                }
+                                facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
+                            }
 
+                            List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
+                            Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
+                            for (int i = 0; i < gm.allFacilities.Count; i++)
+                            {
+                                tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
+                            }
+                            RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
+                        }
+                        this.state = CardState.CardInPlay;
+                        this.gameObject.GetComponentInParent<slippy>().enabled = false;
+                        this.gameObject.GetComponentInParent<slippy>().ResetScale();
                     }
-                    else if (this.teamID == 1)
+                    else
                     {
-                        this.state = CardState.CardDrawn;
-                        this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                        this.gameObject.GetComponentInParent<slippy>().ResetScale();
-
+                        this.gameObject.transform.SetParent(handDropZone.transform, false);
                     }
                 }
             }
             else
             {
+                // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
                 this.gameObject.transform.SetParent(handDropZone.transform, false);
-
-                if (this.teamID == 0)
-                {
-                    this.state = CardState.CardDrawn;
-                    this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                    this.gameObject.GetComponentInParent<slippy>().ResetScale();
-
-                }
-                else if (this.teamID == 1)
-                {
-                    this.state = CardState.CardDrawn;
-                    this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                    this.gameObject.GetComponentInParent<slippy>().ResetScale();
-
-                }
+                this.state = CardState.CardDrawn;
+                this.gameObject.GetComponentInParent<slippy>().enabled = true;
+                this.gameObject.GetComponentInParent<slippy>().ResetScale();
             }
-
         }
     }
 }
