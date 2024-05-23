@@ -457,9 +457,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9bda8f8195304749b3d7379c3c46822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
   cardHistory: {fileID: 1057171973}
   scrollbar: {fileID: 94218774}
   waitingText: {fileID: 1807259632}
@@ -8017,6 +8014,99 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 387101940}
   m_CullTransparentMesh: 1
+--- !u!1 &388623891
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 388623893}
+  - component: {fileID: 388623892}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &388623892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388623891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8f6d54f3722f524290f07c6e2695f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allPlayers: []
+  MalActorObject: {fileID: 1125198112}
+  resPlayer: {fileID: 1103324003}
+  maliciousActor: {fileID: 0}
+  playerActive: 0
+  playerMenu: {fileID: 0}
+  maliciousActorMenu: {fileID: 0}
+  gameStarted: 0
+  gameCanvas: {fileID: 0}
+  startScreen: {fileID: 1214050761}
+  turnCount: 0
+  fundText: {fileID: 0}
+  activePlayerText: {fileID: 0}
+  yarnSpinner: {fileID: 0}
+  activePlayerColor: {r: 0, g: 0, b: 0, a: 0}
+  continueButton: {fileID: 0}
+  maliciousPlayerEndMenu: {fileID: 0}
+  resilientPlayerEndMenu: {fileID: 0}
+  endGameCanvas: {fileID: 0}
+  endGameText: {fileID: 0}
+  policeToggle: {fileID: 0}
+  hospitalToggle: {fileID: 0}
+  fireDeptToggle: {fileID: 0}
+  elecGenToggle: {fileID: 0}
+  waterToggle: {fileID: 0}
+  commoditiesToggle: {fileID: 0}
+  commToggle: {fileID: 0}
+  elecDistToggle: {fileID: 0}
+  cityHallToggle: {fileID: 0}
+  fuelToggle: {fileID: 0}
+  transportationToggle: {fileID: 0}
+  transportationInputCount: 1
+  policeInputCount: 0
+  hospitalInputCount: 0
+  fireDeptInputCount: 0
+  elecGenInputCount: 1
+  waterInputCount: 1
+  commsInputCount: 1
+  commoditiesInputCount: 0
+  elecDistInputCount: 1
+  fuelInputCount: 1
+  allFacilities: []
+  activePlayerNumber: 0
+  cam: {fileID: 0}
+  map: {fileID: 0}
+  tiles: {fileID: 0}
+  facilityEvents: {fileID: 0}
+  criticalEnabled: 0
+  titlee: {fileID: 0}
+--- !u!4 &388623893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388623891}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &391466728
 GameObject:
   m_ObjectHideFlags: 0
@@ -22845,11 +22935,10 @@ MonoBehaviour:
   cardPrefab: {fileID: 4414296153637361319, guid: 1d2415a2587148c46b6da6a63fa33432, type: 3}
   cardDropZone: {fileID: 632497712}
   handDropZone: {fileID: 913412235}
-  Facilities: []
-  seletedFacilities: []
-  fundsText: {fileID: 1193838876}
-  type: 10
+  facilitiesActedUpon: []
   redoCardRead: 0
+  Facilities: []
+  type: 10
 --- !u!1 &1115758217
 GameObject:
   m_ObjectHideFlags: 0
@@ -23185,7 +23274,10 @@ MonoBehaviour:
   cardPrefab: {fileID: 4414296153637361319, guid: 51d7bb6c891606b47917ad3e2a6c1a3b, type: 3}
   cardDropZone: {fileID: 180208928}
   handDropZone: {fileID: 2036154772}
-  targetFacilities: []
+  facilitiesActedUpon: []
+  redoCardRead: 0
+  Facilities: []
+  type: 0
 --- !u!1 &1126549848
 GameObject:
   m_ObjectHideFlags: 0
@@ -29451,9 +29543,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9bda8f8195304749b3d7379c3c46822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
   cardHistory: {fileID: 1057171973}
   scrollbar: {fileID: 94218774}
   waitingText: {fileID: 1807259632}

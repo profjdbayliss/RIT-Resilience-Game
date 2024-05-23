@@ -148,7 +148,7 @@ public class Card : MonoBehaviour, IDropHandler
                             {
                                 tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
                             }
-                            RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
+                            //RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
                         }
                         this.state = CardState.CardInPlay;
                         this.gameObject.GetComponentInParent<slippy>().enabled = false;
@@ -172,7 +172,7 @@ public class Card : MonoBehaviour, IDropHandler
                                 facility.GetComponent<FacilityV3>().health -= 30;
                                 if (facility.GetComponent<FacilityV3>().health <= 0)
                                 {
-                                    RGNetworkPlayerList.instance.CmdEndGame(1);
+                                    //RGNetworkPlayerList.instance.CmdEndGame(1);
                                 }
                                 facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
                             }
@@ -183,7 +183,7 @@ public class Card : MonoBehaviour, IDropHandler
                             {
                                 tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
                             }
-                            RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
+                            //RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
                         }
                         this.state = CardState.CardInPlay;
                         this.gameObject.GetComponentInParent<slippy>().enabled = false;

@@ -8,18 +8,33 @@ using UnityEngine.EventSystems;
 using Unity.VectorGraphics;
 using UnityEngine.SceneManagement;
 using Mirror;
+using System;
 
-public class GameManager : MonoBehaviour, IDragHandler
+public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
 {
+    // has everything been set?
+    bool isInit = false;
+
+    // keep track of all game messages
+    MessageQueue mMessageQueue = new MessageQueue();
+    Message mMessage;
+
+    // network connections
+    RGNetworkPlayerList mRGNetworkPlayerList;
+    bool isServer = true; // is this particular player a server and therefore mal actor?
+
+    // other classes observe this one's gameplay data
+    List<IRGObserver> mObservers = new List<IRGObserver>(20);
+
     // Establish necessary fields
     public GameObject[] allPlayers;
     public GameObject MalActorObject;
-    public NativeArray<int> playerIDs;
+    //public NativeArray<int> playerIDs;
 
     
 
     public GameObject resPlayer;
-
+    public Player resiliencePlayer;
     public MaliciousActor maliciousActor;
     public bool playerActive = false;
     public GameObject playerMenu;
@@ -90,9 +105,12 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public TextMeshProUGUI titlee;
 
+
     // Start is called before the first frame update
     void Start()
     {
+       
+
         startScreen.SetActive(true);
         Debug.Log("Test Start");
         //RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
@@ -109,33 +127,33 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     void DelayedStart()
     {
-        RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
-        RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
-        Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
-        //allPlayers = new GameObject[playerList.playerIDs.Count];
-        for (int i = 0; i < ntwrkPLayers.Length; i++)
-        {
-            //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
-            //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
-            if(RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
-            {
-                if (ntwrkPLayers[i].playerID != 0)
-                {
-                    resPlayer = ntwrkPLayers[i].gameObject;
-                    Player temp = resPlayer.AddComponent<Player>();
-                    temp = ntwrkPLayers[i].GetComponent<Player>();
-                    //Debug.LogError(resPlayer.GetComponent<Player>().type);
-                    activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
-                    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                    //allPlayers[i] = ntwrkPLayers[i].gameObject;
-                }
-                else
-                {
-                    maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
-                }
-            }
+        //RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
+        //RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
+        //Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
+        ////allPlayers = new GameObject[playerList.playerIDs.Count];
+        //for (int i = 0; i < ntwrkPLayers.Length; i++)
+        //{
+        //    //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
+        //    //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
+        //    if(RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
+        //    {
+        //        if (ntwrkPLayers[i].playerID != 0)
+        //        {
+        //            resPlayer = ntwrkPLayers[i].gameObject;
+        //            Player temp = resPlayer.AddComponent<Player>();
+        //            temp = ntwrkPLayers[i].GetComponent<Player>();
+        //            //Debug.LogError(resPlayer.GetComponent<Player>().type);
+        //            activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
+        //            fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+        //            //allPlayers[i] = ntwrkPLayers[i].gameObject;
+        //        }
+        //        else
+        //        {
+        //            maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
+        //        }
+        //    }
             
-        }
+        //}
 
     }
 
@@ -261,11 +279,145 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
+    public void setupActors()
+    {
 
+        if (isServer)
+        {
+            // this is the malicious player
+            Player baseRes = GameObject.FindObjectOfType<Player>();
+            baseRes.gameObject.SetActive(false);
+            MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
+            baseMal.InitializeCards();
+            maliciousActor = this.gameObject.AddComponent<MaliciousActor>();
+
+            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            baseMal.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
+
+            //malActor = baseMal;
+            maliciousActor.funds = baseMal.funds;
+            maliciousActor.Deck = baseMal.Deck; 
+            maliciousActor.Deck = baseMal.Deck;
+            //rgCardCount = baseMal.CardCountList;
+            maliciousActor.CardCountList = baseMal.CardCountList;
+            maliciousActor.cardReader = baseMal.cardReader;
+            maliciousActor.cardDropZone = baseMal.cardDropZone;
+            baseMal.cardDropZone.transform.parent = maliciousActor.transform;
+            maliciousActor.handDropZone = baseMal.handDropZone;
+            baseMal.handDropZone.transform.parent = maliciousActor.transform;
+            maliciousActor.cardPrefab = baseMal.cardPrefab;
+            maliciousActor.HandList = baseMal.HandList;
+            maliciousActor.ActiveCardList = baseMal.ActiveCardList;
+            maliciousActor.activeCardIDs = baseMal.activeCardIDs;
+            maliciousActor.manager = baseMal.manager;
+            maliciousActor.facilitiesActedUpon = baseMal.facilitiesActedUpon;
+            maliciousActor.targetIDList = baseMal.targetIDList;
+            //malActor.gameExampleUI = baseMal.gameExampleUI;
+            baseMal.gameObject.SetActive(false);
+            GameObject centralMap = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(centralMap.transform);
+            GameObject obj = GameObject.Find("RGTitle");
+            obj.GetComponent<TextMeshProUGUI>().text = "M " + maliciousActor.Deck.Count;
+
+            //forcing the networkplayer to be 1 by 1 by 1 to make future calculations easier
+            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            maliciousActor.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            baseMal.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
+            Debug.Log(this.gameObject.name);
+            Debug.Log(maliciousActor.Deck.Count);
+        } else
+        {
+            // regular blue type player
+            MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
+            baseMal.gameObject.SetActive(false);
+            Player baseRes = GameObject.FindObjectOfType<Player>();
+            Player resActor = resPlayer.AddComponent<Player>();
+            resiliencePlayer = resActor;
+            baseRes.InitializeCards();
+            baseRes.InitializeFacilities();
+            //resActor = this.gameObject.AddComponent<Player>();
+            //malActor = baseMal;
+            resActor.funds = baseRes.funds;
+            resActor.Deck = baseRes.Deck;
+            resActor.type = (FacilityV3.Type)(mRGNetworkPlayerList.localPlayerID - 1);
+            //rgDeck = baseRes.Deck;
+            resActor.Deck = baseRes.Deck;
+            //rgCardCount = baseRes.CardCountList;
+            resActor.CardCountList = baseRes.CardCountList;
+            resActor.cardReader = baseRes.cardReader;
+            resActor.cardDropZone = baseRes.cardDropZone;
+            baseRes.cardDropZone.transform.parent = resActor.transform;
+            resActor.handDropZone = baseRes.handDropZone;
+            baseRes.handDropZone.transform.parent = resActor.transform;
+            resActor.cardPrefab = baseRes.cardPrefab;
+            resActor.HandList = baseRes.HandList;
+            resActor.ActiveCardList = baseRes.ActiveCardList;
+            resActor.activeCardIDs = baseRes.activeCardIDs;
+            resActor.manager = baseRes.manager;
+            //resActor.manager.resPlayer = resActor.gameObject;
+            //resActor.gameManager.allPlayers[0] = resActor.gameObject;
+            //resActor.gameManager. = resActor;
+            resActor.Facilities = baseRes.Facilities;
+            resActor.facilitiesActedUpon = baseRes.facilitiesActedUpon;
+            resActor.targetIDList = baseRes.targetIDList;
+            //resActor.gameExampleUI = baseRes.gameExampleUI;
+            baseRes.gameObject.SetActive(false);
+            GameObject centralMap = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(centralMap.transform);
+            GameObject obj = GameObject.Find("RGTitle");
+            obj.GetComponent<TextMeshProUGUI>().text = "R " + resActor.Deck.Count;
+            //this.syncDirection = SyncDirection.ClientToServer;
+            Debug.Log(this.gameObject.name);
+            Debug.Log(resActor.Deck.Count);
+        }
+        
+        
+}
 
     // Update is called once per frame
     void Update()
     {
+        if (isInit)
+        {
+            
+        } else
+        {
+            mRGNetworkPlayerList = RGNetworkPlayerList.instance;
+            if (mRGNetworkPlayerList == null)
+            {
+                Debug.Log("player list is a null var!");
+            }
+            else
+            {
+                RegisterObserver(mRGNetworkPlayerList);
+                isServer = mRGNetworkPlayerList.isServer; 
+                Player baseRes = GameObject.FindObjectOfType<Player>();
+                MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
+                int team = 0;
+              
+                if (baseRes != null && baseMal != null)
+                {
+                    setupActors();
+                    float funds = 0;
+
+                    if (isServer)
+                    {
+                        funds = maliciousActor.funds;
+                    }
+                    else
+                    {
+                        funds = resiliencePlayer.funds;
+                        team = (int)resiliencePlayer.type;
+                    }
+                    GameObject obj = GameObject.Find("ExampleGameUI");
+                    RGGameExampleUI gameView = obj.GetComponent<RGGameExampleUI>();
+                    gameView.SetStartTeamInfo(team, funds);
+                    isInit = true;
+                }
+            }
+        }
         //if (gameStarted)
         //{
         //   if(maliciousActor != null)
@@ -953,110 +1105,40 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
-    //public void ActivePlayerIncreaseOneFeedback()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseOneFeedback();
-    //}
-
-    //public void ActivePlayerAllFeedback()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseAllFeedback();
-
-    //}
-
-    //public void ActivePlayerHireWorkers()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().HireWorkers();
-
-
-    //}
-    //public void ActivePlayerBoostIT()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostIT();
-
-    //}
-    //public void ActivePlayerBoostOT()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostOT();
-
-
-    //}
-    //public void ActivePlayerImprovePhysSec()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().ImprovePhysSec();
-
-
-    //}
-    //public void ActivePlayerIncreaseFunding()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseFunding();
-
-
-    //}
-
-    //public void ActivePlayerBoostElectricity()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostElectricity();
-
-
-    //}
-    //public void ActivePlayerBoostWater()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostWater();
-
-
-    //}
-    //public void ActivePlayerBoostFuel()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostFuel();
-
-
-    //}
-    //public void ActivePlayerBoostComms()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostCommunications();
-
-
-    //}
-    //public void ActivePlayerBoostHealth()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostHealth();
-
-
-    //}
+   
 
     public void AddFunds(int count)
     {
 
-        RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
-        RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
-        Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
-        //allPlayers = new GameObject[playerList.playerIDs.Count];
-        for (int i = 0; i < ntwrkPLayers.Length; i++)
-        {
-            //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
-            //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
-            if (RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
-            {
-                if (ntwrkPLayers[i].playerID != 0)
-                {
-                    resPlayer = ntwrkPLayers[i].gameObject;
-                    Player temp = resPlayer.AddComponent<Player>();
-                    temp = ntwrkPLayers[i].GetComponent<Player>();
-                    resPlayer.GetComponent<Player>().funds += count;
-                    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                    //allPlayers[i] = ntwrkPLayers[i].gameObject;
-                }
-                else
-                {
-                    maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
-                    maliciousActor.funds += count;
-                    fundText.text = "Funds: " + maliciousActor.funds;
+        //RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
+        //RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
+        //Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
+        ////allPlayers = new GameObject[playerList.playerIDs.Count];
+        //for (int i = 0; i < ntwrkPLayers.Length; i++)
+        //{
+        //    //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
+        //    //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
+        //    if (RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
+        //    {
+        //        if (ntwrkPLayers[i].playerID != 0)
+        //        {
+        //            resPlayer = ntwrkPLayers[i].gameObject;
+        //            Player temp = resPlayer.AddComponent<Player>();
+        //            temp = ntwrkPLayers[i].GetComponent<Player>();
+        //            resPlayer.GetComponent<Player>().funds += count;
+        //            fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+        //            //allPlayers[i] = ntwrkPLayers[i].gameObject;
+        //        }
+        //        else
+        //        {
+        //            maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
+        //            maliciousActor.funds += count;
+        //            fundText.text = "Funds: " + maliciousActor.funds;
 
-                }
-            }
+        //        }
+        //    }
 
-        }
+        //}
     }
 
     public void ShowEndGameCanvas(int gameState)
@@ -1094,6 +1176,38 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public void TestEndGame()
     {
-        RGNetworkPlayerList.instance.CmdEndGame(2);
+       // RGNetworkPlayerList.instance.CmdEndGame(2);
+    }
+
+    public void RegisterObserver(IRGObserver o)
+    {
+        if (!mObservers.Exists(x => x == o))
+        {
+            mObservers.Add(o);
+        }
+    }
+
+   
+    public void RemoveObserver(IRGObserver o)
+    { 
+        if (mObservers.Exists(x => x == o) )
+        {
+            mObservers.Remove(o);
+        }
+    }
+
+  
+    public void NotifyObservers()
+    {
+        if (!mMessageQueue.IsEmpty())
+        {
+            while (!mMessageQueue.IsEmpty()) {
+                Message m = mMessageQueue.Dequeue();
+                foreach (IRGObserver o in mObservers)
+                {
+                    o.UpdateObserver(m);
+                } 
+            }
+        }
     }
 }
