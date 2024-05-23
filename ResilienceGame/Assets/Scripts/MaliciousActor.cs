@@ -7,6 +7,7 @@ using System;
 using System.Text;
 
 
+
 public class MaliciousActor : CardPlayer {
     
     // specific to red
