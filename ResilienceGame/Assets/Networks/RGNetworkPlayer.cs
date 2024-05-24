@@ -18,7 +18,7 @@ public class RGNetworkPlayer : NetworkBehaviour
     //[SyncVar] public GameObject cardHandLoc;
     //[SyncVar] public List<int> rgDeck;
     //[SyncVar] public List<int> rgCardCount;
-    public GameObject centralMap;
+    public GameObject canvas;
     public GameObject cardDrop;
     public GameObject cardHandLoc;
     public List<int> rgDeck;
@@ -95,15 +95,15 @@ public class RGNetworkPlayer : NetworkBehaviour
             malActor.targetIDList = baseMal.targetIDList;
             //malActor.gameExampleUI = baseMal.gameExampleUI;
             baseMal.gameObject.SetActive(false);
-            centralMap = GameObject.Find("Central Map");
-            this.gameObject.transform.SetParent(centralMap.transform);
+            canvas = GameObject.Find("Canvas");
+            this.gameObject.transform.SetParent(canvas.transform);
             GameObject obj = GameObject.Find("RGTitle");
             obj.GetComponent<TextMeshProUGUI>().text = "M " + malActor.Deck.Count;
 
             //forcing the networkplayer to be 1 by 1 by 1 to make future calculations easier
-            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
-            malActor.handDropZone.transform.localScale = new Vector3(1, 1, 1);
-            baseMal.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            this.gameObject.transform.localScale = new Vector2( 1, 1);
+            malActor.handDropZone.transform.localScale = new Vector2(1, 1);
+            baseMal.handDropZone.transform.localScale = new Vector2(1, 1);
             Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
 
             Debug.Log(this.gameObject.name);
@@ -145,8 +145,8 @@ public class RGNetworkPlayer : NetworkBehaviour
             resActor.targetIDList = baseRes.targetIDList;
             //resActor.gameExampleUI = baseRes.gameExampleUI;
             baseRes.gameObject.SetActive(false);
-            centralMap = GameObject.Find("Central Map");
-            this.gameObject.transform.SetParent(centralMap.transform);
+            canvas = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(canvas.transform);
             GameObject obj = GameObject.Find("RGTitle");
             obj.GetComponent<TextMeshProUGUI>().text = "R " + resActor.Deck.Count;
             //this.syncDirection = SyncDirection.ClientToServer;

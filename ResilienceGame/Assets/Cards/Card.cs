@@ -93,7 +93,7 @@ public class Card : MonoBehaviour, IDropHandler
         //reader = GameObject.Find("Card Reader").GetComponent<CardReader>();
         handDropZone = this.gameObject.transform.parent.gameObject;
         originalParent = this.gameObject.transform.parent.transform.parent.gameObject;
-
+        this.gameObject.transform.localScale = Vector3.one;
         gameCanvas = GameObject.Find("Central Map");
     }
 
@@ -105,8 +105,10 @@ public class Card : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
+        Debug.Log("trying to drop card");
         if (cardDropZone != null && this.state == CardState.CardDrawn) // Make sure that the card actually has a reference to the card drop location where it will be dropped and that it is currently in the players hand
         {
+
             // Get the bounds of the card Drop Zone
             Vector2 cardDropMin = new Vector2();
             cardDropMin.x = cardDropZone.GetComponent<RectTransform>().localPosition.x - (cardDropZone.GetComponent<RectTransform>().rect.width / 2);
@@ -124,6 +126,7 @@ public class Card : MonoBehaviour, IDropHandler
                this.transform.localPosition.x < cardDropMax.x &&
                this.transform.localPosition.x > cardDropMin.x)
             {
+                Debug.Log("card dropped in card drop zone");
                 // check the cards teamID to see which team they belong to so they can call the proper Select facility method to then see if they have met all conditions to play the card
                 if (this.teamID == 0)
                 {
@@ -157,6 +160,7 @@ public class Card : MonoBehaviour, IDropHandler
                     else
                     {
                         this.gameObject.transform.SetParent(handDropZone.transform, false);
+                       
                     }
                 }
                 else if (this.teamID == 1)
@@ -197,11 +201,12 @@ public class Card : MonoBehaviour, IDropHandler
             }
             else
             {
+                Debug.Log("card not dropped in card drop zone");
                 // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
                 this.gameObject.transform.SetParent(handDropZone.transform, false);
                 this.state = CardState.CardDrawn;
                 this.gameObject.GetComponentInParent<slippy>().enabled = true;
-                this.gameObject.GetComponentInParent<slippy>().ResetScale();
+                this.gameObject.GetComponent<slippy>().ResetPosition();
             }
         }
     }
