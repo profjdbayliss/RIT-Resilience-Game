@@ -9,14 +9,16 @@ using UnityEngine.UI;
 public class RGGameExampleUI : MonoBehaviour
 {
     [Header("UI Elements")]
-    [SerializeField] TMP_Text cardHistory;
-    [SerializeField] Scrollbar scrollbar;
-    [SerializeField] TMP_Text waitingText;
-    [SerializeField] Canvas cardCanvas;
-    [SerializeField] GameObject cardHolder;
-    [SerializeField] GameObject cardPlayedHolder;
-    [SerializeField] Button endTurnButton;
-    [SerializeField] Button[] cards;
+    //TMP_Text cardHistory;
+    public Scrollbar scrollbar;
+    public TextMeshProUGUI activePlayer;
+    public TextMeshProUGUI fundsText;
+    public TextMeshProUGUI turnText;
+    public Canvas cardCanvas;
+    public GameObject cardHolder;
+    public GameObject cardPlayedHolder;
+    public Button endTurnButton;
+    public Button[] cards;
 
     // This is only set on client to the name of the local player
     internal static string localPlayerName;
@@ -25,38 +27,31 @@ public class RGGameExampleUI : MonoBehaviour
     // Server-only cross-reference of connections to player names
     //internal static readonly Dictionary<NetworkConnectionToClient, string> connNames = new Dictionary<NetworkConnectionToClient, string>();
 
-
     private int localPlayerTeamID = 1; // 0 = red, 1 = blue
     private int teamNum = 2; // The number of teams
 
-    public int turn = 0; //The player whose id = turn will play this turn. turn will cycle between 0 to # of player.
-    public int totalTurn = 0;
-
+   
     string[] red_name = { "System Shutdown", "Disk Wipe", "Ransom", "Phishing", "Brute Force", "Input Capture" };
     string[] blue_name = { "Access Processes", "User Training", "Restrict Web-Based Content", "Pay Ransom", "Data Backup", "User Acount Management" };
 
-    public void SetStartTeamInfo(int teamID, float funds)
+  
+    public void SetStartTeamInfo(CardPlayer player, int teamID, float funds)
     {
         localPlayerTeamID = teamID;
-        turn = 0;
-        totalTurn = 0;
-        GameObject obj = GameObject.Find("Active Player Text");
-        GameObject obj2 = GameObject.Find("Funds Text");
-        obj2.GetComponent<TextMeshProUGUI>().text = "Funds: " + funds;
-
+        
         if (teamID == 0)
         {
             // malicious player goes first
             ShowPlayUI();
-            obj.GetComponent<TextMeshProUGUI>().text = "Malicious " + localPlayerName;
+            activePlayer.text = "Malicious " + localPlayerName;
+            
             foreach (Button card in cards)
             {
                 card.GetComponent<Image>().color = Color.red;
             }
         } else
         {
-            cardHistory.text = "";
-            obj.GetComponent<TextMeshProUGUI>().text = "Resilient " + localPlayerName;
+            activePlayer.text = "Resilient " + localPlayerName;
             for (int i = 0; i < cards.Length; i++)
             {
                 GetNewCard(i);
@@ -64,112 +59,10 @@ public class RGGameExampleUI : MonoBehaviour
             HidePlayUI();
         }
 
-
+        turnText.text = "Turn: " + GameManager.instance.GetTurn();
     }
 
-    //public override void OnStartServer()
-    //{
-    //    connNames.Clear();
-
-    //    foreach (Button card in cards)
-    //    {
-    //        card.GetComponent<Image>().color = Color.red;
-    //    }
-    //    localPlayerTeamID = 0;
-    //    turn = 0;
-    //    totalTurn = 0;
-    //}
-
-    //public override void OnStartClient()
-    //{
-    //    cardHistory.text = "";
-
-    //    for (int i = 0; i < cards.Length; i++)
-    //    {
-    //        GetNewCard(i);
-    //    }
-    //    if (isServer)
-    //    {
-    //        ShowPlayUI();
-    //    }
-    //    else
-    //    {
-    //        HidePlayUI();
-    //    }
-    //}
-
-
-    //[Command(requiresAuthority = false)]
-    //void CmdSend(string message, NetworkConnectionToClient sender = null)
-    //{
-    //    if (!connNames.ContainsKey(sender))
-    //        connNames.Add(sender, sender.identity.GetComponent<RGNetworkPlayer>().playerName);
-
-    //    if (!string.IsNullOrWhiteSpace(message))
-    //        RpcReceive(connNames[sender], message.Trim());
-    //}
-
-    //[ClientRpc]
-    //void RpcReceive(string playerName, string message)
-    //{
-    //    string prettyMessage = playerName == localPlayerName ?
-    //        $"<color=red>{playerName}:</color> {message}" :
-    //        $"<color=blue>{playerName}:</color> {message}";
-    //    AppendMessage(prettyMessage);
-    //}
-
-    //public void AskNextTurn() // Called by the current client
-    //{
-    //    CmdAskNextTurn(localPlayerID); // Send a request to the server and pass the local player ID to the server;
-    //    HidePlayUI(); // Disable the UI of the current player
-    //}
-
-    //[Command(requiresAuthority = false)]
-    //public void CmdAskNextTurn(int playerID) // Cmd functions are only called on the host
-    //{
-    //    RGNetworkPlayerList playerList = RGNetworkPlayerList.instance;
-    //    if (playerList == null)
-    //    {
-    //        Debug.LogError("Can't find playerList object!");
-    //    }
-    //    playerList.ChangeReadyFlag(playerID, true); // Change the isReady flag of the current player on the server
-    //    bool isAllPlayersFinish = playerList.IsTeamReady(turn); // Check if all the player on the "turn" team is ready
-    //    if (isAllPlayersFinish)
-    //    {
-    //        playerList.CleanReadyFlag(); // Clean the isReady flags
-    //        turn += 1; // Update the "turn"
-    //        totalTurn += 1;
-    //        if(totalTurn >= 6)
-    //        {
-    //            RGNetworkPlayerList.instance.CmdEndGame(2);
-    //        }
-    //        if (turn >= teamNum)
-    //        {
-    //            turn = 0;
-    //        }
-    //        RpcNextTurn(turn, totalTurn); //Update the turn value to the clients
-    //    }
-    //}
-
-    //[ClientRpc]
-    //public void RpcNextTurn(int newTurn, int totalTurn) // Rpc functions are called on all the clients (including host)
-    //{
-    //    turn = newTurn;
-    //    this.totalTurn = totalTurn;
-    //    if (turn == localPlayerTeamID) // if the current "turn" belongs to the local player's team, enable the local player's UI
-    //    {
-    //        ShowPlayUI(); 
-    //        if (FindObjectOfType<GameManager>()) // Add funds for the local player that starts their turn
-    //        {
-    //            FindObjectOfType<GameManager>().AddFunds(100);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        HidePlayUI();
-    //    }
-    //}
-
+   
     void AppendMessage(string message)
     {
         StartCoroutine(AppendAndScroll(message));
@@ -177,7 +70,7 @@ public class RGGameExampleUI : MonoBehaviour
 
     IEnumerator AppendAndScroll(string message)
     {
-        cardHistory.text += message + "\n";
+       // cardHistory.text += message + "\n";
 
         // it takes 2 frames for the UI to update ?!?!
         yield return null;
@@ -220,27 +113,37 @@ public class RGGameExampleUI : MonoBehaviour
         else
             message += "blue";
         message += ">" + cards[index].transform.Find("CardName").GetComponent<TMP_Text>().text + "</color>.";
-        //CmdSend(message);
 
         GetNewCard(0);
     }
 
     public void ShowPlayUI()
-    {
-        endTurnButton.gameObject.SetActive(true);
-        cardCanvas.gameObject.SetActive(true);
-        cardHolder.SetActive(true);
-        cardPlayedHolder.SetActive(true);
-        waitingText.gameObject.SetActive(false);
+    { 
+       
+            endTurnButton.gameObject.SetActive(true);
+            cardCanvas.gameObject.SetActive(true);
+            cardHolder.SetActive(true);
+            cardPlayedHolder.SetActive(true);
     }
 
     public void HidePlayUI()
     {
-        endTurnButton.gameObject.SetActive(false);
-        cardHolder.SetActive(false);
-        cardCanvas.gameObject.SetActive(false);
-        cardPlayedHolder.SetActive(false);
-        waitingText.gameObject.SetActive(true);
+      
+            endTurnButton.gameObject.SetActive(false);
+            cardHolder.SetActive(false);
+            cardCanvas.gameObject.SetActive(false);
+            cardPlayedHolder.SetActive(false);
     }
 
+    public void EndTurn()
+    {
+        GameManager.instance.EndTurn();
+        Debug.Log("manager end turn called!");
+    }
+
+    public void ShowAllCards()
+    {
+        Debug.Log("button for showing all cards clicked");
+        GameManager.instance.ShowMyCardsToEverybody();
+    }
 }

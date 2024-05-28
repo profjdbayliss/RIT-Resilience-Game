@@ -81,7 +81,6 @@ public class Card : MonoBehaviour, IDropHandler
     public GameObject originalParent;
     public GameObject handDropZone;
     public GameObject gameCanvas;
-
     public CardReader reader;
     // Need to add Target
 
@@ -93,7 +92,6 @@ public class Card : MonoBehaviour, IDropHandler
         //reader = GameObject.Find("Card Reader").GetComponent<CardReader>();
         handDropZone = this.gameObject.transform.parent.gameObject;
         originalParent = this.gameObject.transform.parent.transform.parent.gameObject;
-
         gameCanvas = GameObject.Find("Central Map");
     }
 
@@ -107,6 +105,7 @@ public class Card : MonoBehaviour, IDropHandler
     {
         if (cardDropZone != null && this.state == CardState.CardDrawn) // Make sure that the card actually has a reference to the card drop location where it will be dropped and that it is currently in the players hand
         {
+            Debug.Log("card dropped in drop zone to play it");
             // Get the bounds of the card Drop Zone
             Vector2 cardDropMin = new Vector2();
             cardDropMin.x = cardDropZone.GetComponent<RectTransform>().localPosition.x - (cardDropZone.GetComponent<RectTransform>().rect.width / 2);
@@ -124,15 +123,18 @@ public class Card : MonoBehaviour, IDropHandler
                this.transform.localPosition.x < cardDropMax.x &&
                this.transform.localPosition.x > cardDropMin.x)
             {
+                Debug.Log("card in proper drop zone");
                 // check the cards teamID to see which team they belong to so they can call the proper Select facility method to then see if they have met all conditions to play the card
                 if (this.teamID == 0)
                 {
                     if (this.gameObject.GetComponentInParent<Player>().SelectFacility(this.cardID))
                     {
+                        Debug.Log("card is being played facility selected 1");
                         if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
                         {
-                            GameManager gm = FindObjectOfType<GameManager>();
-                            gm.AddFunds(-100);
+                            Debug.Log("card is being played by malicious player");
+                            
+                            GameManager.instance.AddFunds(-100);
                             foreach (var facility in this.gameObject.GetComponentInParent<Player>().facilitiesActedUpon)
                             {
                                 facility.GetComponent<FacilityV3>().health += 20;
@@ -143,10 +145,10 @@ public class Card : MonoBehaviour, IDropHandler
                                 facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();
                             }
                             List<FacilityV3Info> tempFacs = new List<FacilityV3Info>();
-                            Debug.Log("Facilities Count: " + gm.allFacilities.Count + ", " + teamID);
-                            for (int i = 0; i < gm.allFacilities.Count; i++)
+                            Debug.Log("Facilities Count: " + GameManager.instance.allFacilities.Count + ", " + teamID);
+                            for (int i = 0; i < GameManager.instance.allFacilities.Count; i++)
                             {
-                                tempFacs.Add(gm.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
+                                tempFacs.Add(GameManager.instance.allFacilities[i].GetComponent<FacilityV3>().ToFacilityV3Info());
                             }
                             //RGNetworkPlayerList.instance.AskUpdateFacilities(tempFacs); //Update facilities' info
                         }
@@ -163,8 +165,10 @@ public class Card : MonoBehaviour, IDropHandler
                 {
                     if (this.gameObject.GetComponentInParent<MaliciousActor>().SelectFacility(this.cardID))
                     {
+                        Debug.Log("card is being played facility selected");
                         if (FindObjectOfType<GameManager>()) // Reduce funds of the local player when play a card
                         {
+                            Debug.Log("card is being played by resilient player");
                             GameManager gm = FindObjectOfType<GameManager>();
                             gm.AddFunds(-100);
                             foreach (var facility in this.gameObject.GetComponentInParent<MaliciousActor>().facilitiesActedUpon)
@@ -172,6 +176,7 @@ public class Card : MonoBehaviour, IDropHandler
                                 facility.GetComponent<FacilityV3>().health -= 30;
                                 if (facility.GetComponent<FacilityV3>().health <= 0)
                                 {
+                                    gm.EndGame(1, true);
                                     //RGNetworkPlayerList.instance.CmdEndGame(1);
                                 }
                                 facility.GetComponent<FacilityV3>().Health.text = facility.GetComponent<FacilityV3>().health.ToString();

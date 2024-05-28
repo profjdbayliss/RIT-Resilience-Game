@@ -35,16 +35,17 @@ public class CardPlayer : MonoBehaviour
         // NOTE: set funds in scene var
         cardReader = GameObject.FindObjectOfType<CardReader>();
         manager = GameObject.FindObjectOfType<GameManager>();
-
+        int count = 0;
         for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)playerType) 
             {
                 Deck.Add(i);
                 CardCountList.Add(cardReader.CardCount[i]);
+                count++;
             }
         }
-
+        
         if (HandList.Count < maxHandSize)
         {
             for (int i = 0; i < maxHandSize; i++)
@@ -70,6 +71,7 @@ public class CardPlayer : MonoBehaviour
         int rng = UnityEngine.Random.Range(0, Deck.Count);
         if (CardCountList.Count <= 0) // Check to ensure the deck is actually built before trying to draw a card
         {
+            Debug.Log("no cards drawn.");
             return;
         }
         if (CardCountList[rng] > 0)
@@ -341,6 +343,7 @@ public class CardPlayer : MonoBehaviour
                     {
                         if ((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
                         {
+                            Debug.Log("Facility acted upon is " + obj.GetComponent<FacilityV3>().state);
                             facilitiesActedUpon.Add(obj);
                         }
                     }
