@@ -35,12 +35,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     public List<int> playerTeamIDs = new List<int>();
     private List<bool> playerNetworkReadyFlags = new List<bool>();
     private List<bool> playerTurnTakenFlags = new List<bool>();
-    //public List<List<int>> playerDecks = new List<List<int>>();
-    //public List<List<int>> playerCardCounts = new List<List<int>>();
-
-    //public bool isUpdated = false;
-    //public int gameState = 0; // 0 = ongoing, 1 = red win, 2 = blue win
-
+   
     private void Awake()
     {
         instance = this;
@@ -48,73 +43,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         SetupHandlers();
         manager = FindObjectOfType<GameManager>();
     }
-
-    //[Command(requiresAuthority = false)]
-    //public void CmdEndGame(int gameState)
-    //{
-    //    RpcEndGame(gameState);
-    //}
-
-    //[ClientRpc]
-    //public void RpcEndGame(int gameState)
-    //{
-    //    this.gameState = gameState;
-    //    GameManager gm = FindObjectOfType<GameManager>();
-    //    gm.ShowEndGameCanvas(gameState);
-    //}
-
-    //[Command(requiresAuthority = false)]
-    //public void CmdUpdateInfo()
-    //{
-    //    RpcUpdateInfo(playerIDs, playerTeamIDs, playerReadyFlags);
-    //}
-
-
-    //[ClientRpc]
-    //public void RpcUpdateInfo(List<int> playerIDs, List<int> playerTeamIDs, List<bool> playerReadyFlags)
-    //{
-    //    this.playerIDs.Clear();
-    //    this.playerTeamIDs.Clear();
-    //    this.playerReadyFlags.Clear();
-    //    for (int i = 0; i < playerIDs.Count; i++)
-    //    {
-    //        this.playerIDs.Add(playerIDs[i]);
-    //    }
-    //    for (int i = 0; i < playerTeamIDs.Count; i++)
-    //    {
-    //        this.playerTeamIDs.Add(playerTeamIDs[i]);
-    //    }
-    //    for (int i = 0; i < playerReadyFlags.Count; i++)
-    //    {
-    //        this.playerReadyFlags.Add(playerReadyFlags[i]);
-    //    }
-    //    isUpdated = true;
-    //}
-
-    //public void AskUpdateFacilities(List<FacilityV3Info> facilities) // Called by the client who wants to update
-    //{
-    //    CmdUpdateFacilities(facilities);
-    //}
-
-    //[Command(requiresAuthority = false)]
-    //public void CmdUpdateFacilities(List<FacilityV3Info> facilities) // Server receives the updated info
-    //{
-    //    RpcUpdateFacilities(facilities);
-    //}
-
-    //[ClientRpc]
-    //public void RpcUpdateFacilities(List<FacilityV3Info> facilities) // Update the info to clients
-    //{
-    //    if (FindObjectOfType<GameManager>() != null)
-    //    {
-    //        GameManager gm = FindObjectOfType<GameManager>();
-    //        for(int i = 0; i < gm.allFacilities.Count; i++)
-    //        {
-    //            gm.allFacilities[i].GetComponent<FacilityV3>().UpdateFacilityData(facilities[i]);
-    //        }
-
-    //    }
-    //}
 
     public void AddPlayer(int id, int teamID)
     {
@@ -144,6 +72,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         {
             case CardMessageType.EndTurn:
                 {
+                    // turn taking is handled here because the list of players on 
+                    // the network happens here
                     RGNetworkShortMessage msg = new RGNetworkShortMessage
                     {
                         indexId = (uint)localPlayerID,
@@ -152,8 +82,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     Debug.Log("update observer called end turn! ");
                     if (isServer)
                     {
-
-
                         // we've played so we're no longer on the ready list
                         int playerIndex = playerIDs.Find(x => x == localPlayerID);
                         playerTurnTakenFlags[playerIndex] = true;
@@ -170,13 +98,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 
                         if (nextPlayerId != -1)
                         {
-                            // send my turn to the next player
+                            // send the start turn ok to the next player
                             NetworkConnectionToClient connection = NetworkServer.connections[nextPlayerId];
-                            //connection.Send(msg);
                             msg.type = (uint)CardMessageType.StartTurn;
                             connection.Send(msg);
                             Debug.Log("next client should receive message " + nextPlayerId + " with connection id " + connection.identity.netId);
-
                         }
                         else
                         {
@@ -197,7 +123,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 }
                 break;
             case CardMessageType.IncrementTurn:
-              
                 Debug.Log("update observer called increment turn! ");
                 if (isServer)
                 {
@@ -280,8 +205,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     // only the server should get and end turn message!
                     Debug.Log("client received increment turn message!");
                     manager.IncrementTurn();
-                    break;
-               
+                    break;             
                 default:
                     Debug.Log("client received unknown message!");
                     break;
@@ -302,6 +226,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 Debug.Log("server start turn message");
                 break;
             case CardMessageType.EndTurn:
+                // end turn is handled here because the player list is kept
+                // in this class
                 Debug.Log("server received end turn message");
                 // note this player's turn has ended      
                 int playerIndex = playerIDs.Find(x => x == senderId);
@@ -353,38 +279,39 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         Debug.Log("CLIENT RECEIVED LONG MESSAGE::: " + msg.indexId + " " + msg.type);
         uint senderId = msg.indexId;
         CardMessageType type = (CardMessageType)msg.type;
-
-        switch (type)
+        if (!isServer)
         {
-            case CardMessageType.ShowCards:
-                // only the server should get and end turn message!
-                uint count = msg.count;
-                Debug.Log("client received a list of an opponents cards! " + count);
-                
-                List<int> cardIds = new List<int>((int)count);
-                for (int i = 0; i < count*4; i+=4)
-                {
-                    byte first = msg.payload.ElementAt(i);
-                    byte second = msg.payload.ElementAt(i+1);
-                    byte third = msg.payload.ElementAt(i+2);
-                    byte fourth = msg.payload.ElementAt(i+3);
-                    int actualInt = first | (second << 8) | (third << 16) | (fourth << 24);
-                    cardIds.Add(actualInt);
-                    Debug.Log(" :: " + actualInt + " :: ");
-                }
-                // how do I show them visually?????
-                break;
-            //case CardMessageType.EndGame:
-            //    if (msg.count == 1)
-            //    {
-            //        int whoWins = BitConverter.ToInt32(msg.payload);
-            //        manager.EndGame(whoWins, false);
-            //        Debug.Log("received end game message and will now end game on client");
+            switch (type)
+            {
+                case CardMessageType.ShowCards:
+                    uint count = msg.count;
+                    Debug.Log("client received a list of an opponents cards! " + count);
 
-            //    }
-            //    break;
-            default:
-                break;
+                    List<int> cardIds = new List<int>((int)count);
+                    for (int i = 0; i < count * 4; i += 4)
+                    {
+                        byte first = msg.payload.ElementAt(i);
+                        byte second = msg.payload.ElementAt(i + 1);
+                        byte third = msg.payload.ElementAt(i + 2);
+                        byte fourth = msg.payload.ElementAt(i + 3);
+                        int actualInt = first | (second << 8) | (third << 16) | (fourth << 24);
+                        cardIds.Add(actualInt);
+                        Debug.Log(" :: " + actualInt + " :: ");
+                    }
+                    GameManager.instance.ShowOthersCards(cardIds);
+                    break;
+                //case CardMessageType.EndGame:
+                //    if (msg.count == 1)
+                //    {
+                //        int whoWins = BitConverter.ToInt32(msg.payload);
+                //        manager.EndGame(whoWins, false);
+                //        Debug.Log("received end game message and will now end game on client");
+
+                //    }
+                //    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -396,8 +323,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         
         switch (type)
         {
-            case CardMessageType.ShowCards:
-                // only the server should get and end turn message!  
+            case CardMessageType.ShowCards:  
                 uint count = msg.count;
                 Debug.Log("server received a list of an opponents cards!" + count);
                 List<int> cardIds = new List<int>((int)count);
@@ -411,7 +337,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     cardIds.Add(actualInt);
                     Debug.Log(" :: " + actualInt + " :: ");
                 }
-                // how do I show them visually?????
+                GameManager.instance.ShowOthersCards(cardIds);
                 break;
             //case CardMessageType.EndGame:
             //    if (msg.count == 1)
@@ -434,40 +360,4 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessage);
         NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessage);
     }
-
-    //public void ChangeReadyFlag(int id, bool flag)
-    //{
-    //    if (!isServer) return;
-    //    int playerIndex = playerIDs.Find(x => x == id);
-    //    playerReadyFlags[playerIndex] = flag;
-    //}
-
-    //public void CleanReadyFlag()
-    //{
-    //    if (!isServer) return;
-
-    //    for(int i = 0; i < playerReadyFlags.Count; i++)
-    //    {
-    //        playerReadyFlags[i] = false;
-    //    }
-    //}
-
-    //public bool IsTeamReady(int teamID)
-    //{
-    //    for (int i = 0; i < playerTeamIDs.Count; i++)
-    //    {
-    //        // If the player is part of the specified team
-    //        if (playerTeamIDs[i] == teamID)
-    //        {
-    //            // If any player in the team is not ready, return false
-    //            if (playerReadyFlags[i] == false)
-    //            {
-    //                return false;
-    //            }
-    //        }
-    //    }
-
-    //    // If all players in the team are ready, return true
-    //    return true;
-    //}
 }

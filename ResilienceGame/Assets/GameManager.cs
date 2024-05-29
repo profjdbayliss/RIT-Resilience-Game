@@ -41,9 +41,10 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
 
     
 
-    public GameObject resPlayer;
+    //public GameObject resPlayer;
     public Player resiliencePlayer;
     public MaliciousActor maliciousActor;
+    CardPlayer allCardsPlayer;
     public bool playerActive = false;
     public GameObject playerMenu;
     public GameObject maliciousActorMenu;
@@ -307,45 +308,45 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
             MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
             baseMal.gameObject.SetActive(false);
             Player baseRes = GameObject.FindObjectOfType<Player>();
-            Player resActor = resPlayer.AddComponent<Player>();
-            resiliencePlayer = resActor;
+            resiliencePlayer = this.gameObject.AddComponent<Player>();
+            //resiliencePlayer = resActor;
             baseRes.InitializeCards();
             baseRes.InitializeFacilities();
             //resActor = this.gameObject.AddComponent<Player>();
             //malActor = baseMal;
-            resActor.funds = baseRes.funds;
-            resActor.Deck = baseRes.Deck;
-            resActor.type = (FacilityV3.Type)(mRGNetworkPlayerList.localPlayerID - 1);
+            resiliencePlayer.funds = baseRes.funds;
+            resiliencePlayer.Deck = baseRes.Deck;
+            resiliencePlayer.type = (FacilityV3.Type)(mRGNetworkPlayerList.localPlayerID - 1);
             //rgDeck = baseRes.Deck;
-            resActor.Deck = baseRes.Deck;
+            resiliencePlayer.Deck = baseRes.Deck;
             //rgCardCount = baseRes.CardCountList;
-            resActor.CardCountList = baseRes.CardCountList;
-            resActor.cardReader = baseRes.cardReader;
-            resActor.cardDropZone = baseRes.cardDropZone;
-            baseRes.cardDropZone.transform.parent = resActor.transform;
-            resActor.handDropZone = baseRes.handDropZone;
-            baseRes.handDropZone.transform.parent = resActor.transform;
-            resActor.cardPrefab = baseRes.cardPrefab;
-            resActor.HandList = baseRes.HandList;
-            resActor.ActiveCardList = baseRes.ActiveCardList;
-            resActor.activeCardIDs = baseRes.activeCardIDs;
-            resActor.manager = baseRes.manager;
+            resiliencePlayer.CardCountList = baseRes.CardCountList;
+            resiliencePlayer.cardReader = baseRes.cardReader;
+            resiliencePlayer.cardDropZone = baseRes.cardDropZone;
+            baseRes.cardDropZone.transform.parent = resiliencePlayer.transform;
+            resiliencePlayer.handDropZone = baseRes.handDropZone;
+            baseRes.handDropZone.transform.parent = resiliencePlayer.transform;
+            resiliencePlayer.cardPrefab = baseRes.cardPrefab;
+            resiliencePlayer.HandList = baseRes.HandList;
+            resiliencePlayer.ActiveCardList = baseRes.ActiveCardList;
+            resiliencePlayer.activeCardIDs = baseRes.activeCardIDs;
+            resiliencePlayer.manager = baseRes.manager;
             //resActor.manager.resPlayer = resActor.gameObject;
             //resActor.gameManager.allPlayers[0] = resActor.gameObject;
             //resActor.gameManager. = resActor;
-            resActor.Facilities = baseRes.Facilities;
-            resActor.facilitiesActedUpon = baseRes.facilitiesActedUpon;
-            resActor.targetIDList = baseRes.targetIDList;
+            resiliencePlayer.Facilities = baseRes.Facilities;
+            resiliencePlayer.facilitiesActedUpon = baseRes.facilitiesActedUpon;
+            resiliencePlayer.targetIDList = baseRes.targetIDList;
             //resActor.gameExampleUI = baseRes.gameExampleUI;
             baseRes.gameObject.SetActive(false);
             GameObject centralMap = GameObject.Find("Central Map");
             this.gameObject.transform.SetParent(centralMap.transform);
             GameObject obj = GameObject.Find("RGTitle");
-            obj.GetComponent<TextMeshProUGUI>().text = "R " + resActor.Deck.Count;
+            obj.GetComponent<TextMeshProUGUI>().text = "R " + resiliencePlayer.Deck.Count;
             //this.syncDirection = SyncDirection.ClientToServer;
-            Debug.Log(resActor.Deck.Count);
-            resActor.GetComponent<Player>().cardDropZone.SetActive(true);
-            resActor.GetComponent<Player>().handDropZone.SetActive(true);
+            Debug.Log(resiliencePlayer.Deck.Count);
+            resiliencePlayer.cardDropZone.SetActive(true);
+            resiliencePlayer.handDropZone.SetActive(true);
         }
         
         
@@ -537,7 +538,7 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
             playerActive = !playerActive;
 
             DisableAllOutline();
-            resPlayer.GetComponent<Player>().facilitiesActedUpon.Clear();
+            resiliencePlayer.facilitiesActedUpon.Clear();
             //foreach(GameObject obj in allPlayers)
             //{
             //    obj.GetComponent<Player>().seletedFacilities.Clear();
@@ -551,19 +552,19 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                 //activePlayerText.text = allPlayers[activePlayerNumber].GetComponent<Player>().type + " Player";
                 //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
 
-                activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
-                fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+                activePlayerText.text = resiliencePlayer.type + " Player";
+                fundText.text = "Funds: " + resiliencePlayer.funds;
 
                 activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(true);
                 facilityEvents.SpawnEvent();
                 ChangePlayers();
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                foreach (GameObject card in maliciousActor.HandList)
                 {
                     card.SetActive(false);
                 }
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                foreach (GameObject card in maliciousActor.ActiveCardList)
                 {
                     card.SetActive(false);
                 }
@@ -575,8 +576,8 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                 {
                     obj.GetComponent<Player>().targetIDList.Clear();
                 }
-                maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(false);
-                maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(false);
+                maliciousActor.cardDropZone.SetActive(false);
+                maliciousActor.handDropZone.SetActive(false);
 
             }
             else
@@ -596,15 +597,15 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                 Debug.Log(maliciousActor.handSize);
                 if (maliciousActor.handSize < 5)
                 {
-                    maliciousActor.DrawCard();
+                    maliciousActor.DrawCard(true, 0);
                 }
-                resPlayer.GetComponent<Player>().cardDropZone.SetActive(false);
-                resPlayer.GetComponent<Player>().handDropZone.SetActive(false);
-                foreach (GameObject card in resPlayer.GetComponent<Player>().HandList)
+                resiliencePlayer.cardDropZone.SetActive(false);
+                resiliencePlayer.handDropZone.SetActive(false);
+                foreach (GameObject card in resiliencePlayer.HandList)
                 {
                     card.SetActive(false);
                 }
-                foreach (GameObject card in resPlayer.GetComponent<Player>().ActiveCardList)
+                foreach (GameObject card in resiliencePlayer.ActiveCardList)
                 {
                     card.SetActive(false);
                 }
@@ -621,18 +622,18 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                 //        card.SetActive(false);
                 //    }
                 //}
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                foreach (GameObject card in maliciousActor.HandList)
                 {
                     card.SetActive(true);
                 }
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                foreach (GameObject card in maliciousActor.ActiveCardList)
                 {
                     card.SetActive(true);
                 }
                 maliciousActor.targetIDList.Clear();
                 maliciousActor.facilitiesActedUpon.Clear();
-                maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(true);
-                maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(true);
+                maliciousActor.cardDropZone.SetActive(true);
+                maliciousActor.handDropZone.SetActive(true);
             }
         }
 
@@ -732,9 +733,9 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
         if(!isServer)
         {
             // this is a resilience player
-            if(resPlayer.GetComponent<Player>().facilitiesActedUpon != null)
+            if(resiliencePlayer.facilitiesActedUpon != null)
             {
-                resPlayer.GetComponent<Player>().facilitiesActedUpon.Clear();
+                resiliencePlayer.facilitiesActedUpon.Clear();
             }
             playerActive = true;
 
@@ -749,19 +750,19 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
         if (playerActive)
         {
 
-            activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
+            activePlayerText.text = resiliencePlayer.type + " Player";
             Debug.Log("set active player to be reslilient");
-            fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+            fundText.text = "Funds: " + resiliencePlayer.funds;
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
             //yarnSpinner.SetActive(true);
-            Debug.Log("Starting player: " + resPlayer.name);
-            Debug.Log("set active player to be resilient with number of cards1 " + resiliencePlayer.GetComponent<Player>().HandList.Count);
-            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+            Debug.Log("Starting player: " + resiliencePlayer.name);
+            Debug.Log("set active player to be resilient with number of cards1 " + resiliencePlayer.HandList.Count);
+            foreach (GameObject card in maliciousActor.HandList)
             {
                 card.SetActive(true);
             }
-            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+            foreach (GameObject card in maliciousActor.ActiveCardList)
             {
                 card.SetActive(true);
             }
@@ -796,7 +797,7 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
             foreach (GameObject fac in allFacilities)
             {
                 //if (fac.GetComponent<FacilityV3>().type == allPlayers[activePlayerNumber].GetComponent<Player>().type)
-                if (fac.GetComponent<FacilityV3>().type == resPlayer.GetComponent<Player>().type)
+                if (fac.GetComponent<FacilityV3>().type == resiliencePlayer.type)
                 {
                     Color tempColor = fac.GetComponent<SVGImage>().color;
                     tempColor.a = 1.0f;
@@ -875,11 +876,11 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                 //    }
                 //}
 
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                foreach (GameObject card in maliciousActor.HandList)
                 {
                     card.SetActive(true);
                 }
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                foreach (GameObject card in maliciousActor.ActiveCardList)
                 {
                     card.SetActive(true);
                 }
@@ -887,15 +888,15 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
             {
                 fundText.text = "Funds: " + resiliencePlayer.funds;
                 activePlayerText.text = "Resilient Player";
-                Debug.Log("set active player to be resilient with number of cards1 " + resiliencePlayer.GetComponent<Player>().HandList.Count);
+                Debug.Log("set active player to be resilient with number of cards1 " + resiliencePlayer.HandList.Count);
                 activePlayerColor = Color.blue;
                 activePlayerText.color = activePlayerColor;
 
-                foreach (GameObject card in resiliencePlayer.GetComponent<Player>().HandList)
+                foreach (GameObject card in resiliencePlayer.HandList)
                 {
                     card.SetActive(true);
                 }
-                foreach (GameObject card in resiliencePlayer.GetComponent<Player>().ActiveCardList)
+                foreach (GameObject card in resiliencePlayer.ActiveCardList)
                 {
                     card.SetActive(true);
                 }
@@ -938,7 +939,7 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                     players.GetComponent<Player>().handDropZone.SetActive(true);
                     if (allPlayers[activePlayerNumber].GetComponent<Player>().handSize < 5)
                     {
-                        allPlayers[activePlayerNumber].GetComponent<Player>().DrawCard();
+                        allPlayers[activePlayerNumber].GetComponent<Player>().DrawCard(true, 0);
                     }
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
                     {
@@ -996,11 +997,11 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
-            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+            foreach (GameObject card in maliciousActor.HandList)
             {
                 card.SetActive(false);
             }
-            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+            foreach (GameObject card in maliciousActor.ActiveCardList)
             {
                 card.SetActive(false);
             }
@@ -1261,6 +1262,51 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
         msg = new Message(CardMessageType.ShowCards, tempCardIdList);
         Debug.Log("showing cards: " + msg.arguments.Count);
         AddMessage(msg);
+    }
+
+    public void ShowOthersCards(List<int> cardsToShow)
+    {
+        if (allCardsPlayer == null)
+        {
+            allCardsPlayer = gameObject.AddComponent<CardPlayer>();
+            allCardsPlayer.cardReader = GameObject.FindObjectOfType<CardReader>();
+            allCardsPlayer.manager = this;
+            allCardsPlayer.cardPrefab = resiliencePlayer.cardPrefab;
+            allCardsPlayer.Deck = new List<int>(5);
+            allCardsPlayer.CardCountList = new List<int>(5);
+            allCardsPlayer.HandList = new List<GameObject>(5);
+            allCardsPlayer.Facilities = new List<GameObject>(5);
+            for (int i = 0; i < allCardsPlayer.cardReader.CardIDs.Length; i++)
+            {
+                    allCardsPlayer.Deck.Add(i);
+                    allCardsPlayer.CardCountList.Add(allCardsPlayer.cardReader.CardCount[i]);
+            }
+            Debug.Log("cardread done!");
+            allCardsPlayer.handDropZone = gameView.showCardHolder;
+            allCardsPlayer.InitializeFacilities();
+            Debug.Log("drawing cards");
+            for (int i = 0; i < cardsToShow.Count; i++)
+            {
+                allCardsPlayer.DrawCard(false, cardsToShow[i]);
+            }
+            Debug.Log("cards drawn");
+        } else
+        {
+            for (int i = 0; i < allCardsPlayer.HandList.Count; i++)
+            {
+                allCardsPlayer.HandList[i].SetActive(false);
+                
+            }
+            allCardsPlayer.HandList.Clear();
+            for (int i = 0; i < cardsToShow.Count; i++)
+            {
+                allCardsPlayer.DrawCard(false, cardsToShow[i]);
+            }
+        }
+
+        Debug.Log("setting show to true");
+        gameView.showCardHolder.SetActive(true);
+        Debug.Log("stuff should show!");
     }
 
     public void AddMessage(Message msg)

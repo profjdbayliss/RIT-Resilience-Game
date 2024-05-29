@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class RGGameExampleUI : MonoBehaviour
 {
     [Header("UI Elements")]
-    //TMP_Text cardHistory;
     public Scrollbar scrollbar;
     public TextMeshProUGUI activePlayer;
     public TextMeshProUGUI fundsText;
@@ -17,48 +16,36 @@ public class RGGameExampleUI : MonoBehaviour
     public Canvas cardCanvas;
     public GameObject cardHolder;
     public GameObject cardPlayedHolder;
+    public GameObject showCardHolder;
     public Button endTurnButton;
-    public Button[] cards;
+    //public Button[] cards;
 
-    // This is only set on client to the name of the local player
+    // This is set on client to the name of the local player
     internal static string localPlayerName;
     internal static int localPlayerID;
 
-    // Server-only cross-reference of connections to player names
-    //internal static readonly Dictionary<NetworkConnectionToClient, string> connNames = new Dictionary<NetworkConnectionToClient, string>();
-
-    private int localPlayerTeamID = 1; // 0 = red, 1 = blue
-    private int teamNum = 2; // The number of teams
-
-   
+    // WORK: not sure the following is necessary for current game
     string[] red_name = { "System Shutdown", "Disk Wipe", "Ransom", "Phishing", "Brute Force", "Input Capture" };
     string[] blue_name = { "Access Processes", "User Training", "Restrict Web-Based Content", "Pay Ransom", "Data Backup", "User Acount Management" };
 
   
     public void SetStartTeamInfo(CardPlayer player, int teamID, float funds)
-    {
-        localPlayerTeamID = teamID;
-        
+    {        
         if (teamID == 0)
-        {
-            // malicious player goes first
-            ShowPlayUI();
+        { 
             activePlayer.text = "Malicious " + localPlayerName;
-            
-            foreach (Button card in cards)
-            {
-                card.GetComponent<Image>().color = Color.red;
-            }
+            cardHolder = GameManager.instance.maliciousActor.handDropZone;
+            cardPlayedHolder = GameManager.instance.maliciousActor.cardDropZone;
+            ShowPlayUI();
         } else
         {
             activePlayer.text = "Resilient " + localPlayerName;
-            for (int i = 0; i < cards.Length; i++)
-            {
-                GetNewCard(i);
-            }
-            HidePlayUI();
+            cardHolder = GameManager.instance.resiliencePlayer.handDropZone;
+            cardPlayedHolder = GameManager.instance.resiliencePlayer.cardDropZone;   
         }
 
+        showCardHolder.SetActive(false);
+        ShowPlayUI();
         turnText.text = "Turn: " + GameManager.instance.GetTurn();
     }
 
@@ -88,47 +75,19 @@ public class RGGameExampleUI : MonoBehaviour
         NetworkManager.singleton.StopHost();
     }
 
-    void GetNewCard(int index)
-    {
-        TMP_Text tex = cards[index].transform.Find("CardName").GetComponent<TMP_Text>();
-
-        if (localPlayerTeamID == 0)
-        {
-            int ri = Random.Range(0, red_name.Length);
-            tex.text = red_name[ri];
-        }
-        else
-        {
-            int ri = Random.Range(0, blue_name.Length);
-            tex.text = blue_name[ri];
-        }
-    }
-
-    // Need to call this upon card play
-    public void PlayCard(int index)
-    {
-        string message = "plays the <color=";
-        if (localPlayerTeamID == 0)
-            message += "red";
-        else
-            message += "blue";
-        message += ">" + cards[index].transform.Find("CardName").GetComponent<TMP_Text>().text + "</color>.";
-
-        GetNewCard(0);
-    }
 
     public void ShowPlayUI()
-    { 
-       
+    {      
             endTurnButton.gameObject.SetActive(true);
             cardCanvas.gameObject.SetActive(true);
             cardHolder.SetActive(true);
             cardPlayedHolder.SetActive(true);
+            //  to get rid of random other cards showing up eventually
+            showCardHolder.SetActive(false);
     }
 
     public void HidePlayUI()
-    {
-      
+    {    
             endTurnButton.gameObject.SetActive(false);
             cardHolder.SetActive(false);
             cardCanvas.gameObject.SetActive(false);

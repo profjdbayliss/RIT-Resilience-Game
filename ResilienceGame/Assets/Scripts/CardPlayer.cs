@@ -29,7 +29,6 @@ public class CardPlayer : MonoBehaviour
     // blue player only
     public List<GameObject> Facilities;
     public FacilityV3.Type type;
-
     public void InitializeCards()
     {
         // NOTE: set funds in scene var
@@ -50,7 +49,7 @@ public class CardPlayer : MonoBehaviour
         {
             for (int i = 0; i < maxHandSize; i++)
             {
-                DrawCard();
+                DrawCard(true, 0);
             }
         }
     }
@@ -66,9 +65,17 @@ public class CardPlayer : MonoBehaviour
         }
     }
 
-    public virtual void DrawCard()
+    public virtual void DrawCard(bool random, int cardId)
     {
-        int rng = UnityEngine.Random.Range(0, Deck.Count);
+        int rng;
+        if (random)
+        {
+            rng = UnityEngine.Random.Range(0, Deck.Count);
+        } else
+        {
+            rng = cardId;
+        }
+        
         if (CardCountList.Count <= 0) // Check to ensure the deck is actually built before trying to draw a card
         {
             Debug.Log("no cards drawn.");
@@ -278,7 +285,9 @@ public class CardPlayer : MonoBehaviour
         }
         else
         {
-            DrawCard();
+            // WORK: does this condition ever happen? Is there a card with the id of 0???
+            Debug.Log("random number was less than 0");
+            DrawCard(true, cardId);
         }
     }
 
