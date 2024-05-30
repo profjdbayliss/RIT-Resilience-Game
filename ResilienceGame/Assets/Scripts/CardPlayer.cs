@@ -29,27 +29,27 @@ public class CardPlayer : MonoBehaviour
     // blue player only
     public List<GameObject> Facilities;
     public FacilityV3.Type type;
-
     public void InitializeCards()
     {
         // NOTE: set funds in scene var
         cardReader = GameObject.FindObjectOfType<CardReader>();
         manager = GameObject.FindObjectOfType<GameManager>();
-
+        int count = 0;
         for (int i = 0; i < cardReader.CardIDs.Length; i++)
         {
             if (cardReader.CardTeam[i] == (int)playerType) 
             {
                 Deck.Add(i);
                 CardCountList.Add(cardReader.CardCount[i]);
+                count++;
             }
         }
-
+        
         if (HandList.Count < maxHandSize)
         {
             for (int i = 0; i < maxHandSize; i++)
             {
-                DrawCard();
+                DrawCard(true, 0);
             }
         }
     }
@@ -65,11 +65,20 @@ public class CardPlayer : MonoBehaviour
         }
     }
 
-    public virtual void DrawCard()
+    public virtual void DrawCard(bool random, int cardId)
     {
-        int rng = UnityEngine.Random.Range(0, Deck.Count);
+        int rng;
+        if (random)
+        {
+            rng = UnityEngine.Random.Range(0, Deck.Count);
+        } else
+        {
+            rng = cardId;
+        }
+        
         if (CardCountList.Count <= 0) // Check to ensure the deck is actually built before trying to draw a card
         {
+            Debug.Log("no cards drawn.");
             return;
         }
         if (CardCountList[rng] > 0)
@@ -276,7 +285,9 @@ public class CardPlayer : MonoBehaviour
         }
         else
         {
-            DrawCard();
+            // WORK: does this condition ever happen? Is there a card with the id of 0???
+            Debug.Log("random number was less than 0");
+            DrawCard(true, cardId);
         }
     }
 
@@ -341,6 +352,7 @@ public class CardPlayer : MonoBehaviour
                     {
                         if ((int)(obj.GetComponent<FacilityV3>().state) >= cardReader.CardFacilityStateReqs[cardID])
                         {
+                            Debug.Log("Facility acted upon is " + obj.GetComponent<FacilityV3>().state);
                             facilitiesActedUpon.Add(obj);
                         }
                     }

@@ -8,19 +8,44 @@ using UnityEngine.EventSystems;
 using Unity.VectorGraphics;
 using UnityEngine.SceneManagement;
 using Mirror;
+using System;
+using System.Linq;
+using UnityEditor;
+using static System.Net.Mime.MediaTypeNames;
 
-public class GameManager : MonoBehaviour, IDragHandler
+public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
 {
+    // is it my turn?
+    bool myTurn = false;
+    bool endGame = false;
+    int turnTotal = 0;
+    RGGameExampleUI gameView;
+
+    // has everything been set?
+    bool isInit = false;
+
+    // keep track of all game messages
+    MessageQueue mMessageQueue = new MessageQueue();
+    Message mMessage;
+
+    // network connections
+    RGNetworkPlayerList mRGNetworkPlayerList;
+    bool isServer = true; // is this particular player a server and therefore mal actor?
+
+    // other classes observe this one's gameplay data
+    List<IRGObserver> mObservers = new List<IRGObserver>(20);
+
     // Establish necessary fields
     public GameObject[] allPlayers;
     public GameObject MalActorObject;
-    public NativeArray<int> playerIDs;
+    //public NativeArray<int> playerIDs;
 
     
 
-    public GameObject resPlayer;
-
+    //public GameObject resPlayer;
+    public Player resiliencePlayer;
     public MaliciousActor maliciousActor;
+    CardPlayer allCardsPlayer;
     public bool playerActive = false;
     public GameObject playerMenu;
     public GameObject maliciousActorMenu;
@@ -32,7 +57,7 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public float turnCount;
 
-    public TextMeshProUGUI fundText;
+    public TMP_Text fundText;
     public TextMeshProUGUI activePlayerText;
 
     public GameObject yarnSpinner;
@@ -90,55 +115,23 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public TextMeshProUGUI titlee;
 
+    public static GameManager instance;
+
+    public void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         startScreen.SetActive(true);
         Debug.Log("Test Start");
-        //RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
-        //RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
-        //for(int i = 0; i < ntwrkPLayers.Length; i++)
-        //{
-        //    allPlayers[i] = GameObject.Find(ntwrkPLayers[i].name);
-        //}
-        //Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
-        //allPlayers = 
-        //titlee.GetComponent<TextMeshProUGUI>().text = "T: ";
-        //titlee.GetComponent<TextMeshProUGUI>().text = "T: " + maliciousActor.Deck.Count;
+       
     }
-
-    void DelayedStart()
-    {
-        RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
-        RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
-        Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
-        //allPlayers = new GameObject[playerList.playerIDs.Count];
-        for (int i = 0; i < ntwrkPLayers.Length; i++)
-        {
-            //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
-            //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
-            if(RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
-            {
-                if (ntwrkPLayers[i].playerID != 0)
-                {
-                    resPlayer = ntwrkPLayers[i].gameObject;
-                    Player temp = resPlayer.AddComponent<Player>();
-                    temp = ntwrkPLayers[i].GetComponent<Player>();
-                    //Debug.LogError(resPlayer.GetComponent<Player>().type);
-                    activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
-                    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                    //allPlayers[i] = ntwrkPLayers[i].gameObject;
-                }
-                else
-                {
-                    maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
-                }
-            }
-            
-        }
-
-    }
-
 
     // Created properties to allow for player input to decide how many facilities of each type to have.
     public int TransportationInputCount
@@ -261,44 +254,180 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
+    public void setupActors()
+    {
 
+        if (isServer)
+        {
+            // this is the malicious player
+            Player baseRes = GameObject.FindObjectOfType<Player>();
+            baseRes.gameObject.SetActive(false);
+            MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
+            baseMal.InitializeCards();
+            maliciousActor = this.gameObject.AddComponent<MaliciousActor>();
+
+            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            baseMal.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
+
+            //malActor = baseMal;
+            maliciousActor.funds = baseMal.funds;
+            maliciousActor.Deck = baseMal.Deck; 
+            //rgCardCount = baseMal.CardCountList;
+            maliciousActor.CardCountList = baseMal.CardCountList;
+            maliciousActor.cardReader = baseMal.cardReader;
+            maliciousActor.cardDropZone = baseMal.cardDropZone;
+            baseMal.cardDropZone.transform.parent = maliciousActor.transform;
+            maliciousActor.handDropZone = baseMal.handDropZone;
+            baseMal.handDropZone.transform.parent = maliciousActor.transform;
+            maliciousActor.cardPrefab = baseMal.cardPrefab;
+            maliciousActor.HandList = baseMal.HandList;
+            maliciousActor.ActiveCardList = baseMal.ActiveCardList;
+            maliciousActor.activeCardIDs = baseMal.activeCardIDs;
+            maliciousActor.manager = baseMal.manager;
+            maliciousActor.facilitiesActedUpon = baseMal.facilitiesActedUpon;
+            maliciousActor.targetIDList = baseMal.targetIDList;
+            //malActor.gameExampleUI = baseMal.gameExampleUI;
+            baseMal.gameObject.SetActive(false);
+            GameObject centralMap = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(centralMap.transform);
+            GameObject obj = GameObject.Find("RGTitle");
+            obj.GetComponent<TextMeshProUGUI>().text = "M " + maliciousActor.Deck.Count;
+            maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(true);
+            maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(true);
+
+            //forcing the networkplayer to be 1 by 1 by 1 to make future calculations easier
+            this.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            maliciousActor.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            baseMal.handDropZone.transform.localScale = new Vector3(1, 1, 1);
+            Debug.Log("RGNETWORKPLAYER SIZE:" + this.gameObject.transform.localScale);
+            Debug.Log(this.gameObject.name);
+            Debug.Log(maliciousActor.Deck.Count);
+        } else
+        {
+            // regular blue type player
+            MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
+            baseMal.gameObject.SetActive(false);
+            Player baseRes = GameObject.FindObjectOfType<Player>();
+            resiliencePlayer = this.gameObject.AddComponent<Player>();
+            //resiliencePlayer = resActor;
+            baseRes.InitializeCards();
+            baseRes.InitializeFacilities();
+            //resActor = this.gameObject.AddComponent<Player>();
+            //malActor = baseMal;
+            resiliencePlayer.funds = baseRes.funds;
+            resiliencePlayer.Deck = baseRes.Deck;
+            resiliencePlayer.type = (FacilityV3.Type)(mRGNetworkPlayerList.localPlayerID - 1);
+            //rgDeck = baseRes.Deck;
+            resiliencePlayer.Deck = baseRes.Deck;
+            //rgCardCount = baseRes.CardCountList;
+            resiliencePlayer.CardCountList = baseRes.CardCountList;
+            resiliencePlayer.cardReader = baseRes.cardReader;
+            resiliencePlayer.cardDropZone = baseRes.cardDropZone;
+            baseRes.cardDropZone.transform.parent = resiliencePlayer.transform;
+            resiliencePlayer.handDropZone = baseRes.handDropZone;
+            baseRes.handDropZone.transform.parent = resiliencePlayer.transform;
+            resiliencePlayer.cardPrefab = baseRes.cardPrefab;
+            resiliencePlayer.HandList = baseRes.HandList;
+            resiliencePlayer.ActiveCardList = baseRes.ActiveCardList;
+            resiliencePlayer.activeCardIDs = baseRes.activeCardIDs;
+            resiliencePlayer.manager = baseRes.manager;
+            //resActor.manager.resPlayer = resActor.gameObject;
+            //resActor.gameManager.allPlayers[0] = resActor.gameObject;
+            //resActor.gameManager. = resActor;
+            resiliencePlayer.Facilities = baseRes.Facilities;
+            resiliencePlayer.facilitiesActedUpon = baseRes.facilitiesActedUpon;
+            resiliencePlayer.targetIDList = baseRes.targetIDList;
+            //resActor.gameExampleUI = baseRes.gameExampleUI;
+            baseRes.gameObject.SetActive(false);
+            GameObject centralMap = GameObject.Find("Central Map");
+            this.gameObject.transform.SetParent(centralMap.transform);
+            GameObject obj = GameObject.Find("RGTitle");
+            obj.GetComponent<TextMeshProUGUI>().text = "R " + resiliencePlayer.Deck.Count;
+            //this.syncDirection = SyncDirection.ClientToServer;
+            Debug.Log(resiliencePlayer.Deck.Count);
+            resiliencePlayer.cardDropZone.SetActive(true);
+            resiliencePlayer.handDropZone.SetActive(true);
+        }
+        
+        
+}
 
     // Update is called once per frame
     void Update()
     {
-        //if (gameStarted)
-        //{
-        //   if(maliciousActor != null)
-        //    {
-        //        // Malicious actor
-        //        playerMenu.SetActive(false);
-        //        maliciousActorMenu.SetActive(true);
-        //        yarnSpinner.SetActive(false);
-        //        fundText.text = "Funds: " + maliciousActor.funds;
-        //    }
-        //    else
-        //    {
-        //        playerActive = true;
-        //        // Player
-        //        playerMenu.SetActive(true);
-        //        maliciousActorMenu.SetActive(false);
-        //        yarnSpinner.SetActive(true);
-        //        //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
-        //        fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-        //        // If enough of the facilites are down, trigger response from the govt
-        //    }
-        //    //if (playerActive)
-        //    //{
-        //    //
-        //    //
-        //    //
-        //    //}
-        //    //else
-        //    //{
-        //    //
-        //    //
-        //    //}
-        //}
+        if (isInit)
+        {
+            if (gameStarted)
+            {
+                if (isServer)
+                {
+                    if (!endGame && turnTotal >= 4)
+                    {
+                        EndGame(0, true);
+                    }
+                }
+                
+            }
+            else
+            {
+                if (isServer)
+                {
+                    StartTurn();
+                }
+            }
+            NotifyObservers();
+
+        } else
+        {
+            mRGNetworkPlayerList = RGNetworkPlayerList.instance;
+            if (mRGNetworkPlayerList == null)
+            {
+                Debug.Log("player list is a null var!");
+            }
+            else
+            {
+                RegisterObserver(mRGNetworkPlayerList);
+                isServer = mRGNetworkPlayerList.isServer; 
+                Player baseRes = GameObject.FindObjectOfType<Player>();
+                MaliciousActor baseMal = GameObject.FindObjectOfType<MaliciousActor>();
+                int team = 0;
+              
+                if (baseRes != null && baseMal != null)
+                {
+                    turnTotal = 0;
+                    setupActors();
+                    float funds = 0;
+                    myTurn = false;
+
+                    if (isServer)
+                    {
+                        funds = maliciousActor.funds;
+                        
+                    }
+                    else
+                    {
+                        funds = resiliencePlayer.funds;
+                        team = (int)resiliencePlayer.type+1;
+                        
+                    }
+
+                    GameObject obj = GameObject.Find("ExampleGameUI");
+                    gameView = obj.GetComponent<RGGameExampleUI>();
+              
+                    if (isServer)
+                    {
+                        gameView.SetStartTeamInfo(maliciousActor, team, funds);
+                    } else
+                    {
+                        gameView.SetStartTeamInfo(resiliencePlayer, team, funds);
+                    }
+                   
+                    isInit = true;
+                    
+                }
+            }
+        }
 
     }
 
@@ -382,7 +511,7 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerActive = !playerActive;
 
             DisableAllOutline();
-            resPlayer.GetComponent<Player>().facilitiesActedUpon.Clear();
+            resiliencePlayer.facilitiesActedUpon.Clear();
             //foreach(GameObject obj in allPlayers)
             //{
             //    obj.GetComponent<Player>().seletedFacilities.Clear();
@@ -396,19 +525,19 @@ public class GameManager : MonoBehaviour, IDragHandler
                 //activePlayerText.text = allPlayers[activePlayerNumber].GetComponent<Player>().type + " Player";
                 //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
 
-                activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
-                fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+                activePlayerText.text = resiliencePlayer.type + " Player";
+                fundText.text = "Funds: " + resiliencePlayer.funds;
 
                 activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
                 yarnSpinner.SetActive(true);
                 facilityEvents.SpawnEvent();
                 ChangePlayers();
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                foreach (GameObject card in maliciousActor.HandList)
                 {
                     card.SetActive(false);
                 }
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                foreach (GameObject card in maliciousActor.ActiveCardList)
                 {
                     card.SetActive(false);
                 }
@@ -420,8 +549,8 @@ public class GameManager : MonoBehaviour, IDragHandler
                 {
                     obj.GetComponent<Player>().targetIDList.Clear();
                 }
-                maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(false);
-                maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(false);
+                maliciousActor.cardDropZone.SetActive(false);
+                maliciousActor.handDropZone.SetActive(false);
 
             }
             else
@@ -441,15 +570,15 @@ public class GameManager : MonoBehaviour, IDragHandler
                 Debug.Log(maliciousActor.handSize);
                 if (maliciousActor.handSize < 5)
                 {
-                    maliciousActor.DrawCard();
+                    maliciousActor.DrawCard(true, 0);
                 }
-                resPlayer.GetComponent<Player>().cardDropZone.SetActive(false);
-                resPlayer.GetComponent<Player>().handDropZone.SetActive(false);
-                foreach (GameObject card in resPlayer.GetComponent<Player>().HandList)
+                resiliencePlayer.cardDropZone.SetActive(false);
+                resiliencePlayer.handDropZone.SetActive(false);
+                foreach (GameObject card in resiliencePlayer.HandList)
                 {
                     card.SetActive(false);
                 }
-                foreach (GameObject card in resPlayer.GetComponent<Player>().ActiveCardList)
+                foreach (GameObject card in resiliencePlayer.ActiveCardList)
                 {
                     card.SetActive(false);
                 }
@@ -466,18 +595,18 @@ public class GameManager : MonoBehaviour, IDragHandler
                 //        card.SetActive(false);
                 //    }
                 //}
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                foreach (GameObject card in maliciousActor.HandList)
                 {
                     card.SetActive(true);
                 }
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                foreach (GameObject card in maliciousActor.ActiveCardList)
                 {
                     card.SetActive(true);
                 }
                 maliciousActor.targetIDList.Clear();
                 maliciousActor.facilitiesActedUpon.Clear();
-                maliciousActor.GetComponent<MaliciousActor>().cardDropZone.SetActive(true);
-                maliciousActor.GetComponent<MaliciousActor>().handDropZone.SetActive(true);
+                maliciousActor.cardDropZone.SetActive(true);
+                maliciousActor.handDropZone.SetActive(true);
             }
         }
 
@@ -513,10 +642,9 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public void StartGame()
     {
-        DelayedStart();
         gameCanvas.SetActive(true);
-
-        this.GetComponent<PlaceIcons>().spawnAllFacilities(true, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, true);
+        PlaceIcons  placeIcons = GameObject.Find("FakeMapTest").GetComponent<PlaceIcons>();
+        placeIcons.spawnAllFacilities(true, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, true);
 
         //this.GetComponent<PlaceIcons>().spawnAllFacilities(policeToggle.isOn, hospitalToggle.isOn, fireDeptToggle.isOn, elecGenToggle.isOn, waterToggle.isOn, commToggle.isOn, cityHallToggle.isOn, commoditiesToggle.isOn, elecDistToggle.isOn, fuelToggle.isOn, true);
 
@@ -571,58 +699,46 @@ public class GameManager : MonoBehaviour, IDragHandler
             playerCount++;
 
         }
-        //if (transportationToggle.isOn)
-        //{
-        //    playerCount++;
-        //
-        //}
-        //SpawnPlayers(playerCount);
-        //
-        ////SpawnPlayers(6); // <-- Need to change this to an input
-        //SpawnMaliciousActor();
-
-        //maliciousActor.SpawnDeck();
-        //for (int i = 0; i < maliciousActor.maxHandSize; i++)
-        //{
-        //    maliciousActor.DrawCard();
-        //}
         activePlayerNumber = 0;
-
         playerActive = false;
-
         turnCount = 0;
-        //allPlayers = new GameObject[1];
-        //allPlayers[0] = maliciousActor.gameObject;
-        //for (int i = 0; i < allPlayers.Length; i++)
-        //{
-        //    //allPlayers[activePlayerNumber].GetComponent<Player>().seletedFacilities.Clear();
-        //    resPlayer.GetComponent<Player>().seletedFacilities.Clear();
-        //}
-        if(resPlayer != null)
+       
+        if(!isServer)
         {
-            if(resPlayer.GetComponent<Player>().facilitiesActedUpon != null)
+            // this is a resilience player
+            if(resiliencePlayer.facilitiesActedUpon != null)
             {
-                resPlayer.GetComponent<Player>().facilitiesActedUpon.Clear();
+                resiliencePlayer.facilitiesActedUpon.Clear();
             }
             playerActive = true;
 
         }
-        if (maliciousActor != null)
+        else 
         {
             maliciousActor.facilitiesActedUpon.Clear();
-
+            activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            activePlayerText.color = activePlayerColor;
         }
 
         if (playerActive)
         {
-            //activePlayerText.text = allPlayers[activePlayerNumber].GetComponent<Player>().type + " Player";
-            //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
-            activePlayerText.text = resPlayer.GetComponent<Player>().type + " Player";
-            fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
+
+            activePlayerText.text = resiliencePlayer.type + " Player";
+            Debug.Log("set active player to be reslilient");
+            fundText.text = "Funds: " + resiliencePlayer.funds;
             activePlayerColor = new Color(0.0f, 0.4209991f, 1.0f, 1.0f);
             activePlayerText.color = activePlayerColor;
-            yarnSpinner.SetActive(true);
-            Debug.Log("Starting player: " + resPlayer.name);
+            //yarnSpinner.SetActive(true);
+            Debug.Log("Starting player: " + resiliencePlayer.name);
+            Debug.Log("set active player to be resilient with number of cards1 " + resiliencePlayer.HandList.Count);
+            foreach (GameObject card in maliciousActor.HandList)
+            {
+                card.SetActive(true);
+            }
+            foreach (GameObject card in maliciousActor.ActiveCardList)
+            {
+                card.SetActive(true);
+            }
             //foreach(GameObject players in allPlayers)
             //{
             //    if(players == allPlayers[activePlayerNumber])
@@ -654,7 +770,7 @@ public class GameManager : MonoBehaviour, IDragHandler
             foreach (GameObject fac in allFacilities)
             {
                 //if (fac.GetComponent<FacilityV3>().type == allPlayers[activePlayerNumber].GetComponent<Player>().type)
-                if (fac.GetComponent<FacilityV3>().type == resPlayer.GetComponent<Player>().type)
+                if (fac.GetComponent<FacilityV3>().type == resiliencePlayer.type)
                 {
                     Color tempColor = fac.GetComponent<SVGImage>().color;
                     tempColor.a = 1.0f;
@@ -697,21 +813,18 @@ public class GameManager : MonoBehaviour, IDragHandler
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
-            if(MalActorObject != null)
-            {
-                MalActorObject.SetActive(false);
-
-            }
+            Debug.Log("player active");
         }
         else
         {
-            if(maliciousActor != null)
+            if(isServer )
             {
                 fundText.text = "Funds: " + maliciousActor.funds;
                 activePlayerText.text = "Malicious Player";
+                Debug.Log("set active player to be malicious");
                 activePlayerColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
                 activePlayerText.color = activePlayerColor;
-                yarnSpinner.SetActive(false);
+                //yarnSpinner.SetActive(false);
 
                 //foreach (GameObject players in allPlayers)
                 //{
@@ -724,23 +837,39 @@ public class GameManager : MonoBehaviour, IDragHandler
                 //        card.SetActive(false);
                 //    }
                 //}
-                if(resPlayer != null)
-                {
-                    foreach (GameObject card in resPlayer.GetComponent<Player>().HandList)
-                    {
-                        card.SetActive(false);
-                    }
-                    foreach (GameObject card in resPlayer.GetComponent<Player>().ActiveCardList)
-                    {
-                        card.SetActive(false);
-                    }
-                }
+                //if(resPlayer != null)
+                //{
+                //    foreach (GameObject card in resPlayer.GetComponent<Player>().HandList)
+                //    {
+                //        card.SetActive(false);
+                //    }
+                //    foreach (GameObject card in resPlayer.GetComponent<Player>().ActiveCardList)
+                //    {
+                //        card.SetActive(false);
+                //    }
+                //}
 
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                foreach (GameObject card in maliciousActor.HandList)
                 {
                     card.SetActive(true);
                 }
-                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                foreach (GameObject card in maliciousActor.ActiveCardList)
+                {
+                    card.SetActive(true);
+                }
+            } else
+            {
+                fundText.text = "Funds: " + resiliencePlayer.funds;
+                activePlayerText.text = "Resilient Player";
+                Debug.Log("set active player to be resilient with number of cards1 " + resiliencePlayer.HandList.Count);
+                activePlayerColor = Color.blue;
+                activePlayerText.color = activePlayerColor;
+
+                foreach (GameObject card in resiliencePlayer.HandList)
+                {
+                    card.SetActive(true);
+                }
+                foreach (GameObject card in resiliencePlayer.ActiveCardList)
                 {
                     card.SetActive(true);
                 }
@@ -783,7 +912,7 @@ public class GameManager : MonoBehaviour, IDragHandler
                     players.GetComponent<Player>().handDropZone.SetActive(true);
                     if (allPlayers[activePlayerNumber].GetComponent<Player>().handSize < 5)
                     {
-                        allPlayers[activePlayerNumber].GetComponent<Player>().DrawCard();
+                        allPlayers[activePlayerNumber].GetComponent<Player>().DrawCard(true, 0);
                     }
                     foreach (GameObject card in players.GetComponent<Player>().HandList)
                     {
@@ -841,11 +970,11 @@ public class GameManager : MonoBehaviour, IDragHandler
                     fac.GetComponent<SVGImage>().color = tempColor;
                 }
             }
-            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+            foreach (GameObject card in maliciousActor.HandList)
             {
                 card.SetActive(false);
             }
-            foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+            foreach (GameObject card in maliciousActor.ActiveCardList)
             {
                 card.SetActive(false);
             }
@@ -953,108 +1082,18 @@ public class GameManager : MonoBehaviour, IDragHandler
         }
     }
 
-    //public void ActivePlayerIncreaseOneFeedback()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseOneFeedback();
-    //}
-
-    //public void ActivePlayerAllFeedback()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseAllFeedback();
-
-    //}
-
-    //public void ActivePlayerHireWorkers()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().HireWorkers();
-
-
-    //}
-    //public void ActivePlayerBoostIT()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostIT();
-
-    //}
-    //public void ActivePlayerBoostOT()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostOT();
-
-
-    //}
-    //public void ActivePlayerImprovePhysSec()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().ImprovePhysSec();
-
-
-    //}
-    //public void ActivePlayerIncreaseFunding()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().IncreaseFunding();
-
-
-    //}
-
-    //public void ActivePlayerBoostElectricity()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostElectricity();
-
-
-    //}
-    //public void ActivePlayerBoostWater()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostWater();
-
-
-    //}
-    //public void ActivePlayerBoostFuel()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostFuel();
-
-
-    //}
-    //public void ActivePlayerBoostComms()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostCommunications();
-
-
-    //}
-    //public void ActivePlayerBoostHealth()
-    //{
-    //    allPlayers[activePlayerNumber].GetComponent<Player>().BoostHealth();
-
-
-    //}
+   
 
     public void AddFunds(int count)
     {
-
-        RGNetworkPlayerList playerList = GameObject.FindObjectOfType<RGNetworkPlayerList>();
-        RGNetworkPlayer[] ntwrkPLayers = FindObjectsOfType<RGNetworkPlayer>();
-        Debug.Log("NTWRK LENGTH: " + ntwrkPLayers.Length);
-        //allPlayers = new GameObject[playerList.playerIDs.Count];
-        for (int i = 0; i < ntwrkPLayers.Length; i++)
+        if (isServer)
         {
-            //Debug.LogError(RGNetworkPlayerList.instance.localPlayerID + ", " + ntwrkPLayers[i].playerID);
-            //if (ntwrkPLayers[i].playerID != 0 && ntwrkPLayers[i].playerID == playerIDs[i])
-            if (RGNetworkPlayerList.instance.localPlayerID == ntwrkPLayers[i].playerID)
-            {
-                if (ntwrkPLayers[i].playerID != 0)
-                {
-                    resPlayer = ntwrkPLayers[i].gameObject;
-                    Player temp = resPlayer.AddComponent<Player>();
-                    temp = ntwrkPLayers[i].GetComponent<Player>();
-                    resPlayer.GetComponent<Player>().funds += count;
-                    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                    //allPlayers[i] = ntwrkPLayers[i].gameObject;
-                }
-                else
-                {
-                    maliciousActor = ntwrkPLayers[i].GetComponent<MaliciousActor>();
-                    maliciousActor.funds += count;
-                    fundText.text = "Funds: " + maliciousActor.funds;
-
-                }
-            }
+            maliciousActor.funds += count;
+            fundText.text = "Funds: " + maliciousActor.funds;
+        } else
+        {
+            resiliencePlayer.funds += count;
+            fundText.text = "Funds: " + resiliencePlayer.funds;
 
         }
     }
@@ -1094,6 +1133,191 @@ public class GameManager : MonoBehaviour, IDragHandler
 
     public void TestEndGame()
     {
-        RGNetworkPlayerList.instance.CmdEndGame(2);
+       // RGNetworkPlayerList.instance.CmdEndGame(2);
+    }
+
+    public void EndGame(int whoWins, bool sendMessage)
+    {
+        if (sendMessage)
+        {
+            List<int> winner = new List<int>(1);
+            winner.Add(whoWins);
+            mMessageQueue.Enqueue(new Message(CardMessageType.EndGame, winner));
+            ShowEndGameCanvas(whoWins);
+        }
+        else
+        {
+            ShowEndGameCanvas(whoWins);
+        }
+        endGame = true;
+    }
+
+    public void EndTurn()
+    {
+        if (myTurn)
+        {
+            gameView.HidePlayUI();
+            Debug.Log("play ui hidden");
+            AddMessage(new Message(CardMessageType.EndTurn));
+            myTurn = false;
+        }
+    }
+
+    public void IncrementTurn()
+    {
+        turnTotal++;
+        gameView.turnText.text = "Turn: " + GetTurn();
+        if (isServer)
+        {
+            Debug.Log("server adding increment turn message");
+            AddMessage(new Message(CardMessageType.IncrementTurn));
+        }
+    }
+
+    public void StartTurn()
+    {
+        if (!myTurn)
+        {
+            if (isServer)
+            {
+                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().HandList)
+                {
+                    card.SetActive(true);
+                }
+                foreach (GameObject card in maliciousActor.GetComponent<MaliciousActor>().ActiveCardList)
+                {
+                    card.SetActive(true);
+                }
+            }
+            else
+            {
+                foreach (GameObject card in resiliencePlayer.GetComponent<Player>().HandList)
+                {
+                    card.SetActive(true);
+                }
+                foreach (GameObject card in resiliencePlayer.GetComponent<Player>().ActiveCardList)
+                {
+                    card.SetActive(true);
+                }
+            }
+            myTurn = true;
+            gameView.ShowPlayUI();
+            AddFunds(100);
+            Debug.Log("play ui shown");
+        }
+
+    }
+
+    public int GetTurn()
+    {
+        return turnTotal;
+    }
+
+    public void ShowMyCardsToEverybody()
+    {
+        Message msg;
+        List<int> tempCardIdList = new List<int>(5);
+        // malicious player
+        if (isServer)
+        {
+           for (int i=0; i<maliciousActor.HandList.Count; i++ )
+            {
+                Card cardObj = maliciousActor.HandList[i].GetComponent<Card>();
+                tempCardIdList.Add(cardObj.cardID);
+            }
+        } else
+        {
+            for (int i = 0; i < resiliencePlayer.HandList.Count; i++)
+            {
+                Card cardObj = resiliencePlayer.HandList[i].GetComponent<Card>();
+                tempCardIdList.Add(cardObj.cardID);
+            }           
+        }
+
+        msg = new Message(CardMessageType.ShowCards, tempCardIdList);
+        Debug.Log("showing cards: " + msg.arguments.Count);
+        AddMessage(msg);
+    }
+
+    public void ShowOthersCards(List<int> cardsToShow)
+    {
+        if (allCardsPlayer == null)
+        {
+            allCardsPlayer = gameObject.AddComponent<CardPlayer>();
+            allCardsPlayer.cardReader = GameObject.FindObjectOfType<CardReader>();
+            allCardsPlayer.manager = this;
+            allCardsPlayer.cardPrefab = resiliencePlayer.cardPrefab;
+            allCardsPlayer.Deck = new List<int>(5);
+            allCardsPlayer.CardCountList = new List<int>(5);
+            allCardsPlayer.HandList = new List<GameObject>(5);
+            allCardsPlayer.Facilities = new List<GameObject>(5);
+            for (int i = 0; i < allCardsPlayer.cardReader.CardIDs.Length; i++)
+            {
+                    allCardsPlayer.Deck.Add(i);
+                    allCardsPlayer.CardCountList.Add(allCardsPlayer.cardReader.CardCount[i]);
+            }
+            Debug.Log("cardread done!");
+            allCardsPlayer.handDropZone = gameView.showCardHolder;
+            allCardsPlayer.InitializeFacilities();
+            Debug.Log("drawing cards");
+            for (int i = 0; i < cardsToShow.Count; i++)
+            {
+                allCardsPlayer.DrawCard(false, cardsToShow[i]);
+            }
+            Debug.Log("cards drawn");
+        } else
+        {
+            for (int i = 0; i < allCardsPlayer.HandList.Count; i++)
+            {
+                allCardsPlayer.HandList[i].SetActive(false);
+                
+            }
+            allCardsPlayer.HandList.Clear();
+            for (int i = 0; i < cardsToShow.Count; i++)
+            {
+                allCardsPlayer.DrawCard(false, cardsToShow[i]);
+            }
+        }
+
+        Debug.Log("setting show to true");
+        gameView.showCardHolder.SetActive(true);
+        Debug.Log("stuff should show!");
+    }
+
+    public void AddMessage(Message msg)
+    {
+        mMessageQueue.Enqueue(msg);
+    }
+
+    public void RegisterObserver(IRGObserver o)
+    {
+        if (!mObservers.Exists(x => x == o))
+        {
+            mObservers.Add(o);
+        }
+    }
+
+   
+    public void RemoveObserver(IRGObserver o)
+    { 
+        if (mObservers.Exists(x => x == o) )
+        {
+            mObservers.Remove(o);
+        }
+    }
+
+  
+    public void NotifyObservers()
+    {
+        if (!mMessageQueue.IsEmpty())
+        {
+            while (!mMessageQueue.IsEmpty()) {
+                Message m = mMessageQueue.Dequeue();
+                foreach (IRGObserver o in mObservers)
+                {
+                    o.UpdateObserver(m);
+                } 
+            }
+        }
     }
 }

@@ -1211,15 +1211,15 @@ namespace Mirror
             // FOR SOME FUCKING REASON IT IS CALLING THIS TIWCE
             if (conn.identity != null)
             {
-                Debug.LogError("There is already a player for this connection.");
+                Debug.Log("There is already a player for this connection. " + conn.identity.netId);
                 return;
+            } else
+            {
+                OnServerAddPlayer(conn);
+                Debug.Log("Adding new connection of: " + conn.identity.netId);
             }
-            // FOR SOME FUCKING REASON IT IS CALLING THIS TIWCE
-            //if (conn.identity == null)
-            //{
-            //    OnServerAddPlayer(conn);
-            //}
-            OnServerAddPlayer(conn);
+            
+            
         }
 
         void OnClientConnectInternal()
