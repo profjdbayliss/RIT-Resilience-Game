@@ -20,7 +20,11 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
 
     public Vector2 originalScale;
 
+    public Vector3 originalPosition;
+
     public InputAction resetScale;
+
+    public InputAction resetPosition;
 
     public PlayerInput playerInput;
 
@@ -37,7 +41,8 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
                 resetScale = playerInput.actions["Reset Scale"];
             }
         }
-        originalScale = map.transform.localScale;
+        originalScale = this.gameObject.transform.localScale;
+        originalPosition = this.gameObject.transform.position;
         //if(this.gameObject.GetComponentInParent<Player>().isActiveAndEnabled == false && this.gameObject.GetComponentInParent<MaliciousActor>().isActiveAndEnabled == false)
         //{
         //    resetScale = playerInput.actions["Reset Scale"];
@@ -62,13 +67,13 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
             tempScale.y = maxScale;
             map.transform.localScale = tempScale;
         }
-        //else if (map.transform.localScale.x < minScale)
-        //{
-        //    Vector2 tempScale = map.transform.localScale;
-        //    tempScale.x = minScale;
-        //    tempScale.y = minScale;
-        //    map.transform.localScale = tempScale;
-        //}
+        else if (map.transform.localScale.x < minScale)
+        {
+            Vector2 tempScale = map.transform.localScale;
+            tempScale.x = minScale;
+            tempScale.y = minScale;
+            map.transform.localScale = tempScale;
+        }
 
     }
     public void OnScroll(PointerEventData pointer)
@@ -113,6 +118,7 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
     {
         if (map.gameObject.activeSelf) // Check to see if the gameobject this is attached to is active in the scene
         {
+            UpdatePosition();
             // Create a vector2 to hold the previous position of the element and also set our target of what we want to actually drag.
             Vector2 tempVec2 = default(Vector2);
             RectTransform target = map.gameObject.GetComponent<RectTransform>();
@@ -131,12 +137,31 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler
         }
     }
 
+    public void UpdatePosition()
+    {
+        originalPosition = gameObject.transform.position;
+    }
+    public void UpdateScale()
+    {
+        originalPosition = this.gameObject.transform.localScale;
+
+    }
+
     public void ResetScale()
     {
         Transform parent = this.gameObject.transform.parent;
         this.gameObject.transform.SetParent(null,true);
-        map.transform.localScale = new Vector2(1,1);
-        map.transform.SetParent(parent, true);
-        //map.transform.localScale = originalScale;
+        this.gameObject.transform.localScale = originalScale;
+        this.gameObject.transform.SetParent(parent, true);
+        Debug.Log("resetting scale on" +this.gameObject.name + "to " + originalScale);
+    }
+
+    public void ResetPosition()
+    {
+        Transform parent = this.gameObject.transform.parent;
+        this.gameObject.transform.SetParent(null, true);
+        this.gameObject.transform.SetPositionAndRotation(new Vector3(),gameObject.transform.rotation);
+        this.gameObject.transform.SetParent(parent, true);
+        Debug.Log("resetting position on " + this.gameObject.name + "to " + originalPosition);
     }
 }

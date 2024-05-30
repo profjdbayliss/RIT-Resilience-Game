@@ -7,11 +7,16 @@ public class HoverActivateObject : MonoBehaviour, IPointerEnterHandler, IPointer
 {
     public GameObject targetObject;
     public float delay = 0.5f; 
-
+    public float maxHeightOffset = 100;
+    private Vector3 originalPosition;
     private float timer = 0; 
     private bool isHovering = false; 
     private bool isScaled = false;
 
+    void Start()
+    {
+        originalPosition = transform.position;
+    }
     void Update()
     {
         //will scale the object that is being hovered over and will count a timer until it shows extra card info. 
@@ -23,6 +28,10 @@ public class HoverActivateObject : MonoBehaviour, IPointerEnterHandler, IPointer
             if (timer >= delay)
             {
                 targetObject.SetActive(true);
+                if(targetObject.transform.localPosition.y < originalPosition.y + maxHeightOffset)
+                {
+                    targetObject.transform.localPosition += new Vector3(0, 1, 0);
+                }
             }
         }
         //toggles the scaling effect to scale it back to its original size
@@ -31,16 +40,23 @@ public class HoverActivateObject : MonoBehaviour, IPointerEnterHandler, IPointer
 
     public void ScaleCard(float scaleAmount)
     {
+        if(!isScaled)
+        this.gameObject.layer = 30; 
+        else
+        {
+            this.gameObject.layer = 6;
+        }
+
         Vector2 tempScale = targetObject.transform.parent.localScale;
-        Vector2 offset = targetObject.transform.parent.localPosition;
+        Vector3 offset = targetObject.transform.parent.localPosition;
         tempScale.x = (float)(targetObject.transform.parent.localScale.x + scaleAmount);
         tempScale.y = (float)(targetObject.transform.parent.localScale.y + scaleAmount);
-        offset.y = offset.y + scaleAmount * 100;
+        offset.y = offset.y + scaleAmount * 200;
+
         targetObject.transform.parent.localScale = tempScale;
         targetObject.transform.parent.localPosition = offset;
-
+        
         isScaled = !isScaled;
-
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -51,7 +67,8 @@ public class HoverActivateObject : MonoBehaviour, IPointerEnterHandler, IPointer
     public void OnPointerExit(PointerEventData eventData)
     {
         isHovering = false;       
-        timer = 0;    
+        timer = 0;
+        targetObject.transform.SetLocalPositionAndRotation(new Vector3(), targetObject.transform.rotation);
         targetObject.SetActive(false);
     }
 }
