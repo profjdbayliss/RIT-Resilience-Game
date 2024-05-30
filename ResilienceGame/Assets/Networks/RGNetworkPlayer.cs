@@ -2,7 +2,7 @@ using Mirror;
 
 public class RGNetworkPlayer : NetworkBehaviour
 {
-
+    // Note: any single var that's player specific should be here and sync'd
     [SyncVar] public string playerName;
     [SyncVar] public int playerID;
 
@@ -19,6 +19,5 @@ public class RGNetworkPlayer : NetworkBehaviour
         RGGameExampleUI.localPlayerName = playerName;
         RGGameExampleUI.localPlayerID = playerID;
         RGNetworkPlayerList.instance.localPlayerID = playerID;
-        //StartCoroutine(WaitForPlayerListUpdate());
     }
 }

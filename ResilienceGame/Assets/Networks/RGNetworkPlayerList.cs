@@ -29,7 +29,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 
     public int localPlayerID;
     public List<int> playerIDs = new List<int>();
-    private bool messageHandlersSet = false;
     private GameManager manager;
 
     public List<int> playerTeamIDs = new List<int>();
@@ -66,8 +65,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 
     public void UpdateObserver(Message data)
     {
-
-        // send messages here over network to appropriate place
+        // send messages here over network to appropriate place(s)
         switch (data.Type)
         {
             case CardMessageType.EndTurn:
@@ -158,23 +156,25 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 }
                 break;
             case CardMessageType.EndGame:
-                //RGNetworkLongMessage msg = new RGNetworkLongMessage
-                //{
-                //    netId = (uint)localPlayerID,
-                //    type = (uint)data.Type,
-                //    count = (uint)data.arguments.Count(),
-                //    payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
-                //};
-                //if (isServer)
-                //{
-                //    NetworkServer.SendToAll(msg);
-                //    Debug.Log("SERVER SENT GAME END MESSAGE FIRST");
-                //}
-                //else
-                //{
-                //    NetworkClient.Send(msg);
-                //    Debug.Log("CLIENT SENT GAME END MESSAGE FIRST");
-                //}
+                {
+                    RGNetworkLongMessage msg = new RGNetworkLongMessage
+                    {
+                        indexId = (uint)localPlayerID,
+                        type = (uint)data.Type,
+                        count = (uint)data.arguments.Count(),
+                        payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
+                    };
+                    if (isServer)
+                    {
+                        NetworkServer.SendToAll(msg);
+                        Debug.Log("SERVER SENT GAME END MESSAGE FIRST");
+                    }
+                    else
+                    {
+                        NetworkClient.Send(msg);
+                        Debug.Log("CLIENT SENT GAME END MESSAGE FIRST");
+                    }
+                }
                 break;
         default:
                 break;
@@ -300,15 +300,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     }
                     GameManager.instance.ShowOthersCards(cardIds);
                     break;
-                //case CardMessageType.EndGame:
-                //    if (msg.count == 1)
-                //    {
-                //        int whoWins = BitConverter.ToInt32(msg.payload);
-                //        manager.EndGame(whoWins, false);
-                //        Debug.Log("received end game message and will now end game on client");
+                case CardMessageType.EndGame:
+                    if (msg.count == 1)
+                    {
+                        int whoWins = BitConverter.ToInt32(msg.payload);
+                        manager.EndGame(whoWins, false);
+                        Debug.Log("received end game message and will now end game on client");
 
-                //    }
-                //    break;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -339,15 +339,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 }
                 GameManager.instance.ShowOthersCards(cardIds);
                 break;
-            //case CardMessageType.EndGame:
-            //    if (msg.count == 1)
-            //    {
-            //        int whoWins = BitConverter.ToInt32(msg.payload);
-            //        manager.EndGame(whoWins, false);
-            //        Debug.Log("received end game message and will now end game on client");
+            case CardMessageType.EndGame:
+                if (msg.count == 1)
+                {
+                    int whoWins = BitConverter.ToInt32(msg.payload);
+                    manager.EndGame(whoWins, false);
+                    Debug.Log("received end game message and will now end game on server");
 
-            //    }
-            //    break;
+                }
+                break;
             default:
                 break;
         }

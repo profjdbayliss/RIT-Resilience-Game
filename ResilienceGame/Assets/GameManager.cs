@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
 {
     // is it my turn?
     bool myTurn = false;
+    bool endGame = false;
     int turnTotal = 0;
     RGGameExampleUI gameView;
 
@@ -359,40 +360,17 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
         {
             if (gameStarted)
             {
-                //if (isServer)
-                //{
-                //    // Malicious actor
-                //    playerMenu.SetActive(false);
-                //    maliciousActorMenu.SetActive(true);
-                //    yarnSpinner.SetActive(false);
-                //    fundText.text = "Funds: " + maliciousActor.funds;
-                //}
-                //else
-                //{
-                //    playerActive = true;
-                //    // Player
-                //    playerMenu.SetActive(true);
-                //    maliciousActorMenu.SetActive(false);
-                //    yarnSpinner.SetActive(true);
-                //    //fundText.text = "Funds: " + allPlayers[activePlayerNumber].GetComponent<Player>().funds;
-                //    fundText.text = "Funds: " + resPlayer.GetComponent<Player>().funds;
-                //    // If enough of the facilites are down, trigger response from the govt
-                //}
-                //if (playerActive)
-                //{
-                //
-                //
-                //
-                //}
-                //else
-                //{
-                //
-                //
-                //}
+                if (isServer)
+                {
+                    if (!endGame && turnTotal >= 4)
+                    {
+                        EndGame(0, true);
+                    }
+                }
+                
             }
             else
             {
-                //StartGame();
                 if (isServer)
                 {
                     StartTurn();
@@ -436,12 +414,7 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
 
                     GameObject obj = GameObject.Find("ExampleGameUI");
                     gameView = obj.GetComponent<RGGameExampleUI>();
-                    //obj = GameObject.Find("Funds Text");
-                    //if (obj == null)
-                    //{
-                    //    Debug.Log("no funds text found.");
-                    //}
-                    //fundText = obj.GetComponent<TextMeshPro>();
+              
                     if (isServer)
                     {
                         gameView.SetStartTeamInfo(maliciousActor, team, funds);
@@ -1165,16 +1138,18 @@ public class GameManager : MonoBehaviour, IDragHandler, IRGObservable
 
     public void EndGame(int whoWins, bool sendMessage)
     {
-        //if (sendMessage)
-        //{
-        //    List<int> winner = new List<int>(1);
-        //    winner.Add(whoWins);
-        //    mMessageQueue.Enqueue(new Message(RGNetworkPlayerList.instance.localPlayerID, CardMessageType.EndGame, winner));
-        //}
-        //else
-        //{
-        //    ShowEndGameCanvas(whoWins);
-        //}
+        if (sendMessage)
+        {
+            List<int> winner = new List<int>(1);
+            winner.Add(whoWins);
+            mMessageQueue.Enqueue(new Message(CardMessageType.EndGame, winner));
+            ShowEndGameCanvas(whoWins);
+        }
+        else
+        {
+            ShowEndGameCanvas(whoWins);
+        }
+        endGame = true;
     }
 
     public void EndTurn()

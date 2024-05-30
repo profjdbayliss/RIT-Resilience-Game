@@ -18,16 +18,10 @@ public class RGGameExampleUI : MonoBehaviour
     public GameObject cardPlayedHolder;
     public GameObject showCardHolder;
     public Button endTurnButton;
-    //public Button[] cards;
 
     // This is set on client to the name of the local player
     internal static string localPlayerName;
     internal static int localPlayerID;
-
-    // WORK: not sure the following is necessary for current game
-    string[] red_name = { "System Shutdown", "Disk Wipe", "Ransom", "Phishing", "Brute Force", "Input Capture" };
-    string[] blue_name = { "Access Processes", "User Training", "Restrict Web-Based Content", "Pay Ransom", "Data Backup", "User Acount Management" };
-
   
     public void SetStartTeamInfo(CardPlayer player, int teamID, float funds)
     {        
@@ -82,7 +76,7 @@ public class RGGameExampleUI : MonoBehaviour
             cardCanvas.gameObject.SetActive(true);
             cardHolder.SetActive(true);
             cardPlayedHolder.SetActive(true);
-            //  to get rid of random other cards showing up eventually
+            //  to get rid of the show cards command because it's annoying after a while
             showCardHolder.SetActive(false);
     }
 
