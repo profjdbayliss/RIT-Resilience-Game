@@ -327,11 +327,21 @@ MonoBehaviour:
   maxScale: 0
   minScale: 0
   originalScale: {x: 0, y: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
   resetScale:
     m_Name: Reset Scale
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: fc7ef897-528a-4689-a86c-934b3e15b0fa
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  resetPosition:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
