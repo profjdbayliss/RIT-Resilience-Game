@@ -18,6 +18,7 @@ public class CardAction : MonoBehaviour
         ShowEffectsOnFacilities //
     }
 
+    public ActionType type; 
     public List<string> parameters = new List<string>();
     public List<Facility> targetFacilities = new List<Facility>();
 
