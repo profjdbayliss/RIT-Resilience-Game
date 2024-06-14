@@ -59,6 +59,13 @@ public class Card : MonoBehaviour, IDropHandler
     // Static fields that are only utilized on spawn and cardloading.
     //public Type type;
 
+    // Properties needed by the new design
+    public List<Meeple> cardCost = new List<Meeple>();
+    public List<string> targetFacilityTypes = new List<string>();
+    public int targetCount;
+    public int duration;
+    public List<Effect> prerequisiteEffects = new List<Effect>();
+    public List<CardAction> actions = new List<CardAction>();
 
     // Separate these -- As they will change more often, will need type
     public float percentSuccess;
@@ -67,11 +74,9 @@ public class Card : MonoBehaviour, IDropHandler
     public int cardID;
     public int teamID;
     public int cost;
-    public int targetCount;
     //public Hashtable blueTargetMits;
     public List<int> blueTargetMits;
     public int[] blueCardTargets;
-    public float duration;
     public CardFront front;
     public CardState state;
     public FacilityStateRequirements facilityStateRequirements;

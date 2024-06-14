@@ -7,6 +7,14 @@ using UnityEngine.UI;
 
 public class CardPlayer : MonoBehaviour
 {
+
+    // Properties needed by the new design
+    public int playerTeam;
+    public List<Card> cardDeck = new List<Card>();
+    public List<int> cardCountList = new List<int>();
+    public List<Facility> controlledFacilities = new List<Facility>();
+    public List<Meeple> meeples = new List<Meeple>();
+
     // Establish necessary fields
     public Card.Type playerType = Card.Type.Resilient;
     public float funds = 100.0f;
@@ -303,7 +311,7 @@ public class CardPlayer : MonoBehaviour
                     HandList.Remove(card);
                     ActiveCardList.Add(card);
                     activeCardIDs.Add(card.GetComponent<Card>().cardID);
-                    card.GetComponent<Card>().duration = cardReader.CardDuration[card.GetComponent<Card>().cardID] + manager.turnCount;
+                    card.GetComponent<Card>().duration = (int)(cardReader.CardDuration[card.GetComponent<Card>().cardID] + manager.turnCount);
                     break;
                 }
             }
