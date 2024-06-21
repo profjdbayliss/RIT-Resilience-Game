@@ -12,6 +12,7 @@ public class CardPlayer : MonoBehaviour
     public int playerTeam;
     public List<Card> cardDeck = new List<Card>();
     public List<int> cardCountList = new List<int>();
+    public List<Card> handList = new List<Card>();
     public List<Facility> controlledFacilities = new List<Facility>();
     public List<Meeple> meeples = new List<Meeple>();
 
@@ -430,6 +431,11 @@ public class CardPlayer : MonoBehaviour
     public void DiscardCard(int cardID)
     {
         // Check to see if the card has expired and if so, then discard it from play and disable the game object.
+
+    }
+
+    public void Overtime()
+    {
 
     }
 }

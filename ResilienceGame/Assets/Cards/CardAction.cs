@@ -31,4 +31,9 @@ public class CardAction : MonoBehaviour
     {
         
     }
+
+    public void ExecuteAction()
+    {
+
+    }
 }

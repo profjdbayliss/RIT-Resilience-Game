@@ -60,6 +60,8 @@ public class Card : MonoBehaviour, IDropHandler
     //public Type type;
 
     // Properties needed by the new design
+    public string cardTitle;
+    public string cardDescription;
     public List<Meeple> cardCost = new List<Meeple>();
     public List<string> targetFacilityTypes = new List<string>();
     public int targetCount;
@@ -104,6 +106,11 @@ public class Card : MonoBehaviour, IDropHandler
 
     // Update is called once per frame
     void Update()
+    {
+
+    }
+
+    public void PlayCard()
     {
 
     }
