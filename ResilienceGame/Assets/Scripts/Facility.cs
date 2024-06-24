@@ -11,6 +11,8 @@ public class Facility : MonoBehaviour
     public int financialPoints;
     public List<Effect> effects = new List<Effect>();
 
+    public bool negatePointsReduction;
+    public List<Effect> negateEffects = new List<Effect>();
 
 
     void Start()

@@ -110,9 +110,40 @@ public class Card : MonoBehaviour, IDropHandler
 
     }
 
-    public void PlayCard()
+    public bool PlayCard(CardPlayer player)
     {
+        if (CanAfford(player))
+        {
+            foreach (var cost in cardCost)
+            {
+                player.meeples.Remove(cost);
+            }
 
+            foreach (var action in actions)
+            {
+                action.ExecuteAction(player);
+            }
+
+            return true;
+        }
+        else
+        {
+            Debug.Log("Not enough resources to play this card.");
+            return false;
+        }
+    }
+
+    private bool CanAfford(CardPlayer player)
+    {
+        // Checks if the player has enough meeples for each cost item
+        foreach (var cost in cardCost)
+        {
+            if (!player.meeples.Contains(cost))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void OnDrop(PointerEventData eventData)

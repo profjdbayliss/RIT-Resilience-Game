@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,6 +39,60 @@ public class CardPlayer : MonoBehaviour
     // blue player only
     public List<GameObject> Facilities;
     public FacilityV3.Type type;
+
+    public void DrawCards(int cardCount)
+    {
+        for (int i = 0; i < cardCount && cardDeck.Count > 0; i++)
+        {
+            handList.Add(cardDeck[0]);
+            cardDeck.RemoveAt(0);
+        }
+    }
+
+    public void DrawSpecificCard(string cardTitle)
+    {
+        var card = cardDeck.FirstOrDefault(c => c.cardTitle == cardTitle);
+        if (card != null)
+        {
+            handList.Add(card);
+            cardDeck.Remove(card);
+        }
+    }
+
+    public void ShuffleCards(int cardCount)
+    {
+        System.Random rand = new System.Random();
+        var selectedCards = handList.OrderBy(x => rand.Next()).Take(cardCount).ToList();
+        foreach (var card in selectedCards)
+        {
+            handList.Remove(card); 
+            cardDeck.Insert(rand.Next(cardDeck.Count), card); 
+        }
+    }
+
+    public void DiscardCards(int cardCount)
+    {
+        System.Random rand = new System.Random();
+        for (int i = 0; i < cardCount && handList.Count > 0; i++)
+        {
+            var cardIndex = rand.Next(handList.Count);
+            handList.RemoveAt(cardIndex); 
+        }
+    }
+
+    public void PlayCard(Card card)
+    {
+        if (handList.Contains(card))
+        {
+            bool isPlayed = card.PlayCard(this);
+            if (isPlayed)
+            {
+                handList.Remove(card);
+            }
+        }
+    }
+
+
     public void InitializeCards()
     {
         // NOTE: set funds in scene var
