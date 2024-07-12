@@ -12,10 +12,14 @@ public class CardPlayer : MonoBehaviour
     // Properties needed by the new design
     public int playerTeam;
     public List<Card> cardDeck = new List<Card>();
+    public List<Card> discardPile = new List<Card>();
     public List<int> cardCountList = new List<int>();
     public List<Card> handList = new List<Card>();
     public List<Facility> controlledFacilities = new List<Facility>();
+    public List<Facility> selectedFacilities = new List<Facility>();
+    public List<Meeple> meepleSamples = new List<Meeple>();
     public List<Meeple> meeples = new List<Meeple>();
+    public int overtimeCharges = 2;
 
     // Establish necessary fields
     public Card.Type playerType = Card.Type.Resilient;
@@ -70,6 +74,18 @@ public class CardPlayer : MonoBehaviour
         }
     }
 
+    public void DiscardCard(Card card)
+    {
+        if (handList.Contains(card))
+        {
+            handList.Remove(card);
+        }
+        else
+        {
+            Debug.Log("Card not found in hand.");
+        }
+    }
+
     public void DiscardCards(int cardCount)
     {
         System.Random rand = new System.Random();
@@ -80,11 +96,24 @@ public class CardPlayer : MonoBehaviour
         }
     }
 
+    public void ShuffleCardsFromDiscard(int cardCount)
+    {
+        System.Random rand = new System.Random();
+        var cardsToShuffle = discardPile.OrderBy(x => rand.Next()).Take(cardCount).ToList();
+        foreach (var card in cardsToShuffle)
+        {
+            discardPile.Remove(card);
+            cardDeck.Add(card);
+        }
+
+        cardDeck = cardDeck.OrderBy(x => rand.Next()).ToList();
+    }
+
     public void PlayCard(Card card)
     {
         if (handList.Contains(card))
         {
-            bool isPlayed = card.PlayCard(this);
+            bool isPlayed = card.PlayCard(this, selectedFacilities);
             if (isPlayed)
             {
                 handList.Remove(card);
@@ -92,6 +121,91 @@ public class CardPlayer : MonoBehaviour
         }
     }
 
+    public void ReduceCardCost(int reducedCost, string meepleTypes = "all")
+    {
+        List<string> types;
+        if (meepleTypes.ToLower() == "all")
+        {
+            // If "all", get all distinct types from the card costs
+            types = cardDeck.SelectMany(card => card.cardCost.Select(m => m.type.ToLower())).Distinct().ToList();
+        }
+        else
+        {
+            types = meepleTypes.ToLower().Split(';').Distinct().ToList();
+        }
+
+        foreach (var card in cardDeck)
+        {
+            foreach (var type in types)
+            {
+                // Get all Meeples of the current type in the card cost
+                List<Meeple> meepleList = card.cardCost.Where(m => m.type.ToLower() == type).ToList();
+
+                // Determine how many Meeples to remove
+                int removeCount = Mathf.Min(meepleList.Count, reducedCost);
+
+                // Remove the specified number of Meeples
+                for (int i = 0; i < removeCount; i++)
+                {
+                    card.cardCost.Remove(meepleList[i]);
+                }
+            }
+        }
+    }
+
+    public void ChangeMeepleAmount(int valueChange, string meepleTypes = "all")
+    {
+        List<string> types;
+        if (meepleTypes.ToLower() == "all")
+        {
+            // If "all", get all distinct types from the meeples list
+            if (valueChange > 0)
+            {
+                types = meepleSamples.Select(m => m.type.ToLower()).Distinct().ToList();
+            }
+            else
+            {
+                types = meeples.Select(m => m.type.ToLower()).Distinct().ToList();
+            }
+        }
+        else
+        {
+            types = meepleTypes.ToLower().Split(';').Distinct().ToList();
+        }
+
+        foreach (var type in types)
+        {
+            // Calculate the current number of meeples of this type
+            int currentCount = meeples.Count(m => m.type.ToLower() == type);
+
+            if (valueChange > 0)
+            {
+                // Add meeples of this type
+                for (int i = 0; i < valueChange; i++)
+                {
+                    meeples.Add(new Meeple { type = type });
+                }
+            }
+            else if (valueChange < 0)
+            {
+                // Remove meeples of this type, up to the number available
+                int removeCount = Mathf.Min(currentCount, -valueChange);
+                for (int i = 0; i < removeCount; i++)
+                {
+                    var meepleToRemove = meeples.FirstOrDefault(m => m.type.ToLower() == type);
+                    if (meepleToRemove != null)
+                    {
+                        meeples.Remove(meepleToRemove);
+                    }
+                }
+            }
+        }
+    }
+
+    public void IncreaseOvertime(int valueChange)
+    {
+        overtimeCharges += valueChange;  // Assuming overtimeCharges is an int tracking overtime
+    }
 
     public void InitializeCards()
     {

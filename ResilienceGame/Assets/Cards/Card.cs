@@ -66,6 +66,7 @@ public class Card : MonoBehaviour, IDropHandler
     public List<string> targetFacilityTypes = new List<string>();
     public int targetCount;
     public int duration;
+    public int rollDicePrerequisite = -1; // -1 = no prerequisite
     public List<Effect> prerequisiteEffects = new List<Effect>();
     public List<CardAction> actions = new List<CardAction>();
 
@@ -110,7 +111,7 @@ public class Card : MonoBehaviour, IDropHandler
 
     }
 
-    public bool PlayCard(CardPlayer player)
+    public bool PlayCard(CardPlayer player, List<Facility> targetFacilities)
     {
         if (CanAfford(player))
         {
@@ -121,7 +122,7 @@ public class Card : MonoBehaviour, IDropHandler
 
             foreach (var action in actions)
             {
-                action.ExecuteAction(player);
+                action.ExecuteAction(player, targetFacilities);
             }
 
             return true;
