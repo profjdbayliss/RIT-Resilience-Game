@@ -9,9 +9,20 @@ public class Effect : MonoBehaviour
     public string description;
     public int duration;
 
+    public Effect()
+    {
+
+    }
+
     public Effect(string type)
     {
         this.type = type;
+    }
+
+    public Effect(string type, int duration)
+    {
+        this.type = type;
+        this.duration = duration;
     }
 
     void Start()
