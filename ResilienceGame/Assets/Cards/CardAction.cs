@@ -21,11 +21,14 @@ public class CardAction : MonoBehaviour
         SpreadEffect, // [Effect Type]
         ChangeMeepleAmount, // [Value Change] [Meeple Type]
         IncreaseOvertimeAmount, // [Value Change]
-        ShuffleCardsFromDiscard // [Card Count]
+        ShuffleCardsFromDiscard, // [Card Count]
+        RemoveEffectByTeam // [Effect Count] [Effect Team]
     }
 
     public ActionType type; 
     public List<string> parameters = new List<string>();
+    public List<Facility> targetFacilities = new List<Facility>();
+    public List<Card> targetCards = new List<Card>();
 
     void Start()
     {
@@ -37,7 +40,7 @@ public class CardAction : MonoBehaviour
         
     }
 
-    public void ExecuteAction(CardPlayer player, List<Facility> targetFacilities)
+    public void ExecuteAction(CardPlayer player)
     {
         switch (type)
         {
@@ -107,9 +110,26 @@ public class CardAction : MonoBehaviour
             case ActionType.ShuffleCardsFromDiscard:
                 player.ShuffleCardsFromDiscard(int.Parse(parameters[0]));
                 break;
+            case ActionType.RemoveEffectByTeam:
+                string effectToRemoveByTeam = parameters[0];
+                foreach (var facility in targetFacilities)
+                    facility.effects.RemoveAll(e => e.team == effectToRemoveByTeam);
+                break;
             default:
                 Debug.LogError("Unsupported action type.");
                 break;
         }
+    }
+
+    public void ExecuteAction(CardPlayer player, List<Facility> targetFacilities)
+    {
+        this.targetFacilities = targetFacilities;
+        ExecuteAction(player);
+    }
+
+    public void ExecuteAction(CardPlayer player, List<Card> targetCards)
+    {
+        this.targetCards = targetCards;
+        ExecuteAction(player);
     }
 }

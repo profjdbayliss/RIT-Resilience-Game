@@ -62,6 +62,8 @@ public class Card : MonoBehaviour, IDropHandler
     // Properties needed by the new design
     public string cardTitle;
     public string cardDescription;
+    public string cardTeam;
+    public int totalMeepleCost;
     public List<Meeple> cardCost = new List<Meeple>();
     public List<string> targetFacilityTypes = new List<string>();
     public int targetCount;

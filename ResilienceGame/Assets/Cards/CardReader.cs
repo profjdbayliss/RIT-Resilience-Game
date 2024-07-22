@@ -57,6 +57,128 @@ public class CardReader : MonoBehaviour
 
     }
 
+    public List<Card> LoadCards(string filePath)
+    {
+        List<Card> cards = new List<Card>();
+
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError("File not found: " + filePath);
+            return cards;
+        }
+
+        string[] lines = File.ReadAllLines(filePath);
+        string[] headers = lines[0].Split(',');
+
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string[] fields = lines[i].Split(',');
+            if (fields.Length >= headers.Length)
+            {
+                Card card = new Card
+                {
+                    cardTitle = fields[6],
+                    cardDescription = fields[36],
+                    cardTeam = fields[0],
+                    rollDicePrerequisite = int.Parse(fields[34]),
+                    totalMeepleCost = int.Parse(fields[16])
+                };
+
+
+                card.prerequisiteEffects.Add(new Effect(fields[29]));
+
+                for (int j = 0; j < int.Parse(fields[17]); j++)
+                {
+                    Meeple blueMeeple = new Meeple("Blue");
+                    card.cardCost.Add(blueMeeple);
+                }
+
+                for (int j = 0; j < int.Parse(fields[18]); j++)
+                {
+                    Meeple blackMeeple = new Meeple("Black");
+                    card.cardCost.Add(blackMeeple);
+                }
+
+                for (int j = 0; j < int.Parse(fields[19]); j++)
+                {
+                    Meeple purpleMeeple = new Meeple("Purple");
+                    card.cardCost.Add(purpleMeeple);
+                }
+
+                string[] methods = fields[2].Split(';');
+
+                foreach (string method in methods)
+                {
+                    CardAction action = new CardAction();
+                    action.type = (CardAction.ActionType)System.Enum.Parse(typeof(CardAction.ActionType), method);
+                    action.parameters = new List<string>();
+
+                    // Add parameters based on action type
+                    switch (action.type)
+                    {
+                        case CardAction.ActionType.DrawAndDiscardCards:
+                            action.parameters.Add(fields[23]); // Draw Count
+                            action.parameters.Add(fields[24]); // Discard Count
+                            break;
+                        case CardAction.ActionType.ShuffleAndDrawCards:
+                            action.parameters.Add(fields[25]); // Shuffle Count
+                            action.parameters.Add(fields[23]); // Draw Count
+                            break;
+                        case CardAction.ActionType.ChangeNetworkPoints:
+                            action.parameters.Add(fields[20]); // Network Change
+                            break;
+                        case CardAction.ActionType.ChangePhysicalPoints:
+                            action.parameters.Add(fields[21]); // Physical Change
+                            break;
+                        case CardAction.ActionType.ChangeFinancialPoints:
+                            action.parameters.Add(fields[22]); // Financial Change
+                            break;
+                        case CardAction.ActionType.AddEffect:
+                            action.parameters.Add(fields[26]); // Effect Type
+                            action.parameters.Add(fields[30]); // Effect Duration
+                            break;
+                        case CardAction.ActionType.RemoveEffect:
+                            action.parameters.Add(fields[27]); // Effect Type
+                            break;
+                        case CardAction.ActionType.NegateEffect:
+                            action.parameters.Add(fields[27]); // Effect Type
+                            break;
+                        case CardAction.ActionType.ReduceCardCost:
+                            action.parameters.Add(fields[15]); // Cost Reduction
+                            action.parameters.Add(fields[14]); // Meeple Types
+                            break;
+                        case CardAction.ActionType.SpreadEffect:
+                            action.parameters.Add(fields[26]); // Effect Type
+                            break;
+                        case CardAction.ActionType.ChangeMeepleAmount:
+                            action.parameters.Add(fields[15]); // Cost Reduction
+                            action.parameters.Add(fields[14]); // Meeple Types
+                            break;
+                        case CardAction.ActionType.IncreaseOvertimeAmount:
+                            action.parameters.Add("1"); // Increase Amount
+                            break;
+                        case CardAction.ActionType.ShuffleCardsFromDiscard:
+                            action.parameters.Add(fields[25]); // Shuffle Count
+                            break;
+                        case CardAction.ActionType.RemoveEffectByTeam:
+                            action.parameters.Add(fields[27]); // Effect Team
+                            action.parameters.Add(fields[28]); // Effect Count
+                            break;
+                    }
+
+                    card.actions.Add(action);
+                }
+
+                cards.Add(card);
+            }
+            else
+            {
+                Debug.LogWarning("Skipped line due to insufficient data: " + lines[i]);
+            }
+        }
+
+        return cards;
+    }
 
     // Reformat to an SOA style 
     public void CSVRead()
