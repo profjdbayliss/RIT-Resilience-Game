@@ -71,6 +71,8 @@ public class Card : MonoBehaviour, IDropHandler
     public int rollDicePrerequisite = -1; // -1 = no prerequisite
     public List<Effect> prerequisiteEffects = new List<Effect>();
     public List<CardAction> actions = new List<CardAction>();
+    public Color backgroundColor;
+
 
     // Separate these -- As they will change more often, will need type
     public float percentSuccess;

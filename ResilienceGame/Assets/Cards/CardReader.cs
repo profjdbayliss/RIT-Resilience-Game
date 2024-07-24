@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Unity.Collections;
 using System.IO;
@@ -11,6 +12,12 @@ using System.Text;
 
 public class CardReader : MonoBehaviour
 {
+    // Properties needed by the new design
+    public GameObject cardPrefab;
+    public Transform cardTemplateContainer;
+    public string cardFileLoc;
+
+
     // Establish necessary fields
 
 
@@ -34,7 +41,6 @@ public class CardReader : MonoBehaviour
     public NativeArray<float> CardImpact;
     public NativeArray<float> CardSpreadChance;
     public NativeArray<float> CardPercentChance;
-    public string cardFileLoc;
 
 
 
@@ -42,13 +48,14 @@ public class CardReader : MonoBehaviour
 
     public MaliciousActor maliciousActor;
 
-    public GameObject cardPrefab;
 
 
     // Start is called before the first frame update
     void Start()
     {
         //CSVRead();
+        LoadCards(cardFileLoc);
+
     }
 
     // Update is called once per frame
@@ -68,21 +75,29 @@ public class CardReader : MonoBehaviour
         }
 
         string[] lines = File.ReadAllLines(filePath);
-        string[] headers = lines[0].Split(',');
+        Regex csvPattern = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
+        string[] headers = csvPattern.Split(lines[0]);
 
         for (int i = 1; i < lines.Length; i++)
         {
-            string[] fields = lines[i].Split(',');
+            string[] fields = csvPattern.Split(lines[i]);
             if (fields.Length >= headers.Length)
             {
-                Card card = new Card
+                GameObject cardObject = Instantiate(cardPrefab, cardTemplateContainer);
+                Card card = cardObject.GetComponent<Card>();
+
+                for (int j = 0; j < fields.Length; j++)
                 {
-                    cardTitle = fields[6],
-                    cardDescription = fields[36],
-                    cardTeam = fields[0],
-                    rollDicePrerequisite = int.Parse(fields[34]),
-                    totalMeepleCost = int.Parse(fields[16])
-                };
+                    fields[j] = fields[j].Trim('\"');
+                }
+
+                card.cardTitle = fields[6];
+                card.cardDescription = fields[36];
+                card.cardTeam = fields[0];
+                card.rollDicePrerequisite = int.Parse(fields[34]);
+                card.totalMeepleCost = int.Parse(fields[16]);
+                card.backgroundColor = HexToColor(fields[7]);
 
 
                 card.prerequisiteEffects.Add(new Effect(fields[29]));
@@ -170,6 +185,8 @@ public class CardReader : MonoBehaviour
                 }
 
                 cards.Add(card);
+
+                cardObject.GetComponent<CardUI>().SetCardUI(card);
             }
             else
             {
@@ -178,6 +195,28 @@ public class CardReader : MonoBehaviour
         }
 
         return cards;
+    }
+
+    Color HexToColor(string hex)
+    {
+        Color color = new Color();
+        byte r, g, b;
+
+        if (hex.StartsWith("0x"))
+        {
+            hex = hex.Substring(2);
+        }
+
+        if (hex.Length != 6 ||
+            !byte.TryParse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out r) ||
+            !byte.TryParse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out g) ||
+            !byte.TryParse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out b))
+        {
+            return Color.white;
+        }
+
+        color = new Color(r / 255f, g / 255f, b / 255f);
+        return color;
     }
 
     // Reformat to an SOA style 
