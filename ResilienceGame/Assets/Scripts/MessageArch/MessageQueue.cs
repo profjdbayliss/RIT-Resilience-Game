@@ -74,6 +74,10 @@ public class MessageQueue
         return messages.Count;
     }
 
+    public void Clear()
+    {
+       messages.Clear();
+    }
     #endregion
 } // MessageQueue
 

@@ -26,9 +26,10 @@ public class RGNetworkLoginUI : MonoBehaviour
         clientButton.interactable = !string.IsNullOrWhiteSpace(username);
     }
 
-    public void LoadScene(int index)
-    {
-        SceneManager.LoadScene(index);
+    //public void LoadScene(int index)
+    //{
+    //    Debug.Log("loading scene in rg login ui");
+    //    SceneManager.LoadScene(index);
         
-    }
+    //}
 }

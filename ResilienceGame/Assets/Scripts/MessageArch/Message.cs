@@ -7,10 +7,14 @@ using System.Text;
 /// </summary>
 public enum CardMessageType
 {
-    StartTurn,
-    EndTurn,
+    StartGame,
+    StartNextPhase,
+    EndPhase,
     IncrementTurn,
-    ShowCards,
+    SharePlayerType,
+    ShareDiscardNumber,
+    SendCardUpdates,  
+    SendPlayedFacility,
     EndGame,
     None
 }
@@ -20,6 +24,13 @@ public enum CardMessageType
 /// </summary>
 public class Message
 {
+    private bool isBytes = false;
+    public bool IsBytes
+    {
+        get { return isBytes; }
+        set { isBytes = value; }
+    }
+
     // not all messages have args
     private bool hasArgs = false;
     public bool HasArgs
@@ -44,6 +55,7 @@ public class Message
     /// This is the normal way messages are sent.
     /// </summary>
     public List<int> arguments;
+    public List<byte> byteArguments;
 
     /// <summary>
     /// A constructor that sets message info for short messages without args.
@@ -53,6 +65,7 @@ public class Message
     {
         type = t;
         hasArgs = false;
+        isBytes = false;
     }
 
     /// <summary>
@@ -64,11 +77,54 @@ public class Message
     {
         type = t;
         hasArgs = true;
-        arguments = new List<int>(args.Count);
-        foreach (int element in args)
-        {
-            arguments.Add(element);
-        }
+        isBytes = false;
+        arguments = new List<int>(args);
+    }
+
+    /// <summary>
+    /// A constructor that sets message info.
+    /// </summary>
+    /// <param name="t">The type of the message</param>
+    /// <param name="args">A list of the arguments for the message.</param>
+    public Message(CardMessageType t, List<byte> args)
+    {
+        type = t;
+        hasArgs = true;
+        isBytes = true;
+        byteArguments = new List<byte>(args);
+       
+    }
+
+    /// <summary>
+    /// A constructor that sets message info specifically for messages such as
+    /// sending new facility id info
+    /// </summary>
+    /// <param name="t">The type of the message</param>
+    /// <param name="arg">single argument</param>
+    public Message(CardMessageType t, int singleArg)
+    {
+        type = t;
+        hasArgs = true;
+        isBytes = false;
+        arguments = new List<int>(1);
+        arguments.Add(singleArg);
+    }
+
+    /// <summary>
+    /// A constructor that sets message info specifically for messages such as
+    /// sending new facility id info
+    /// </summary>
+    /// <param name="t">The type of the message</param>
+    /// <param name="uniqueID">card's unique id</param>
+    /// <param name="cardID">A unique card id.</param>
+    public Message(CardMessageType t, int uniqueID, int cardID)
+    {
+        type = t;
+        hasArgs = true;
+        isBytes = false;
+        arguments = new List<int>(2);
+        arguments.Add(uniqueID);
+        arguments.Add(cardID);
     }
 
     /// <summary>
@@ -127,4 +183,5 @@ public class Message
         return str.ToString();
     }
     
+
 }

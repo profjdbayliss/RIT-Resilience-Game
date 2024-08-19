@@ -8,10 +8,7 @@ using TMPro;
 public class RGNetworkManager : NetworkManager
 {
     public GameObject playerListPrefab;
-    public CardReader cardReader;
-    public CreateTextureAtlas textAtlas;
-    public CreateTextureAtlas atlasMaker;
-
+   
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -25,27 +22,17 @@ public class RGNetworkManager : NetworkManager
     public override void OnStartClient()
     {
         base.OnStartClient();
-        textAtlas.DelayedStart();
-
     }
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
 
         int playerID = conn.connectionId;
-        if (conn.identity.isLocalPlayer && (RGNetworkPlayerList.instance.playerIDs.Contains(0) == false)) // if the player is host, join red team
-        {
-            RGNetworkPlayerList.instance.AddPlayer(playerID, 0);
-            // Add their cards to the player
-
-        }
-        else // if the player is client, join blue team
-        {
-            RGNetworkPlayerList.instance.AddPlayer(playerID, 1);
-            // Add their cards to the blue players
-
-        }
+        RGNetworkPlayer player = (RGNetworkPlayer)conn.identity.GetComponent<RGNetworkPlayer>();
+        string name = (string)player.mPlayerName;
+        RGNetworkPlayerList.instance.AddPlayer(playerID, name);
     }
+
 
     // Called by UI element NetworkAddressInput.OnValueChanged
     public void SetHostname(string hostname)
@@ -58,9 +45,6 @@ public class RGNetworkManager : NetworkManager
         // remove player name from the HashSet
         if (conn.authenticationData != null)
             RGNetworkAuthenticator.playerNames.Remove((string)conn.authenticationData);
-
-        // remove connection from Dictionary of conn > names
-        //RGGameExampleUI.connNames.Remove(conn);
 
         RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId);
 
