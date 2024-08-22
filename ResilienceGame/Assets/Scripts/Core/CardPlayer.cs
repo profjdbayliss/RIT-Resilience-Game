@@ -20,22 +20,22 @@ public enum PlayerTeam
 public enum PlayerSector
 {
     // TODO: Randomly assign to blue players at the start of the game, starting with the core sectors
+    Communications, //Core
+    Energy, //Core
+    Water, //Core
+    Information, //Core
     Chemical,
     Commercial,
-    Communications,
     Manufacturing,
     Dams,
     Defense,
     Emergency,
-    Energy,
     Financial,
     Agriculture,
     Government,
     Healthcare,
-    Information,
     Nuclear,
     Transport,
-    Water,
     Any,
     All
 };
