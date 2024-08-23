@@ -15,6 +15,8 @@ After teams are implemented it is recommended that you then implement team turns
 There are several TODO comments left throughout the code if you are unsure what to do next.
 
 If you need help with Networking or the general code reach out to Jessica
+
 If you need clarification on the design of the game reach out to Dariel Ramos or James Zilberman
+
 If there are specific code-related questions reach out to James Zilberman
 
