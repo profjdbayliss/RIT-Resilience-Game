@@ -49,8 +49,17 @@ public class Sector : MonoBehaviour
     public Facility[] CheckDownedFacilities()
     {
         Facility[] facilitiesList = new Facility[3];
-
-        // TODO: check isDown
+        int downedFacilities = 0;
+        // TODO: check isDown;
+        //I think this should work? - Mukund
+        for(int i = 0; i < facilities.Length; i++)
+        {
+            if(facilities[i].isDown)
+            {
+                facilitiesList[downedFacilities] = facilities[i];
+                downedFacilities++;
+            }
+        }
 
         return facilitiesList;
     } 
