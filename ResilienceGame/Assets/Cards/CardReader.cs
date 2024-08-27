@@ -172,36 +172,47 @@ public class CardReader : MonoBehaviour
                                     break;
                                 case "ReduceCardCost":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ReduceCardCost());
                                     break;
                                 case "ChangePoints":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ChangePoints());
                                     break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new AddEffect());
                                     break;
                                 case "RemoveEffectByTeam":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new RemoveEffectByTeam());
                                     break;
                                 case "NegateEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new NegateEffect());
                                     break;
                                 case "ChangeFinancialPoints":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ChangeFinancialPoints());
                                     break;
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new RemoveEffect());
                                     break;
                                 case "SpreadEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new SpreadEffect());
                                     break;
                                 case "ChangeMeepleAmount":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ChangeMeepleAmount());
                                     break;
                                 case "IncreaseOvertimeAmount":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new IncreaseOvertimeAmount());
                                     break;
                                 case "ShuffleCardsFromDiscard":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
                                     break;
 
                                 default:

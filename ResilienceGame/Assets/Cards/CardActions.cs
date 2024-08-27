@@ -53,33 +53,7 @@ public class ShuffleAndDrawCards : ICardAction
     }
 }
 
-public class ChangeNetworkPoints : ICardAction
-{
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
-    {
-
-    }
-
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
-    {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
-public class ChangePhysicalPoints : ICardAction
-{
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
-    {
-
-    }
-
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
-    {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
-public class ChangeFinancialPoints : ICardAction
+public class ChangePoints : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
     {
@@ -105,7 +79,7 @@ public class AddEffect : ICardAction
     }
 }
 
-public class RemoveEffect : ICardAction
+public class RemoveEffectByTeam : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
     {
@@ -131,7 +105,20 @@ public class NegateEffect : ICardAction
     }
 }
 
-public class ReduceCardCost : ICardAction
+public class ChangeFinancialPoints : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+
+public class RemoveEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
     {
@@ -196,7 +183,7 @@ public class ShuffleCardsFromDiscard : ICardAction
     }
 }
 
-public class RemoveEffectByTeam : ICardAction
+public class ReduceCardCost : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
     {
@@ -208,3 +195,5 @@ public class RemoveEffectByTeam : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
+
+
