@@ -65,7 +65,6 @@ public class ChangeNetworkPoints : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-}
 
 public class ChangePhysicalPoints : ICardAction
 {
@@ -78,7 +77,6 @@ public class ChangePhysicalPoints : ICardAction
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
-}
 }
 
 public class ChangeFinancialPoints : ICardAction
@@ -93,7 +91,6 @@ public class ChangeFinancialPoints : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-}
 
 public class AddEffect : ICardAction
 {
@@ -106,7 +103,6 @@ public class AddEffect : ICardAction
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
-}
 }
 
 public class RemoveEffect : ICardAction
@@ -121,7 +117,6 @@ public class RemoveEffect : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-}
 
 public class NegateEffect : ICardAction
 {
@@ -134,7 +129,6 @@ public class NegateEffect : ICardAction
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
-}
 }
 
 public class ReduceCardCost : ICardAction
@@ -149,7 +143,6 @@ public class ReduceCardCost : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-}
 
 public class SpreadEffect : ICardAction
 {
@@ -162,7 +155,6 @@ public class SpreadEffect : ICardAction
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
-}
 }
 
 public class ChangeMeepleAmount : ICardAction
@@ -177,7 +169,6 @@ public class ChangeMeepleAmount : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-}
 
 public class IncreaseOvertimeAmount : ICardAction
 {
@@ -190,7 +181,6 @@ public class IncreaseOvertimeAmount : ICardAction
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
-}
 }
 
 public class ShuffleCardsFromDiscard : ICardAction
@@ -205,7 +195,6 @@ public class ShuffleCardsFromDiscard : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-}
 
 public class RemoveEffectByTeam : ICardAction
 {
@@ -218,5 +207,4 @@ public class RemoveEffectByTeam : ICardAction
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
-}
 }
