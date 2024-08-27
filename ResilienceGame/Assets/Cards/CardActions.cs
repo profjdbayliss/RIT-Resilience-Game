@@ -53,36 +53,170 @@ public class ShuffleAndDrawCards : ICardAction
     }
 }
 
-public class ActionImpactFacilityWorth : ICardAction
+public class ChangeNetworkPoints : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
     {
-        Debug.Log("card " + card.front.title + " played to attack the selected station.");
-        cardActedUpon.DefenseHealth += card.data.facilityAmount;
-        card.state = CardState.CardNeedsToBeDiscarded;
-        TextMeshProUGUI[] tempTexts = cardActedUpon.GetComponentsInChildren<TextMeshProUGUI>(true);
-        for (int i = 0; i < tempTexts.Length; i++)
-        {
-            if (tempTexts[i].name.Equals("Description Text"))
-            {
-                tempTexts[i].color = Color.red;
-                tempTexts[i].text = "<size=600%>+" + cardActedUpon.DefenseHealth;
-            }
-        }
+
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
     {
-        Debug.Log("card " + card.front.title + " attack undone.");
-        cardActedUpon.DefenseHealth -= card.data.facilityAmount;      
-        TextMeshProUGUI[] tempTexts = cardActedUpon.GetComponentsInChildren<TextMeshProUGUI>(true);
-        for (int i = 0; i < tempTexts.Length; i++)
-        {
-            if (tempTexts[i].name.Equals("Description Text"))
-            {
-                tempTexts[i].color = Color.blue;
-                tempTexts[i].text = "<size=600%>+" + cardActedUpon.DefenseHealth;
-            }
-        }
+        Debug.Log("card " + card.front.title + " canceled.");
     }
+}
+}
+
+public class ChangePhysicalPoints : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class ChangeFinancialPoints : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class AddEffect : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class RemoveEffect : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class NegateEffect : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class ReduceCardCost : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class SpreadEffect : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class ChangeMeepleAmount : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class IncreaseOvertimeAmount : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class ShuffleCardsFromDiscard : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+}
+
+public class RemoveEffectByTeam : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
 }
