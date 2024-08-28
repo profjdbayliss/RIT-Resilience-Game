@@ -8,7 +8,9 @@ using UnityEngine;
  *                                  "DrawAndDiscardCards":
                                 case "ShuffleAndDrawCards":
                                 case "ReduceCardCost":
-                                case "ChangePoints":
+                                case "ChangeNetworkPoints":
+                                case "ChangeFinancialkPoints":
+                                case "ChangePhysicalPoints":
                                 case "AddEffect":
                                 case "RemoveEffectByTeam":
                                 case "NegateEffect":
@@ -52,11 +54,37 @@ public class ShuffleAndDrawCards : ICardAction
     }
 }
 
-public class ChangePoints : ICardAction
+public class ChangeNetworkPoints : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
+        facilityActedUpon.ChangeFacilityPoints("network", card.data.facilityAmount);
+    }
 
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+
+public class ChangeFinancialPoints : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
+    {
+        facilityActedUpon.ChangeFacilityPoints("financial", card.data.facilityAmount);
+    }
+
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
+    {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+
+public class ChangePhysicalPoints : ICardAction
+{
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
+    {
+        facilityActedUpon.ChangeFacilityPoints("physical", card.data.facilityAmount);
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)

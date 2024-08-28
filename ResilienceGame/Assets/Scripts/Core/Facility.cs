@@ -43,26 +43,25 @@ public class Facility : MonoBehaviour
         UpdateUI();
     }
 
-    public void ChangeFacilityPoints(string[] targets, int value)
+    public void ChangeFacilityPoints(string target, int value)
     {
-        foreach(string target in targets)
+        target = target.ToLower().Trim();
+        switch (target)
         {
-            switch (target)
-            {
-                case "physical": 
-                    physicalPoints += value;
-                    physicalPoints = (physicalPoints > maxPhysicalPoints) ? maxPhysicalPoints : (physicalPoints < 0) ? 0 : physicalPoints; //If any problems check here
-                                               // if >max                  //Set to max        //else if <0      //Set to 0  //Else set self
-                    break;
-                case "finacial": 
-                    finacialPoints += value;
-                    finacialPoints = (finacialPoints > maxFinacialPoints) ? maxFinacialPoints : (finacialPoints < 0) ? 0 : finacialPoints;
-                    break;
-                case "network": 
-                    networkPoints += value;
-                    networkPoints = (networkPoints > maxNetworkPoints) ? maxNetworkPoints : (networkPoints < 0) ? 0 : networkPoints;
-                    break;
-            }
+
+            case "physical": 
+                physicalPoints += value;
+                physicalPoints = (physicalPoints > maxPhysicalPoints) ? maxPhysicalPoints : (physicalPoints < 0) ? 0 : physicalPoints; //If any problems check here
+                                           // if >max                  //Set to max        //else if <0      //Set to 0  //Else set self
+                break;
+            case "finacial": 
+                finacialPoints += value;
+                finacialPoints = (finacialPoints > maxFinacialPoints) ? maxFinacialPoints : (finacialPoints < 0) ? 0 : finacialPoints;
+                break;
+            case "network": 
+                networkPoints += value;
+                networkPoints = (networkPoints > maxNetworkPoints) ? maxNetworkPoints : (networkPoints < 0) ? 0 : networkPoints;
+                break;
         }
 
         if (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0) { isDown = true; }

@@ -159,24 +159,32 @@ public class CardReader : MonoBehaviour
                             switch (type)
                             {
                                 case "DrawAndDiscardCards":
-                                    tempCard.ActionList.Add(new DrawAndDiscardCards());
                                     // 17:  Cards drawn
                                     tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
                                     // 18:  Cards removed
                                     tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
+                                    tempCard.ActionList.Add(new DrawAndDiscardCards());
                                     break;
                                 case "ShuffleAndDrawCards":
-                                    tempCard.ActionList.Add(new ShuffleAndDrawCards());
                                     tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
                                     tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
+                                    tempCard.ActionList.Add(new ShuffleAndDrawCards());
                                     break;
                                 case "ReduceCardCost":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ReduceCardCost());
                                     break;
-                                case "ChangePoints":
+                                case "ChangeNetworkPoints":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangePoints());
+                                    tempCard.ActionList.Add(new ChangeNetworkPoints());
+                                    break;
+                                case "ChangeFinancialPoints":
+                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ChangeFinancialPoints());
+                                    break;
+                                case "ChangePhysicalPoints":
+                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.ActionList.Add(new ChangePhysicalPoints());
                                     break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
@@ -189,10 +197,6 @@ public class CardReader : MonoBehaviour
                                 case "NegateEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new NegateEffect());
-                                    break;
-                                case "ChangeFinancialPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangeFinancialPoints());
                                     break;
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
