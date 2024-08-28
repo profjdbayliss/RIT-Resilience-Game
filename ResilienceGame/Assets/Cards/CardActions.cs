@@ -12,7 +12,6 @@ using UnityEngine;
                                 case "AddEffect":
                                 case "RemoveEffectByTeam":
                                 case "NegateEffect":
-                                case "ChangeFinancialPoints":
                                 case "RemoveEffect":
                                 case "SpreadEffect":
                                 case "ChangeMeepleAmount":
@@ -20,7 +19,7 @@ using UnityEngine;
                                 case "ShuffleCardsFromDiscard":*/
 public class DrawAndDiscardCards : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " played.");
         // TODO: Get data from card reader to loop
@@ -31,7 +30,7 @@ public class DrawAndDiscardCards : ICardAction
         // TODO: Select Card(s) to Discard / reactivate discard box
         player.DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
     }
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -39,7 +38,7 @@ public class DrawAndDiscardCards : ICardAction
 
 public class ShuffleAndDrawCards : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " played to mitigate a card on the selected station.");
         // TODO: Get data from card reader to loop
@@ -47,7 +46,7 @@ public class ShuffleAndDrawCards : ICardAction
         // TODO: Select Shuffled Card
 
     }
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -55,12 +54,12 @@ public class ShuffleAndDrawCards : ICardAction
 
 public class ChangePoints : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -68,12 +67,12 @@ public class ChangePoints : ICardAction
 
 public class AddEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -81,12 +80,12 @@ public class AddEffect : ICardAction
 
 public class RemoveEffectByTeam : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -94,25 +93,12 @@ public class RemoveEffectByTeam : ICardAction
 
 public class NegateEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
-    {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
-public class ChangeFinancialPoints : ICardAction
-{
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
-    {
-
-    }
-
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -120,12 +106,12 @@ public class ChangeFinancialPoints : ICardAction
 
 public class RemoveEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -133,12 +119,12 @@ public class RemoveEffect : ICardAction
 
 public class SpreadEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -146,12 +132,12 @@ public class SpreadEffect : ICardAction
 
 public class ChangeMeepleAmount : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -159,12 +145,12 @@ public class ChangeMeepleAmount : ICardAction
 
 public class IncreaseOvertimeAmount : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -172,12 +158,12 @@ public class IncreaseOvertimeAmount : ICardAction
 
 public class ShuffleCardsFromDiscard : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -185,12 +171,12 @@ public class ShuffleCardsFromDiscard : ICardAction
 
 public class ReduceCardCost : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
 
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Card cardActedUpon, Card card)
+    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
