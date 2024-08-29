@@ -30,6 +30,7 @@ public struct CardData
     public int removeAmount;
     public int targetAmount;
     public int facilityAmount;
+    public FacilityEffect effect;
     public string[] meepleType;
     public float meepleAmount;
     public PlayerSector[] onlyPlayedOn;

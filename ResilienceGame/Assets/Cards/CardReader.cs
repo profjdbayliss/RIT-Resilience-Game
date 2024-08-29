@@ -188,6 +188,7 @@ public class CardReader : MonoBehaviour
                                     break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
                                     tempCard.ActionList.Add(new AddEffect());
                                     break;
                                 case "RemoveEffectByTeam":
@@ -200,6 +201,7 @@ public class CardReader : MonoBehaviour
                                     break;
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                                    tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
                                     tempCard.ActionList.Add(new RemoveEffect());
                                     break;
                                 case "SpreadEffect":

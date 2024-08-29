@@ -8,7 +8,8 @@ public enum FacilityEffect
 {
     None,
     Backdoor,
-    Fortify
+    Fortify,
+    MeepleReduction
 }
 
 public class Facility : MonoBehaviour

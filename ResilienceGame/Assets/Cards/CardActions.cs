@@ -97,7 +97,7 @@ public class AddEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
-
+        facilityActedUpon.AddOrRemoveEffect(card.data.effect, true);
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
@@ -136,7 +136,7 @@ public class RemoveEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
-
+        facilityActedUpon.AddOrRemoveEffect(card.data.effect, false);
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
