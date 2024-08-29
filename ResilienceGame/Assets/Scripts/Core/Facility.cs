@@ -4,6 +4,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum FacilityEffect
+{
+    None,
+    Backdoor,
+    Fortify
+}
+
 public class Facility : MonoBehaviour
 {
     public enum FacilityName
@@ -21,10 +28,7 @@ public class Facility : MonoBehaviour
     private int physicalPoints, finacialPoints, networkPoints;
     private TextMeshProUGUI[] pointsUI;
 
-    // TODO: Effect class and reference here
-    // For now it is just written as two bools
-    public bool hasBackdoor;
-    public bool hasFortify;
+    public FacilityEffect effect;
 
     public bool isDown;
 
@@ -34,6 +38,7 @@ public class Facility : MonoBehaviour
         facilityCanvas = this.transform.gameObject;
         products = new PlayerSector[3];
         pointsUI = new TextMeshProUGUI[3];
+        effect = FacilityEffect.None;
 
         for(int i = 0; i < 3; i++)
         {
@@ -79,12 +84,12 @@ public class Facility : MonoBehaviour
         UpdateUI();
     }
 
-    public void AddOrRemoveEffect(string effectType, bool isAddingEffect)
+    public void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect)
     {
-        if(effectType.Trim().ToLower() == "backdoor" && isAddingEffect) { hasBackdoor = true; }
-        else if (effectType.Trim().ToLower() == "backdoor" && !isAddingEffect) { hasBackdoor = false; }
-        else if (effectType.Trim().ToLower() == "fortify" && isAddingEffect) { hasFortify = true; }
-        else if (effectType.Trim().ToLower() == "fortify" && !isAddingEffect) { hasFortify = false; }
+        if (isAddingEffect)
+            effect = effectToAdd;
+        else
+            effect = FacilityEffect.None;
     }
 
     private void UpdateUI()
