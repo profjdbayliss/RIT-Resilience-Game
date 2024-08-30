@@ -368,82 +368,81 @@ public class CardPlayer : MonoBehaviour
         
         // for all active facilities
         foreach (GameObject facilityGameObject in ActiveFacilities.Values)
-        {
-            Card facilityCard = facilityGameObject.GetComponent<Card>();
-            Debug.Log("number of attacks on facility: " + facilityCard.AttackingCards.Count);
-            // for all attacking cards on those facilities
-            foreach(CardIDInfo cardInfo in facilityCard.AttackingCards)
-            {
-                // TODO: Remove random
+        //{
+        //    Facility facilityCard = facilityGameObject.GetComponent<Facility>();
+        //    // for all attacking cards on those facilities
+        //    foreach(CardIDInfo cardInfo in facilityCard.AttackingCards)
+        //    {
+        //        // TODO: Remove random
 
 
-                // run the effects of the card, but only if we roll between 11-20 on a d20 does the attack happen
-                // This is the same as 50-99 on a 0-100 random roll
-                int randomNumber = UnityEngine.Random.Range(0, 100);
-                if (randomNumber >= 50)
-                {
-                    // get the card
-                    GameObject opponentAttackObject = opponent.GetActiveCardObject(cardInfo);
+        //        // run the effects of the card, but only if we roll between 11-20 on a d20 does the attack happen
+        //        // This is the same as 50-99 on a 0-100 random roll
+        //        int randomNumber = UnityEngine.Random.Range(0, 100);
+        //        if (randomNumber >= 50)
+        //        {
+        //            // get the card
+        //            GameObject opponentAttackObject = opponent.GetActiveCardObject(cardInfo);
 
-                    // run the attack effects
-                    if (opponentAttackObject != null)
-                    {
+        //            // run the attack effects
+        //            if (opponentAttackObject != null)
+        //            {
                         
-                        Card opponentCard = opponentAttackObject.GetComponent<Card>();
-                        Debug.Log("attacking card with value : " + opponentCard.data.facilityAmount);
-                        opponentCard.Play(this, opponent, facilityCard);
-                        mUpdatesThisPhase.Add(new Updates
-                        {
-                            WhatToDo = AddOrRem.Remove,
-                            UniqueFacilityID = facilityCard.UniqueID,
-                            CardID = opponentCard.data.cardID
-                        });
-                    } else
-                    {
-                        Debug.Log("there's a problem because an opponent attack card wasn't in the opponent's active list.");
-                    }
-                }
-            }
+        //                Card opponentCard = opponentAttackObject.GetComponent<Card>();
+        //                Debug.Log("attacking card with value : " + opponentCard.data.facilityAmount);
+        //                opponentCard.Play(this, opponent, facilityCard);
+        //                mUpdatesThisPhase.Add(new Updates
+        //                {
+        //                    WhatToDo = AddOrRem.Remove,
+        //                    UniqueFacilityID = facilityCard.UniqueID,
+        //                    CardID = opponentCard.data.cardID
+        //                });
+        //            } else
+        //            {
+        //                Debug.Log("there's a problem because an opponent attack card wasn't in the opponent's active list.");
+        //            }
+        //        }
+        //    }
 
-            Debug.Log("facility worth is " + (facilityCard.data.facilityAmount + facilityCard.DefenseHealth));
+        //    Debug.Log("facility worth is " + (facilityCard.data.facilityAmount + facilityCard.DefenseHealth));
 
-            // now check the total worth of the facility to see if it
-            // and do a removal of all cards that were spent in attacks
-            if (facilityCard.data.facilityAmount+facilityCard.DefenseHealth <= 0)
-            {
-                Debug.Log("we need to get rid of this facility");
-                // the facility needs to be removed along with all remaining
-                // attack cards on it
-                foreach(CardIDInfo cardInfo in facilityCard.AttackingCards)
-                {
-                    GameObject cardObject = opponent.GetActiveCardObject(cardInfo);
-                    if (cardObject != null)
-                    {
-                        Card cardToDispose = cardObject.GetComponent<Card>();
-                        Debug.Log("handling all attack cards on defunct facility : this one's id is " + cardToDispose.UniqueID);
-                        cardToDispose.state = CardState.CardNeedsToBeDiscarded;
+        //    // now check the total worth of the facility to see if it
+        //    // and do a removal of all cards that were spent in attacks
+        //    if (facilityCard.data.facilityAmount+facilityCard.DefenseHealth <= 0)
+        //    {
+        //        Debug.Log("we need to get rid of this facility");
+        //        // the facility needs to be removed along with all remaining
+        //        // attack cards on it
+        //        foreach(CardIDInfo cardInfo in facilityCard.AttackingCards)
+        //        {
+        //            GameObject cardObject = opponent.GetActiveCardObject(cardInfo);
+        //            if (cardObject != null)
+        //            {
+        //                Card cardToDispose = cardObject.GetComponent<Card>();
+        //                Debug.Log("handling all attack cards on defunct facility : this one's id is " + cardToDispose.UniqueID);
+        //                cardToDispose.state = CardState.CardNeedsToBeDiscarded;
 
-                    } else
-                    {
-                        Debug.Log("attack card with id " + cardInfo.CardID + " wasn't found in the pile of cards on a defunct facility.");
-                    }
-                    //opponent.HandleDiscard(opponent.ActiveCards, opponent.opponentDropZone, facilityCard.UniqueID, true);
-                }
-                // let's discard all the cards on the facility in question
-                opponent.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, facilityCard.UniqueID);
-                facilityCard.AttackingCards.Clear();
-                facilityCard.state = CardState.CardNeedsToBeDiscarded;
+        //            } else
+        //            {
+        //                Debug.Log("attack card with id " + cardInfo.CardID + " wasn't found in the pile of cards on a defunct facility.");
+        //            }
+        //            //opponent.HandleDiscard(opponent.ActiveCards, opponent.opponentDropZone, facilityCard.UniqueID, true);
+        //        }
+        //        // let's discard all the cards on the facility in question
+        //        opponent.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, facilityCard.UniqueID);
+        //        facilityCard.AttackingCards.Clear();
+        //        facilityCard.state = CardState.CardNeedsToBeDiscarded;
                 
-                mUpdatesThisPhase.Add(new Updates
-                {
-                    WhatToDo = AddOrRem.Remove,
-                    UniqueFacilityID = facilityCard.UniqueID,
-                    CardID = facilityCard.data.cardID
-                });
+        //        mUpdatesThisPhase.Add(new Updates
+        //        {
+        //            WhatToDo = AddOrRem.Remove,
+        //            UniqueFacilityID = facilityCard.UniqueID,
+        //            CardID = facilityCard.data.cardID
+        //        });
 
-            } 
+        //    } 
 
-        }
+        //}
 
         // now discard all facilities annihilated
         DiscardAllInactiveCards(DiscardFromWhere.MyFacility, false, -1);
@@ -1115,14 +1114,14 @@ public class CardPlayer : MonoBehaviour
         foreach (Updates update in updates)
         {
             GameObject facility;
-            Card selectedCard = null;
+            Facility selectedFacility = null;
             int index = -1;
             Debug.Log("number of active facilities are " + ActiveFacilities.Count);
 
             // find unique facility in facilities list
             if (ActiveFacilities.TryGetValue(update.UniqueFacilityID, out facility))
             {
-                selectedCard = facility.GetComponent<Card>();
+                selectedFacility = facility.GetComponent<Facility>();
 
                 // if we found the right facility
                 if (update.WhatToDo == AddOrRem.Add)
@@ -1136,7 +1135,7 @@ public class CardPlayer : MonoBehaviour
                     StackCards(facility, cardGameObject, opponentDropZone, GamePhase.Action);
                     card.state = CardState.CardInPlay;
                     Debug.Log("opponent player updates added " + card.data.cardID + " to the active list of size " + ActiveCards.Count);
-                    card.Play(this, opponent, selectedCard);
+                    card.Play(this, opponent, selectedFacility);
                     cardGameObject.SetActive(true);
                 }
 
