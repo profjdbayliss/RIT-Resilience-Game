@@ -85,19 +85,20 @@ public class Sector : MonoBehaviour
                 string[] individualCSVObjects = allCSVObjects[i].Split(",");
                 if (individualCSVObjects.Length > 1)
                 {
-                    //  0: Sector			
-                    //  1: Facility Type
-                    //  2: Dependency 1		
-                    //  3: Dependency 2
-                    //  4: Dependency 3
-                    //  5: Number of Dependant Sectors
-                    //  6: Number of Sector Dependencies
-                    //  7: Core Facility T/F
-                    //  8: Sector Appeal
-                    //  9: Physical Health		
-                    // 10: Financial Health
-                    // 11: Network Health
-                    // 12: Facility ID // TODO: Use this if possible otherwise remove/replace
+                    //  0: Sector
+                    //  1: Facility Name
+                    //  2: Facility Type
+                    //  3: Dependency 1		
+                    //  4: Dependency 2
+                    //  5: Dependency 3
+                    //  6: Number of Dependant Sectors
+                    //  7: Number of Sector Dependencies
+                    //  8: Core Facility T/F
+                    //  9: Sector Appeal
+                    //  10: Physical Health		
+                    //  11: Financial Health
+                    //  12: Network Health
+                    //  13: Facility ID // TODO: Use this if possible otherwise remove/replace
 
                     //  0: Sector	
                     if (individualCSVObjects[0].Trim().ToLower() != sectorName.ToString().ToLower())
@@ -110,6 +111,7 @@ public class Sector : MonoBehaviour
                     {
                         case "Production":
                             facilities[0].facilityType = Facility.FacilityType.Production;
+                            facilities[0].facilityName = individualCSVObjects[1];
 
                             //  3-5: Dependencies
                             for (int j = 3; j < 6; j++)
@@ -124,6 +126,7 @@ public class Sector : MonoBehaviour
 
                         case "Transmission":
                             facilities[1].facilityType = Facility.FacilityType.Transmission;
+                            facilities[1].facilityName = individualCSVObjects[1];
 
                             for (int j = 3; j < 6; j++)
                             {
@@ -136,6 +139,7 @@ public class Sector : MonoBehaviour
 
                         case "Distribution":
                             facilities[2].facilityType = Facility.FacilityType.Distribution;
+                            facilities[2].facilityName = individualCSVObjects[1];
 
                             for (int j = 3; j < 6; j++)
                             {
