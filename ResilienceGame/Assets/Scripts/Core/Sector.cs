@@ -111,44 +111,44 @@ public class Sector : MonoBehaviour
                         case "Production":
                             facilities[0].facilityType = Facility.FacilityType.Production;
 
-                            //  2-4: Dependencies
-                            for (int j = 2; j < 5; j++)
+                            //  3-5: Dependencies
+                            for (int j = 3; j < 6; j++)
                             {
                                 if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[0].products[(j-2)] = enumName; }
                                 else { Debug.Log("Dependency not parsed"); }
                             }
 
-                            // 9-11: Health
-                            facilities[0].SetFacilityPoints(int.Parse(individualCSVObjects[9]), int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]));
+                            // 10-12: Health
+                            facilities[0].SetFacilityPoints(int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]), int.Parse(individualCSVObjects[12]));
                             break;
 
                         case "Transmission":
                             facilities[1].facilityType = Facility.FacilityType.Transmission;
 
-                            for (int j = 2; j < 5; j++)
+                            for (int j = 3; j < 6; j++)
                             {
                                 if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[1].products[(j - 2)] = enumName; }
                                 else { Debug.Log("Dependency not parsed"); }
                             }
 
-                            facilities[1].SetFacilityPoints(int.Parse(individualCSVObjects[9]), int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]));
+                            facilities[1].SetFacilityPoints(int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]), int.Parse(individualCSVObjects[12]));
                             break;
 
                         case "Distribution":
                             facilities[2].facilityType = Facility.FacilityType.Distribution;
 
-                            for (int j = 2; j < 5; j++)
+                            for (int j = 3; j < 6; j++)
                             {
                                 if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[2].products[(j - 2)] = enumName; }
                                 else { Debug.Log("Dependency not parsed"); }
                             }
 
-                            facilities[2].SetFacilityPoints(int.Parse(individualCSVObjects[9]), int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]));
+                            facilities[2].SetFacilityPoints(int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]), int.Parse(individualCSVObjects[12]));
                             break;
                     }
 
                     // 7: Core Sector?
-                    if(individualCSVObjects[7] != "") { isCore = bool.Parse(individualCSVObjects[7].Trim()); }
+                    if(individualCSVObjects[7] != "") { isCore = bool.Parse(individualCSVObjects[8].Trim()); }
                 }
             }
 

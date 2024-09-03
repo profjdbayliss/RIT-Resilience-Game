@@ -22,6 +22,7 @@ public class Facility : MonoBehaviour
     };
 
     public FacilityType facilityType;
+    public string facilityName;
     public PlayerSector[] products;
     public GameObject facilityCanvas;
 
