@@ -106,10 +106,10 @@ public class Sector : MonoBehaviour
                     }
 
                     //  1: Facility Type
-                    switch (individualCSVObjects[1].Trim())
+                    switch (individualCSVObjects[2].Trim())
                     {
                         case "Production":
-                            facilities[0].facilityName = Facility.FacilityName.Production;
+                            facilities[0].facilityType = Facility.FacilityType.Production;
 
                             //  2-4: Dependencies
                             for (int j = 2; j < 5; j++)
@@ -123,7 +123,7 @@ public class Sector : MonoBehaviour
                             break;
 
                         case "Transmission":
-                            facilities[1].facilityName = Facility.FacilityName.Transmission;
+                            facilities[1].facilityType = Facility.FacilityType.Transmission;
 
                             for (int j = 2; j < 5; j++)
                             {
@@ -135,7 +135,7 @@ public class Sector : MonoBehaviour
                             break;
 
                         case "Distribution":
-                            facilities[2].facilityName = Facility.FacilityName.Distribution;
+                            facilities[2].facilityType = Facility.FacilityType.Distribution;
 
                             for (int j = 2; j < 5; j++)
                             {

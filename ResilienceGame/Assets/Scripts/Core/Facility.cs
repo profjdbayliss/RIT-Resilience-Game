@@ -14,14 +14,14 @@ public enum FacilityEffect
 
 public class Facility : MonoBehaviour
 {
-    public enum FacilityName
+    public enum FacilityType
     {
         Production,
         Transmission,
         Distribution
     };
 
-    public FacilityName facilityName;
+    public FacilityType facilityType;
     public PlayerSector[] products;
     public GameObject facilityCanvas;
 
