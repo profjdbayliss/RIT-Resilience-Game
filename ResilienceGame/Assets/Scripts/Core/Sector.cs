@@ -116,7 +116,7 @@ public class Sector : MonoBehaviour
                             //  3-5: Dependencies
                             for (int j = 3; j < 6; j++)
                             {
-                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[0].products[(j-2)] = enumName; }
+                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[0].products[(j-3)] = enumName; }
                                 else { Debug.Log("Dependency not parsed"); }
                             }
 
@@ -130,7 +130,7 @@ public class Sector : MonoBehaviour
 
                             for (int j = 3; j < 6; j++)
                             {
-                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[1].products[(j - 2)] = enumName; }
+                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[1].products[(j - 3)] = enumName; }
                                 else { Debug.Log("Dependency not parsed"); }
                             }
 
@@ -143,7 +143,7 @@ public class Sector : MonoBehaviour
 
                             for (int j = 3; j < 6; j++)
                             {
-                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[2].products[(j - 2)] = enumName; }
+                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[2].products[(j - 3)] = enumName; }
                                 else { Debug.Log("Dependency not parsed"); }
                             }
 
