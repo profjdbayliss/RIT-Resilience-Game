@@ -152,7 +152,11 @@ public class Sector : MonoBehaviour
                     }
 
                     // 7: Core Sector?
-                    if(individualCSVObjects[8] != "") { isCore = bool.Parse(individualCSVObjects[8].Trim()); }
+                    if(individualCSVObjects[8] != "")
+                    {
+                        Debug.Log("Is it a core facility?"+ individualCSVObjects[8]);
+                        isCore = bool.Parse(individualCSVObjects[8].Trim()); 
+                    }
                 }
             }
 
