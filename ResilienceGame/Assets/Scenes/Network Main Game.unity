@@ -3779,11 +3779,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c96e5d975e75ac4498ffe45af5a9f2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  facilityType: 0
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
-  hasBackdoor: 0
-  hasFortify: 0
+  effect: 0
   isDown: 0
 --- !u!1 &327071780
 GameObject:
@@ -5719,11 +5719,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c96e5d975e75ac4498ffe45af5a9f2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  facilityType: 0
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
-  hasBackdoor: 0
-  hasFortify: 0
+  effect: 0
   isDown: 0
 --- !u!1 &520008979
 GameObject:
@@ -13006,11 +13006,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c96e5d975e75ac4498ffe45af5a9f2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  facilityType: 0
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
-  hasBackdoor: 0
-  hasFortify: 0
+  effect: 0
   isDown: 0
 --- !u!1 &1358697067
 GameObject:
@@ -16526,7 +16526,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1756113746}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
@@ -16537,7 +16537,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -1015.11066, y: -0.10932416}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &1774689028
@@ -17965,7 +17965,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1444.27, y: -37}
+  m_AnchoredPosition: {x: 143, y: -33}
   m_SizeDelta: {x: 1000, y: 210}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1937381451
