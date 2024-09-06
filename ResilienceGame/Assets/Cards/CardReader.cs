@@ -325,7 +325,7 @@ public class CardReader : MonoBehaviour
                         tempCard.data.facilityAmount = int.Parse(individualCSVObjects[16]);
 
                         // 19:  Effect
-
+                        tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
 
                         // 20:  Number of Effects
 
