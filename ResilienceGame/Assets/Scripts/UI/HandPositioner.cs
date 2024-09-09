@@ -45,11 +45,19 @@ public class HandPositioner : MonoBehaviour {
         }
     }
 
-    public void NotifyCardDragEnd(GameObject card) {
+    public void NotifyCardDragEnd(GameObject card, bool cardWasPlayed = false) {
         cardsBeingDragged.Remove(card);
-        card.transform.localScale = Vector3.one * defaultScale;
-        card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
-        ArrangeCards(); // Rearrange cards when dragging ends
+
+        if (cardWasPlayed) {
+            cards.Remove(card);
+            //   Destroy(card);
+        }
+        else {
+
+            card.transform.localScale = Vector3.one * defaultScale;
+            card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
+            ArrangeCards(); // Rearrange cards when dragging ends
+        }
     }
 
 

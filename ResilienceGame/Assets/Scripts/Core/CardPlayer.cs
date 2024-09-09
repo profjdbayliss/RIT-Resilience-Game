@@ -338,7 +338,7 @@ public class CardPlayer : MonoBehaviour {
         List<int> facilitiesToRemove = new List<int>(8);
 
         // for all active facilities
-        foreach (GameObject facilityGameObject in ActiveFacilities.Values)
+        foreach (GameObject facilityGameObject in ActiveFacilities.Values) { }
             //{
             //    Facility facilityCard = facilityGameObject.GetComponent<Facility>();
             //    // for all attacking cards on those facilities

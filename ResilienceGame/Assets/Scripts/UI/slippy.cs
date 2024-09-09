@@ -188,6 +188,8 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler, IBeginDragHan
         if (handPositioner != null) {
             handPositioner.NotifyCardDragEnd(gameObject);
         }
+        //Get the mouse position to see where the card was dropped
+        var mousePos = eventData.position;
         
     }
 
