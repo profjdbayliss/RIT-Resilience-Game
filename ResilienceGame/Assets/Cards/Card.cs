@@ -18,6 +18,16 @@ public enum CardState
     CardDiscarded,
 };
 
+// Enum to indicate what the card is being played on
+public enum CardTarget
+{
+    Hand,
+    Card,
+    Effect,
+    Facility,
+    Sector
+};
+
 public struct CardIDInfo
 {
     public int UniqueID;
