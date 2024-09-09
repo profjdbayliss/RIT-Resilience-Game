@@ -233,6 +233,21 @@ public class CardReader : MonoBehaviour
                         switch (target)
                         {
                             // TODO: Enum needed for hand/sector/facility
+                            case "Hand":
+                                tempCard.target = CardTarget.Hand;
+                                break;
+                            case "Card":
+                                tempCard.target = CardTarget.Card;
+                                break;
+                            case "Effect":
+                                tempCard.target = CardTarget.Effect;
+                                break;
+                            case "Facility":
+                                tempCard.target = CardTarget.Facility;
+                                break;
+                            case "Sector":
+                                tempCard.target = CardTarget.Sector;
+                                break;
                             // Is this needed? Is this handled by just CardActions?
                             default:
                                 //tempCard.data.onlyPlayedOn[0] = PlayerSector.Any;
