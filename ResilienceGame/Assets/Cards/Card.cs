@@ -41,6 +41,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public int UniqueID; 
     public CardFront front;
     public CardState state;
+    public CardTarget target;
     public string DeckName;
     public GameObject cardZone;
     public GameObject originalParent;
