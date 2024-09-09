@@ -7,9 +7,13 @@ using Mirror;
 using System.Linq;
 using Yarn.Unity;
 using System.Xml;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour, IRGObservable
 {
+    //allow for spawning of cards
+    public bool DEBUG_ENABLED = true;
+
     // Deck readers and resulting card lists.
     public CardReader redDeckReader;
     public CardReader blueDeckReader;
@@ -207,6 +211,16 @@ public class GameManager : MonoBehaviour, IRGObservable
     // Update is called once per frame
     void Update()
     {
+        if (DEBUG_ENABLED) {
+            if (Keyboard.current.f1Key.wasPressedThisFrame) {
+                Debug.Log("Add card to hand");
+                actualPlayer.ForceDrawCard();
+            }
+            else if (Keyboard.current.f2Key.wasPressedThisFrame) {
+                Debug.Log("Add card to discard");
+                actualPlayer.ForceDiscardRandomCard();
+            }
+        }
         if (isInit)
         {
             if (gameStarted)

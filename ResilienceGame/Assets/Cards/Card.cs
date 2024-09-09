@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Unity.Collections;
+using System.Linq;
 
 // Enum to track the state of the card
 public enum CardState
@@ -53,7 +54,10 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public int DefenseHealth = 0;
     public List<int> ModifyingCards = new List<int>(10);
     public List<CardIDInfo> AttackingCards = new List<CardIDInfo>(10);
-    
+
+    public int HandPosition { get; set; } = 0;
+
+
     // NOTE: this is a string currently because mitigations are for 
     // cards from the other player's deck.
     //public List<string> MitigatesWhatCards = new List<string>(10);
@@ -127,4 +131,10 @@ public class Card : MonoBehaviour, IPointerClickHandler
             action.Canceled(player, opponent, facilityActedUpon, this);
         }
     }
+
+    public void ToggleCardVisuals(bool enable) {
+        transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
+    }
+
+    
 }
