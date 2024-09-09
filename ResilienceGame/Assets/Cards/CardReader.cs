@@ -323,38 +323,38 @@ public class CardReader : MonoBehaviour
                         tempCard.data.meepleType = individualCSVObjects[11].Trim().Split(';');
 
                         // 12:  Number of Meeples changed
-                        if (individualCSVObjects[12] != "") { tempCard.data.meepleAmount = float.Parse(individualCSVObjects[12]); }
+                        if (individualCSVObjects[12] != "") { tempCard.data.meepleAmount = float.Parse(individualCSVObjects[12].Trim()); }
 
                         // 13:  Blue cost
-                        tempCard.data.blueCost = int.Parse(individualCSVObjects[13]);
+                        tempCard.data.blueCost = int.Parse(individualCSVObjects[13].Trim());
                         tempCardFront.blueCircle = (tempCard.data.blueCost != 0);
                         // 14:  Black cost
-                        tempCard.data.blackCost = int.Parse(individualCSVObjects[14]);
+                        tempCard.data.blackCost = int.Parse(individualCSVObjects[14].Trim());
                         tempCardFront.blackCircle = (tempCard.data.blackCost != 0);
                         // 15:  Purple cost
-                        tempCard.data.purpleCost = int.Parse(individualCSVObjects[15]);
+                        tempCard.data.purpleCost = int.Parse(individualCSVObjects[15].Trim());
                         tempCardFront.purpleCircle = (tempCard.data.purpleCost != 0);
 
 
                         // 16:  Damage/Heal
-                        tempCard.data.facilityAmount = int.Parse(individualCSVObjects[16]);
+                        tempCard.data.facilityAmount = int.Parse(individualCSVObjects[16].Trim());
 
                         // 19:  Effect
-                        tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
+                        tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19].Trim());
 
                         // 20:  Number of Effects
-
+                        tempCard.data.effectCount = int.Parse(individualCSVObjects[20].Trim());
 
                         // 21:  Prereq Effect
-
+                        tempCard.data.preReqEffect = (FacilityEffect)int.Parse(individualCSVObjects[21].Trim());
 
                         // 22:  Duration
-
+                        tempCard.data.duration = int.Parse(individualCSVObjects[22].Trim());
 
                         // 23:  Doom Effect
+                        tempCard.data.hasDoomEffect = bool.Parse(individualCSVObjects[23].Trim());
 
-
-                        // 24:  Dice roll minimum
+                        // 24:  Dice roll minimum [I thought dice rolls were done away with?]
 
                         // 25:  Flavor Text
                         // Replace csv semi-colons with appropiate commas

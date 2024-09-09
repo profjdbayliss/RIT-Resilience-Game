@@ -31,6 +31,10 @@ public struct CardData
     public int targetAmount;
     public int facilityAmount;
     public FacilityEffect effect;
+    public FacilityEffect preReqEffect;
+    public int effectCount;
+    public int duration;
+    public bool hasDoomEffect;
     public string[] meepleType;
     public float meepleAmount;
     public PlayerSector[] onlyPlayedOn;
