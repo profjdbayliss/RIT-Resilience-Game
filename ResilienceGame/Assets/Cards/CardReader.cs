@@ -232,7 +232,6 @@ public class CardReader : MonoBehaviour
                         string target = individualCSVObjects[3].Trim();
                         switch (target)
                         {
-                            // TODO: Enum needed for hand/sector/facility
                             case "Hand":
                                 tempCard.target = CardTarget.Hand;
                                 break;

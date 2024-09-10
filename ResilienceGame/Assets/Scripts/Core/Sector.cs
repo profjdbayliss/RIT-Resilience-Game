@@ -35,6 +35,7 @@ public class Sector : MonoBehaviour
             facilities[i] = sectorCanvas.transform.GetChild(i).GetComponent<Facility>();
             facilities[i].Initialize();
             facilities[i].facilityCanvas = sectorCanvas.transform.GetChild(i).gameObject;
+            facilities[i].sectorItsAPartOf = this;
         }
 
         CSVRead();
