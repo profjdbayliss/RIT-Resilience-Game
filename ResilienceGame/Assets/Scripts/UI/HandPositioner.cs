@@ -50,7 +50,7 @@ public class HandPositioner : MonoBehaviour {
 
         if (cardWasPlayed) {
             cards.Remove(card);
-            //   Destroy(card);
+            Debug.Log("Played card removed from hand");
         }
         else {
 

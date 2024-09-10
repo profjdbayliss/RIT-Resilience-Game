@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using static UnityEngine.PlayerLoop.PreUpdate;
 using Image = UnityEngine.UI.Image;
 using Vector2 = UnityEngine.Vector2;
@@ -158,12 +160,14 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
+
+    //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawCard() {
         if (DeckIDs.Count > 0) {
             DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
         }
     }
-    public virtual void ForceDiscardRandomCard() {
+    public virtual void ForceDiscardRandomCard() {  
         var num = UnityEngine.Random.Range(0, HandCards.Count);
         var card = HandCards[num];
         HandCards.Remove(num);
@@ -329,6 +333,23 @@ public class CardPlayer : MonoBehaviour {
     void Update() {
         // nothing to update at the moment
     }
+    public bool HandleCardDrop(Card card) {
+
+        var locations = GameObject.FindGameObjectsWithTag("CardDropLocation");
+
+        foreach (var location in locations) {
+            if (TryGetComponent(out Collider2D collider)) {
+                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
+                    Debug.LogWarning($"Card dropped on {location.name}");
+                    return true;
+                }
+            }
+        }
+        return false;
+        
+
+    }
+    
 
     public void ResetMeepleCost() {
         mMeeplesSpent = 0;
@@ -434,23 +455,12 @@ public class CardPlayer : MonoBehaviour {
 
     public void DiscardAllInactiveCards(DiscardFromWhere where, bool addUpdate, int uniqueFacilityID) {
         List<int> inactives = new List<int>(10);
-        Dictionary<int, GameObject> discardFromArea;
-
-        switch (where) {
-            case DiscardFromWhere.Hand:
-                discardFromArea = HandCards;
-                break;
-            case DiscardFromWhere.MyPlayZone:
-                discardFromArea = ActiveCards;
-                break;
-            case DiscardFromWhere.MyFacility:
-                discardFromArea = ActiveFacilities;
-                break;
-            default:
-                discardFromArea = HandCards;
-                break;
-        }
-
+        Dictionary<int, GameObject> discardFromArea = where switch {
+            DiscardFromWhere.Hand => HandCards,
+            DiscardFromWhere.MyPlayZone => ActiveCards,
+            DiscardFromWhere.MyFacility => ActiveFacilities,
+            _ => HandCards,
+        };
         foreach (GameObject activeCardObject in discardFromArea.Values) {
             //GameObject activeCardObject = ActiveCardList[i];
             Card card = activeCardObject.GetComponent<Card>();

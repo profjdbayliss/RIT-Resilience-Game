@@ -47,7 +47,8 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler, IBeginDragHan
     void Start() {
         originalScale = new Vector2(0.5f, 0.5f);
         originalPosition = this.gameObject.transform.position;
-        gameCanvas = transform.parent.parent.gameObject;
+        
+        gameCanvas = GameObject.Find("GameCanvas");
         // initial offset is always zero
         mOffsetPos = new Vector2();
         handPositioner = GetComponentInParent<HandPositioner>();
@@ -185,8 +186,14 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler, IBeginDragHan
 
     public void OnEndDrag(PointerEventData eventData) {
         IsBeingDragged = false;
-        if (handPositioner != null) {
-            handPositioner.NotifyCardDragEnd(gameObject);
+
+        // Notify the HandPositioner that the card has been dropped
+        if (GameObject.FindWithTag("GameController").TryGetComponent(out GameManager gameManager)) {
+            if (handPositioner != null) {
+                handPositioner.NotifyCardDragEnd(
+                    gameObject, 
+                    gameManager.actualPlayer.HandleCardDrop(GetComponent<Card>())); //get the drop zone from the card player
+            }
         }
         //Get the mouse position to see where the card was dropped
         var mousePos = eventData.position;
