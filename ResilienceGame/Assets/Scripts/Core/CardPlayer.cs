@@ -357,7 +357,7 @@ public class CardPlayer : MonoBehaviour {
                 if (location.TryGetComponent(out Collider2D collider)) {
                     if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
                         hoveredDropLocation = x == 0 ? location : location.transform.parent.gameObject; //if its a facility (first list) return the parent
-                        //Debug.Log($"Card hovering over {location.name}");
+                        Debug.Log($"Card hovering over {location.name}");
                         return;
                     }
                 }
@@ -366,25 +366,43 @@ public class CardPlayer : MonoBehaviour {
         hoveredDropLocation = null;
     }
     void InitDropLocations() {
-
         var facilityLocations = GameObject.FindGameObjectsWithTag("FacilityDropLocation").ToList();
         var locations = GameObject.FindGameObjectsWithTag("CardDropLocation").ToList();
-
-
         dropLocations.Add(facilityLocations);
         dropLocations.Add(locations);
-
-
-
     }
     public GameObject HandleCardDrop(Card card) {
 
         Debug.Log("CardPlayer HandleCardDrop");
 
+        if (hoveredDropLocation == null) {
+            Debug.Log("No drop location found");
+            return null;
+        }
+        else {
+            Debug.Log("Drop location found: " + hoveredDropLocation.name);
+            if (hoveredDropLocation.CompareTag("FacilityDropLocation")) {
+                Debug.Log("Drop location is a facility");
+            }
+            else {
+                if (hoveredDropLocation.name == "DiscardDrop") {
+                    Debug.Log("Drop location is a discard");
+                }
+                else {
+                    Debug.Log("Drop location is a play area");
+                }
+            }
+        }
+
 
         return null;
 
 
+    }
+    public bool IsPlayerTurn() {
+        //replace with call to game manager?
+        //some code to validate turn order red goes before blue
+        return true;
     }
 
 
@@ -553,199 +571,199 @@ public class CardPlayer : MonoBehaviour {
         int playCount = 0;
         int playKey = 0;
 
-        if (HandCards.Count != 0) {
-            foreach (GameObject gameObjectCard in HandCards.Values) {
-                Card card = gameObjectCard.GetComponent<Card>();
-                if (card.state == CardState.CardDrawnDropped) {
-                    Debug.Log("card dropped in cardhandle");
-                    // card has been dropped somewhere - where?
-                    Vector2 cardPosition = card.getDroppedPosition();
+        //if (HandCards.Count != 0) {
+        //    foreach (GameObject gameObjectCard in HandCards.Values) {
+        //        Card card = gameObjectCard.GetComponent<Card>();
+        //        if (card.state == CardState.CardDrawnDropped) {
+        //            Debug.Log("card dropped in cardhandle");
+        //            // card has been dropped somewhere - where?
+        //            Vector2 cardPosition = card.getDroppedPosition();
 
-                    // DO a AABB collision test to see if the card is on the discard drop
-                    if ((cardPosition.y < discardDropMax.y &&
-                       cardPosition.y > discardDropMin.y &&
-                       cardPosition.x < discardDropMax.x &&
-                       cardPosition.x > discardDropMin.x)) {
-                        switch (phase) {
-                            case GamePhase.Draw:
-                                Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
+        //            // DO a AABB collision test to see if the card is on the discard drop
+        //            if ((cardPosition.y < discardDropMax.y &&
+        //               cardPosition.y > discardDropMin.y &&
+        //               cardPosition.x < discardDropMax.x &&
+        //               cardPosition.x > discardDropMin.x)) {
+        //                switch (phase) {
+        //                    case GamePhase.Draw:
+        //                        Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
 
-                                // change parent and rescale
-                                card.state = CardState.CardNeedsToBeDiscarded;
-                                playCount = 1;
-                                break;
-                            case GamePhase.Action:
-                                break;
-                        }
-                    }
+        //                        // change parent and rescale
+        //                        card.state = CardState.CardNeedsToBeDiscarded;
+        //                        playCount = 1;
+        //                        break;
+        //                    case GamePhase.Action:
+        //                        break;
+        //                }
+        //            }
 
-                    // DO a AABB collision test to see if the card is on the player's drop
-                    else if (cardPosition.y < playedDropMax.y &&
-                       cardPosition.y > playedDropMin.y &&
-                       cardPosition.x < playedDropMax.x &&
-                       cardPosition.x > playedDropMin.x) {
-                        Debug.Log("collision with played area");
-                        switch (phase) {
-                            case GamePhase.Action:
-                                /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
-                                {
-                                    GameObject selected = GetHighlightedStation();
-                                    Card selectedCard = selected.GetComponent<Card>();
-                                    StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
-                                    card.state = CardState.CardInPlay;
-                                    ActiveCards.Add(card.UniqueID, gameObjectCard);
+        //            // DO a AABB collision test to see if the card is on the player's drop
+        //            else if (cardPosition.y < playedDropMax.y &&
+        //               cardPosition.y > playedDropMin.y &&
+        //               cardPosition.x < playedDropMax.x &&
+        //               cardPosition.x > playedDropMin.x) {
+        //                Debug.Log("collision with played area");
+        //                switch (phase) {
+        //                    case GamePhase.Action:
+        //                        /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
+        //                        {
+        //                            GameObject selected = GetHighlightedStation();
+        //                            Card selectedCard = selected.GetComponent<Card>();
+        //                            StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
+        //                            card.state = CardState.CardInPlay;
+        //                            ActiveCards.Add(card.UniqueID, gameObjectCard);
 
-                                    selectedCard.ModifyingCards.Add(card.UniqueID);
-                                    mUpdatesThisPhase.Add(new Updates
-                                    {
-                                        WhatToDo=AddOrRem.Add,
-                                        UniqueFacilityID=selectedCard.UniqueID,
-                                        CardID=card.data.cardID
-                                    });
+        //                            selectedCard.ModifyingCards.Add(card.UniqueID);
+        //                            mUpdatesThisPhase.Add(new Updates
+        //                            {
+        //                                WhatToDo=AddOrRem.Add,
+        //                                UniqueFacilityID=selectedCard.UniqueID,
+        //                                CardID=card.data.cardID
+        //                            });
 
-                                    // we should play the card's effects
-                                    card.Play(this, opponentPlayer, selectedCard);
-                                    playCount = 1;
-                                    selectedCard.OutlineImage.SetActive(false);
-                                    playKey = card.UniqueID;
-                                }
-                                else
-                                {
-                                    card.state = CardState.CardDrawn;
-                                    manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
-                                }*/
-                                break;
-                            //case GamePhase.Mitigate:
-                            /*if (card.data.cardType == CardType.Mitigation && CheckHighlightedStations())
-                            {
-                                Debug.Log("trying to mitigate");
-                                GameObject selected = GetHighlightedStation();
-                                Card selectedCard = selected.GetComponent<Card>();
+        //                            // we should play the card's effects
+        //                            card.Play(this, opponentPlayer, selectedCard);
+        //                            playCount = 1;
+        //                            selectedCard.OutlineImage.SetActive(false);
+        //                            playKey = card.UniqueID;
+        //                        }
+        //                        else
+        //                        {
+        //                            card.state = CardState.CardDrawn;
+        //                            manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
+        //                        }*/
+        //                        break;
+        //                    //case GamePhase.Mitigate:
+        //                    /*if (card.data.cardType == CardType.Mitigation && CheckHighlightedStations())
+        //                    {
+        //                        Debug.Log("trying to mitigate");
+        //                        GameObject selected = GetHighlightedStation();
+        //                        Card selectedCard = selected.GetComponent<Card>();
 
-                                ActiveCards.Add(card.UniqueID, gameObjectCard);
+        //                        ActiveCards.Add(card.UniqueID, gameObjectCard);
 
-                                // we should play the card's effects
-                                card.Play(this, opponentPlayer, selectedCard);
+        //                        // we should play the card's effects
+        //                        card.Play(this, opponentPlayer, selectedCard);
 
-                                if (card.state == CardState.CardNeedsToBeDiscarded)
-                                {
-                                    //HandleDiscard(ActiveCards, playerDropZone, selectedCard.UniqueID, false);
-                                    //opponentPlayer.HandleDiscard(opponentPlayer.ActiveCards, playerDropZone, selectedCard.UniqueID, true);
-                                    DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, false, selectedCard.UniqueID);
-                                    opponentPlayer.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, selectedCard.UniqueID);
-                                    playCount = 1;
-                                    playKey = card.UniqueID;
-                                    selectedCard.OutlineImage.SetActive(false);
-                                }
-                                else
-                                {
-                                    // remove what we just added
-                                    ActiveCards.Remove(card.UniqueID);
-                                    card.state = CardState.CardDrawn;
-                                    manager.DisplayGameStatus("Please select a card that can mitigate a vulnerability card on a chosen facility.");
-                                }
-                            }
-                            else
-                            {
-                                card.state = CardState.CardDrawn;
-                                manager.DisplayGameStatus("Please select a single opponent facility and play a vulnerability card.");
-                            }*/
-                            //break;
-                            default:
-                                // we're not in the right phase, so
-                                // reset the dropped state
-                                card.state = CardState.CardDrawn;
-                                break;
-                        }
+        //                        if (card.state == CardState.CardNeedsToBeDiscarded)
+        //                        {
+        //                            //HandleDiscard(ActiveCards, playerDropZone, selectedCard.UniqueID, false);
+        //                            //opponentPlayer.HandleDiscard(opponentPlayer.ActiveCards, playerDropZone, selectedCard.UniqueID, true);
+        //                            DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, false, selectedCard.UniqueID);
+        //                            opponentPlayer.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, selectedCard.UniqueID);
+        //                            playCount = 1;
+        //                            playKey = card.UniqueID;
+        //                            selectedCard.OutlineImage.SetActive(false);
+        //                        }
+        //                        else
+        //                        {
+        //                            // remove what we just added
+        //                            ActiveCards.Remove(card.UniqueID);
+        //                            card.state = CardState.CardDrawn;
+        //                            manager.DisplayGameStatus("Please select a card that can mitigate a vulnerability card on a chosen facility.");
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        card.state = CardState.CardDrawn;
+        //                        manager.DisplayGameStatus("Please select a single opponent facility and play a vulnerability card.");
+        //                    }*/
+        //                    //break;
+        //                    default:
+        //                        // we're not in the right phase, so
+        //                        // reset the dropped state
+        //                        card.state = CardState.CardDrawn;
+        //                        break;
+        //                }
 
-                    }
-                    else if (cardPosition.y < opponentDropMax.y &&
-                       cardPosition.y > opponentDropMin.y &&
-                       cardPosition.x < opponentDropMax.x &&
-                       cardPosition.x > opponentDropMin.x) {
-                        Debug.Log("card dropped in opponent zone");
-                        switch (phase) {
-                            //case GamePhase.Vulnerability:
-                            /* if (card.data.cardType == CardType.Vulnerability && opponentPlayer.CheckHighlightedStations() &&
-                                 ((mValueSpentOnVulnerabilities + card.data.blueCost) <= mTotalFacilityValue))
-                             {
-                                 GameObject selected = opponentPlayer.GetHighlightedStation();
-                                 Card selectedCard = selected.GetComponent<Card>();
-                                 if (!DuplicateCardPlayed(selectedCard, card))
-                                 {
-                                     StackCards(selected, gameObjectCard, opponentDropZone, GamePhase.Vulnerability);
-                                     card.state = CardState.CardInPlay;
-                                     ActiveCards.Add(card.UniqueID, gameObjectCard);
+        //            }
+        //            else if (cardPosition.y < opponentDropMax.y &&
+        //               cardPosition.y > opponentDropMin.y &&
+        //               cardPosition.x < opponentDropMax.x &&
+        //               cardPosition.x > opponentDropMin.x) {
+        //                Debug.Log("card dropped in opponent zone");
+        //                switch (phase) {
+        //                    //case GamePhase.Vulnerability:
+        //                    /* if (card.data.cardType == CardType.Vulnerability && opponentPlayer.CheckHighlightedStations() &&
+        //                         ((mValueSpentOnVulnerabilities + card.data.blueCost) <= mTotalFacilityValue))
+        //                     {
+        //                         GameObject selected = opponentPlayer.GetHighlightedStation();
+        //                         Card selectedCard = selected.GetComponent<Card>();
+        //                         if (!DuplicateCardPlayed(selectedCard, card))
+        //                         {
+        //                             StackCards(selected, gameObjectCard, opponentDropZone, GamePhase.Vulnerability);
+        //                             card.state = CardState.CardInPlay;
+        //                             ActiveCards.Add(card.UniqueID, gameObjectCard);
 
-                                     selectedCard.AttackingCards.Add(new CardIDInfo
-                                     {
-                                         CardID = card.data.cardID,
-                                         UniqueID = card.UniqueID
-                                     });
-                                     mUpdatesThisPhase.Add(new Updates
-                                     {
-                                         WhatToDo = AddOrRem.Add,
-                                         UniqueFacilityID = selectedCard.UniqueID,
-                                         CardID = card.data.cardID
-                                     });
+        //                             selectedCard.AttackingCards.Add(new CardIDInfo
+        //                             {
+        //                                 CardID = card.data.cardID,
+        //                                 UniqueID = card.UniqueID
+        //                             });
+        //                             mUpdatesThisPhase.Add(new Updates
+        //                             {
+        //                                 WhatToDo = AddOrRem.Add,
+        //                                 UniqueFacilityID = selectedCard.UniqueID,
+        //                                 CardID = card.data.cardID
+        //                             });
 
-                                     // we don't play vuln effects until the attack phase
-                                     playCount = 1;
-                                     playKey = card.UniqueID;
-                                     selectedCard.OutlineImage.SetActive(false);
-                                     mValueSpentOnVulnerabilities += card.data.blueCost;
-                                     Debug.Log("Amount spent on vuln is " + mValueSpentOnVulnerabilities + " with total facility worth of " + mTotalFacilityValue);
+        //                             // we don't play vuln effects until the attack phase
+        //                             playCount = 1;
+        //                             playKey = card.UniqueID;
+        //                             selectedCard.OutlineImage.SetActive(false);
+        //                             mValueSpentOnVulnerabilities += card.data.blueCost;
+        //                             Debug.Log("Amount spent on vuln is " + mValueSpentOnVulnerabilities + " with total facility worth of " + mTotalFacilityValue);
 
-                                 }
-                                 else
-                                 {
-                                     card.state = CardState.CardDrawn;
-                                     manager.DisplayGameStatus("Can't play multiples of the same card on a station.");
+        //                         }
+        //                         else
+        //                         {
+        //                             card.state = CardState.CardDrawn;
+        //                             manager.DisplayGameStatus("Can't play multiples of the same card on a station.");
 
-                                 }
-                             }
-                             else
-                             {
-                                 card.state = CardState.CardDrawn;
-                                 manager.DisplayGameStatus("Please select a single opponent facility and play a vulnerability card less than the total worth of your facility cards.");
-                             }*/
-                            //break;
-                            default:
-                                // we're not in the right phase, so
-                                // reset the dropped state
-                                card.state = CardState.CardDrawn;
-                                break;
-                        }
-                    }
-                    else {
-                        Debug.Log("card not dropped in card drop zone");
-                        // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
-                        gameObjectCard.transform.SetParent(handDropZone.transform, false);
-                        card.state = CardState.CardDrawn;
-                        gameObjectCard.GetComponentInParent<slippy>().enabled = true;
-                        gameObjectCard.GetComponent<HoverScale>().Drop();
-                    }
-                }
+        //                         }
+        //                     }
+        //                     else
+        //                     {
+        //                         card.state = CardState.CardDrawn;
+        //                         manager.DisplayGameStatus("Please select a single opponent facility and play a vulnerability card less than the total worth of your facility cards.");
+        //                     }*/
+        //                    //break;
+        //                    default:
+        //                        // we're not in the right phase, so
+        //                        // reset the dropped state
+        //                        card.state = CardState.CardDrawn;
+        //                        break;
+        //                }
+        //            }
+        //            else {
+        //                Debug.Log("card not dropped in card drop zone");
+        //                // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
+        //                gameObjectCard.transform.SetParent(handDropZone.transform, false);
+        //                card.state = CardState.CardDrawn;
+        //                gameObjectCard.GetComponentInParent<slippy>().enabled = true;
+        //                gameObjectCard.GetComponent<HoverScale>().Drop();
+        //            }
+        //        }
 
-                // index of where this card is in handlist
-                if (playCount > 0) {
-                    break;
-                }
-            }
-        }
+        //        // index of where this card is in handlist
+        //        if (playCount > 0) {
+        //            break;
+        //        }
+        //    }
+        //}
 
-        if (playCount > 0) {
-            if (phase == GamePhase.Draw) {
-                // we're not discarding a facility or sharing what we're discarding with the opponent
-                DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
-            }
-            else {
-                // remove the discarded card
-                if (!HandCards.Remove(playKey)) {
-                    Debug.Log("didn't find a key to remove! " + playKey);
-                }
-            }
-        }
+        //if (playCount > 0) {
+        //    if (phase == GamePhase.Draw) {
+        //        // we're not discarding a facility or sharing what we're discarding with the opponent
+        //        DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
+        //    }
+        //    else {
+        //        // remove the discarded card
+        //        if (!HandCards.Remove(playKey)) {
+        //            Debug.Log("didn't find a key to remove! " + playKey);
+        //        }
+        //    }
+        //}
 
         return playCount;
     }

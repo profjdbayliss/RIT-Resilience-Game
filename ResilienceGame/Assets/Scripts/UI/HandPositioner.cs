@@ -62,7 +62,7 @@ public class HandPositioner : MonoBehaviour {
         //card was played somewhere, so we need to do something with it
         var dropLoc = GameManager.instance.actualPlayer.hoveredDropLocation;
         if (dropLoc) {
-            Debug.Log($"card was played on: {dropLoc.name}");
+           // Debug.Log($"card was played on: {dropLoc.name}");
             
         }
         else {
