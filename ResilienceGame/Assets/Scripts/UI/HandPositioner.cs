@@ -6,24 +6,27 @@ using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// This class is responsible for arranging the cards in the player's hand.
+/// </summary>
 public class HandPositioner : MonoBehaviour {
+
     public List<GameObject> cards = new List<GameObject>();
-    public float arcRadius = 3300f;
+    public float arcRadius = 3300f;     //the size of the arc/curve the cards will be placed on
     public float arcAngle = 20f;
     public float cardAngle = 5f;
-    private float hoverHeight = 150f;
-    public float hoverScale = 1f;
-    public float defaultScale = .5f;
-    public float cardWidth = 100f;
-    public float hoverTransitionSpeed = 10f; // New field for smooth transitions
+    private float hoverHeight = 150f;   //how far to move the card up when hovered over
+    public float hoverScale = 1f;       //scale of the cards when hovered over
+    public float defaultScale = .5f;    //default scale of the cards when in the hand
+    public float cardWidth = 100f;      //approximate width of a card
+    public float hoverTransitionSpeed = 10f; // transition speed of hover animation faster is faster
 
-    public RectTransform hoverParent;
-    private RectTransform rect;
+    private RectTransform rect; //the rect transform of the hand positioner
 
-
-
+    //TODO: unknown if there is a real max cards in game rules but there should be for technical reasons if nothing else
     private const int MIN_CARDS = 3;
     private const int MAX_CARDS = 10;
+
 
     private GameObject currentHoveredCard;
     private bool isDraggingCard = false;
@@ -35,25 +38,33 @@ public class HandPositioner : MonoBehaviour {
     }
 
 
-
+    /// <summary>
+    /// Tells the hand positioner that a card is being dragged
+    /// </summary>
+    /// <param name="card">The game object of the card being dragged</param>
     public void NotifyCardDragStart(GameObject card) {
         cardsBeingDragged.Add(card);
-      //  card.transform.localScale = Vector3.one * defaultScale;
         card.transform.localRotation = Quaternion.identity;
         if (currentHoveredCard == card) {
             currentHoveredCard = null;
         }
     }
 
+    /// <summary>
+    /// Tells the hand positioner that the card was dropped after being dragged
+    /// </summary>
+    /// <param name="card">The card that was dropped</param>
+    /// <param name="cardWasPlayed">true if the card was dropped on a playable area, false otherwise</param>
     public void NotifyCardDragEnd(GameObject card, bool cardWasPlayed = false) {
         cardsBeingDragged.Remove(card);
 
+        //remove the card from the hand if it was played 
         if (cardWasPlayed) {
             cards.Remove(card);
             Debug.Log("Played card removed from hand");
         }
         else {
-
+            //reset scale and reset sibling index to position it correctly in the hand
             card.transform.localScale = Vector3.one * defaultScale;
             card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
             ArrangeCards(); // Rearrange cards when dragging ends
@@ -68,21 +79,25 @@ public class HandPositioner : MonoBehaviour {
         HandleHovering();
     }
 
-    //handles adding and removing cards from this class's card tracker (cards list)
+    /// <summary>
+    /// handles adding and removing cards from this class's card tracker (cards list)
+    /// </summary>
     private void HandleNewCards() {
+        //get all the child cards of the hand positioner
         var newCards = transform.GetComponentsInChildren<Card>().Select(card => card.gameObject).ToList();
 
+        //filter the cards list and cardsToAdd to create exlusively new cards and cards to remove
         var cardsToAdd = newCards.Except(cards).ToList();
         var cardsToRemove = cards.Except(newCards).ToList();
 
+        //set the scale of the new cards to the default scale
         cardsToAdd.ForEach(card => {
             card.transform.localScale = Vector3.one * defaultScale;
 
         });
 
-
+        //If there are new cards or cards to remove, update the cards list
         if (cardsToAdd.Any()) {
-            Debug.Log("Found new card, adding");
             cards.AddRange(cardsToAdd);
             for (int x = 0; x < cards.Count; x++) {
                 cards[x].GetComponent<Card>().HandPosition = x;
@@ -98,17 +113,6 @@ public class HandPositioner : MonoBehaviour {
 
 
     }
-    //private void HandleCardClick() {
-    //    if (Mouse.current.leftButton.wasPressedThisFrame) {
-    //        var card = GetCardUnderMouse(Mouse.current.position.ReadValue().x);
-    //        if (card) {
-    //            isDraggingCard = true;
-    //        }
-    //    }
-    //    else if (Mouse.current.leftButton.wasReleasedThisFrame) {
-    //        isDraggingCard = false;
-    //    }
-    //}
 
     //handles arranging the cards in the hand by fanning them out in an arc
     //spreads the cards out in the x direction to fill the hand position rect
@@ -116,10 +120,12 @@ public class HandPositioner : MonoBehaviour {
         int cardCount = cards.Count;
         if (cardCount == 0) return;
 
+        // Calculate the angle step based on the number of cards
         float currentArcAngle = Mathf.Min(arcAngle, Mathf.Max(0, (cardCount - MIN_CARDS) * 5f));
         float angleStep = currentArcAngle / (cardCount - 1);
-        if (cardCount <= MIN_CARDS) angleStep = 0;
+        if (cardCount <= MIN_CARDS) angleStep = 0;      //3 cards or less should be in a straight line
 
+        //calculate the overlap factor using the max allowed width (hand positioner size) and the total width of the cards
         float startAngle = -currentArcAngle / 2f;
         float maxScreenWidth = rect.rect.width;
         float totalCardWidth = cardWidth * cardCount;
@@ -131,26 +137,37 @@ public class HandPositioner : MonoBehaviour {
 
         float horizontalSpacing = cardWidth * overlapFactor;
 
+        // Loop through all the cards and position them
         for (int i = 0; i < cardCount; i++) {
             GameObject card = cards[i];
-
+            // Skip cards that are being dragged
             if (cardsBeingDragged.Contains(card)) continue;
 
+            //calculate the angle and x position of the card
             float angle = startAngle + (i * angleStep);
             float x = (i - (cardCount - 1) / 2f) * horizontalSpacing;
+            //calculate the y position of the card
             float baseY = Mathf.Cos(angle * Mathf.Deg2Rad) * arcRadius - arcRadius;
 
             Vector3 targetPosition = new Vector3(x, baseY, 0);
             Quaternion targetRotation = Quaternion.Euler(0, 0, -angle);
 
+            //if the card is the current hover card, rotate it to straight and push it up a bit
             if (card == currentHoveredCard) {
                 targetPosition.y += hoverHeight;
                 targetRotation = Quaternion.identity;
             }
 
-            // Smooth transition
-            card.transform.localPosition = Vector3.Lerp(card.transform.localPosition, targetPosition, Time.deltaTime * hoverTransitionSpeed);
-            card.transform.localRotation = Quaternion.Slerp(card.transform.localRotation, targetRotation, Time.deltaTime * hoverTransitionSpeed);
+            // Smooth position and rotation transition
+            card.transform.SetLocalPositionAndRotation(
+                Vector3.Lerp(
+                    card.transform.localPosition, 
+                    targetPosition, 
+                    Time.deltaTime * hoverTransitionSpeed),
+                Quaternion.Slerp(
+                    card.transform.localRotation, 
+                    targetRotation, 
+                    Time.deltaTime * hoverTransitionSpeed));
 
             // Smooth scale transition
             float targetScale = card == currentHoveredCard ? hoverScale : defaultScale;
@@ -158,28 +175,41 @@ public class HandPositioner : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// handles determining which card is being hovered over
+    /// </summary>
     private void HandleHovering() {
+        //dont hover if dragging a card
         if (cardsBeingDragged.Count > 0) {
             currentHoveredCard = null;
             return;
         }
-
+        //get the mouse position
         Vector2 mousePosition = Mouse.current.position.ReadValue();
+
+        // Convert the mouse position to local space of the hand positioner
         Vector2 localMousePosition = rect.InverseTransformPoint(mousePosition);
 
+        // Get the card under the mouse
         GameObject hoveredCard = GetCardUnderMouse(localMousePosition.x);
 
+        // If the hovered card has changed, update the current hovered card
         if (hoveredCard != currentHoveredCard) {
             if (currentHoveredCard != null) {
-                currentHoveredCard.transform.SetSiblingIndex(currentHoveredCard.GetComponent<Card>().HandPosition);
+                currentHoveredCard.transform.SetSiblingIndex(currentHoveredCard.GetComponent<Card>().HandPosition);//reset the sibling index of the current hovered card, sending it to its proper spot in the draw order
             }
             currentHoveredCard = hoveredCard;
 
             if (currentHoveredCard != null) {
-                currentHoveredCard.transform.SetAsLastSibling();
+                currentHoveredCard.transform.SetAsLastSibling(); //bring the hovered card to the front of the draw order
             }
         }
     }
+
+    /// <summary>
+    /// Determines if the mouse is inside of the hand positioner rect
+    /// </summary>
+    /// <returns>True if the mouse is inside of the hand positioner</returns>
     private bool IsMouseInsideRect() {
         // Get the mouse position in screen space
         Vector2 mousePositionScreen = Mouse.current.position.ReadValue();
@@ -191,11 +221,14 @@ public class HandPositioner : MonoBehaviour {
         return rect.rect.Contains(localPoint);
     }
 
+    /// <summary>
+    /// Gets the card under the mouse, this is done by finding the card with the closest x position to the mouse to provide a seemless transition between selecting neighboring cards
+    /// </summary>
+    /// <param name="mouseX">The local x position of the mouse</param>
+    /// <returns></returns>
     private GameObject GetCardUnderMouse(float mouseX) {
 
-
-
-        if (!IsMouseInsideRect()) return null;
+        if (!IsMouseInsideRect()) return null; //dont hover if the mouse is outside of the hand area
 
         float minDistance = float.MaxValue;
         GameObject closestCard = null;
@@ -210,29 +243,7 @@ public class HandPositioner : MonoBehaviour {
             }
         }
 
-        // You might want to add a threshold here to prevent hovering when the mouse is too far from any card
         return closestCard;
     }
 
-    //private void HoverCard(GameObject card) {
-    //    if (cardsBeingDragged.Contains(card)) return;
-    //    card.transform.localPosition += Vector3.up * hoverHeight;
-    //    card.transform.localScale = Vector3.one * hoverScale;
-    //    card.transform.localRotation = Quaternion.identity;
-    //}
-
-    //private void ResetCardTransform(GameObject card) {
-    //    if (cardsBeingDragged.Contains(card)) return;
-    //    int index = cards.IndexOf(card);
-    //    if (index != -1) {
-    //        float angle = -arcAngle / 2f + (index * (arcAngle / (cards.Count - 1)));
-    //        card.transform.localScale = Vector3.one * defaultScale;
-    //        card.transform.localRotation = Quaternion.Euler(0, 0, -angle);
-    //        // Restore the original y position (you might need to store this separately if it varies)
-    //        Vector3 position = card.transform.localPosition;
-    //        position.y -= hoverHeight;
-    //        card.transform.localPosition = position;
-    //        card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
-    //    }
-    //}
 }
