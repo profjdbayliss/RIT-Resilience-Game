@@ -29,7 +29,7 @@ public class HandPositioner : MonoBehaviour {
 
 
     private GameObject currentHoveredCard;
-    private bool isDraggingCard = false;
+    public bool IsDraggingCard { get; private set; } = false;
     private HashSet<GameObject> cardsBeingDragged = new HashSet<GameObject>();
 
     private void Start() {
@@ -44,6 +44,7 @@ public class HandPositioner : MonoBehaviour {
     /// <param name="card">The game object of the card being dragged</param>
     public void NotifyCardDragStart(GameObject card) {
         cardsBeingDragged.Add(card);
+        IsDraggingCard = true;
         card.transform.localRotation = Quaternion.identity;
         if (currentHoveredCard == card) {
             currentHoveredCard = null;
@@ -55,12 +56,13 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="card">The card that was dropped</param>
     /// <param name="cardWasPlayed">true if the card was dropped on a playable area, false otherwise</param>
-    public void NotifyCardDragEnd(GameObject card, GameObject areaPlayed) {
+    public void NotifyCardDragEnd(GameObject card) {
         cardsBeingDragged.Remove(card);
-
+        IsDraggingCard = false;
         //card was played somewhere, so we need to do something with it
-        if (areaPlayed) {
-            
+        var dropLoc = GameManager.instance.actualPlayer.hoveredDropLocation;
+        if (dropLoc) {
+            Debug.Log($"card was played on: {dropLoc.name}");
             
         }
         else {

@@ -7237,6 +7237,7 @@ MonoBehaviour:
   playerDropZone: {fileID: 1920413917}
   cardStackingCanvas: {fileID: 2138364093}
   DeckName: 
+  hoveredDropLocation: {fileID: 0}
   blueMeepleCount: 0
   blackMeepleCount: 0
   purpleMeepleCount: 0
@@ -8547,7 +8548,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &791040123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11966,6 +11967,7 @@ MonoBehaviour:
   playerDropZone: {fileID: 1920413917}
   cardStackingCanvas: {fileID: 2138364093}
   DeckName: 
+  hoveredDropLocation: {fileID: 0}
   blueMeepleCount: 0
   blackMeepleCount: 0
   purpleMeepleCount: 0

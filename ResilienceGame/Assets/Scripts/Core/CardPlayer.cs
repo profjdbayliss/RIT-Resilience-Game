@@ -75,11 +75,15 @@ public class CardPlayer : MonoBehaviour {
     public GameObject cardPrefab;
     public GameObject discardDropZone;
     public GameObject handDropZone;
+    private HandPositioner handPositioner;
     public GameObject opponentDropZone;
     public GameObject playerDropZone;
     public GameObject cardStackingCanvas;
     public readonly float ORIGINAL_SCALE = 0.2f;
     public string DeckName = "";
+    public bool IsDraggingCard { get; private set; } = false;
+    public GameObject hoveredDropLocation;
+    public List<List<GameObject>> dropLocations = new();
 
     //Meeples
     // TODO: Move to Sector.cs if needed
@@ -100,6 +104,14 @@ public class CardPlayer : MonoBehaviour {
     List<Updates> mUpdatesThisPhase = new List<Updates>(6);
 
     public void Start() {
+
+        if (handDropZone)
+            handPositioner = handDropZone.GetComponent<HandPositioner>();
+        else {
+            Debug.LogError("Hand drop zone not found");
+        }
+
+        InitDropLocations();
         // discard rectangle information for AABB collisions
         RectTransform discardRectTransform = discardDropZone.GetComponent<RectTransform>();
         discardDropMin.x = discardRectTransform.position.x - (discardRectTransform.rect.width / 2);
@@ -331,30 +343,43 @@ public class CardPlayer : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        // nothing to update at the moment
+        IsDraggingCard = handPositioner.IsDraggingCard;
+
+        if (IsDraggingCard) {
+            UpdateHoveredDropLocation();
+        }
+    }
+    //updates the hoverDropLocation class field to hold the object the card is hovering over
+    void UpdateHoveredDropLocation() {
+
+        for (int x = 0; x < dropLocations.Count; x++) {
+            foreach (GameObject location in dropLocations[x]) {
+                if (location.TryGetComponent(out Collider2D collider)) {
+                    if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
+                        hoveredDropLocation = x == 0 ? location : location.transform.parent.gameObject; //if its a facility (first list) return the parent
+                        //Debug.Log($"Card hovering over {location.name}");
+                        return;
+                    }
+                }
+            }
+        }
+        hoveredDropLocation = null;
+    }
+    void InitDropLocations() {
+
+        var facilityLocations = GameObject.FindGameObjectsWithTag("FacilityDropLocation").ToList();
+        var locations = GameObject.FindGameObjectsWithTag("CardDropLocation").ToList();
+
+
+        dropLocations.Add(facilityLocations);
+        dropLocations.Add(locations);
+
+
+
     }
     public GameObject HandleCardDrop(Card card) {
 
-        var facilityLocations = GameObject.FindGameObjectsWithTag("FacilityDropLocation");
-
-        foreach (var location in facilityLocations) {
-            if (location.TryGetComponent(out Collider2D collider)) {
-                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
-                    return location.transform.parent.gameObject;    //return the parent of the facility box, this is where the facility script lives
-                }
-            }
-        }
-
-
-        var locations = GameObject.FindGameObjectsWithTag("CardDropLocation");
-
-        foreach (var location in locations) {
-            if (location.TryGetComponent(out Collider2D collider)) {
-                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
-                    return location;                            //these are more generic and dont need to return a script
-                }
-            }
-        }
+        Debug.Log("CardPlayer HandleCardDrop");
 
 
         return null;
