@@ -170,6 +170,9 @@ public class HandPositioner : MonoBehaviour {
         GameObject hoveredCard = GetCardUnderMouse(localMousePosition.x);
 
         if (hoveredCard != currentHoveredCard) {
+            if (currentHoveredCard != null) {
+                currentHoveredCard.transform.SetSiblingIndex(currentHoveredCard.GetComponent<Card>().HandPosition);
+            }
             currentHoveredCard = hoveredCard;
 
             if (currentHoveredCard != null) {
