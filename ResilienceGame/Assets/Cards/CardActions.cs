@@ -97,6 +97,7 @@ public class AddEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
+        //need to find a way to implement amount of turns this effect is active for
         facilityActedUpon.AddOrRemoveEffect(card.data.effect, true);
     }
 
@@ -149,7 +150,12 @@ public class SpreadEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)
     {
-
+        for(int i = 0; i < facilityActedUpon.sectorItsAPartOf.facilities.Length; i++)
+        {
+            //can probably slightly optimize this by finding out which of the facilities in the sector is facility acted upon
+            //and excluding it from this but i don't think its worth the effort
+            facilityActedUpon.sectorItsAPartOf.facilities[i].effect = facilityActedUpon.effect; 
+        }
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card card)

@@ -25,6 +25,7 @@ public class Facility : MonoBehaviour
     public string facilityName;
     public PlayerSector[] products;
     public GameObject facilityCanvas;
+    public Sector sectorItsAPartOf;
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     private int physicalPoints, finacialPoints, networkPoints;
