@@ -8,6 +8,8 @@ TagManager:
   - CardDropLocation
   - GameCanvas
   - FacilityDropLocation
+  - DiscardDropLocation
+  - FreePlayDropLocation
   layers:
   - Default
   - TransparentFX
