@@ -129,9 +129,8 @@ public class slippy : MonoBehaviour, IDragHandler, IScrollHandler, IBeginDragHan
 
         if (GameObject.FindWithTag("GameController").TryGetComponent(out GameManager gameManager)) {
             if (handPositioner != null) {
-                handPositioner.NotifyCardDragEnd(
-                    gameObject,
-                    gameManager.actualPlayer.HandleCardDrop(GetComponent<Card>()));
+                gameManager.actualPlayer.HandleCardDrop(GetComponent<Card>());
+                handPositioner.NotifyCardDragEnd(gameObject);
             }
         }
     }
