@@ -1000,9 +1000,10 @@ GameObject:
   - component: {fileID: 92073677}
   - component: {fileID: 92073676}
   - component: {fileID: 92073679}
+  - component: {fileID: 92073680}
   m_Layer: 5
   m_Name: Distribution Facility Box
-  m_TagString: Untagged
+  m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1110,6 +1111,32 @@ MonoBehaviour:
   highlightObject: {fileID: 912450320}
   scale: 0
   scaleObject: {fileID: 0}
+--- !u!61 &92073680
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92073674}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 866, y: 123}
+  m_EdgeRadius: 0
 --- !u!1 &92478569
 GameObject:
   m_ObjectHideFlags: 0
@@ -2104,7 +2131,7 @@ RectTransform:
   m_Children:
   - {fileID: 208574807}
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2344,7 +2371,7 @@ RectTransform:
   m_Children:
   - {fileID: 244775017}
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2955,7 +2982,7 @@ RectTransform:
   m_Children:
   - {fileID: 1774689029}
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -5146,7 +5173,7 @@ RectTransform:
   m_Children:
   - {fileID: 879134670}
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5765,9 +5792,10 @@ GameObject:
   - component: {fileID: 520008982}
   - component: {fileID: 520008981}
   - component: {fileID: 520008984}
+  - component: {fileID: 520008985}
   m_Layer: 5
   m_Name: Transmission Facility Box
-  m_TagString: Untagged
+  m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5875,6 +5903,32 @@ MonoBehaviour:
   highlightObject: {fileID: 2138288040}
   scale: 0
   scaleObject: {fileID: 0}
+--- !u!61 &520008985
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520008979}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 866, y: 123}
+  m_EdgeRadius: 0
 --- !u!1 &522352602
 GameObject:
   m_ObjectHideFlags: 0
@@ -7150,7 +7204,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -8493,7 +8547,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &791040123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11338,7 +11392,7 @@ Transform:
   - {fileID: 970184694}
   - {fileID: 814751665}
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1055011277
 GameObject:
@@ -11879,7 +11933,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -13713,7 +13767,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 14
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -17513,7 +17567,7 @@ Transform:
   - {fileID: 325979392}
   - {fileID: 510286170}
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1871187429
 MonoBehaviour:
@@ -17989,12 +18043,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 15
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 143, y: 62.463013}
-  m_SizeDelta: {x: 1000, y: 509.5782}
+  m_AnchoredPosition: {x: 253.9906, y: 163.69348}
+  m_SizeDelta: {x: 1241.958, y: 678.9489}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &1920413922
 BoxCollider2D:
@@ -18006,7 +18060,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -18020,7 +18074,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1000, y: 510}
+  m_Size: {x: 1241.958, y: 678.9489}
   m_EdgeRadius: 0
 --- !u!1 &1937381451
 GameObject:
@@ -18865,6 +18919,7 @@ RectTransform:
   - {fileID: 1021846753}
   - {fileID: 1269457914}
   - {fileID: 366419931}
+  - {fileID: 1920413921}
   - {fileID: 1871187428}
   - {fileID: 433258441}
   - {fileID: 1050762458}
@@ -18875,7 +18930,6 @@ RectTransform:
   - {fileID: 1125198113}
   - {fileID: 680164115}
   - {fileID: 1445810751}
-  - {fileID: 1920413921}
   - {fileID: 2075808972}
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -19058,7 +19112,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1994761816}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -19149,7 +19203,6 @@ MonoBehaviour:
   defaultScale: 0.5
   cardWidth: 100
   hoverTransitionSpeed: 10
-  hoverParent: {fileID: 0}
 --- !u!1 &2058548353
 GameObject:
   m_ObjectHideFlags: 0
@@ -19858,9 +19911,10 @@ GameObject:
   - component: {fileID: 2097464032}
   - component: {fileID: 2097464035}
   - component: {fileID: 2097464036}
+  - component: {fileID: 2097464037}
   m_Layer: 5
   m_Name: FacilityBox
-  m_TagString: Untagged
+  m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19980,6 +20034,32 @@ MonoBehaviour:
   highlightObject: {fileID: 180503385}
   scale: 0
   scaleObject: {fileID: 0}
+--- !u!61 &2097464037
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097464030}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &2099342281
 GameObject:
   m_ObjectHideFlags: 0
@@ -21938,7 +22018,6 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   playerInput: {fileID: 1887695112}
-  hoverScale: {x: 1, y: 1}
   dragScale: {x: 0.5, y: 0.5}
   dragSmoothTime: 0.1
 --- !u!1 &5095766208849916539

@@ -55,13 +55,13 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="card">The card that was dropped</param>
     /// <param name="cardWasPlayed">true if the card was dropped on a playable area, false otherwise</param>
-    public void NotifyCardDragEnd(GameObject card, bool cardWasPlayed = false) {
+    public void NotifyCardDragEnd(GameObject card, GameObject areaPlayed) {
         cardsBeingDragged.Remove(card);
 
-        //remove the card from the hand if it was played 
-        if (cardWasPlayed) {
-            cards.Remove(card);
-            Debug.Log("Played card removed from hand");
+        //card was played somewhere, so we need to do something with it
+        if (areaPlayed) {
+            
+            
         }
         else {
             //reset scale and reset sibling index to position it correctly in the hand
