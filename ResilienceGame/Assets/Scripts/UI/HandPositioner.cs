@@ -73,6 +73,11 @@ public class HandPositioner : MonoBehaviour {
         }
     }
 
+    public void DiscardCard(GameObject card) {
+        cards.Remove(card);
+      //  Destroy(card);
+    }
+
 
 
     private void Update() {
