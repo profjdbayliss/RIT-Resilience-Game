@@ -32,8 +32,10 @@ public class Card : MonoBehaviour, IPointerClickHandler {
     public List<int> ModifyingCards = new List<int>(10);
     public List<CardIDInfo> AttackingCards = new List<CardIDInfo>(10);
 
+    
     public int HandPosition { get; set; } = 0;
 
+   // public int serializedHandPosition = 0;
 
     // NOTE: this is a string currently because mitigations are for 
     // cards from the other player's deck.
@@ -48,6 +50,9 @@ public class Card : MonoBehaviour, IPointerClickHandler {
         //    mManager = GameObject.FindObjectOfType<GameManager>();
         OutlineImage.SetActive(false);
     }
+    //void Update() {
+    //    serializedHandPosition = HandPosition;
+    //}
 
     public void InitializeFromCard(Card sourceCard, GameObject dropZone, int uniqueId, Transform parent = null) {
         this.cardZone = dropZone;

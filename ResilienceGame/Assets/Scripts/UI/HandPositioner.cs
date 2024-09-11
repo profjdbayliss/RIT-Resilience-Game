@@ -77,7 +77,9 @@ public class HandPositioner : MonoBehaviour {
         else {
             //reset scale and reset sibling index to position it correctly in the hand
             card.transform.localScale = Vector3.one * defaultScale;
-            card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
+            var tCard  = card.GetComponent<Card>();
+            Debug.Log($"returning {tCard.data.front.title} to position {tCard.HandPosition}");
+            card.transform.SetSiblingIndex(tCard.HandPosition);
             ArrangeCards(); // Rearrange cards when dragging ends
         }
     }
@@ -218,6 +220,12 @@ public class HandPositioner : MonoBehaviour {
 
         // If the hovered card has changed, update the current hovered card
         if (hoveredCard != currentHoveredCard) {
+
+            if (hoveredCard == null) {
+                onCardHover.Invoke(null);
+                currentHoveredCard.transform.SetSiblingIndex(currentHoveredCard.GetComponent<Card>().HandPosition); //bring the hovered card to the front of the draw order
+            }
+
             currentHoveredCard = hoveredCard;
 
             if (currentHoveredCard != null) {
