@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System;
 using UnityEngine.UI;
+using System.Linq;
 
 public class CardReader : MonoBehaviour
 {
@@ -153,80 +154,101 @@ public class CardReader : MonoBehaviour
 
                         // 2: which type of card is this?
                         // NOTE: here is where we add appropriate card actions
-                        string[] methods = individualCSVObjects[2].Split(';');
-                        foreach (string type in methods)
-                        {
-                            switch (type)
-                            {
-                                case "DrawAndDiscardCards":
-                                    // 17:  Cards drawn
-                                    tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
-                                    // 18:  Cards removed
-                                    tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
-                                    tempCard.ActionList.Add(new DrawAndDiscardCards());
-                                    break;
-                                case "ShuffleAndDrawCards":
-                                    tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
-                                    tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
-                                    tempCard.ActionList.Add(new ShuffleAndDrawCards());
-                                    break;
-                                case "ReduceCardCost":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ReduceCardCost());
-                                    break;
-                                case "ChangeNetworkPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangeNetworkPoints());
-                                    break;
-                                case "ChangeFinancialPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangeFinancialPoints());
-                                    break;
-                                case "ChangePhysicalPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangePhysicalPoints());
-                                    break;
-                                case "AddEffect":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
-                                    tempCard.ActionList.Add(new AddEffect());
-                                    break;
-                                case "RemoveEffectByTeam":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new RemoveEffectByTeam());
-                                    break;
-                                case "NegateEffect":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new NegateEffect());
-                                    break;
-                                case "RemoveEffect":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
-                                    tempCard.ActionList.Add(new RemoveEffect());
-                                    break;
-                                case "SpreadEffect":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new SpreadEffect());
-                                    break;
-                                case "ChangeMeepleAmount":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangeMeepleAmount());
-                                    break;
-                                case "IncreaseOvertimeAmount":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new IncreaseOvertimeAmount());
-                                    break;
-                                case "ShuffleCardsFromDiscard":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
-                                    break;
+                        var methods = individualCSVObjects[2].Split(';').ToList();
+                        
+                        methods.ForEach(methodName => {
+                            Debug.Log($"Adding {methodName} action to {tempCard.name}");
+                            //add the function names to the card
+                            tempCard.ActionList.Add(methodName);
 
-                                default:
-                                    tempCard.data.cardType = CardType.None;
-                                    break;
+                            //handle current edge cases
+                            //i do not see a reason why reading in a 0 value for these on all cards even if they arent draw/discard would be a problem
+                            if (methodName.ToLower().Contains("draw")) {
+                                // 17:  Cards drawn
+                                tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
+                                // 18:  Cards removed
+                                tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
                             }
-                        }
+                            if (methodName.ToLower().Contains("effect")) {
+                                tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
+                            }
+                        });
 
+                        #region old
+                        //foreach (string type in methods)
+                        //{
+                        //    switch (type)
+                        //    {
+                        //        case "DrawAndDiscardCards":
+                        //            // 17:  Cards drawn
+                        //            tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
+                        //            // 18:  Cards removed
+                        //            tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
+                        //            tempCard.ActionList.Add(new DrawAndDiscardCards());
+                        //            break;
+                        //        case "ShuffleAndDrawCards":
+                        //            tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
+                        //            tempCard.data.removeAmount = int.Parse(individualCSVObjects[18]);
+                        //            tempCard.ActionList.Add(new ShuffleAndDrawCards());
+                        //            break;
+                        //        case "ReduceCardCost":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new ReduceCardCost());
+                        //            break;
+                        //        case "ChangeNetworkPoints":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new ChangeNetworkPoints());
+                        //            break;
+                        //        case "ChangeFinancialPoints":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new ChangeFinancialPoints());
+                        //            break;
+                        //        case "ChangePhysicalPoints":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new ChangePhysicalPoints());
+                        //            break;
+                        //        case "AddEffect":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
+                        //            tempCard.ActionList.Add(new AddEffect());
+                        //            break;
+                        //        case "RemoveEffectByTeam":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new RemoveEffectByTeam());
+                        //            break;
+                        //        case "NegateEffect":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new NegateEffect());
+                        //            break;
+                        //        case "RemoveEffect":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
+                        //            tempCard.ActionList.Add(new RemoveEffect());
+                        //            break;
+                        //        case "SpreadEffect":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new SpreadEffect());
+                        //            break;
+                        //        case "ChangeMeepleAmount":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new ChangeMeepleAmount());
+                        //            break;
+                        //        case "IncreaseOvertimeAmount":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new IncreaseOvertimeAmount());
+                        //            break;
+                        //        case "ShuffleCardsFromDiscard":
+                        //            //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
+                        //            tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
+                        //            break;
+
+                        //        default:
+                        //            tempCard.data.cardType = CardType.None;
+                        //            break;
+                        //    }
+                        //}
+
+                        #endregion
                         // 3: Target type
                         tempCard.data.playableTarget = individualCSVObjects[3].Trim() switch {
 
@@ -300,7 +322,7 @@ public class CardReader : MonoBehaviour
                         tempCard.data.meepleType = individualCSVObjects[11].Trim().Split(';');
 
                         // 12:  Number of Meeples changed
-                        if (individualCSVObjects[12] != "") { tempCard.data.meepleAmount = float.Parse(individualCSVObjects[12].Trim()); }
+                        if (individualCSVObjects[12] != "") { tempCard.data.meepleAmount = int.Parse(individualCSVObjects[12].Trim()); }
 
                         // 13:  Blue cost
                         tempCard.data.blueCost = int.Parse(individualCSVObjects[13].Trim());
