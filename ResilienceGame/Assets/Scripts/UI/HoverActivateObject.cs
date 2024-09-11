@@ -7,48 +7,14 @@ using UnityEngine.UI;
 
 public class HoverActivateObject : MonoBehaviour
 {
-    public float fadeTime = .25f;
     public Image hoverImage;
-
-    private bool isHovering = false;
-
-
-    private Coroutine fadeCoroutine;
-
-    public void StartFadeIn() {
+    public void ActivateHover() {
         hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, 1f);
     }
-    public void StartFadeOut() {
+    public void DeactivateHover() {
         hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, 0f);
 
     }
-    //public void StartFadeIn() {
-    //    if (isHovering) return;
-    //    isHovering = true;
-    //    if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-    //    fadeCoroutine = StartCoroutine(FadeTo(1f));
-    //}
-    //public void StartFadeOut() {
-    //    if (!isHovering) return;
-    //    isHovering = false;
-    //    if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-    //    fadeCoroutine = StartCoroutine(FadeTo(0f));
-    //}
-
-    //private IEnumerator FadeTo(float targetAlpha) {
-    //    float startAlpha = hoverImage.color.a;
-    //    float elapsedTime = 0;
-
-    //    while (elapsedTime < fadeTime) {
-    //        elapsedTime += Time.deltaTime;
-    //        float currentAlpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeTime);
-    //        hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, currentAlpha);
-    //        yield return null;
-    //    }
-
-    //    hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, targetAlpha);
-    //}
-
 
     #region old
 
