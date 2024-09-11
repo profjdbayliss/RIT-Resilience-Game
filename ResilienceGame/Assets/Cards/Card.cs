@@ -109,13 +109,13 @@ public class Card : MonoBehaviour, IPointerClickHandler
     }
 
     // we save the exact position of dropping so others can look at it
-    public Vector2 getDroppedPosition() {
+    public Vector2 GetDroppedPosition() {
         return mDroppedPosition;
     }
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon)
+    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
     {
         foreach(ICardAction action in ActionList)
         {
@@ -124,7 +124,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     }
 
     // Cancel this card
-    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon)
+    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
     {
         foreach (ICardAction action in ActionList)
         {

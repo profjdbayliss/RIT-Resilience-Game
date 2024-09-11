@@ -446,9 +446,11 @@ public class CardPlayer : MonoBehaviour {
     public void HandlePlayCard(Card card, GameObject dropLocation) {
         switch (dropLocation.tag) {
             case "FacilityDropLocation":
+                //TODO: Implement facility drop location
                 Debug.Log("Facility Drop Location");
                 break;
             case "FreePlayDropLocation":
+                //TODO: Implement free play drop location
                 Debug.Log("Card Drop Location");
                 break;
             case "DiscardDropLocation":
