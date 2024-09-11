@@ -9,10 +9,6 @@ using static UnityEngine.PlayerLoop.PreUpdate;
 using Image = UnityEngine.UI.Image;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
-using Newtonsoft.Json.Linq;
-using System;
-using UnityEngine.UIElements;
-using System.Data;
 
 #region Enums
 // Enum to track player type
@@ -388,7 +384,14 @@ public class CardPlayer : MonoBehaviour {
             if (kvp.Value.TryGetComponent(out Collider2D collider)) {
                 if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
                     //the facilities hitboxes are children of their script objects
-                    hoveredDropLocation = kvp.Key.Contains("FacilityDropLocation") ? kvp.Value.transform.parent.gameObject : kvp.Value;
+                    GameObject hoveredObject = kvp.Value;
+                    if (kvp.Key.Contains("FacilityDropLocation")) {
+                        if (GameManager.instance.CanStationsBeHighlighted()) {
+                           // hoveredObject.GetComponent<HoverActivateObject>().OnPointerEnter(null);
+                        }
+                        hoveredObject = kvp.Value.transform.parent.gameObject;
+                    }
+                    hoveredDropLocation = hoveredObject;
                     // Debug.Log("Hovered over " + hoveredDropLocation.name);
                     return;
                 }
@@ -1023,36 +1026,36 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Station Facility Functions
-    public bool CheckHighlightedStations() {
-        bool singleHighlighted = false;
-        int countHighlighted = 0;
+    //public bool CheckHighlightedStations() {
+    //    bool singleHighlighted = false;
+    //    int countHighlighted = 0;
 
-        foreach (GameObject gameObject in ActiveFacilities.Values) {
-            Card card = gameObject.GetComponent<Card>();
-            if (card.OutlineImage.activeSelf) {
-                countHighlighted++;
-            }
-        }
+    //    foreach (GameObject gameObject in ActiveFacilities.Values) {
+    //        Card card = gameObject.GetComponent<Card>();
+    //        if (card.OutlineImage.activeSelf) {
+    //            countHighlighted++;
+    //        }
+    //    }
 
-        if (countHighlighted == 1)
-            singleHighlighted = true;
+    //    if (countHighlighted == 1)
+    //        singleHighlighted = true;
 
-        return singleHighlighted;
-    }
+    //    return singleHighlighted;
+    //}
 
-    public GameObject GetHighlightedStation() {
-        GameObject station = null;
+    //public GameObject GetHighlightedStation() {
+    //    GameObject station = null;
 
-        foreach (GameObject gameObject in ActiveFacilities.Values) {
-            Card card = gameObject.GetComponent<Card>();
-            if (card.OutlineImage.activeSelf) {
-                station = gameObject;
-                break;
-            }
-        }
+    //    foreach (GameObject gameObject in ActiveFacilities.Values) {
+    //        Card card = gameObject.GetComponent<Card>();
+    //        if (card.OutlineImage.activeSelf) {
+    //            station = gameObject;
+    //            break;
+    //        }
+    //    }
 
-        return station;
-    }
+    //    return station;
+    //}
 
     #endregion
 
