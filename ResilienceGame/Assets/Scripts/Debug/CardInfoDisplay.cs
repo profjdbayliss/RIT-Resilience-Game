@@ -49,7 +49,7 @@ public class CardInfoDisplay : MonoBehaviour
         sb.AppendLine($"Name: {card.data.front.title}");
         sb.AppendLine($"Desc: {card.data.front.description}");
         sb.AppendLine($"State: {card.state}");
-        sb.AppendLine($"Target: {card.target}");
+        sb.AppendLine($"Target: {card.data.playableTarget}");
         sb.AppendLine($"Attacking Cards: {card.AttackingCards.Count}");
         sb.AppendLine($"Modifying Cards: {card.ModifyingCards.Count}");
 
