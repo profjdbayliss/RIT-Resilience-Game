@@ -55,9 +55,9 @@ public class CardInfoDisplay : MonoBehaviour
 
         // Actions
         sb.AppendLine("Actions:");
-        Debug.Log($"Card Action List Count: {card.ActionList.Count}");
+        //Debug.Log($"Card Action List Count: {card.ActionList.Count}");
         foreach (var action in card.ActionList) {
-            sb.AppendLine($"- {action.GetType().Name}");
+            sb.AppendLine($"- {action}");
         }
 
         // CardData information

@@ -269,6 +269,7 @@ public class CardPlayer : MonoBehaviour {
 
         activeDeck[tempCard.UniqueID] = tempCard.gameObject;
         tempCard.transform.SetParent(dropZone.transform, false);
+        tempCard.HandPosition = handSize++;
         return tempCard;
     }
 
