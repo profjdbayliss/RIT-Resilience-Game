@@ -62,14 +62,14 @@ public class Card : MonoBehaviour, IPointerClickHandler
     // cards from the other player's deck.
     //public List<string> MitigatesWhatCards = new List<string>(10);
     Vector2 mDroppedPosition;
-    GameManager mManager; 
+   // GameManager mManager; 
     public List<ICardAction> ActionList = new List<ICardAction>(6);
 
     // Start is called before the first frame update
     void Start()
     {
         originalPosition = this.gameObject.transform.position;
-        mManager = GameObject.FindObjectOfType<GameManager>();
+    //    mManager = GameObject.FindObjectOfType<GameManager>();
         OutlineImage.SetActive(false);
     }
 
