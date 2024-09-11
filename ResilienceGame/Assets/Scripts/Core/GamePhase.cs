@@ -3,9 +3,7 @@ public enum GamePhase
 {
     Start,
     Draw,
-    Overtime,
+    Bonus,
     Action,
-    Discard,
-    Donate,
     End
 };

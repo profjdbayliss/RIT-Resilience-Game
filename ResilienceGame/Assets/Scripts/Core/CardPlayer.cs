@@ -606,13 +606,14 @@ public class CardPlayer : MonoBehaviour {
         card.state = CardState.CardNeedsToBeDiscarded;
         if (GameManager.instance.MGamePhase == GamePhase.Draw) {
             CardsDiscardedThisPhase++;
-            DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
+            
         }
+        DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
         // remove the discarded card
         if (!HandCards.Remove(card.UniqueID)) {
             Debug.Log("didn't find a key to remove! " + card.UniqueID);
         }
-        handPositioner.DiscardCard(card.gameObject);
+        handPositioner.DiscardCard(card.gameObject);    //remove it from the hand positioner as well
     }
     public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
         int playCount = 0;

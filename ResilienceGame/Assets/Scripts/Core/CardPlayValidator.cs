@@ -10,10 +10,8 @@ public static class CardPlayValidator {
         return GameManager.instance.MGamePhase switch {
             GamePhase.Start => CanPlayCardDuringStartPhase(player, card, playLocation),
             GamePhase.Draw => CanPlayCardDuringDrawPhase(player, card, playLocation),
-            GamePhase.Overtime => CanPlayCardDuringOvertimePhase(player, card, playLocation),
+            GamePhase.Bonus => CanPlayCardDuringBonusPhase(player, card, playLocation),
             GamePhase.Action => CanPlayCardDuringActionPhase(player, card, playLocation),
-            GamePhase.Discard => CanPlayCardDuringDiscardPhase(player, card, playLocation),
-            GamePhase.Donate => CanPlayCardDuringDonatePhase(player, card, playLocation),
             GamePhase.End => CanPlayCardDuringEndPhase(player, card, playLocation),
             _ => false,
         };
@@ -24,13 +22,14 @@ public static class CardPlayValidator {
     }
     //only allowed to discard and draw new cards during this phase (up to 3)
     private static bool CanPlayCardDuringDrawPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
-        if (playLocation.CompareTag("DiscardDropLocation")) {
-            return player.CardsDiscardedThisPhase < GameManager.MAX_DISCARDS;
-        }
-        return false;
+
+        return playLocation.tag switch {
+            "DiscardDropLocation" => player.CardsDiscardedThisPhase < GameManager.MAX_DISCARDS,
+            _ => false,
+        };
     }
 
-    private static bool CanPlayCardDuringOvertimePhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
+    private static bool CanPlayCardDuringBonusPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
         return false;
     }
 

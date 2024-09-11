@@ -293,7 +293,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                 }
                 break;
-            case GamePhase.Overtime:
+            case GamePhase.Bonus:
             /*if (phaseJustChanged && !skip) 
             { 
                 runner.StartDialogue("Defense"); 
@@ -791,42 +791,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Gets the next phase.
     public GamePhase GetNextPhase() {
-        GamePhase nextPhase = GamePhase.Start;
 
-        switch (MGamePhase) {
-            case GamePhase.Start:
-                nextPhase = GamePhase.Draw;
-                break;
-            case GamePhase.Draw:
-                nextPhase = GamePhase.Overtime;
-                break;
-            case GamePhase.Overtime:
-                nextPhase = GamePhase.Action;
-                break;
-            case GamePhase.Action:
-                nextPhase = GamePhase.Discard;
-                break;
-            case GamePhase.Discard:
-                nextPhase = GamePhase.Donate;
-                break;
-            case GamePhase.Donate:
-                // end the game if we're out of cards or have
-                // no stations left on the board
-                if (actualPlayer.DeckIDs.Count == 0 || (actualPlayer.ActiveFacilities.Count == 0)) {
-                    nextPhase = GamePhase.End;
-                }
-                else {
-                    nextPhase = GamePhase.Draw;
-                }
-                break;
-            case GamePhase.End:
-                nextPhase = GamePhase.End;
-                break;
-            default:
-                break;
-        }
-
-        return nextPhase;
+        return MGamePhase switch {
+            GamePhase.Start => GamePhase.Draw,
+            GamePhase.Draw => GamePhase.Bonus,
+            GamePhase.Bonus => GamePhase.Action,
+            GamePhase.Action => GamePhase.End,
+            GamePhase.End => (actualPlayer.DeckIDs.Count == 0 || (actualPlayer.ActiveFacilities.Count == 0)) ? GamePhase.End : GamePhase.Draw,
+            _ => GamePhase.End,
+        };
     }
 
     // Increments a turn. Note that turns consist of multiple phases.
@@ -855,34 +828,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public bool CanStationsBeHighlighted() {
-        bool canBe = false;
-        switch (MGamePhase) {
-            case GamePhase.Start:
-                canBe = false;
-                break;
-            case GamePhase.Draw:
-                canBe = false;
-                break;
-            case GamePhase.Overtime:
-                canBe = true;
-                break;
-            case GamePhase.Action:
-                canBe = true;
-                break;
-            case GamePhase.Discard:
-                canBe = true;
-                break;
-            case GamePhase.Donate:
-                canBe = false;
-                break;
-            case GamePhase.End:
-                canBe = false;
-                break;
-            default:
-                break;
-        }
 
-        return canBe;
+        return MGamePhase == GamePhase.Bonus || MGamePhase == GamePhase.Action;   
     }
 
     // Adds a message to the message queue for the network.
