@@ -4029,7 +4029,7 @@ GameObject:
   - component: {fileID: 325979393}
   m_Layer: 0
   m_Name: TransmissionFacility
-  m_TagString: Untagged
+  m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7737,9 +7737,6 @@ MonoBehaviour:
   cardStackingCanvas: {fileID: 2138364093}
   DeckName: 
   hoveredDropLocation: {fileID: 0}
-  blueMeepleCount: 0
-  blackMeepleCount: 0
-  purpleMeepleCount: 0
 --- !u!1 &682017820
 GameObject:
   m_ObjectHideFlags: 0
@@ -12635,9 +12632,6 @@ MonoBehaviour:
   cardStackingCanvas: {fileID: 2138364093}
   DeckName: 
   hoveredDropLocation: {fileID: 0}
-  blueMeepleCount: 0
-  blackMeepleCount: 0
-  purpleMeepleCount: 0
 --- !u!1 &1134896414
 GameObject:
   m_ObjectHideFlags: 0
@@ -13797,7 +13791,7 @@ GameObject:
   - component: {fileID: 1343283884}
   m_Layer: 0
   m_Name: ProductionFacility
-  m_TagString: Untagged
+  m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20174,7 +20168,7 @@ GameObject:
   - component: {fileID: 2008192385}
   m_Layer: 5
   m_Name: Transmission Facility Effect
-  m_TagString: Untagged
+  m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

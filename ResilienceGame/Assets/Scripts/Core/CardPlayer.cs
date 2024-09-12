@@ -410,7 +410,7 @@ public class CardPlayer : MonoBehaviour {
                     GameObject hoveredObject = kvp.Value;
                     //  Debug.Log("Hovered over " + hoveredObject.name);
                     // Handle fade in if we've moved over a facility
-                    if (kvp.Key.Contains("FacilityDropLocation")) {
+                    if (kvp.Key.Contains(CardDropZoneTag.FACILITY)) {
                         if (GameManager.instance.CanStationsBeHighlighted()) {
                             currentHoveredFacility = kvp.Value;
                             if (currentHoveredFacility != previousHoveredFacility) {
@@ -457,15 +457,15 @@ public class CardPlayer : MonoBehaviour {
     #region Card Playing
     public void HandlePlayCard(Card card, GameObject dropLocation) {
         switch (dropLocation.tag) {
-            case "FacilityDropLocation":
+            case CardDropZoneTag.FACILITY:
                 //TODO: Implement facility drop location
                 Debug.Log("Facility Drop Location");
                 break;
-            case "FreePlayDropLocation":
+            case CardDropZoneTag.FREE_PLAY:
                 //TODO: Implement free play drop location
                 Debug.Log("Card Drop Location");
                 break;
-            case "DiscardDropLocation":
+            case CardDropZoneTag.DISCARD:
                 HandleCardDiscard(card);
                 break;
             default:
@@ -486,8 +486,8 @@ public class CardPlayer : MonoBehaviour {
                 HandlePlayCard(card, hoveredDropLocation);
             }
             else {
-                //reset the card position since it was rejected back to the hand
-                card.transform.SetSiblingIndex(card.HandPosition);
+                //reset card positions
+                handPositioner.ResetCardSiblingIndices();
             }
 
         }

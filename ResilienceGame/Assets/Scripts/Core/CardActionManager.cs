@@ -23,7 +23,7 @@ public class CardActionManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    //map card action names to their respective functions
     private void InitializeCardActions() {
         cardActions = new Dictionary<string, Action<CardPlayer, CardPlayer, Facility, Card, Card>>
         {
@@ -44,7 +44,15 @@ public class CardActionManager : MonoBehaviour
         };
     }
 
-    
+    /// <summary>
+    /// Executes the card action
+    /// </summary>
+    /// <param name="actionName">String name of the action</param>
+    /// <param name="player">actor who played the action</param>
+    /// <param name="opponent">opponent player</param>
+    /// <param name="facilityActedUpon">the facility the card was played on or null if non facility card</param>
+    /// <param name="cardActedUpon">The card the card was played on or null</param>
+    /// <param name="card">The card that was played</param>
     public void ExecuteCardAction(string actionName, CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         if (cardActions.TryGetValue(actionName, out var action)) {
             action.Invoke(player, opponent, facilityActedUpon, cardActedUpon, card);
@@ -119,22 +127,6 @@ public class CardActionManager : MonoBehaviour
     }
 
     private void ReduceCardCost(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        //foreach (string meepleType in cardActedUpon.data.meepleType) {
-        //    switch (meepleType) {
-        //        case "Blue":
-        //            cardActedUpon.data.blueCost -= card.data.meepleAmount;
-        //            break;
-        //        case "Black":
-        //            cardActedUpon.data.blackCost -= card.data.meepleAmount;
-        //            break;
-        //        case "Purple":
-        //            cardActedUpon.data.purpleCost -= card.data.meepleAmount;
-        //            break;
-        //        default:
-        //            Debug.Log("Meeple type not blue, black or purple for some reason");
-        //            break;
-        //    }
-        //}
         //this assumes that it will always reduce the cost of all meeple types
         cardActedUpon.data.meepleActionAmount.Values.ToList().ForEach(meepleCost => meepleCost -= card.data.meepleAmount);
     }
