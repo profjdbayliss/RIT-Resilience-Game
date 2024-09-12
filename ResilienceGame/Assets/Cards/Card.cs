@@ -194,13 +194,13 @@ public class Card : MonoBehaviour, IPointerClickHandler {
                     text.text = this.data.front.flavor;
                     break;
                 case "BlackCardNumber":
-                    SetupCostText(text, this.data.front.blackCircle, this.data.blackCost);
+                    SetupCostText(text, this.data.front.blackCircle, this.data.meepleCost[MeepleType.Black]);
                     break;
                 case "BlueCardNumber":
-                    SetupCostText(text, this.data.front.blueCircle, this.data.blueCost);
+                    SetupCostText(text, this.data.front.blueCircle, this.data.meepleCost[MeepleType.Blue]);
                     break;
                 case "PurpleCardNumber":
-                    SetupCostText(text, this.data.front.purpleCircle, this.data.purpleCost);
+                    SetupCostText(text, this.data.front.purpleCircle, this.data.meepleCost[MeepleType.Purple]);
                     break;
             }
         }

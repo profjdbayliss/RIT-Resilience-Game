@@ -105,12 +105,6 @@ public class CardPlayer : MonoBehaviour {
     public int CardsDiscardedThisPhase { get; private set; } = 0;
     // private int MAX_DISCARD_PER_PHASE = 3;
 
-    //Vector2 discardDropMin;
-    //Vector2 discardDropMax;
-    //Vector2 playedDropMin;
-    //Vector2 playedDropMax;
-    //Vector2 opponentDropMin;
-    //Vector2 opponentDropMax;
 
     private int facilityCount = 0;
     // the var is static to make sure the id's don't overlap between
@@ -130,26 +124,6 @@ public class CardPlayer : MonoBehaviour {
         }
 
         InitDropLocations();
-        //// discard rectangle information for AABB collisions
-        //RectTransform discardRectTransform = discardDropZone.GetComponent<RectTransform>();
-        //discardDropMin.x = discardRectTransform.position.x - (discardRectTransform.rect.width / 2);
-        //discardDropMin.y = discardRectTransform.position.y - (discardRectTransform.rect.height / 2);
-        //discardDropMax.x = discardRectTransform.position.x + (discardRectTransform.rect.width / 2);
-        //discardDropMax.y = discardRectTransform.position.y + (discardRectTransform.rect.height / 2);
-
-        //// played area rectangle information for AABB collisions
-        //RectTransform playedRectTransform = playerDropZone.GetComponent<RectTransform>();
-        //playedDropMin.x = playedRectTransform.position.x - (playedRectTransform.rect.width / 2);
-        //playedDropMin.y = playedRectTransform.position.y - (playedRectTransform.rect.height / 2);
-        //playedDropMax.x = playedRectTransform.position.x + (playedRectTransform.rect.width / 2);
-        //playedDropMax.y = playedRectTransform.position.y + (playedRectTransform.rect.height / 2);
-
-        //// playing on opponent area rectangle information
-        //RectTransform opponentRectTransform = opponentDropZone.GetComponent<RectTransform>();
-        //opponentDropMin.x = opponentRectTransform.position.x - (opponentRectTransform.rect.width / 2);
-        //opponentDropMin.y = opponentRectTransform.position.y - (opponentRectTransform.rect.height / 2);
-        //opponentDropMax.x = opponentRectTransform.position.x + (opponentRectTransform.rect.width / 2);
-        //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
 
@@ -353,7 +327,7 @@ public class CardPlayer : MonoBehaviour {
                 if (tempCard.data.front.blackCircle) {
                     // set the text number for cost
                     tempTexts[i].enabled = true;
-                    tempTexts[i].text = tempCard.data.blackCost + "";
+                    tempTexts[i].text = tempCard.data.meepleCost[MeepleType.Black] + "";
                 }
                 else {
                     // turn off the text box
@@ -363,14 +337,14 @@ public class CardPlayer : MonoBehaviour {
             else if (tempTexts[i].name.Equals("BlueCardNumber")) {
                 if (tempCard.data.front.blueCircle) {
                     tempTexts[i].enabled = true;
-                    tempTexts[i].text = tempCard.data.blueCost + "";
+                    tempTexts[i].text = tempCard.data.meepleCost[MeepleType.Blue] + "";
                 }
                 else { tempTexts[i].enabled = false; }
             }
             else if (tempTexts[i].name.Equals("PurpleCardNumber")) {
                 if (tempCard.data.front.purpleCircle) {
                     tempTexts[i].enabled = true;
-                    tempTexts[i].text = tempCard.data.purpleCost + "";
+                    tempTexts[i].text = tempCard.data.meepleCost[MeepleType.Purple] + "";
                 }
                 else { tempTexts[i].enabled = false; }
             }
@@ -429,7 +403,7 @@ public class CardPlayer : MonoBehaviour {
         foreach (KeyValuePair<string, GameObject> kvp in cardDropLocations) {
 
             if (kvp.Value.TryGetComponent(out Collider2D collider)) {                       //grab colliders
-                Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
+               // Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
                 if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
                     isOverAnyDropLocation = true;
                     GameObject hoveredObject = kvp.Value;
@@ -808,11 +782,11 @@ public class CardPlayer : MonoBehaviour {
         return cMeepleCount[meepleType];
     }   
     public int GetMaxMeepleSum() {
-        return oMeepleCount.Values.Aggregate(0, (sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
+        return oMeepleCount.Values.Aggregate((sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
     }
     public int GetCurrentMeeplesSum() {
 
-        return cMeepleCount.Values.Aggregate(0, (sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
+        return cMeepleCount.Values.Aggregate((sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
     }
     #endregion
 

@@ -33,6 +33,10 @@ public static class CardPlayValidator {
     private static bool CanPlayCardDuringBonusPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
         return false;
     }
+    private static bool CanAffordCard(CardPlayer player, Card card) {
+        //TODO: Implement this
+        return true;
+    }
 
     private static bool CanPlayCardDuringActionPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
         
