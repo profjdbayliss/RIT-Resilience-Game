@@ -34,12 +34,13 @@ public static class CardPlayValidator {
         return false;
     }
     private static bool CanAffordCard(CardPlayer player, Card card) {
-        //TODO: Implement this
-        return true;
+        return player.CanAffordToPlay(card);
     }
 
     private static bool CanPlayCardDuringActionPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
-        
+
+        if (!CanAffordCard(player, card)) return false;
+
         return playLocation.tag switch {
             "FreePlayLocation" => CheckActionFreePlay(player, card, playLocation),
             "DiscardDropLocation" => false,

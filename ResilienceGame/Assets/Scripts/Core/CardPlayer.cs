@@ -11,6 +11,7 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 using kcp2k;
 using UnityEngine.Events;
+using System;
 
 #region Enums
 // Enum to track player type
@@ -97,8 +98,8 @@ public class CardPlayer : MonoBehaviour {
     //Meeples
     // TODO: Move to Sector.cs if needed
     // public int blueMeepleCount, blackMeepleCount, purpleMeepleCount = 0;
-    public Dictionary<string, int> oMeepleCount = new Dictionary<string, int> { { "blue", 2 }, { "black", 2 }, { "purple", 2 } };
-    public Dictionary<string, int> cMeepleCount = new Dictionary<string, int> { { "blue", 2 }, { "black", 2 }, { "purple", 2 } };
+    public Dictionary<MeepleType, int> oMeepleCount = new Dictionary<MeepleType, int> { { MeepleType.Black, 2 }, { MeepleType.Blue, 2 }, { MeepleType.Purple, 2 } };
+    public Dictionary<MeepleType, int> cMeepleCount = new Dictionary<MeepleType, int> { { MeepleType.Black, 2 }, { MeepleType.Blue, 2 }, { MeepleType.Purple, 2 } };
     int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
@@ -778,8 +779,8 @@ public class CardPlayer : MonoBehaviour {
     public int GetMeeplesSpent() {
         return mMeeplesSpent;
     }
-    public int GetMeepleValue(string meepleType) {
-        return cMeepleCount[meepleType];
+    public int GetMeepleValue(MeepleType mType) {
+        return cMeepleCount[mType];
     }   
     public int GetMaxMeepleSum() {
         return oMeepleCount.Values.Aggregate((sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
@@ -1333,6 +1334,12 @@ public class CardPlayer : MonoBehaviour {
         mMeeplesSpent = 0;
         mFinalScore = 0;
         mUpdatesThisPhase.Clear();
+    }
+
+    internal bool CanAffordToPlay(Card card) {
+        return cMeepleCount[MeepleType.Black] >= card.data.meepleCost[MeepleType.Black] && 
+            cMeepleCount[MeepleType.Blue] >= card.data.meepleCost[MeepleType.Blue] &&
+            cMeepleCount[MeepleType.Purple] >= card.data.meepleCost[MeepleType.Purple];
     }
     #endregion
 
