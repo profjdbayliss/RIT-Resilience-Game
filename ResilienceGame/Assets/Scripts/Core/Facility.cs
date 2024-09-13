@@ -30,6 +30,7 @@ public class Facility : MonoBehaviour
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     private int physicalPoints, finacialPoints, networkPoints;
     private TextMeshProUGUI[] pointsUI;
+    [SerializeField] private TextMeshProUGUI facilityNameText;
 
     public FacilityEffect effect;
 
@@ -43,14 +44,18 @@ public class Facility : MonoBehaviour
         pointsUI = new TextMeshProUGUI[3];
         effect = FacilityEffect.None;
 
-        for(int i = 0; i < 3; i++)
+        
+
+        for (int i = 0; i < 3; i++)
         {
             pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
         }
 
         UpdateUI();
     }
-
+    public void UpdateNameText() {
+        facilityNameText.text = facilityName;
+    }
     public void ChangeFacilityPoints(string target, int value)
     {
         target = target.ToLower().Trim();

@@ -3859,6 +3859,7 @@ MonoBehaviour:
   products: 
   facilityCanvas: {fileID: 0}
   sectorItsAPartOf: {fileID: 0}
+  facilityNameText: {fileID: 310921094}
   effect: 0
   isDown: 0
 --- !u!1 &327071780
@@ -5800,6 +5801,7 @@ MonoBehaviour:
   products: 
   facilityCanvas: {fileID: 0}
   sectorItsAPartOf: {fileID: 0}
+  facilityNameText: {fileID: 96068603}
   effect: 0
   isDown: 0
 --- !u!1 &520008979
@@ -13125,6 +13127,7 @@ MonoBehaviour:
   products: 
   facilityCanvas: {fileID: 0}
   sectorItsAPartOf: {fileID: 0}
+  facilityNameText: {fileID: 1435387040}
   effect: 0
   isDown: 0
 --- !u!1 &1358697067

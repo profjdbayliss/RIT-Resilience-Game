@@ -109,106 +109,82 @@ public class Sector : MonoBehaviour
         blueMeeples = blackMeeples = purpleMeeples = STARTING_MEEPLES;
         UpdateMeepleAmountUI();
     }
-    private void CSVRead()
-    {
-        fileLocation = Application.streamingAssetsPath + "/" + csvFileName;
+    private void CSVRead() {
+        //  0: Sector
+        //  1: Facility Name
+        //  2: Facility Type
+        //  3: Dependency 1		
+        //  4: Dependency 2
+        //  5: Dependency 3
+        //  6: Number of Dependant Sectors
+        //  7: Number of Sector Dependencies
+        //  8: Core Facility T/F
+        //  9: Sector Appeal
+        //  10: Physical Health		
+        //  11: Financial Health
+        //  12: Network Health
+        //  13: Facility ID // TODO: Use this if possible otherwise remove/replace
+        string fileLocation = Path.Combine(Application.streamingAssetsPath, csvFileName);
 
-        if (File.Exists(fileLocation))
-        {
-            FileStream stream = File.OpenRead(fileLocation);
-            TextReader reader = new StreamReader(stream);
-            string allCSVText = reader.ReadToEnd();
+        if (!File.Exists(fileLocation)) {
+            Debug.Log("Sector file not found");
+            return;
+        }
 
-            // Split the read in CSV file into seperate objects at the new line character
-            string[] allCSVObjects = allCSVText.Split("\n");
-            //Debug.Log("Number of lines in csv file is: " + allCSVObjects.Length);
+        using var reader = new StreamReader(fileLocation);
+        // Skip the header row
+        reader.ReadLine();
 
-            // get all the textual elements in the csv file
-            // NOTE: row 0 is always headings and not data
-            for (int i = 1; i < allCSVObjects.Length; i++)
-            {
-                string[] individualCSVObjects = allCSVObjects[i].Split(",");
-                if (individualCSVObjects.Length > 1)
-                {
-                    //  0: Sector
-                    //  1: Facility Name
-                    //  2: Facility Type
-                    //  3: Dependency 1		
-                    //  4: Dependency 2
-                    //  5: Dependency 3
-                    //  6: Number of Dependant Sectors
-                    //  7: Number of Sector Dependencies
-                    //  8: Core Facility T/F
-                    //  9: Sector Appeal
-                    //  10: Physical Health		
-                    //  11: Financial Health
-                    //  12: Network Health
-                    //  13: Facility ID // TODO: Use this if possible otherwise remove/replace
+        string line;
+        while ((line = reader.ReadLine()) != null) {
+            string[] values = line.Split(',');
+            if (values.Length <= 1) continue;
 
-                    //  0: Sector	
-                    if (individualCSVObjects[0].Trim().ToLower() != sectorName.ToString().ToLower())
-                    {
-                        continue;
-                    }
-
-                    //  1: Facility Type
-                    switch (individualCSVObjects[2].Trim())
-                    {
-                        case "Production":
-                            facilities[0].facilityType = Facility.FacilityType.Production;
-                            facilities[0].facilityName = individualCSVObjects[1];
-
-                            //  3-5: Dependencies
-                            for (int j = 3; j < 6; j++)
-                            {
-                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[0].products[(j-3)] = enumName; }
-                                else { Debug.Log("Dependency not parsed"); }
-                            }
-
-                            // 10-12: Health
-                            facilities[0].SetFacilityPoints(int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]), int.Parse(individualCSVObjects[12]));
-                            break;
-
-                        case "Transmission":
-                            facilities[1].facilityType = Facility.FacilityType.Transmission;
-                            facilities[1].facilityName = individualCSVObjects[1];
-
-                            for (int j = 3; j < 6; j++)
-                            {
-                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[1].products[(j - 3)] = enumName; }
-                                else { Debug.Log("Dependency not parsed"); }
-                            }
-
-                            facilities[1].SetFacilityPoints(int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]), int.Parse(individualCSVObjects[12]));
-                            break;
-
-                        case "Distribution":
-                            facilities[2].facilityType = Facility.FacilityType.Distribution;
-                            facilities[2].facilityName = individualCSVObjects[1];
-
-                            for (int j = 3; j < 6; j++)
-                            {
-                                if (Enum.TryParse(individualCSVObjects[j], out PlayerSector enumName)) { facilities[2].products[(j - 3)] = enumName; }
-                                else { Debug.Log("Dependency not parsed"); }
-                            }
-
-                            facilities[2].SetFacilityPoints(int.Parse(individualCSVObjects[10]), int.Parse(individualCSVObjects[11]), int.Parse(individualCSVObjects[12]));
-                            break;
-                    }
-
-                    // 7: Core Sector?
-                    if(individualCSVObjects[8] != "")
-                    {
-                        Debug.Log("Is it a core facility?"+ individualCSVObjects[8]);
-                        isCore = bool.Parse(individualCSVObjects[8].Trim()); 
-                    }
-                }
+            if (!values[0].Trim().Equals(sectorName.ToString(), StringComparison.OrdinalIgnoreCase)) {
+                continue;
             }
 
-            // Close at the end
-            reader.Close();
-            stream.Close();
+            ProcessFacility(values);
+
+            // TODO: arent sectors core not facilities? Actually i just think this print statement is misleading, isCore is part of sector
+            if (!string.IsNullOrEmpty(values[8])) {
+                isCore = bool.Parse(values[8].Trim());
+                Debug.Log($"Is it a core facility? {isCore}");
+            }
         }
-        else { Debug.Log("Sector file not found"); }
+        reader.Close();
+    }
+
+    private void ProcessFacility(string[] values) {
+        if (!Enum.TryParse(values[2].Trim(), out Facility.FacilityType facilityType)) {
+            Debug.Log($"Unknown facility type: {values[2]}");
+            return;
+        }
+
+        int index = (int)facilityType;
+        if (index < 0 || index >= facilities.Length) {
+            Debug.Log($"Invalid facility index: {index}");
+            return;
+        }
+
+        Facility facility = facilities[index];
+        facility.facilityType = facilityType;
+        facility.facilityName = values[1];
+        facility.UpdateNameText();
+
+        for (int j = 3; j < 6; j++) {
+            if (Enum.TryParse(values[j], out PlayerSector enumName)) {
+                facility.products[j - 3] = enumName;
+            }
+            else {
+                Debug.Log($"Dependency not parsed: {values[j]}");
+            }
+        }
+
+        facility.SetFacilityPoints(
+            int.Parse(values[10]),
+            int.Parse(values[11]),
+            int.Parse(values[12])
+        );
     }
 }
