@@ -416,18 +416,18 @@ public class CardPlayer : MonoBehaviour {
     #endregion
     void InitDropLocations() {
 
-        //var dropZones = FindObjectsOfType<CardDropLocation>();
-        //dropZones.ToList().ForEach(dropZone => {
+        var dropZones = FindObjectsOfType<CardDropLocation>();
+        dropZones.ToList().ForEach(dropZone => {
 
-        //    var tag = dropZone.tag;
-        //    if (cardDropLocations.ContainsKey(tag)) {
-        //        tag += ++facilityCount;
-        //    }
+            var tag = dropZone.tag;
+            if (cardDropLocations.ContainsKey(tag)) {
+                tag += ++facilityCount;
+            }
 
-        //    cardDropLocations.Add(tag, dropZone.gameObject);
+            cardDropLocations.Add(tag, dropZone.gameObject);
 
-        //});
-        
+        });
+
     }
     public GameObject HandleCardDrop(Card card) {
 
