@@ -371,7 +371,7 @@ public class CardPlayer : MonoBehaviour {
                     GameObject hoveredObject = kvp.Value;
                     //  Debug.Log("Hovered over " + hoveredObject.name);
                     // Handle fade in if we've moved over a facility
-                    if (kvp.Key.Contains(CardDropZoneTag.FACILITY)) {
+                    if (kvp.Key.Contains("FacilityDropLocation")) {
                         if (GameManager.instance.CanStationsBeHighlighted()) {
                             currentHoveredFacility = kvp.Value;
                             if (currentHoveredFacility != previousHoveredFacility) {
@@ -416,17 +416,17 @@ public class CardPlayer : MonoBehaviour {
     #endregion
     void InitDropLocations() {
 
-        var dropZones = FindObjectsOfType<CardDropLocation>();
-        dropZones.ToList().ForEach(dropZone => {
+        //var dropZones = FindObjectsOfType<CardDropLocation>();
+        //dropZones.ToList().ForEach(dropZone => {
 
-            var tag = dropZone.tag;
-            if (cardDropLocations.ContainsKey(tag)) {
-                tag += ++facilityCount;
-            }
+        //    var tag = dropZone.tag;
+        //    if (cardDropLocations.ContainsKey(tag)) {
+        //        tag += ++facilityCount;
+        //    }
 
-            cardDropLocations.Add(tag, dropZone.gameObject);
+        //    cardDropLocations.Add(tag, dropZone.gameObject);
 
-        });
+        //});
         
     }
     public GameObject HandleCardDrop(Card card) {
@@ -469,7 +469,7 @@ public class CardPlayer : MonoBehaviour {
         return canPlay;
     }
     private bool CanDiscardCard() {
-        return hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD) && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; 
+        return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; 
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?
