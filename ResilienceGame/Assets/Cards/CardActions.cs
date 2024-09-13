@@ -209,7 +209,27 @@ public class ReduceCardCost : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        for (int i = 0; i < cardActedUpon.data.meepleType.Length; i++)
+        {
+            switch (cardActedUpon.data.meepleType[i])
+            {
+                case "Blue":
+                    cardActedUpon.data.blueCost -= card.data.meepleAmount; ;
+                    break;
 
+                case "Black":
+                    cardActedUpon.data.blackCost -= card.data.meepleAmount; ;
+                    break;
+
+                case "Purple":
+                    cardActedUpon.data.purpleCost -= card.data.meepleAmount; ;
+                    break;
+
+                default:
+                    Debug.Log("Meeple type not blue, black or purple for some reason");
+                    break;
+            }
+        }
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
