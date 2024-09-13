@@ -66,7 +66,22 @@ public class Sector : MonoBehaviour
         }
 
         return facilitiesList;
-    } 
+    }
+    
+    public bool CanAffordCardPlay(Card card) {
+        return card.data.blueCost <= blueMeeples &&
+            card.data.blackCost <= blackMeeples &&
+            card.data.purpleCost <= purpleMeeples;
+    }
+    public bool SpendMeeples(Card card) {
+        if (CanAffordCardPlay(card)) {
+            blueMeeples -= card.data.blueCost;
+            blackMeeples -= card.data.blackCost;
+            purpleMeeples -= card.data.purpleCost;
+            return true;
+        }
+        return false;
+    }
 
     private void CSVRead()
     {

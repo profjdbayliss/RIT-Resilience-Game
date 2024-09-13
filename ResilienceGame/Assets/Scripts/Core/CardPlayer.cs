@@ -195,14 +195,6 @@ public class CardPlayer : MonoBehaviour {
         card.transform.SetParent(discardDropZone.transform, false);
         card.transform.localPosition = new Vector3();
     }
-    public bool CanAffordToPlay(Card card) {
-        Debug.Log("Checking if card can be afforded");
-        Debug.Log("Blue: " + blueMeepleCount + " Black: " + blackMeepleCount + " Purple: " + purpleMeepleCount);
-        Debug.Log($"Blue: {card.data.blueCost} Black: {card.data.blackCost} Purple:  {card.data.purpleCost}");
-        return card.data.blueCost <= blueMeepleCount &&
-            card.data.blackCost <= blackMeepleCount &&
-            card.data.purpleCost <= purpleMeepleCount;
-    }
 
     public virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy,
@@ -465,7 +457,7 @@ public class CardPlayer : MonoBehaviour {
         var canPlay = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(card),
             GamePhase.Bonus => false, //TODO get clarification on this phase
-            GamePhase.Action => CanAffordToPlay(card),
+            GamePhase.Action => playerSector.SpendMeeples(card), //returns true if the card could be afforded, false if not will also spend the meeples on the sector
             _ => false,
         };
         //var canPlay = true;
