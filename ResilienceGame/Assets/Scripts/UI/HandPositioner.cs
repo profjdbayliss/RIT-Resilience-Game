@@ -4,13 +4,22 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+#region Events
+
+// Custom UnityEvent that passes a Card object
+[System.Serializable]
+public class CardHoverEvent : UnityEvent<Card> { }
+
+#endregion
 /// <summary>
 /// This class is responsible for arranging the cards in the player's hand.
 /// </summary>
 public class HandPositioner : MonoBehaviour {
 
+    private CardHoverEvent onCardHover = new CardHoverEvent();
     public List<GameObject> cards = new List<GameObject>();
     public float arcRadius = 3300f;     //the size of the arc/curve the cards will be placed on
     public float arcAngle = 20f;
@@ -55,22 +64,28 @@ public class HandPositioner : MonoBehaviour {
     /// Tells the hand positioner that the card was dropped after being dragged
     /// </summary>
     /// <param name="card">The card that was dropped</param>
-    /// <param name="cardWasPlayed">true if the card was dropped on a playable area, false otherwise</param>
     public void NotifyCardDragEnd(GameObject card) {
         cardsBeingDragged.Remove(card);
         IsDraggingCard = false;
         //card was played somewhere, so we need to do something with it
         var dropLoc = GameManager.instance.actualPlayer.hoveredDropLocation;
         if (dropLoc) {
-           // Debug.Log($"card was played on: {dropLoc.name}");
-            
+            // Debug.Log($"card was played on: {dropLoc.name}");
+
         }
         else {
             //reset scale and reset sibling index to position it correctly in the hand
             card.transform.localScale = Vector3.one * defaultScale;
-            card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
+            var tCard = card.GetComponent<Card>();
+            // Debug.Log($"returning {tCard.data.front.title} to position {tCard.HandPosition}");
+            card.transform.SetSiblingIndex(tCard.HandPosition);
             ArrangeCards(); // Rearrange cards when dragging ends
         }
+    }
+
+    public void DiscardCard(GameObject card) {
+        cards.Remove(card);
+        //  Destroy(card);
     }
 
 
@@ -163,12 +178,12 @@ public class HandPositioner : MonoBehaviour {
             // Smooth position and rotation transition
             card.transform.SetLocalPositionAndRotation(
                 Vector3.Lerp(
-                    card.transform.localPosition, 
-                    targetPosition, 
+                    card.transform.localPosition,
+                    targetPosition,
                     Time.deltaTime * hoverTransitionSpeed),
                 Quaternion.Slerp(
-                    card.transform.localRotation, 
-                    targetRotation, 
+                    card.transform.localRotation,
+                    targetRotation,
                     Time.deltaTime * hoverTransitionSpeed));
 
             // Smooth scale transition
@@ -177,34 +192,39 @@ public class HandPositioner : MonoBehaviour {
         }
     }
 
+    //Allows other classes to subscribe to the onCardHover event
+    public void AddCardHoverListener(UnityAction<Card> listener) {
+        onCardHover.AddListener(listener);
+    }
     /// <summary>
-    /// handles determining which card is being hovered over
+    /// Handles determining which card is being hovered over
     /// </summary>
     private void HandleHovering() {
-        //dont hover if dragging a card
-        if (cardsBeingDragged.Count > 0) {
-            currentHoveredCard = null;
-            return;
+        GameObject newHoveredCard = null;
+
+        // If no cards are being dragged, check which card is under the mouse
+        if (cardsBeingDragged.Count == 0) {
+            Vector2 localMousePosition = rect.InverseTransformPoint(Mouse.current.position.ReadValue());
+            newHoveredCard = GetCardUnderMouse(localMousePosition.x);
         }
-        //get the mouse position
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
 
-        // Convert the mouse position to local space of the hand positioner
-        Vector2 localMousePosition = rect.InverseTransformPoint(mousePosition);
-
-        // Get the card under the mouse
-        GameObject hoveredCard = GetCardUnderMouse(localMousePosition.x);
-
-        // If the hovered card has changed, update the current hovered card
-        if (hoveredCard != currentHoveredCard) {
-            if (currentHoveredCard != null) {
-                currentHoveredCard.transform.SetSiblingIndex(currentHoveredCard.GetComponent<Card>().HandPosition);//reset the sibling index of the current hovered card, sending it to its proper spot in the draw order
-            }
-            currentHoveredCard = hoveredCard;
+        if (newHoveredCard != currentHoveredCard) {
+            currentHoveredCard = newHoveredCard;
 
             if (currentHoveredCard != null) {
-                currentHoveredCard.transform.SetAsLastSibling(); //bring the hovered card to the front of the draw order
+                currentHoveredCard.transform.SetAsLastSibling();
             }
+            else {
+                ResetCardSiblingIndices();
+            }
+
+            onCardHover.Invoke(currentHoveredCard?.GetComponent<Card>());
+        }
+    }
+
+    public void ResetCardSiblingIndices() {
+        foreach (var card in cards) {
+            card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
         }
     }
 
@@ -227,7 +247,7 @@ public class HandPositioner : MonoBehaviour {
     /// Gets the card under the mouse, this is done by finding the card with the closest x position to the mouse to provide a seemless transition between selecting neighboring cards
     /// </summary>
     /// <param name="mouseX">The local x position of the mouse</param>
-    /// <returns></returns>
+    /// <returns>A game object, the card in the hand that is closest the the x position of the mouse</returns>
     private GameObject GetCardUnderMouse(float mouseX) {
 
         if (!IsMouseInsideRect()) return null; //dont hover if the mouse is outside of the hand area

@@ -83,6 +83,7 @@ public class CardPlayer : MonoBehaviour {
     public string DeckName = "";
     public bool IsDraggingCard { get; private set; } = false;
     public GameObject hoveredDropLocation;
+    private GameObject previousHoveredFacility;
     public List<List<GameObject>> dropLocations = new();
 
     //Meeples
@@ -102,6 +103,9 @@ public class CardPlayer : MonoBehaviour {
     static int sUniqueIDCount = 0;
     int mFinalScore = 0;
     List<Updates> mUpdatesThisPhase = new List<Updates>(6);
+
+    //public GameObject hoveredDropLocation;
+    
 
     public void Start() {
 
@@ -373,31 +377,33 @@ public class CardPlayer : MonoBehaviour {
     }
     public GameObject HandleCardDrop(Card card) {
 
-        Debug.Log("CardPlayer HandleCardDrop");
+        //  Debug.Log("CardPlayer HandleCardDrop");
 
         if (hoveredDropLocation == null) {
             Debug.Log("No drop location found");
             return null;
         }
         else {
-            Debug.Log("Drop location found: " + hoveredDropLocation.name);
-            if (hoveredDropLocation.CompareTag("FacilityDropLocation")) {
-                Debug.Log("Drop location is a facility");
+            if (ValidateCardPlay(card)) {
+                //HandlePlayCard(card, hoveredDropLocation);
+                //set card state to played
+                card.state = CardState.CardDrawnDropped;
             }
             else {
-                if (hoveredDropLocation.name == "DiscardDrop") {
-                    Debug.Log("Drop location is a discard");
-                }
-                else {
-                    Debug.Log("Drop location is a play area");
-                }
+                //reset card positions
+                handPositioner.ResetCardSiblingIndices();
             }
+
         }
-
-
         return null;
+    }
+    private bool ValidateCardPlay(Card card) {
 
+        var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
 
+        Debug.Log($"Playing {card} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
+
+        return canPlay;
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?
