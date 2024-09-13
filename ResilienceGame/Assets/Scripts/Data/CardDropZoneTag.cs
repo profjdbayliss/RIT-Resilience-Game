@@ -5,6 +5,6 @@ public static class CardDropZoneTag {
     public const string FREE_PLAY = "FreePlayDropLocation";
     public const string DISCARD = "DiscardDropLocation";
     public const string FACILITY = "FacilityDropLocation";
-    public const string SECTOR = "SectorDropLocation";
+    //public const string SECTOR = "SectorDropLocation";
 
 }

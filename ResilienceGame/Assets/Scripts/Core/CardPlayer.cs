@@ -84,11 +84,12 @@ public class CardPlayer : MonoBehaviour {
     public bool IsDraggingCard { get; private set; } = false;
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
-    public List<List<GameObject>> dropLocations = new List<List<GameObject>>();
+    public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
 
+    int facilityCount = 0;
     //Meeples
     // TODO: Move to Sector.cs if needed
-    public int blueMeepleCount, blackMeepleCount, purpleMeepleCount = 0;
+    public int blueMeepleCount= 2, blackMeepleCount= 2, purpleMeepleCount = 2;
     int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
@@ -104,8 +105,10 @@ public class CardPlayer : MonoBehaviour {
     int mFinalScore = 0;
     List<Updates> mUpdatesThisPhase = new List<Updates>(6);
 
+
+
     //public GameObject hoveredDropLocation;
-    
+
 
     public void Start() {
 
@@ -193,6 +196,9 @@ public class CardPlayer : MonoBehaviour {
         card.transform.localPosition = new Vector3();
     }
     public bool CanAffordToPlay(Card card) {
+        Debug.Log("Checking if card can be afforded");
+        Debug.Log("Blue: " + blueMeepleCount + " Black: " + blackMeepleCount + " Purple: " + purpleMeepleCount);
+        Debug.Log($"Blue: {card.data.blueCost} Black: {card.data.blackCost} Purple:  {card.data.purpleCost}");
         return card.data.blueCost <= blueMeepleCount &&
             card.data.blackCost <= blackMeepleCount &&
             card.data.purpleCost <= purpleMeepleCount;
@@ -347,6 +353,7 @@ public class CardPlayer : MonoBehaviour {
         return tempCard;
     }
 
+    #region Update Functions
     // Update is called once per frame
     void Update() {
         IsDraggingCard = handPositioner.IsDraggingCard;
@@ -357,25 +364,76 @@ public class CardPlayer : MonoBehaviour {
     }
     //updates the hoverDropLocation class field to hold the object the card is hovering over
     void UpdateHoveredDropLocation() {
+        GameObject currentHoveredFacility = null;
+        bool isOverAnyDropLocation = false;
 
-        for (int x = 0; x < dropLocations.Count; x++) {
-            foreach (GameObject location in dropLocations[x]) {
-                if (location.TryGetComponent(out Collider2D collider)) {
-                    if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
-                        hoveredDropLocation = x == 0 ? location : location.transform.parent.gameObject; //if its a facility (first list) return the parent
-                        Debug.Log($"Card hovering over {location.name}");
-                        return;
+        //check all drop locations to see if the mouse is over any of them
+        foreach (KeyValuePair<string, GameObject> kvp in cardDropLocations) {
+
+            if (kvp.Value.TryGetComponent(out Collider2D collider)) {                       //grab colliders
+                                                                                            // Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
+                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
+                    isOverAnyDropLocation = true;
+                    GameObject hoveredObject = kvp.Value;
+                    //  Debug.Log("Hovered over " + hoveredObject.name);
+                    // Handle fade in if we've moved over a facility
+                    if (kvp.Key.Contains(CardDropZoneTag.FACILITY)) {
+                        if (GameManager.instance.CanStationsBeHighlighted()) {
+                            currentHoveredFacility = kvp.Value;
+                            if (currentHoveredFacility != previousHoveredFacility) {
+                                if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                                    //  Debug.Log("Hightlight on");
+                                    hoverActivateObject.ActivateHover();
+                                }
+                                else {
+                                    Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
+                                }
+                            }
+                        }
+                        hoveredObject = kvp.Value.transform.parent.gameObject;
                     }
+
+                    hoveredDropLocation = hoveredObject;
+                    // Debug.Log("Hovered over " + hoveredDropLocation.name);
+                    break;
                 }
             }
         }
-        hoveredDropLocation = null;
+
+        // Handle fade out if we've moved off a facility
+        if (previousHoveredFacility != null && previousHoveredFacility != currentHoveredFacility) {
+            if (previousHoveredFacility.TryGetComponent(out HoverActivateObject previousHoverActivateObject)) {
+                //   Debug.Log("Highlight off");
+                previousHoverActivateObject.DeactivateHover();
+            }
+            else {
+                Debug.LogError("Missing hover on faciltiy " + previousHoverActivateObject.name);
+            }
+
+
+        }
+        // If we're not over any drop location, set hoveredDropLocation to null
+        if (!isOverAnyDropLocation) {
+            hoveredDropLocation = null;
+        }
+
+        previousHoveredFacility = currentHoveredFacility;
     }
+    #endregion
     void InitDropLocations() {
-        var facilityLocations = GameObject.FindGameObjectsWithTag("FacilityDropLocation").ToList();
-        var locations = GameObject.FindGameObjectsWithTag("CardDropLocation").ToList();
-        dropLocations.Add(facilityLocations);
-        dropLocations.Add(locations);
+
+        var dropZones = FindObjectsOfType<CardDropLocation>();
+        dropZones.ToList().ForEach(dropZone => {
+
+            var tag = dropZone.tag;
+            if (cardDropLocations.ContainsKey(tag)) {
+                tag += ++facilityCount;
+            }
+
+            cardDropLocations.Add(tag, dropZone.gameObject);
+
+        });
+        
     }
     public GameObject HandleCardDrop(Card card) {
 
@@ -403,13 +461,22 @@ public class CardPlayer : MonoBehaviour {
         return null;
     }
     private bool ValidateCardPlay(Card card) {
-        //TODO: reimplement card validation maybe or just leave it to playCard as before
-         var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
+        //much simpler card validation
+        var canPlay = GameManager.instance.MGamePhase switch {
+            GamePhase.Draw => CanDiscardCard(card),
+            GamePhase.Bonus => false, //TODO get clarification on this phase
+            GamePhase.Action => CanAffordToPlay(card),
+            _ => false,
+        };
         //var canPlay = true;
 
         Debug.Log($"Playing {card} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
         return canPlay;
+    }
+    private bool CanDiscardCard(Card card) {
+        Debug.Log($"Player has discarded {GameManager.instance.MNumberDiscarded} cards this turn");
+        return hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD) && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; //TODO: is this the correct place to access this value?
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?

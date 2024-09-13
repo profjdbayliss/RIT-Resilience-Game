@@ -288,6 +288,8 @@ public class GameManager : MonoBehaviour, IRGObservable
 
                 if (phaseJustChanged)
                 {
+                    //reset player discard amounts
+                    
                     mIsDiscardAllowed = true;
                     // draw cards if necessary
                     actualPlayer.DrawCards();
@@ -921,29 +923,7 @@ public class GameManager : MonoBehaviour, IRGObservable
 
     public bool CanStationsBeHighlighted()
     {
-        bool canBe = false;
-        switch (MGamePhase)
-        {
-            case GamePhase.Start:
-                canBe = false;
-                break;
-            case GamePhase.Draw:
-                canBe = false;
-                break;
-            case GamePhase.Bonus:
-                canBe = true;
-                break;
-            case GamePhase.Action:
-                canBe = true;
-                break;
-            case GamePhase.End:
-                canBe = false;
-                break;
-            default:
-                break;
-        }
-
-        return canBe;
+        return MGamePhase == GamePhase.Bonus || MGamePhase == GamePhase.Action;
     }
 
     // Adds a message to the message queue for the network.

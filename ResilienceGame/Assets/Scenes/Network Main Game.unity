@@ -1001,6 +1001,7 @@ GameObject:
   - component: {fileID: 92073676}
   - component: {fileID: 92073679}
   - component: {fileID: 92073680}
+  - component: {fileID: 92073681}
   m_Layer: 5
   m_Name: Distribution Facility Box
   m_TagString: FacilityDropLocation
@@ -1105,12 +1106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delay: 0.5
-  maxHeightOffset: 100
-  highlight: 1
-  highlightObject: {fileID: 912450320}
-  scale: 0
-  scaleObject: {fileID: 0}
+  hoverImage: {fileID: 912450324}
 --- !u!61 &92073680
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1137,6 +1133,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 866, y: 123}
   m_EdgeRadius: 0
+--- !u!114 &92073681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92073674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &92478569
 GameObject:
   m_ObjectHideFlags: 0
@@ -2350,9 +2358,10 @@ GameObject:
   - component: {fileID: 180208930}
   - component: {fileID: 180208932}
   - component: {fileID: 180208933}
+  - component: {fileID: 180208934}
   m_Layer: 5
   m_Name: DiscardDrop
-  m_TagString: CardDropLocation
+  m_TagString: DiscardDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2462,6 +2471,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 221, y: 312}
   m_EdgeRadius: 0
+--- !u!114 &180208934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180208928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &180503385
 GameObject:
   m_ObjectHideFlags: 0
@@ -5795,6 +5816,7 @@ GameObject:
   - component: {fileID: 520008981}
   - component: {fileID: 520008984}
   - component: {fileID: 520008985}
+  - component: {fileID: 520008986}
   m_Layer: 5
   m_Name: Transmission Facility Box
   m_TagString: FacilityDropLocation
@@ -5899,12 +5921,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delay: 0.5
-  maxHeightOffset: 100
-  highlight: 1
-  highlightObject: {fileID: 2138288040}
-  scale: 0
-  scaleObject: {fileID: 0}
+  hoverImage: {fileID: 2138288044}
 --- !u!61 &520008985
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5931,6 +5948,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 866, y: 123}
   m_EdgeRadius: 0
+--- !u!114 &520008986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520008979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &522352602
 GameObject:
   m_ObjectHideFlags: 0
@@ -17967,9 +17996,10 @@ GameObject:
   - component: {fileID: 1920413919}
   - component: {fileID: 1920413918}
   - component: {fileID: 1920413922}
+  - component: {fileID: 1920413923}
   m_Layer: 5
   m_Name: PlayerDropLocation
-  m_TagString: CardDropLocation
+  m_TagString: FreePlayDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18084,6 +18114,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1241.958, y: 678.9489}
   m_EdgeRadius: 0
+--- !u!114 &1920413923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920413917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1937381451
 GameObject:
   m_ObjectHideFlags: 0
@@ -19124,8 +19166,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 270.5, y: -337.99994}
-  m_SizeDelta: {x: 1000, y: 268.5882}
+  m_AnchoredPosition: {x: 201, y: -342.39368}
+  m_SizeDelta: {x: 1222.7625, y: 306.6637}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2036154774
 MonoBehaviour:
@@ -19160,7 +19202,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2036154772}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -19920,8 +19962,9 @@ GameObject:
   - component: {fileID: 2097464035}
   - component: {fileID: 2097464036}
   - component: {fileID: 2097464037}
+  - component: {fileID: 2097464038}
   m_Layer: 5
-  m_Name: FacilityBox
+  m_Name: ProductionFacilityBox
   m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20036,12 +20079,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delay: 0.5
-  maxHeightOffset: 100
-  highlight: 1
-  highlightObject: {fileID: 180503385}
-  scale: 0
-  scaleObject: {fileID: 0}
+  hoverImage: {fileID: 180503389}
 --- !u!61 &2097464037
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -20068,6 +20106,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &2097464038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097464030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2099342281
 GameObject:
   m_ObjectHideFlags: 0
