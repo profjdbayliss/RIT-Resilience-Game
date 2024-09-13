@@ -104,7 +104,7 @@ public class CardPlayer : MonoBehaviour {
     Vector2 playedDropMax;
     Vector2 opponentDropMin;
     Vector2 opponentDropMax;
-
+    
     private int facilityCount = 0;
     // the var is static to make sure the id's don't overlap between
     // multiple card players
@@ -367,7 +367,7 @@ public class CardPlayer : MonoBehaviour {
                 if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
                     //the facilities hitboxes are children of their script objects
                     hoveredDropLocation = kvp.Key.Contains("FacilityDropLocation") ? kvp.Value.transform.parent.gameObject : kvp.Value;
-                    // Debug.Log("Hovered over " + hoveredDropLocation.name);
+                    Debug.Log("Hovered over " + hoveredDropLocation.name);
                     return;
                 }
             }
@@ -399,11 +399,7 @@ public class CardPlayer : MonoBehaviour {
         }
         else {
             if (ValidateCardPlay(card)) {
-               HandlePlayCard(card, hoveredDropLocation);
-            }
-            else {
-                //reset the card position since it was rejected back to the hand
-                card.transform.SetSiblingIndex(card.HandPosition);
+
             }
 
         }
@@ -411,16 +407,14 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public bool IsPlayerTurn() {
-        //TODO: replace with call to game manager?
+        //replace with call to game manager?
         //some code to validate turn
         return true;
     }
     private bool ValidateCardPlay(Card card) {
 
         var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
-
-        Debug.Log($"Playing {card} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
-
+        Debug.Log($"{(canPlay ? "Card Play Validated" : "Card Play Invalid")}");
         return canPlay;
     }
 
@@ -528,7 +522,6 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public void DiscardAllInactiveCards(DiscardFromWhere where, bool addUpdate, int uniqueFacilityID) {
-        //Debug.Log("discarding all inactive cards");
         List<int> inactives = new List<int>(10);
         Dictionary<int, GameObject> discardFromArea = where switch {
             DiscardFromWhere.Hand => HandCards,
@@ -587,32 +580,19 @@ public class CardPlayer : MonoBehaviour {
         return blueMeepleCount + purpleMeepleCount + blackMeepleCount;
     }
     public void HandlePlayCard(Card card, GameObject dropLocation) {
-        switch (dropLocation.tag) {
+
+        switch (dropLocation.name) {
             case "FacilityDropLocation":
                 Debug.Log("Facility Drop Location");
                 break;
-            case "FreePlayDropLocation":
+            case "CardDropLocation":
                 Debug.Log("Card Drop Location");
                 break;
-            case "DiscardDropLocation":
-                HandleCardDiscard(card);
-                break;
+            case "DiscardDrop":
             default:
                 Debug.Log("No drop location found");
                 break;
         }
-    }
-    public void HandleCardDiscard(Card card) {
-        card.state = CardState.CardNeedsToBeDiscarded;
-        if (GameManager.instance.MGamePhase == GamePhase.Draw) {
-            CardsDiscardedThisPhase++;
-            DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
-        }
-        // remove the discarded card
-        if (!HandCards.Remove(card.UniqueID)) {
-            Debug.Log("didn't find a key to remove! " + card.UniqueID);
-        }
-        handPositioner.DiscardCard(card.gameObject);
     }
     public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
         int playCount = 0;

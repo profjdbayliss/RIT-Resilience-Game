@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool gameStarted = false;
 
     // var's for game rules
-    public static readonly int MAX_DISCARDS = 3;
+    public readonly int MAX_DISCARDS = 2;
     public readonly int MAX_DEFENSE = 1;
     int mNumberDiscarded = 0;
     int mNumberDefense = 0;

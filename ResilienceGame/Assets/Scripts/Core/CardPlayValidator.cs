@@ -7,16 +7,31 @@ public static class CardPlayValidator {
         if (!player.IsPlayerTurn()) return false;
 
 
-        return GameManager.instance.MGamePhase switch {
-            GamePhase.Start => CanPlayCardDuringStartPhase(player, card, playLocation),
-            GamePhase.Draw => CanPlayCardDuringDrawPhase(player, card, playLocation),
-            GamePhase.Overtime => CanPlayCardDuringOvertimePhase(player, card, playLocation),
-            GamePhase.Action => CanPlayCardDuringActionPhase(player, card, playLocation),
-            GamePhase.Discard => CanPlayCardDuringDiscardPhase(player, card, playLocation),
-            GamePhase.Donate => CanPlayCardDuringDonatePhase(player, card, playLocation),
-            GamePhase.End => CanPlayCardDuringEndPhase(player, card, playLocation),
-            _ => false,
-        };
+        switch (GameManager.instance.MGamePhase) {
+            case GamePhase.Start:
+                CanPlayCardDuringStartPhase(player, card, playLocation);
+                break;
+            case GamePhase.Draw:
+                CanPlayCardDuringDrawPhase(player, card, playLocation);
+                break;
+            case GamePhase.Overtime:
+                CanPlayCardDuringOvertimePhase(player, card, playLocation);
+                break;
+            case GamePhase.Action:
+                CanPlayCardDuringActionPhase(player, card, playLocation);
+                break;
+            case GamePhase.Discard:
+                CanPlayCardDuringDiscardPhase(player, card, playLocation);
+                break;
+            case GamePhase.Donate:
+                CanPlayCardDuringDonatePhase(player, card, playLocation);
+                break;
+            case GamePhase.End:
+                CanPlayCardDuringEndPhase(player, card, playLocation);
+                break;
+            default: return false;
+        }
+        return false;
     }
     //cant play cards at all during start phase
     private static bool CanPlayCardDuringStartPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
@@ -24,8 +39,9 @@ public static class CardPlayValidator {
     }
     //only allowed to discard and draw new cards during this phase (up to 3)
     private static bool CanPlayCardDuringDrawPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
-        if (playLocation.CompareTag("DiscardDropLocation")) {
-            return player.CardsDiscardedThisPhase < GameManager.MAX_DISCARDS;
+        //TODO swap this to tags
+        if (playLocation.name == "DiscardDrop") {
+            
         }
         return false;
     }
