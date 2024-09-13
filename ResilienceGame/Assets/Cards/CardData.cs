@@ -1,4 +1,4 @@
-using System.Collections.Generic;   
+
 using UnityEngine;
 
 public enum CardType
@@ -50,10 +50,9 @@ public struct CardData
     public float percentSuccess;
     public int cardID;
     public int teamID; // TODO: Use for SD
-    public Dictionary<MeepleType, int> meepleCost;
-    //public int blueCost;
-    //public int blackCost;
-    //public int purpleCost;
+    public int blueCost;
+    public int blackCost;
+    public int purpleCost;
     public int drawAmount;
     public int removeAmount;
     public int targetAmount;
@@ -63,7 +62,7 @@ public struct CardData
     public int effectCount;
     public int duration;
     public bool hasDoomEffect;
-    public Dictionary<MeepleType, int> meepleActionAmount;
+    public string[] meepleType;
     public int meepleAmount;
     public PlayerSector[] onlyPlayedOn;
 }

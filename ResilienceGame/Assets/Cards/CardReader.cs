@@ -6,7 +6,8 @@ using System;
 using UnityEngine.UI;
 using System.Linq;
 
-public class CardReader : MonoBehaviour {
+public class CardReader : MonoBehaviour
+{
     // TODO: Currently used in two objects, one for each of Jessica's decks
 
     // deck name to use for the deck
@@ -29,13 +30,15 @@ public class CardReader : MonoBehaviour {
     // conflicting card id's for different deck files.
     private static int sCardID = 0;
 
-    public List<Card> CSVRead(bool createAtlas) {
+    public List<Card> CSVRead(bool createAtlas)
+    {
         List<Card> cards = new List<Card>(50); // TODO: Get number per deck
 
         // Check to see if the file exists
         fileLocation = Application.streamingAssetsPath + "/" + cardFileName;
         //Debug.Log("trying to read file at location: " + fileLocation);
-        if (File.Exists(fileLocation)) {
+        if (File.Exists(fileLocation))
+        {
             //Debug.Log("reading the file!");
             FileStream stream = File.OpenRead(fileLocation);
             TextReader reader = new StreamReader(stream);
@@ -47,22 +50,26 @@ public class CardReader : MonoBehaviour {
             //Debug.Log("Number of lines in csv file is: " + allCSVObjects.Length);
 
             // get all the image elements in the csv file
-            if (createAtlas) {
+            if (createAtlas)
+            {
 
                 // Make sure to get the atlas first, as we only need to query it once. 
                 TextureAtlas currentAtlas = new TextureAtlas();
 
                 // make a list of all filenames
                 List<string> filenames = new List<string>(50);
-                for (int i = 1; i < allCSVObjects.Length; i++) {
+                for (int i = 1; i < allCSVObjects.Length; i++)
+                {
                     string[] singleLineCSVObjects = allCSVObjects[i].Split(",");
                     if (singleLineCSVObjects.Length > 1) // excel adds an empty line at the end
                     {
                         //Debug.Log("number of items in a line is: " + singleLineCSVObjects.Length);
-                        if (!singleLineCSVObjects[5].Equals(string.Empty) && !singleLineCSVObjects[5].Equals("")) {
+                        if (!singleLineCSVObjects[5].Equals(string.Empty) && !singleLineCSVObjects[5].Equals(""))
+                        {
                             filenames.Add(singleLineCSVObjects[5].Trim());
                         }
-                        else {
+                        else
+                        {
                             filenames.Add(string.Empty);
                         }
                     }
@@ -73,19 +80,21 @@ public class CardReader : MonoBehaviour {
                 byte[] tempBytes = File.ReadAllBytes(Application.streamingAssetsPath + "/" + outputAtlasName);
                 tex.LoadImage(tempBytes);
             }
-            else {
+            else
+            {
                 byte[] tempBytes = File.ReadAllBytes(Application.streamingAssetsPath + "/" + outputAtlasName);
                 tex.LoadImage(tempBytes);
             }
 
             // get all the textual elements in the csv file
             // NOTE: row 0 is always headings and not data
-            for (int i = 1; i < allCSVObjects.Length; i++) {
+            for (int i = 1; i < allCSVObjects.Length; i++)
+            {
                 //TODO: Create check for deck type
 
                 // Then in each of the lines of csv data, split them based on commas to get the different pieces of information on each object
                 // and instantiate a base card object to then fill in with data.
-                string[] individualCSVObjects = allCSVObjects[i].Split(",");
+                string[] individualCSVObjects = allCSVObjects[i].Split(","); 
                 if (individualCSVObjects.Length > 1) // excel adds an empty line at the end
                 {
                     // TODO: update list and numbering
@@ -121,7 +130,8 @@ public class CardReader : MonoBehaviour {
 
                     // 0: Read only cards of the correct team
                     // TODO: If possible use one card reader instead of 3 (1 for each team)
-                    if (individualCSVObjects[0].Trim().ToLower() != DeckName.ToLower()) {
+                    if (individualCSVObjects[0].Trim().ToLower() != DeckName.ToLower())
+                    {
                         continue;
                     }
 
@@ -130,23 +140,24 @@ public class CardReader : MonoBehaviour {
 
                     // 1:if there's one or more cards to be inserted into the deck
                     int numberOfCards = int.Parse(individualCSVObjects[1].Trim());
-                    if (numberOfCards > 0) {
+                    if (numberOfCards > 0)
+                    {
                         // get appropriate game objects to set up
                         GameObject tempCardObj = Instantiate(cardPrefab);
 
                         // Get a reference to the Card component on the card gameobject.
                         Card tempCard = tempCardObj.GetComponent<Card>();
                         tempCard.DeckName = DeckName;
-                        //   CardFront tempCardFront = tempCard.GetComponent<CardFront>();
+                     //   CardFront tempCardFront = tempCard.GetComponent<CardFront>();
                         tempCard.data.cardID = sCardID;
                         sCardID++;
 
                         // 2: which type of card is this?
                         // NOTE: here is where we add appropriate card actions
                         var methods = individualCSVObjects[2].Split(';').ToList();
-
+                        
                         methods.ForEach(methodName => {
-                            // Debug.Log($"Adding {methodName} action to {tempCard.name}");
+                            Debug.Log($"Adding {methodName} action to {tempCard.name}");
                             //add the function names to the card
                             tempCard.ActionList.Add(methodName);
 
@@ -252,7 +263,8 @@ public class CardReader : MonoBehaviour {
                         // 4: is this card only played on a specific player type?
                         string[] onlyPlayedOn = individualCSVObjects[4].Trim().Split(';');
                         tempCard.data.onlyPlayedOn = new PlayerSector[4];
-                        for (int j = 0; j < onlyPlayedOn.Length; j++) {
+                        for (int j = 0; j<onlyPlayedOn.Length; j++)
+                        {
                             // TODO: Better to do string[] then TryParse when checking sector being played on?
                             if (Enum.TryParse(onlyPlayedOn[j], out PlayerSector sector)) { tempCard.data.onlyPlayedOn[j] = sector; }
                             else { Debug.Log("Parse failed"); }
@@ -277,7 +289,8 @@ public class CardReader : MonoBehaviour {
                         Texture2D tex3 = new Texture2D(TextureAtlas.SIZE, TextureAtlas.SIZE); // This needs to match the textureatlas pixel width
                         string imageFilename = individualCSVObjects[27].Trim(); // TODO: Set to single image Atlas
 
-                        if (individualCSVObjects[7] != "") {
+                        if (individualCSVObjects[7] != "")
+                        {
                             int col = int.Parse(individualCSVObjects[7].Trim());
                             int row = int.Parse(individualCSVObjects[8].Trim());
                             //Debug.Log("col is " + col + " row is " + row);
@@ -290,8 +303,9 @@ public class CardReader : MonoBehaviour {
 
                         // 9/10: card background // TODO: Set to single image Atlas
                         tex3 = new Texture2D(TextureAtlas.SIZE, TextureAtlas.SIZE); // This needs to match the textureatlas pixel width
-
-                        if (individualCSVObjects[9] != "") {
+                        
+                        if (individualCSVObjects[9] != "")
+                        {
                             int col = int.Parse(individualCSVObjects[9].Trim());
                             int row = int.Parse(individualCSVObjects[10].Trim());
                             //Debug.Log("col is " + col + " row is " + row);
@@ -305,31 +319,20 @@ public class CardReader : MonoBehaviour {
 
                         // 11:  Meeple type changed
                         // TODO: May need enum implemented
-
-                        var meepleActionTypes = individualCSVObjects[11].Trim().Split(';');
-                        if (meepleActionTypes.Length > 0 && meepleActionTypes[0] != "") {
-                            tempCard.data.meepleActionAmount = new Dictionary<MeepleType, int>();
-                            meepleActionTypes.ToList().ForEach(meepleActionTypes => {
-                                tempCard.data.meepleActionAmount.Add((MeepleType)Enum.Parse(typeof(MeepleType), meepleActionTypes), 0);
-                            });
-                        }
-
+                        tempCard.data.meepleType = individualCSVObjects[11].Trim().Split(';');
 
                         // 12:  Number of Meeples changed
                         if (individualCSVObjects[12] != "") { tempCard.data.meepleAmount = int.Parse(individualCSVObjects[12].Trim()); }
 
-
-                        //13-15 : Meeple costs
-                        tempCard.data.meepleCost = new Dictionary<MeepleType, int> {
-                            { MeepleType.Blue, int.Parse(individualCSVObjects[13].Trim()) },
-                            { MeepleType.Black, int.Parse(individualCSVObjects[14].Trim()) },
-                            { MeepleType.Purple, int.Parse(individualCSVObjects[15].Trim()) }
-                        };
-
-                        // Set up the colored circles
-                        tempCard.data.front.blueCircle = (tempCard.data.meepleCost[MeepleType.Blue] != 0);
-                        tempCard.data.front.blackCircle = (tempCard.data.meepleCost[MeepleType.Black] != 0);
-                        tempCard.data.front.purpleCircle = (tempCard.data.meepleCost[MeepleType.Purple] != 0);
+                        // 13:  Blue cost
+                        tempCard.data.blueCost = int.Parse(individualCSVObjects[13].Trim());
+                        tempCard.data.front.blueCircle = (tempCard.data.blueCost != 0);
+                        // 14:  Black cost
+                        tempCard.data.blackCost = int.Parse(individualCSVObjects[14].Trim());
+                        tempCard.data.front.blackCircle = (tempCard.data.blackCost != 0);
+                        // 15:  Purple cost
+                        tempCard.data.purpleCost = int.Parse(individualCSVObjects[15].Trim());
+                        tempCard.data.front.purpleCircle = (tempCard.data.purpleCost != 0);
 
 
                         // 16:  Damage/Heal
@@ -358,7 +361,7 @@ public class CardReader : MonoBehaviour {
                         tempCard.data.front.flavor.Replace(';', ',');
 
                         // 26:  Text description
-                        tempCard.data.front.description = individualCSVObjects[26];
+                        tempCard.data.front.description = individualCSVObjects[26]; 
                         tempCard.data.front.description.Replace(';', ',');
 
                         // now add one copy of this card for every instance in the card game

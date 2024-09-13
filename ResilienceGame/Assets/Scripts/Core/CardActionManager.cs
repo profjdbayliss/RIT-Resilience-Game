@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Linq;
 /// <summary>
 /// This class serves to handle all card actions
 /// New actions should be added here
@@ -119,24 +118,22 @@ public class CardActionManager : MonoBehaviour
     }
 
     private void ReduceCardCost(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        //foreach (string meepleType in cardActedUpon.data.meepleType) {
-        //    switch (meepleType) {
-        //        case "Blue":
-        //            cardActedUpon.data.blueCost -= card.data.meepleAmount;
-        //            break;
-        //        case "Black":
-        //            cardActedUpon.data.blackCost -= card.data.meepleAmount;
-        //            break;
-        //        case "Purple":
-        //            cardActedUpon.data.purpleCost -= card.data.meepleAmount;
-        //            break;
-        //        default:
-        //            Debug.Log("Meeple type not blue, black or purple for some reason");
-        //            break;
-        //    }
-        //}
-        //this assumes that it will always reduce the cost of all meeple types
-        cardActedUpon.data.meepleActionAmount.Values.ToList().ForEach(meepleCost => meepleCost -= card.data.meepleAmount);
+        foreach (string meepleType in cardActedUpon.data.meepleType) {
+            switch (meepleType) {
+                case "Blue":
+                    cardActedUpon.data.blueCost -= card.data.meepleAmount;
+                    break;
+                case "Black":
+                    cardActedUpon.data.blackCost -= card.data.meepleAmount;
+                    break;
+                case "Purple":
+                    cardActedUpon.data.purpleCost -= card.data.meepleAmount;
+                    break;
+                default:
+                    Debug.Log("Meeple type not blue, black or purple for some reason");
+                    break;
+            }
+        }
     }
 
     #endregion
