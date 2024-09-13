@@ -52,7 +52,6 @@ public struct FrontData {
 
 public struct CardData
 {
-    public CardTarget playableTarget;
     public FrontData front;
     public int numberInDeck;
     public CardType cardType;

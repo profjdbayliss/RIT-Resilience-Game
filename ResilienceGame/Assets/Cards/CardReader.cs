@@ -226,17 +226,32 @@ public class CardReader : MonoBehaviour
                                     break;
                             }
                         }
+                        
 
                         // 3: Target type
-                        tempCard.data.playableTarget = individualCSVObjects[3].Trim() switch {
-
-                            "Hand" => CardTarget.Hand,
-                            "Card" => CardTarget.Card,
-                            "Effect" => CardTarget.Effect,
-                            "Facility" => CardTarget.Facility,
-                            "Sector" => CardTarget.Sector,
-                            _ => CardTarget.Hand,
-                        };
+                        string target = individualCSVObjects[3].Trim();
+                        switch (target)
+                        {
+                            case "Hand":
+                                tempCard.target = CardTarget.Hand;
+                                break;
+                            case "Card":
+                                tempCard.target = CardTarget.Card;
+                                break;
+                            case "Effect":
+                                tempCard.target = CardTarget.Effect;
+                                break;
+                            case "Facility":
+                                tempCard.target = CardTarget.Facility;
+                                break;
+                            case "Sector":
+                                tempCard.target = CardTarget.Sector;
+                                break;
+                            // Is this needed? Is this handled by just CardActions?
+                            default:
+                                //tempCard.data.onlyPlayedOn[0] = PlayerSector.Any;
+                                break;
+                        }
 
                         // 4: is this card only played on a specific player type?
                         string[] onlyPlayedOn = individualCSVObjects[4].Trim().Split(';');

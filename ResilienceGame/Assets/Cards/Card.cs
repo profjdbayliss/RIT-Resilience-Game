@@ -18,7 +18,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public int UniqueID; 
     
     public CardState state;
-    public CardTarget dropTarget; //TODO: might not use this
+    public CardTarget target;
     public string DeckName;
     public GameObject cardZone;
     public GameObject originalParent;
