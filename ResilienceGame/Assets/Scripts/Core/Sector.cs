@@ -10,9 +10,6 @@ public class Sector : MonoBehaviour
     public PlayerSector sectorName; // TODO: Move playersector here
     public Facility[] facilities;
     public bool isCore;
-    public float blueMeeples;
-    public float blackMeeples;
-    public float purpleMeeples;
 
     // filename - directory path is assumed to be Application.streamingAssetsPath
     // extension is assumed to be csv
@@ -30,7 +27,7 @@ public class Sector : MonoBehaviour
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
         sectorName = sector;
-        blackMeeples = blueMeeples = purpleMeeples = 2;
+
         facilities = new Facility[3];
 
         for (int i = 0; i < sectorCanvas.transform.childCount; i++) // TODO: If children added change count to 3

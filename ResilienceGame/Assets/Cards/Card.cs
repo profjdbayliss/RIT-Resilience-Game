@@ -115,20 +115,20 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon)
+    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon)
     {
         foreach(ICardAction action in ActionList)
         {
-            action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
+            action.Played(player, opponent, facilityActedUpon, this);
         }
     }
 
     // Cancel this card
-    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon)
+    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon)
     {
         foreach (ICardAction action in ActionList)
         {
-            action.Canceled(player, opponent, facilityActedUpon, cardActedUpon, this);
+            action.Canceled(player, opponent, facilityActedUpon, this);
         }
     }
 
