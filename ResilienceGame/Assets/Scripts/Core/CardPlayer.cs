@@ -10,7 +10,6 @@ using Image = UnityEngine.UI.Image;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 using kcp2k;
-using UnityEngine.Events;
 
 #region Enums
 // Enum to track player type
@@ -62,11 +61,8 @@ public enum DiscardFromWhere {
 };
 #endregion
 
-
-
 public class CardPlayer : MonoBehaviour {
     #region Fields
-
     // Establish necessary fields
     public GameManager manager;
     public PlayerTeam playerTeam = PlayerTeam.Any;

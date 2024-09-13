@@ -10,7 +10,6 @@ TagManager:
   - FacilityDropLocation
   - DiscardDropLocation
   - FreePlayDropLocation
-  - Debug
   layers:
   - Default
   - TransparentFX

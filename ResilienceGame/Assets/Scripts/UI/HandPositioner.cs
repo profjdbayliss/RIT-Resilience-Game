@@ -4,22 +4,13 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-#region Events
-
-// Custom UnityEvent that passes a Card object
-[System.Serializable]
-public class CardHoverEvent : UnityEvent<Card> { }
-
-#endregion
 /// <summary>
 /// This class is responsible for arranging the cards in the player's hand.
 /// </summary>
 public class HandPositioner : MonoBehaviour {
 
-    private CardHoverEvent onCardHover = new CardHoverEvent();
     public List<GameObject> cards = new List<GameObject>();
     public float arcRadius = 3300f;     //the size of the arc/curve the cards will be placed on
     public float arcAngle = 20f;
@@ -191,20 +182,13 @@ public class HandPositioner : MonoBehaviour {
         }
     }
 
-    //Allows other classes to subscribe to the onCardHover event
-    public void AddCardHoverListener(UnityAction<Card> listener) {
-        onCardHover.AddListener(listener);
-    }
     /// <summary>
     /// handles determining which card is being hovered over
     /// </summary>
     private void HandleHovering() {
         //dont hover if dragging a card
         if (cardsBeingDragged.Count > 0) {
-
             currentHoveredCard = null;
-            //this should hide the card info panel on drag
-            onCardHover.Invoke(null);
             return;
         }
         //get the mouse position
@@ -218,19 +202,15 @@ public class HandPositioner : MonoBehaviour {
 
         // If the hovered card has changed, update the current hovered card
         if (hoveredCard != currentHoveredCard) {
+            if (currentHoveredCard != null) {
+                currentHoveredCard.transform.SetSiblingIndex(currentHoveredCard.GetComponent<Card>().HandPosition);//reset the sibling index of the current hovered card, sending it to its proper spot in the draw order
+            }
             currentHoveredCard = hoveredCard;
 
             if (currentHoveredCard != null) {
                 currentHoveredCard.transform.SetAsLastSibling(); //bring the hovered card to the front of the draw order
-                onCardHover.Invoke(currentHoveredCard.GetComponent<Card>()); // Invoke with the new hovered card
-            }
-            else {
-                onCardHover.Invoke(null); // Invoke with null when no card is hovered
             }
         }
-        //if (currentHoveredCard == null) {
-        //    onCardHover.Invoke(null);
-        //}
     }
 
     /// <summary>
