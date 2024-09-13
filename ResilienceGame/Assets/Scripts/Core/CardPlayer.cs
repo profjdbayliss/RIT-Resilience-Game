@@ -190,6 +190,24 @@ public class CardPlayer : MonoBehaviour {
 
     #endregion
 
+    //#region Debug Functions
+    ////These are for testing purposes to add/remove cards from the hand
+    //public virtual void ForceDrawCard() {
+    //    if (DeckIDs.Count > 0) {
+    //        DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+    //    }
+    //}
+    //public virtual void ForceDiscardRandomCard() {
+    //    var num = UnityEngine.Random.Range(0, HandCards.Count);
+    //    var card = HandCards[num];
+    //    HandCards.Remove(num);
+    //    Discards.Add(num, card);
+    //    card.GetComponent<Card>().state = CardState.CardNeedsToBeDiscarded;
+    //    card.transform.SetParent(discardDropZone.transform, false);
+    //    card.transform.localPosition = new Vector3();
+    //}
+    //#endregion
+
     #region Card Drawing
     public virtual void DrawCards() {
         if (HandCards.Count < maxHandSize) // TODO: Liar???????
@@ -252,7 +270,6 @@ public class CardPlayer : MonoBehaviour {
         activeDeck[tempCard.UniqueID] = tempCard.gameObject;
         tempCard.transform.SetParent(dropZone.transform, false);
         tempCard.HandPosition = handSize++;
-        tempCard.state = CardState.CardDrawn;
         return tempCard;
     }
 
@@ -1352,23 +1369,5 @@ public class CardPlayer : MonoBehaviour {
         mFinalScore = 0;
         mUpdatesThisPhase.Clear();
     }
-    #endregion
-
-    #region Debug Functions
-    ////These are for testing purposes to add/remove cards from the hand
-    //public virtual void ForceDrawCard() {
-    //    if (DeckIDs.Count > 0) {
-    //        DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
-    //    }
-    //}
-    //public virtual void ForceDiscardRandomCard() {
-    //    var num = UnityEngine.Random.Range(0, HandCards.Count);
-    //    var card = HandCards[num];
-    //    HandCards.Remove(num);
-    //    Discards.Add(num, card);
-    //    card.GetComponent<Card>().state = CardState.CardNeedsToBeDiscarded;
-    //    card.transform.SetParent(discardDropZone.transform, false);
-    //    card.transform.localPosition = new Vector3();
-    //}
     #endregion
 }

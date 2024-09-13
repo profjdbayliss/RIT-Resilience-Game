@@ -13,7 +13,16 @@ public enum CardType
 
     // TODO: Add Card Types for SD
 }
-
+// Enum to track the state of the card
+public enum CardState {
+    NotInDeck,
+    CardInDeck,
+    CardDrawn,
+    CardDrawnDropped,
+    CardInPlay,
+    CardNeedsToBeDiscarded,
+    CardDiscarded,
+};
 
 // Enum to indicate what the card is being played on
 public enum CardTarget {

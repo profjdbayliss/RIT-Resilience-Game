@@ -9,16 +9,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine.Animations;
 
-// Enum to track the state of the card
-public enum CardState {
-    NotInDeck,
-    CardInDeck,
-    CardDrawn,
-    CardDrawnDropped,
-    CardInPlay,
-    CardNeedsToBeDiscarded,
-    CardDiscarded,
-};
+
 
 
 
