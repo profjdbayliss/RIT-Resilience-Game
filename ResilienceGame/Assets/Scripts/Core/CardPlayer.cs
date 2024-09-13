@@ -457,20 +457,19 @@ public class CardPlayer : MonoBehaviour {
     private bool ValidateCardPlay(Card card) {
         //much simpler card validation
         var canPlay = GameManager.instance.MGamePhase switch {
-            GamePhase.Draw => CanDiscardCard(card),
+            GamePhase.Draw => CanDiscardCard(),
             GamePhase.Bonus => false, //TODO get clarification on this phase
-            GamePhase.Action => playerSector.SpendMeeples(card), //returns true if the card could be afforded, false if not will also spend the meeples on the sector
+            GamePhase.Action => playerSector.SpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not will also spend the meeples on the sector
             _ => false,
         };
         //var canPlay = true;
 
-        Debug.Log($"Playing {card} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
+        Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
         return canPlay;
     }
-    private bool CanDiscardCard(Card card) {
-        Debug.Log($"Player has discarded {GameManager.instance.MNumberDiscarded} cards this turn");
-        return hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD) && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; //TODO: is this the correct place to access this value?
+    private bool CanDiscardCard() {
+        return hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD) && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; 
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?
@@ -633,6 +632,10 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public int GetMeeplesSpent() {
+        return mMeeplesSpent;
+    }
+    public int AddMeeplesSpent(int meeples) {
+        mMeeplesSpent += meeples;
         return mMeeplesSpent;
     }
 

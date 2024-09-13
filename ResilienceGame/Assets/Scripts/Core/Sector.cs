@@ -89,11 +89,12 @@ public class Sector : MonoBehaviour
             card.data.blackCost <= blackMeeples &&
             card.data.purpleCost <= purpleMeeples;
     }
-    public bool SpendMeeples(Card card) {
+    public bool SpendMeeples(Card card, ref int numMeeplesSpent) {
         if (CanAffordCardPlay(card)) {
             blueMeeples -= card.data.blueCost;
             blackMeeples -= card.data.blackCost;
             purpleMeeples -= card.data.purpleCost;
+            numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost); //incrememnt the reference variable to hold total meeples spent
             UpdateMeepleAmountUI();
             return true;
         }
