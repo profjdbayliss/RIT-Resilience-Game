@@ -111,35 +111,56 @@ public class HandPositioner : MonoBehaviour {
     /// handles adding and removing cards from this class's card tracker (cards list)
     /// </summary>
     private void HandleNewCards() {
-        //get all the child cards of the hand positioner
-        var newCards = transform.GetComponentsInChildren<Card>().Select(card => card.gameObject).ToList();
+        // Get all the child cards of the hand positioner
+        Card[] childCards = GetComponentsInChildren<Card>();
+        List<GameObject> newCards = new List<GameObject>();
+        foreach (Card card in childCards) {
+            newCards.Add(card.gameObject);
+        }
 
-        //filter the cards list and cardsToAdd to create exlusively new cards and cards to remove
-        var cardsToAdd = newCards.Except(cards).ToList();
-        var cardsToRemove = cards.Except(newCards).ToList();
+        // Filter the cards list and create lists for new cards and cards to remove
+        List<GameObject> cardsToAdd = new List<GameObject>();
+        List<GameObject> cardsToRemove = new List<GameObject>();
 
-        //set the scale of the new cards to the default scale
-        cardsToAdd.ForEach(card => {
+        // Find cards to add
+        foreach (GameObject card in newCards) {
+            if (!cards.Contains(card)) {
+                cardsToAdd.Add(card);
+            }
+        }
+
+        // Find cards to remove
+        foreach (GameObject card in cards) {
+            if (!newCards.Contains(card)) {
+                cardsToRemove.Add(card);
+            }
+        }
+
+        // Set the scale of the new cards to the default scale
+        foreach (GameObject card in cardsToAdd) {
             card.transform.localScale = Vector3.one * defaultScale;
+        }
 
-        });
-
-        //If there are new cards or cards to remove, update the cards list
-        if (cardsToAdd.Any()) {
+        // If there are new cards, add them and update positions
+        if (cardsToAdd.Count > 0) {
             cards.AddRange(cardsToAdd);
-            for (int x = 0; x < cards.Count; x++) {
-                cards[x].GetComponent<Card>().HandPosition = x;
-            }
+            UpdateCardPositions();
         }
 
-        if (cardsToRemove.Any()) {
-            cards.RemoveAll(card => cardsToRemove.Contains(card));
-            for (int x = 0; x < cards.Count; x++) {
-                cards[x].GetComponent<Card>().HandPosition = x;
+        // If there are cards to remove, remove them and update positions
+        if (cardsToRemove.Count > 0) {
+            foreach (GameObject card in cardsToRemove) {
+                cards.Remove(card);
             }
+            UpdateCardPositions();
         }
+    }
 
-
+    // Helper method to update card positions
+    private void UpdateCardPositions() {
+        for (int x = 0; x < cards.Count; x++) {
+            cards[x].GetComponent<Card>().HandPosition = x;
+        }
     }
 
     //handles arranging the cards in the hand by fanning them out in an arc

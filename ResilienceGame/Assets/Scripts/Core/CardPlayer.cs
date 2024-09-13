@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -417,16 +416,14 @@ public class CardPlayer : MonoBehaviour {
     void InitDropLocations() {
 
         var dropZones = FindObjectsOfType<CardDropLocation>();
-        dropZones.ToList().ForEach(dropZone => {
-
+        foreach (var dropZone in dropZones) {
             var tag = dropZone.tag;
             if (cardDropLocations.ContainsKey(tag)) {
                 tag += ++facilityCount;
             }
-
-            cardDropLocations.Add(tag, dropZone.gameObject);
-
-        });
+            cardDropLocations.Add(dropZone.tag, dropZone.gameObject);
+        }
+        
 
     }
     public GameObject HandleCardDrop(Card card) {
