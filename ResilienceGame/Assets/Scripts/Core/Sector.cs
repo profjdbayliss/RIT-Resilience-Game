@@ -136,10 +136,12 @@ public class Sector : MonoBehaviour
         reader.ReadLine();
 
         string line;
+        //read one line at a time
         while ((line = reader.ReadLine()) != null) {
             string[] values = line.Split(',');
             if (values.Length <= 1) continue;
 
+            //grab all the values from the line and trim white space
             if (!values[0].Trim().Equals(sectorName.ToString(), StringComparison.OrdinalIgnoreCase)) {
                 continue;
             }
@@ -155,6 +157,10 @@ public class Sector : MonoBehaviour
         reader.Close();
     }
 
+    /// <summary>
+    /// Processes the facility data from the CSV file
+    /// </summary>
+    /// <param name="values">array of string values for a single facility (1 line of csv data)</param>
     private void ProcessFacility(string[] values) {
         if (!Enum.TryParse(values[2].Trim(), out Facility.FacilityType facilityType)) {
             Debug.Log($"Unknown facility type: {values[2]}");
