@@ -404,8 +404,8 @@ public class CardPlayer : MonoBehaviour {
     }
     private bool ValidateCardPlay(Card card) {
         //TODO: reimplement card validation maybe or just leave it to playCard as before
-        // var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
-        var canPlay = true;
+         var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
+        //var canPlay = true;
 
         Debug.Log($"Playing {card} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
@@ -684,7 +684,8 @@ public class CardPlayer : MonoBehaviour {
                             default:
                                 // we're not in the right phase, so
                                 // reset the dropped state
-                                card.state = CardState.CardDrawn;
+                                //card.state = CardState.CardDrawn;
+                                ResetCardToInHand(card);
                                 break;
                         }
 
@@ -743,16 +744,17 @@ public class CardPlayer : MonoBehaviour {
                             default:
                                 // we're not in the right phase, so
                                 // reset the dropped state
-                                card.state = CardState.CardDrawn;
-
+                                //card.state = CardState.CardDrawn;
+                                ResetCardToInHand(card);
                                 break;
                         }
                     }
                     else {
                         Debug.Log("card not dropped in card drop zone");
                         // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
-                        gameObjectCard.transform.SetParent(handDropZone.transform, false);
-                        card.state = CardState.CardDrawn;
+                        //  gameObjectCard.transform.SetParent(handDropZone.transform, false);
+                        //  card.state = CardState.CardDrawn;
+                        handPositioner.ReturnCardToHand(card);
                         gameObjectCard.GetComponentInParent<slippy>().enabled = true;
                         gameObjectCard.GetComponent<HoverScale>().Drop();
                     }
@@ -779,6 +781,11 @@ public class CardPlayer : MonoBehaviour {
         }
 
         return playCount;
+    }
+    //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
+    public void ResetCardToInHand(Card card) {
+        card.state = CardState.CardDrawn;
+        handPositioner.ReturnCardToHand(card);
     }
 
     public bool DuplicateCardPlayed(Card facilityCard, Card cardToPlay) {

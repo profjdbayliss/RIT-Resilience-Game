@@ -61,26 +61,37 @@ public class HandPositioner : MonoBehaviour {
     }
 
     /// <summary>
+    /// Return a card to its proper place in the hand
+    /// </summary>
+    /// <param name="card">The card to enter the hand</param>
+    public void ReturnCardToHand(Card card) {
+        Debug.Log($"Sending {card.front.title} to hand");
+        card.transform.SetParent(transform, false);
+        card.transform.SetSiblingIndex(card.HandPosition);
+        ResetCardSiblingIndices();
+    }
+
+    /// <summary>
     /// Tells the hand positioner that the card was dropped after being dragged
     /// </summary>
     /// <param name="card">The card that was dropped</param>
     public void NotifyCardDragEnd(GameObject card) {
         cardsBeingDragged.Remove(card);
         IsDraggingCard = false;
-        //card was played somewhere, so we need to do something with it
-        var dropLoc = GameManager.instance.actualPlayer.hoveredDropLocation;
-        if (dropLoc) {
-            // Debug.Log($"card was played on: {dropLoc.name}");
+        ////card was played somewhere, so we need to do something with it
+        //var dropLoc = GameManager.instance.actualPlayer.hoveredDropLocation;
+        //if (dropLoc) {
+        //    // Debug.Log($"card was played on: {dropLoc.name}");
 
-        }
-        else {
-            //reset scale and reset sibling index to position it correctly in the hand
-            card.transform.localScale = Vector3.one * defaultScale;
-            var tCard = card.GetComponent<Card>();
-            // Debug.Log($"returning {tCard.data.front.title} to position {tCard.HandPosition}");
-            card.transform.SetSiblingIndex(tCard.HandPosition);
-            ArrangeCards(); // Rearrange cards when dragging ends
-        }
+        //}
+        //else {
+        //    //reset scale and reset sibling index to position it correctly in the hand
+        //    card.transform.localScale = Vector3.one * defaultScale;
+        //    var tCard = card.GetComponent<Card>();
+        //    // Debug.Log($"returning {tCard.data.front.title} to position {tCard.HandPosition}");
+        //    card.transform.SetSiblingIndex(tCard.HandPosition);
+        //    ArrangeCards(); // Rearrange cards when dragging ends
+        //}
     }
 
     public void DiscardCard(GameObject card) {
