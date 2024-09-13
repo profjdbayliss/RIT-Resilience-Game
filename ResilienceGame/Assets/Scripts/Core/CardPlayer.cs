@@ -405,7 +405,7 @@ public class CardPlayer : MonoBehaviour {
                             if (currentHoveredFacility != previousHoveredFacility) {
                                 if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
                                   //  Debug.Log("Hightlight on");
-                                    hoverActivateObject.ActivateHover();
+                                    hoverActivateObject.StartFadeIn();
                                 }
                                 else {
                                     Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
@@ -426,7 +426,7 @@ public class CardPlayer : MonoBehaviour {
         if (previousHoveredFacility != null && previousHoveredFacility != currentHoveredFacility) {
             if (previousHoveredFacility.TryGetComponent(out HoverActivateObject previousHoverActivateObject)) {
              //   Debug.Log("Highlight off");
-                previousHoverActivateObject.DeactivateHover();
+                previousHoverActivateObject.StartFadeOut();
             }
             else {
                 Debug.LogError("Missing hover on faciltiy " + previousHoverActivateObject.name);
