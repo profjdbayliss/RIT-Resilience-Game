@@ -3856,9 +3856,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   facilityType: 0
   facilityName: 0
-  products: 
+  dependancies: 
   facilityCanvas: {fileID: 0}
   sectorItsAPartOf: {fileID: 0}
+  dependencyIcons: []
   facilityNameText: {fileID: 310921094}
   effect: 0
   isDown: 0
@@ -5798,9 +5799,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   facilityType: 0
   facilityName: 0
-  products: 
+  dependancies: 
   facilityCanvas: {fileID: 0}
   sectorItsAPartOf: {fileID: 0}
+  dependencyIcons: []
   facilityNameText: {fileID: 96068603}
   effect: 0
   isDown: 0
@@ -13124,9 +13126,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   facilityType: 0
   facilityName: 0
-  products: 
+  dependancies: 
   facilityCanvas: {fileID: 0}
   sectorItsAPartOf: {fileID: 0}
+  dependencyIcons: []
   facilityNameText: {fileID: 1435387040}
   effect: 0
   isDown: 0
