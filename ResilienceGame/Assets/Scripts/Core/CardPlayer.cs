@@ -96,14 +96,12 @@ public class CardPlayer : MonoBehaviour {
 
     //Meeples
     // TODO: Move to Sector.cs if needed
-    // public int blueMeepleCount, blackMeepleCount, purpleMeepleCount = 0;
-    public Dictionary<string, int> oMeepleCount = new Dictionary<string, int> { { "blue", 2 }, { "black", 2 }, { "purple", 2 } };
-    public Dictionary<string, int> cMeepleCount = new Dictionary<string, int> { { "blue", 2 }, { "black", 2 }, { "purple", 2 } };
+    public int blueMeepleCount, blackMeepleCount, purpleMeepleCount = 0;
     int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
     public int CardsDiscardedThisPhase { get; private set; } = 0;
-    // private int MAX_DISCARD_PER_PHASE = 3;
+   // private int MAX_DISCARD_PER_PHASE = 3;
 
     //Vector2 discardDropMin;
     //Vector2 discardDropMax;
@@ -178,12 +176,12 @@ public class CardPlayer : MonoBehaviour {
 
         var dropZones = FindObjectsOfType<CardDropLocation>();
         dropZones.ToList().ForEach(dropZone => {
-
+            
             var tag = dropZone.tag;
             if (cardDropLocations.ContainsKey(tag)) {
                 tag += ++facilityCount;
             }
-
+          
             cardDropLocations.Add(tag, dropZone.gameObject);
 
         });
@@ -311,7 +309,7 @@ public class CardPlayer : MonoBehaviour {
         // set the info on the card front
         //   CardFront front = actualCard.GetComponent<CardFront>();
 
-        // tempCard.data.front = actualCard.data.front;
+       // tempCard.data.front = actualCard.data.front;
 
         RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
         for (int i = 0; i < tempRaws.Length; i++) {
@@ -427,20 +425,20 @@ public class CardPlayer : MonoBehaviour {
 
         //check all drop locations to see if the mouse is over any of them
         foreach (KeyValuePair<string, GameObject> kvp in cardDropLocations) {
-
+           
             if (kvp.Value.TryGetComponent(out Collider2D collider)) {                       //grab colliders
                 Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
                 if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
                     isOverAnyDropLocation = true;
                     GameObject hoveredObject = kvp.Value;
-                    //  Debug.Log("Hovered over " + hoveredObject.name);
+                  //  Debug.Log("Hovered over " + hoveredObject.name);
                     // Handle fade in if we've moved over a facility
                     if (kvp.Key.Contains("FacilityDropLocation")) {
                         if (GameManager.instance.CanStationsBeHighlighted()) {
                             currentHoveredFacility = kvp.Value;
                             if (currentHoveredFacility != previousHoveredFacility) {
                                 if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                                    //  Debug.Log("Hightlight on");
+                                  //  Debug.Log("Hightlight on");
                                     hoverActivateObject.ActivateHover();
                                 }
                                 else {
@@ -461,14 +459,14 @@ public class CardPlayer : MonoBehaviour {
         // Handle fade out if we've moved off a facility
         if (previousHoveredFacility != null && previousHoveredFacility != currentHoveredFacility) {
             if (previousHoveredFacility.TryGetComponent(out HoverActivateObject previousHoverActivateObject)) {
-                //   Debug.Log("Highlight off");
+             //   Debug.Log("Highlight off");
                 previousHoverActivateObject.DeactivateHover();
             }
             else {
                 Debug.LogError("Missing hover on faciltiy " + previousHoverActivateObject.name);
             }
 
-
+            
         }
         // If we're not over any drop location, set hoveredDropLocation to null
         if (!isOverAnyDropLocation) {
@@ -804,15 +802,9 @@ public class CardPlayer : MonoBehaviour {
     public int GetMeeplesSpent() {
         return mMeeplesSpent;
     }
-    public int GetMeepleValue(string meepleType) {
-        return cMeepleCount[meepleType];
-    }   
-    public int GetMaxMeepleSum() {
-        return oMeepleCount.Values.Aggregate(0, (sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
-    }
-    public int GetCurrentMeeplesSum() {
 
-        return cMeepleCount.Values.Aggregate(0, (sum, meepleValue) => sum + meepleValue);   //sum up all the meeples
+    public int GetTotalMeeples() {
+        return blueMeepleCount + purpleMeepleCount + blackMeepleCount;
     }
     #endregion
 
@@ -962,8 +954,8 @@ public class CardPlayer : MonoBehaviour {
 
             addedObject.GetComponent<Slippy>().enabled = false;
             //TODO replace with new scaling?
-            //   addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
-            //    addedObject.GetComponent<HoverScale>().SlippyOff = true;
+         //   addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
+        //    addedObject.GetComponent<HoverScale>().SlippyOff = true;
 
         }
         else {
@@ -1265,7 +1257,7 @@ public class CardPlayer : MonoBehaviour {
         foreach (Updates update in updates) {
             GameObject facility;
             Facility selectedFacility = null;
-            //  int index = -1;
+          //  int index = -1;
             Debug.Log("number of active facilities are " + ActiveFacilities.Count);
 
             // find unique facility in facilities list

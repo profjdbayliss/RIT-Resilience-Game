@@ -574,7 +574,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         // do nothing - most common scenario
                     }
                     else
-                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetCurrentMeeplesSum()) {
+                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetTotalMeeples()) {
                         mIsActionAllowed = false;
                         DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
                     }
