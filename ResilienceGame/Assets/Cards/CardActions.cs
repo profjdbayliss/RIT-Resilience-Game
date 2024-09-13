@@ -214,15 +214,15 @@ public class ReduceCardCost : ICardAction
             switch(cardActedUpon.data.meepleType[i])
             {
                 case "Blue":
-                    cardActedUpon.data.blueCost -= card.data.meepleAmount;
+                    cardActedUpon.data.blueCost--;
                     break;
 
                 case "Black":
-                    cardActedUpon.data.blackCost -= card.data.meepleAmount;
+                    cardActedUpon.data.blackCost--;
                     break;
 
                 case "Purple":
-                    cardActedUpon.data.purpleCost -= card.data.meepleAmount;
+                    cardActedUpon.data.purpleCost--;
                     break;
 
                 default:
