@@ -59,9 +59,9 @@ public struct CardData
     public float percentSuccess;
     public int cardID;
     public int teamID; // TODO: Use for SD
-    public int blueCost;
-    public int blackCost;
-    public int purpleCost;
+    public float blueCost;
+    public float blackCost;
+    public float purpleCost;
     public int drawAmount;
     public int removeAmount;
     public int targetAmount;
@@ -72,6 +72,6 @@ public struct CardData
     public int duration;
     public bool hasDoomEffect;
     public string[] meepleType;
-    public int meepleAmount;
+    public float meepleAmount;
     public PlayerSector[] onlyPlayedOn;
 }

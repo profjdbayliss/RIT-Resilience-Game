@@ -1106,6 +1106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeTime: 0.25
   hoverImage: {fileID: 912450324}
 --- !u!61 &92073680
 BoxCollider2D:
@@ -6093,50 +6094,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 504302114}
   m_CullTransparentMesh: 1
---- !u!1 &508678951
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 508678952}
-  - component: {fileID: 508678953}
-  m_Layer: 0
-  m_Name: CardActionManager
-  m_TagString: GameController
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &508678952
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508678951}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 18.68572, y: 12.461287, z: -25.311954}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 985016583}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &508678953
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508678951}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64e0646d4471a674a8db5d643309bad8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &510286169
 GameObject:
   m_ObjectHideFlags: 0
@@ -6311,6 +6268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeTime: 0.25
   hoverImage: {fileID: 2138288044}
 --- !u!61 &520008985
 BoxCollider2D:
@@ -11436,39 +11394,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 970184693}
   m_CullTransparentMesh: 1
---- !u!1 &985016582
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 985016583}
-  m_Layer: 0
-  m_Name: Game Controllers
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &985016583
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 985016582}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2133546054}
-  - {fileID: 508678952}
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &997801799
 GameObject:
   m_ObjectHideFlags: 0
@@ -18630,9 +18555,6 @@ MonoBehaviour:
   sectorName: 0
   facilities: []
   isCore: 0
-  blueMeeples: 0
-  blackMeeples: 0
-  purpleMeeples: 0
   csvFileName: Sectors.csv
   outputAtlasName: sectorAtlas
   sectorCanvas: {fileID: 0}
@@ -18806,6 +18728,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeTime: 0.25
   hoverImage: {fileID: 180503389}
 --- !u!114 &1886739616
 MonoBehaviour:
@@ -21249,6 +21172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeTime: 0.25
   hoverImage: {fileID: 180503389}
 --- !u!61 &2097464037
 BoxCollider2D:
@@ -21842,13 +21766,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2133546050}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 18.68572, y: 12.461287, z: -25.311954}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 985016583}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2138288040
 GameObject:
@@ -22570,6 +22494,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0164fa3f67e3c844b4657610799a7ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blueCircle: 0
+  blackCircle: 0
+  purpleCircle: 0
+  color: {r: 0, g: 0, b: 0, a: 0}
+  title: 
+  description: 
+  flavor: 
+  background: {fileID: 0}
+  img: {fileID: 0}
 --- !u!114 &3395120114322209512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23448,8 +23381,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UniqueID: 0
+  front: {fileID: 0}
   state: 0
-  dropTarget: 0
+  target: 0
   DeckName: 
   cardZone: {fileID: 0}
   originalParent: {fileID: 1994761812}
@@ -23460,7 +23394,6 @@ MonoBehaviour:
   OutlineImage: {fileID: 6945917863268426752}
   DefenseHealth: 0
   ModifyingCards: 
-  ActionList: []
 --- !u!114 &8428484966745356290
 MonoBehaviour:
   m_ObjectHideFlags: 0

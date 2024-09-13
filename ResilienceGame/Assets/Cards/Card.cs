@@ -6,18 +6,17 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Unity.Collections;
 using System.Linq;
-using TMPro;
-using UnityEngine.Animations;
 
 
 
 
 
-public class Card : MonoBehaviour, IPointerClickHandler {
+public class Card : MonoBehaviour, IPointerClickHandler
+{
     public CardData data;
     // this card needs a unique id since multiples of the same card can be played
-    public int UniqueID;
-
+    public int UniqueID; 
+    
     public CardState state;
     public CardTarget dropTarget; //TODO: might not use this
     public string DeckName;
@@ -39,45 +38,23 @@ public class Card : MonoBehaviour, IPointerClickHandler {
     // cards from the other player's deck.
     //public List<string> MitigatesWhatCards = new List<string>(10);
     Vector2 mDroppedPosition;
-    // GameManager mManager; 
-    //    public List<ICardAction> ActionList = new List<ICardAction>(6);
-    public List<string> ActionList = new List<string>();
+   // GameManager mManager; 
+    public List<ICardAction> ActionList = new List<ICardAction>(6);
+
     // Start is called before the first frame update
-    void Start() {
+    void Start()
+    {
         originalPosition = this.gameObject.transform.position;
-        //    mManager = GameObject.FindObjectOfType<GameManager>();
+    //    mManager = GameObject.FindObjectOfType<GameManager>();
         OutlineImage.SetActive(false);
     }
 
-    public void InitializeFromCard(Card sourceCard, GameObject dropZone, int uniqueId, Transform parent = null) {
-        this.cardZone = dropZone;
-        this.data = sourceCard.data;
-        this.UniqueID = uniqueId;
-        Debug.Log($"Setting unique id for card {this.UniqueID}");
 
-        // Deep copy all other properties
-        this.state = sourceCard.state;
-        this.dropTarget = sourceCard.dropTarget;
-        this.DeckName = sourceCard.DeckName;
-        this.originalParent = sourceCard.originalParent;
-        this.originalPosition = sourceCard.originalPosition;
-        this.CanvasHolder = sourceCard.CanvasHolder;
-        this.HasCanvas = sourceCard.HasCanvas;
-        this.stackNumber = sourceCard.stackNumber;
-        this.DefenseHealth = sourceCard.DefenseHealth;
-        this.HandPosition = sourceCard.HandPosition;
-
-        // Deep copy lists
-        this.ModifyingCards = new List<int>(sourceCard.ModifyingCards);
-        this.AttackingCards = new List<CardIDInfo>(sourceCard.AttackingCards);
-        this.ActionList = new List<string>(sourceCard.ActionList);
-
-        this.originalPosition = this.transform.position;
-    }
-
-    public void OnPointerClick(PointerEventData eventData) {
+    public void OnPointerClick(PointerEventData eventData)
+    {
         Debug.Log("click happened on card");
-        if (this.state == CardState.CardDrawn) {
+        if (this.state == CardState.CardDrawn)
+        {
             // note that click consumes the release of most drag and release motions
             Debug.Log("potentially card dropped.");
             state = CardState.CardDrawnDropped;
@@ -102,7 +79,8 @@ public class Card : MonoBehaviour, IPointerClickHandler {
         }*/
     }
 
-    public bool OutlineActive() {
+    public bool OutlineActive()
+    {
         return OutlineImage.activeSelf;
     }
 
@@ -113,96 +91,26 @@ public class Card : MonoBehaviour, IPointerClickHandler {
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null) {
-        //foreach (ICardAction action in ActionList) {
-        //    action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
-        //}
-        ActionList.ForEach(action => CardActionManager.Instance.ExecuteCardAction(action, player, opponent, facilityActedUpon, cardActedUpon, this));
+    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    {
+        foreach(ICardAction action in ActionList)
+        {
+            action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
+        }
     }
 
     // Cancel this card
-    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null) {
-        //TODO: implement action canceling
-        //currently it only did print statements but this might be needed later
-
-        //foreach (ICardAction action in ActionList) {
-        //    action.Canceled(player, opponent, facilityActedUpon, cardActedUpon, this);
-        //}
-    }
-
-    #region Init Card Visuals
-    public void SetupCardVisuals() {
-        SetupRawImages();
-        SetupColoredCircles();
-        SetupTextElements();
-    }
-
-    private void SetupRawImages() {
-        RawImage[] tempRaws = GetComponentsInChildren<RawImage>();
-        foreach (var raw in tempRaws) {
-            if (raw.name == "Image") {
-                raw.texture = this.data.front.img;
-            }
-            else if (raw.name == "Background") {
-                raw.color = this.data.front.color;
-            }
-        }
-    }
-
-    private void SetupColoredCircles() {
-        Image[] tempImages = GetComponentsInChildren<Image>();
-        foreach (var img in tempImages) {
-            switch (img.name) {
-                case "BlackCardSlot":
-                    img.enabled = this.data.front.blackCircle;
-                    break;
-                case "BlueCardSlot":
-                    img.enabled = this.data.front.blueCircle;
-                    break;
-                case "PurpleCardSlot":
-                    img.enabled = this.data.front.purpleCircle;
-                    break;
-            }
-        }
-    }
-
-    private void SetupTextElements() {
-        TextMeshProUGUI[] tempTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
-        foreach (var text in tempTexts) {
-            switch (text.name) {
-                case "Title Text":
-                    text.text = this.data.front.title;
-                    break;
-                case "Description Text":
-                    text.text = this.data.front.description;
-                    break;
-                case "Flavor Text":
-                    text.text = this.data.front.flavor;
-                    break;
-                case "BlackCardNumber":
-                    SetupCostText(text, this.data.front.blackCircle, this.data.blackCost);
-                    break;
-                case "BlueCardNumber":
-                    SetupCostText(text, this.data.front.blueCircle, this.data.blueCost);
-                    break;
-                case "PurpleCardNumber":
-                    SetupCostText(text, this.data.front.purpleCircle, this.data.purpleCost);
-                    break;
-            }
-        }
-    }
-
-    private void SetupCostText(TextMeshProUGUI text, bool isEnabled, int cost) {
-        text.enabled = isEnabled;
-        if (isEnabled) {
-            text.text = cost.ToString();
+    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    {
+        foreach (ICardAction action in ActionList)
+        {
+            action.Canceled(player, opponent, facilityActedUpon, cardActedUpon, this);
         }
     }
 
     public void ToggleCardVisuals(bool enable) {
         transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
     }
-    #endregion
 
-
+    
 }

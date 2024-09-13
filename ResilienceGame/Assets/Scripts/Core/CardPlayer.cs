@@ -225,55 +225,6 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     public virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
-    GameObject dropZone, bool allowSlippy,
-    ref Dictionary<int, GameObject> activeDeck) {
-
-        // Part 1: Card Selection
-        Card actualCard;
-        int indexForCard;
-        if (random) {
-            if (deckToDrawFrom.Count <= 0) {
-                Debug.Log("No cards drawn.");
-                return null;
-            }
-            int rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
-            if (!cards.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
-                Debug.Log("Error: Random card not found in deck.");
-                return null;
-            }
-            indexForCard = rng;
-        }
-        else {
-            if (!cards.TryGetValue(cardId, out actualCard)) {
-                Debug.Log($"Error: Card with ID {cardId} not found in deck.");
-                return null;
-            }
-            indexForCard = deckToDrawFrom.FindIndex(x => x == cardId);
-            if (indexForCard == -1) {
-                Debug.Log($"Error: Card with ID {cardId} not found in draw deck.");
-                return null;
-            }
-        }
-
-        // Part 2: Card Instantiation
-        var tempCard = Instantiate(cardPrefab).GetComponent<Card>();
-
-        // Part 3: Basic Property Setting and Deep Copy
-        tempCard.InitializeFromCard(actualCard, dropZone, uniqueId != -1 ? uniqueId : sUniqueIDCount++);
-
-        // Part 4: Visual Setup
-        tempCard.SetupCardVisuals();
-
-        // Remove the drawn card from the deck
-        deckToDrawFrom.RemoveAt(indexForCard);
-
-        activeDeck[tempCard.UniqueID] = tempCard.gameObject;
-        tempCard.transform.SetParent(dropZone.transform, false);
-        return tempCard;
-    }
-
-    #region old draw card
-    public virtual Card DrawCardOld(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy,
         ref Dictionary<int, GameObject> activeDeck) {
         int rng = -1;
@@ -422,7 +373,6 @@ public class CardPlayer : MonoBehaviour {
         deckToDrawFrom.RemoveAt(indexForCard);
         return tempCard;
     }
-    #endregion
     #endregion
 
     #region Update Functions
