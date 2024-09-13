@@ -1001,7 +1001,6 @@ GameObject:
   - component: {fileID: 92073676}
   - component: {fileID: 92073679}
   - component: {fileID: 92073680}
-  - component: {fileID: 92073681}
   m_Layer: 5
   m_Name: Distribution Facility Box
   m_TagString: FacilityDropLocation
@@ -1018,7 +1017,7 @@ RectTransform:
   m_GameObject: {fileID: 92073674}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 690.97565}
-  m_LocalScale: {x: 0.85106915, y: 0.85106915, z: 0.85106915}
+  m_LocalScale: {x: 0.85106903, y: 0.85106903, z: 0.85106903}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 96068602}
@@ -1027,7 +1026,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -87.746124, y: -15.745895}
+  m_AnchoredPosition: {x: -87.74608, y: -15.7458725}
   m_SizeDelta: {x: 866, y: 123.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &92073676
@@ -1138,18 +1137,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 866, y: 123}
   m_EdgeRadius: 0
---- !u!114 &92073681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 92073674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be30dc5bb345e14f9c8a157e63561db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &92478569
 GameObject:
   m_ObjectHideFlags: 0
@@ -2363,10 +2350,9 @@ GameObject:
   - component: {fileID: 180208930}
   - component: {fileID: 180208932}
   - component: {fileID: 180208933}
-  - component: {fileID: 180208934}
   m_Layer: 5
   m_Name: DiscardDrop
-  m_TagString: DiscardDropLocation
+  m_TagString: CardDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2476,18 +2462,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 221, y: 312}
   m_EdgeRadius: 0
---- !u!114 &180208934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 180208928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be30dc5bb345e14f9c8a157e63561db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &180503385
 GameObject:
   m_ObjectHideFlags: 0
@@ -3863,7 +3837,6 @@ MonoBehaviour:
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
-  sectorItsAPartOf: {fileID: 0}
   effect: 0
   isDown: 0
 --- !u!1 &327071780
@@ -5804,7 +5777,6 @@ MonoBehaviour:
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
-  sectorItsAPartOf: {fileID: 0}
   effect: 0
   isDown: 0
 --- !u!1 &520008979
@@ -5821,7 +5793,6 @@ GameObject:
   - component: {fileID: 520008981}
   - component: {fileID: 520008984}
   - component: {fileID: 520008985}
-  - component: {fileID: 520008986}
   m_Layer: 5
   m_Name: Transmission Facility Box
   m_TagString: FacilityDropLocation
@@ -5958,18 +5929,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 866, y: 123}
   m_EdgeRadius: 0
---- !u!114 &520008986
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 520008979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be30dc5bb345e14f9c8a157e63561db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &522352602
 GameObject:
   m_ObjectHideFlags: 0
@@ -13134,7 +13093,6 @@ MonoBehaviour:
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
-  sectorItsAPartOf: {fileID: 0}
   effect: 0
   isDown: 0
 --- !u!1 &1358697067
@@ -18003,10 +17961,9 @@ GameObject:
   - component: {fileID: 1920413919}
   - component: {fileID: 1920413918}
   - component: {fileID: 1920413922}
-  - component: {fileID: 1920413923}
   m_Layer: 5
   m_Name: PlayerDropLocation
-  m_TagString: FreePlayDropLocation
+  m_TagString: CardDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18121,18 +18078,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1241.958, y: 678.9489}
   m_EdgeRadius: 0
---- !u!114 &1920413923
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1920413917}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be30dc5bb345e14f9c8a157e63561db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1937381451
 GameObject:
   m_ObjectHideFlags: 0
@@ -19969,7 +19914,6 @@ GameObject:
   - component: {fileID: 2097464035}
   - component: {fileID: 2097464036}
   - component: {fileID: 2097464037}
-  - component: {fileID: 2097464038}
   m_Layer: 5
   m_Name: FacilityBox
   m_TagString: FacilityDropLocation
@@ -20118,18 +20062,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &2097464038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2097464030}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be30dc5bb345e14f9c8a157e63561db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2099342281
 GameObject:
   m_ObjectHideFlags: 0

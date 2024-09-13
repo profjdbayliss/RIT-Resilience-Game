@@ -135,7 +135,7 @@ public class CardReader : MonoBehaviour
                     }
 
                     // TODO: If needed set teamID here
-                    //Debug.Log(DeckName);
+                    Debug.Log(DeckName);
 
                     // 1:if there's one or more cards to be inserted into the deck
                     int numberOfCards = int.Parse(individualCSVObjects[1].Trim());
