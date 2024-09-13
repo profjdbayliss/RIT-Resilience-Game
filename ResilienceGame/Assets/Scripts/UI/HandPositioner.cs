@@ -27,7 +27,7 @@ public class HandPositioner : MonoBehaviour {
     private float hoverHeight = 150f;   //how far to move the card up when hovered over
     public float hoverScale = 1f;       //scale of the cards when hovered over
     public float defaultScale = .5f;    //default scale of the cards when in the hand
-    public float cardWidth = 100f;      //approximate width of a card
+    public float cardWidth = 125f;      //approximate width of a card
     public float hoverTransitionSpeed = 10f; // transition speed of hover animation faster is faster
 
     private RectTransform rect; //the rect transform of the hand positioner

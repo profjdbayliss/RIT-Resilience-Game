@@ -191,9 +191,11 @@ public class CardPlayer : MonoBehaviour {
         card.GetComponent<Card>().state = CardState.CardNeedsToBeDiscarded;
         card.transform.SetParent(discardDropZone.transform, false);
         card.transform.localPosition = new Vector3();
-
-
-
+    }
+    public bool CanAffordToPlay(Card card) {
+        return card.data.blueCost <= blueMeepleCount &&
+            card.data.blackCost <= blackMeepleCount &&
+            card.data.purpleCost <= purpleMeepleCount;
     }
 
     public virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
@@ -742,6 +744,7 @@ public class CardPlayer : MonoBehaviour {
                                 // we're not in the right phase, so
                                 // reset the dropped state
                                 card.state = CardState.CardDrawn;
+
                                 break;
                         }
                     }

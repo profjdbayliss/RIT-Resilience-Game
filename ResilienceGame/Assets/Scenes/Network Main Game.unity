@@ -17589,6 +17589,9 @@ MonoBehaviour:
   sectorName: 0
   facilities: []
   isCore: 0
+  blueMeeples: 0
+  blackMeeples: 0
+  purpleMeeples: 0
   csvFileName: Sectors.csv
   outputAtlasName: sectorAtlas
   sectorCanvas: {fileID: 0}
@@ -19206,7 +19209,7 @@ MonoBehaviour:
   cardAngle: 5
   hoverScale: 1
   defaultScale: 0.5
-  cardWidth: 100
+  cardWidth: 120
   hoverTransitionSpeed: 10
 --- !u!1 &2058548353
 GameObject:
@@ -20600,8 +20603,10 @@ MonoBehaviour:
   mCreateWaterAtlas: 0
   redCards: []
   blueCards: []
+  MGamePhase: 0
   playerDeckList: {fileID: 1570887177}
   gameStarted: 0
+  MNumberDiscarded: 0
   actualPlayer: {fileID: 1125198114}
   opponentPlayer: {fileID: 680164116}
   opponentPlayedZone: {fileID: 1445810747}

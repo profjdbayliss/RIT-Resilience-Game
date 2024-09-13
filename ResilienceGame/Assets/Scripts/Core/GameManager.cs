@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour, IRGObservable
     public List<Card> blueCards;
 
     // where are we in game phases?
-    GamePhase mGamePhase = GamePhase.Start;
+    public GamePhase MGamePhase = GamePhase.Start;
     GamePhase mPreviousGamePhase = GamePhase.Start;
 
     // Various turn and game info.
@@ -40,9 +40,9 @@ public class GameManager : MonoBehaviour, IRGObservable
     public bool gameStarted = false;
 
     // var's for game rules
-    public readonly int MAX_DISCARDS = 2;
+    public readonly int MAX_DISCARDS = 3;
     public readonly int MAX_DEFENSE = 1;
-    int mNumberDiscarded = 0;
+    public int MNumberDiscarded = 0;
     int mNumberDefense = 0;
     bool mIsDiscardAllowed = false;
     bool mIsActionAllowed = false;
@@ -225,7 +225,7 @@ public class GameManager : MonoBehaviour, IRGObservable
         {
             if (gameStarted)
             {
-                HandlePhases(mGamePhase);        
+                HandlePhases(MGamePhase);        
             }
            
             // always notify observers in case there's a message
@@ -264,11 +264,11 @@ public class GameManager : MonoBehaviour, IRGObservable
 
         // keep track of 
         bool phaseJustChanged = false;
-        mGamePhase = phase;
-        if (!mGamePhase.Equals(mPreviousGamePhase))
+        MGamePhase = phase;
+        if (!MGamePhase.Equals(mPreviousGamePhase))
         {
             phaseJustChanged = true;
-            mPhaseText.text = mGamePhase.ToString();
+            mPhaseText.text = MGamePhase.ToString();
             mPreviousGamePhase = phase;
             //SkipTutorial();
         }
@@ -293,7 +293,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                     actualPlayer.DrawCards();
                     // set the discard area to work if necessary
                     actualPlayer.discardDropZone.SetActive(true);
-                    mNumberDiscarded = 0;
+                    MNumberDiscarded = 0;
                     DisplayGameStatus("[TEAM COLOR] has drawn " + actualPlayer.HandCards.Count + " cards each."); 
                 } else
                 {
@@ -301,7 +301,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                     actualPlayer.DrawCards();
 
                     // check for discard and if there's a discard draw again
-                    if (mNumberDiscarded == MAX_DISCARDS)
+                    if (MNumberDiscarded == MAX_DISCARDS)
                     {
                         DisplayGameStatus(mPlayerName.text + " has reached the maximum discard number. Please hit end phase to continue.");
                     }
@@ -309,12 +309,12 @@ public class GameManager : MonoBehaviour, IRGObservable
                     {
                         if (mIsDiscardAllowed)
                         {
-                            mNumberDiscarded += actualPlayer.HandlePlayCard(GamePhase.Draw, opponentPlayer);
+                            MNumberDiscarded += actualPlayer.HandlePlayCard(GamePhase.Draw, opponentPlayer);
                         }
                     }
                 }
                 break;
-            case GamePhase.Overtime:
+            case GamePhase.Bonus:
                 /*if (phaseJustChanged && !skip) 
                 { 
                     runner.StartDialogue("Defense"); 
@@ -483,7 +483,7 @@ public class GameManager : MonoBehaviour, IRGObservable
             startScreen.SetActive(false); // Start menu isn't necessary now
             turnTotal = 0;
             mTurnText.text = "Turn: " + GetTurn();
-            mPhaseText.text = "Phase: " + mGamePhase.ToString();
+            mPhaseText.text = "Phase: " + MGamePhase.ToString();
             mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
             mPlayerDeckType.text = "" + playerType;
 
@@ -580,7 +580,7 @@ public class GameManager : MonoBehaviour, IRGObservable
         gameStarted = true;
 
         // go on to the next phase
-        mGamePhase = GamePhase.Draw;
+        MGamePhase = GamePhase.Draw;
 
     }
 
@@ -594,7 +594,7 @@ public class GameManager : MonoBehaviour, IRGObservable
     // WORK: rewrite for this card game
     public void ShowEndGameCanvas()
     {
-        mGamePhase = GamePhase.End;
+        MGamePhase = GamePhase.End;
         endGameCanvas.SetActive(true);
         endGameText.text = mPlayerName.text + " ends the game with score " + actualPlayer.GetScore() +
             " and " + mOpponentName.text + " ends the game with score " + opponentPlayer.GetScore();
@@ -682,7 +682,7 @@ public class GameManager : MonoBehaviour, IRGObservable
     // Ends the phase.
     public void EndPhase()
     {
-        switch (mGamePhase)
+        switch (MGamePhase)
         {
             case GamePhase.Draw:
                 {
@@ -700,14 +700,14 @@ public class GameManager : MonoBehaviour, IRGObservable
                     // send a message with number of discards of the player
                     Message msg;
                     List<int> tmpList = new List<int>(1);
-                    tmpList.Add(mNumberDiscarded);
+                    tmpList.Add(MNumberDiscarded);
                     msg = new Message(CardMessageType.ShareDiscardNumber, tmpList);
                     AddMessage(msg);
                 }
                 break;
             case GamePhase.Action:
                 {
-                    SendUpdatesToOpponent(mGamePhase, actualPlayer);
+                    SendUpdatesToOpponent(MGamePhase, actualPlayer);
                     // reset the defense var's for the next turn
                     mIsActionAllowed = false;
                     mNumberDefense = 0;
@@ -857,24 +857,18 @@ public class GameManager : MonoBehaviour, IRGObservable
     {
         GamePhase nextPhase = GamePhase.Start;
 
-        switch(mGamePhase)
+        switch(MGamePhase)
         {
             case GamePhase.Start:
                 nextPhase = GamePhase.Draw;
                 break;
             case GamePhase.Draw:
-                nextPhase = GamePhase.Overtime;
+                nextPhase = GamePhase.Bonus;
                 break;
-            case GamePhase.Overtime:
+            case GamePhase.Bonus:
                 nextPhase = GamePhase.Action;
                 break;
             case GamePhase.Action:
-                nextPhase = GamePhase.Discard;
-                break;
-            case GamePhase.Discard:
-                nextPhase = GamePhase.Donate;
-                break;
-            case GamePhase.Donate:
                 // end the game if we're out of cards or have
                 // no stations left on the board
                 if (actualPlayer.DeckIDs.Count == 0 || (actualPlayer.ActiveFacilities.Count == 0))
@@ -913,7 +907,7 @@ public class GameManager : MonoBehaviour, IRGObservable
         if (!myTurn)
         {
             myTurn = true;
-            mGamePhase = GetNextPhase();
+            MGamePhase = GetNextPhase();
             mEndPhaseButton.SetActive(true);
         }
 
@@ -928,7 +922,7 @@ public class GameManager : MonoBehaviour, IRGObservable
     public bool CanStationsBeHighlighted()
     {
         bool canBe = false;
-        switch (mGamePhase)
+        switch (MGamePhase)
         {
             case GamePhase.Start:
                 canBe = false;
@@ -936,17 +930,11 @@ public class GameManager : MonoBehaviour, IRGObservable
             case GamePhase.Draw:
                 canBe = false;
                 break;
-            case GamePhase.Overtime:
+            case GamePhase.Bonus:
                 canBe = true;
                 break;
             case GamePhase.Action:
                 canBe = true;
-                break;
-            case GamePhase.Discard:
-                canBe = true;
-                break;
-            case GamePhase.Donate:
-                canBe = false;
                 break;
             case GamePhase.End:
                 canBe = false;
@@ -1003,7 +991,7 @@ public class GameManager : MonoBehaviour, IRGObservable
     {
         if (!yarnSpinner.activeInHierarchy) { return; }
 
-        if ((skip && mPreviousGamePhase != GamePhase.Start && mGamePhase == GamePhase.Draw)
+        if ((skip && mPreviousGamePhase != GamePhase.Start && MGamePhase == GamePhase.Draw)
             || skipClicked)
         {
             skip = true;
@@ -1029,8 +1017,8 @@ public class GameManager : MonoBehaviour, IRGObservable
         background.SetActive(true);
         skipClicked = false;
         skip = false;
-        Debug.Log(mGamePhase.ToString());
-        runner.StartDialogue(mGamePhase.ToString());
+        Debug.Log(MGamePhase.ToString());
+        runner.StartDialogue(MGamePhase.ToString());
     }
 
     public void ResetForNewGame()
@@ -1039,14 +1027,14 @@ public class GameManager : MonoBehaviour, IRGObservable
         opponentPlayer.ResetForNewGame();
 
         // where are we in game phases?
-        mGamePhase = GamePhase.Start;
+        MGamePhase = GamePhase.Start;
         mPreviousGamePhase = GamePhase.Start;
 
         // Various turn and game info.
         myTurn = false;
         turnTotal = 0;
         gameStarted = false;
-        mNumberDiscarded = 0;
+        MNumberDiscarded = 0;
         mNumberDefense = 0;
         mIsDiscardAllowed = false;
         mIsActionAllowed = false;
