@@ -222,7 +222,7 @@ public class HandPositioner : MonoBehaviour {
         }
     }
 
-    public void ResetCardSiblingIndices() {
+    private void ResetCardSiblingIndices() {
         foreach (var card in cards) {
             card.transform.SetSiblingIndex(card.GetComponent<Card>().HandPosition);
         }

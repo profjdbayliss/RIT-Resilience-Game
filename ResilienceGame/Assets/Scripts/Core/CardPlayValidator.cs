@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CardPlayValidator{
+public static class CardPlayValidator {
     public static bool CanPlayCard(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
         if (!player.IsPlayerTurn()) return false;
 
@@ -24,7 +24,7 @@ public static class CardPlayValidator{
     private static bool CanPlayCardDuringDrawPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
 
         return playLocation.tag switch {
-            CardDropZoneTag.DISCARD => player.CardsDiscardedThisPhase < GameManager.MAX_DISCARDS,
+            "DiscardDropLocation" => player.CardsDiscardedThisPhase < GameManager.MAX_DISCARDS,
             _ => false,
         };
     }
@@ -38,18 +38,18 @@ public static class CardPlayValidator{
     }
 
     private static bool CanPlayCardDuringActionPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
-        Debug.Log($"Action Phase Card Validate at {playLocation.name} : {playLocation.tag}");
+
         if (!CanAffordCard(player, card)) return false;
-        Debug.Log($"Can Afford Card");
+
         return playLocation.tag switch {
-            CardDropZoneTag.FREE_PLAY => CheckActionFreePlay(player, card, playLocation),
-            CardDropZoneTag.FACILITY => CheckActionFacilityPlay(player, card, playLocation),
+            "FreePlayLocation" => CheckActionFreePlay(player, card, playLocation),
+            "DiscardDropLocation" => false,
+            "FacilityDropLocation" => CheckActionFacilityPlay(player, card, playLocation),
             _ => false,
         };
     }
 
     private static bool CheckActionFreePlay(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
-        Debug.Log($"Validate Action play on free zone using card target: {card.data.playableTarget}");
         return card.data.playableTarget switch {
             CardTarget.Hand => true,        //play card on 'hand' (draw/discard) cards 
             CardTarget.Card => true,        //play card on 'card' (reduces cost of card) cards TODO: this will need a seperate handler script to run the action
@@ -61,7 +61,6 @@ public static class CardPlayValidator{
     }
 
     private static bool CheckActionFacilityPlay(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
-        Debug.Log($"Validate Action play on facility using card target: {card.data.playableTarget}");
         return card.data.playableTarget switch {
             CardTarget.Hand => false,       //Cannot play a hand card in the facility zone
             CardTarget.Card => false,       //Cannot play a card card in the facility zone
@@ -70,6 +69,7 @@ public static class CardPlayValidator{
             CardTarget.Sector => false,     //Cannot play a sector card in the facility zone
             _ => false,
         };
+        return false;
     }
 
     private static bool CanPlayCardDuringDiscardPhase(CardPlayer player, Card card, UnityEngine.GameObject playLocation) {
