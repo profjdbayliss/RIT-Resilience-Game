@@ -147,7 +147,7 @@ public class CardReader : MonoBehaviour
                         // Get a reference to the Card component on the card gameobject.
                         Card tempCard = tempCardObj.GetComponent<Card>();
                         tempCard.DeckName = DeckName;
-                     //   CardFront tempCardFront = tempCard.GetComponent<CardFront>();
+                        CardFront tempCardFront = tempCard.GetComponent<CardFront>();
                         tempCard.data.cardID = sCardID;
                         sCardID++;
 
@@ -268,14 +268,21 @@ public class CardReader : MonoBehaviour
 
                         // 6: set up the card title
                         // WORK: do we really need to set both of these?
-                        tempCard.data.front.title = tempCardObj.name = individualCSVObjects[6];
+                        tempCardFront.title = tempCardObj.name = individualCSVObjects[6];
 
                         // Set up the card color. Could be done using csv
-                        tempCard.data.front.color = DeckName.ToLower() switch {
-                            "blue" => new Color(106f / 255f, 137f / 255f, 220f / 255f),
-                            "red" => new Color(222f / 255f, 0, 0),
-                            _ => Color.white,
-                        };
+                        switch (DeckName.ToLower())
+                        {
+                            case "blue":
+                                tempCardFront.color = new Color(106f/255f,137f/255f,220f/255f);
+                                break;
+                            case "red":
+                                tempCardFront.color = new Color(222f/255f,0,0);
+                                break;
+                            default:
+                                tempCardFront.color = Color.white;
+                                break;
+                        }
 
 
                         // 7/8: card image
@@ -292,7 +299,7 @@ public class CardReader : MonoBehaviour
                             tex3.SetPixels(tempColors);
                             tex3.Apply();
                         }
-                        tempCard.data.front.img = tex3;
+                        tempCardFront.img = tex3;
 
                         // 9/10: card background // TODO: Set to single image Atlas
                         tex3 = new Texture2D(TextureAtlas.SIZE, TextureAtlas.SIZE); // This needs to match the textureatlas pixel width
@@ -319,13 +326,13 @@ public class CardReader : MonoBehaviour
 
                         // 13:  Blue cost
                         tempCard.data.blueCost = int.Parse(individualCSVObjects[13].Trim());
-                        tempCard.data.front.blueCircle = (tempCard.data.blueCost != 0);
+                        tempCardFront.blueCircle = (tempCard.data.blueCost != 0);
                         // 14:  Black cost
                         tempCard.data.blackCost = int.Parse(individualCSVObjects[14].Trim());
-                        tempCard.data.front.blackCircle = (tempCard.data.blackCost != 0);
+                        tempCardFront.blackCircle = (tempCard.data.blackCost != 0);
                         // 15:  Purple cost
                         tempCard.data.purpleCost = int.Parse(individualCSVObjects[15].Trim());
-                        tempCard.data.front.purpleCircle = (tempCard.data.purpleCost != 0);
+                        tempCardFront.purpleCircle = (tempCard.data.purpleCost != 0);
 
 
                         // 16:  Damage/Heal
@@ -350,12 +357,12 @@ public class CardReader : MonoBehaviour
 
                         // 25:  Flavor Text
                         // Replace csv semi-colons with appropiate commas
-                        tempCard.data.front.flavor = individualCSVObjects[25];
-                        tempCard.data.front.flavor.Replace(';', ',');
+                        tempCardFront.flavor = individualCSVObjects[25];
+                        tempCardFront.flavor.Replace(';', ',');
 
                         // 26:  Text description
-                        tempCard.data.front.description = individualCSVObjects[26]; 
-                        tempCard.data.front.description.Replace(';', ',');
+                        tempCardFront.description = individualCSVObjects[26]; 
+                        tempCardFront.description.Replace(';', ',');
 
                         // now add one copy of this card for every instance in the card game
                         tempCard.data.numberInDeck = numberOfCards;

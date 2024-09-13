@@ -274,48 +274,47 @@ public class CardPlayer : MonoBehaviour {
         }
 
         // set the info on the card front
-        //   CardFront front = actualCard.GetComponent<CardFront>();
-
-       // tempCard.data.front = actualCard.data.front;
+        CardFront front = actualCard.GetComponent<CardFront>();
+        tempCard.front = front;
 
         RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
         for (int i = 0; i < tempRaws.Length; i++) {
             Debug.Log(tempRaws[i]);
             if (tempRaws[i].name == "Image") {
-                tempRaws[i].texture = tempCard.data.front.img;
+                tempRaws[i].texture = tempCard.front.img;
             }
             else if (tempRaws[i].name == "Background") {
-                tempRaws[i].color = tempCard.data.front.color;
-                Debug.Log(tempCard.data.front.color);
+                tempRaws[i].color = tempCard.front.color;
+                Debug.Log(tempCard.front.color);
             }
         }
 
         Image[] tempImage = tempCardObj.GetComponentsInChildren<Image>();
         for (int i = 0; i < tempImage.Length; i++) {
             if (tempImage[i].name.Equals("BlackCardSlot")) {
-                tempImage[i].enabled = tempCard.data.front.blackCircle;
+                tempImage[i].enabled = tempCard.front.blackCircle;
             }
             else if (tempImage[i].name.Equals("BlueCardSlot")) {
-                tempImage[i].enabled = tempCard.data.front.blueCircle;
+                tempImage[i].enabled = tempCard.front.blueCircle;
             }
             else if (tempImage[i].name.Equals("PurpleCardSlot")) {
-                tempImage[i].enabled = tempCard.data.front.purpleCircle;
+                tempImage[i].enabled = tempCard.front.purpleCircle;
             }
         }
 
         TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
         for (int i = 0; i < tempTexts.Length; i++) {
             if (tempTexts[i].name.Equals("Title Text")) {
-                tempTexts[i].text = tempCard.data.front.title;
+                tempTexts[i].text = tempCard.front.title;
             }
             else if (tempTexts[i].name.Equals("Description Text")) {
-                tempTexts[i].text = tempCard.data.front.description;
+                tempTexts[i].text = tempCard.front.description;
             }
             else if (tempTexts[i].name.Equals("Flavor Text")) {
-                tempTexts[i].text = tempCard.data.front.flavor;
+                tempTexts[i].text = tempCard.front.flavor;
             }
             else if (tempTexts[i].name.Equals("BlackCardNumber")) {
-                if (tempCard.data.front.blackCircle) {
+                if (tempCard.front.blackCircle) {
                     // set the text number for cost
                     tempTexts[i].enabled = true;
                     tempTexts[i].text = tempCard.data.blackCost + "";
@@ -326,14 +325,14 @@ public class CardPlayer : MonoBehaviour {
                 }
             }
             else if (tempTexts[i].name.Equals("BlueCardNumber")) {
-                if (tempCard.data.front.blueCircle) {
+                if (tempCard.front.blueCircle) {
                     tempTexts[i].enabled = true;
                     tempTexts[i].text = tempCard.data.blueCost + "";
                 }
                 else { tempTexts[i].enabled = false; }
             }
             else if (tempTexts[i].name.Equals("PurpleCardNumber")) {
-                if (tempCard.data.front.purpleCircle) {
+                if (tempCard.front.purpleCircle) {
                     tempTexts[i].enabled = true;
                     tempTexts[i].text = tempCard.data.purpleCost + "";
                 }
@@ -726,7 +725,7 @@ public class CardPlayer : MonoBehaviour {
                 activeCardObject.transform.localScale = new Vector3(1, 1, 1);
 
                 // for the future might want to stack cards in the discard zone
-                Debug.Log("setting card to discard zone: " + card.UniqueID + " with name " + card.data.front.title);
+                Debug.Log("setting card to discard zone: " + card.UniqueID + " with name " + card.front.title);
                 activeCardObject.SetActive(false);
                 card.cardZone = discardDropZone;
                 if (addUpdate) {

@@ -7,16 +7,40 @@ using UnityEngine.EventSystems;
 using Unity.Collections;
 using System.Linq;
 
+// Enum to track the state of the card
+public enum CardState
+{
+    NotInDeck,
+    CardInDeck,
+    CardDrawn,
+    CardDrawnDropped,
+    CardInPlay,
+    CardNeedsToBeDiscarded,
+    CardDiscarded,
+};
 
+// Enum to indicate what the card is being played on
+public enum CardTarget
+{
+    Hand,
+    Card,
+    Effect,
+    Facility,
+    Sector
+};
 
-
+public struct CardIDInfo
+{
+    public int UniqueID;
+    public int CardID;
+};
 
 public class Card : MonoBehaviour, IPointerClickHandler
 {
     public CardData data;
     // this card needs a unique id since multiples of the same card can be played
     public int UniqueID; 
-    
+    public CardFront front;
     public CardState state;
     public CardTarget target;
     public string DeckName;

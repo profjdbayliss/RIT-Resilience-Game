@@ -46,8 +46,8 @@ public class CardInfoDisplay : MonoBehaviour
         StringBuilder sb = new StringBuilder();
 
         // Card information
-        sb.AppendLine($"Name: {card.data.front.title}");
-        sb.AppendLine($"Desc: {card.data.front.description}");
+        sb.AppendLine($"Name: {card.front.title}");
+        sb.AppendLine($"Desc: {card.front.description}");
         sb.AppendLine($"State: {card.state}");
         sb.AppendLine($"Target: {card.target}");
         sb.AppendLine($"Attacking Cards: {card.AttackingCards.Count}");
