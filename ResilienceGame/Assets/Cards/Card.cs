@@ -65,7 +65,7 @@ public class Card : MonoBehaviour, IPointerClickHandler {
         this.HasCanvas = sourceCard.HasCanvas;
         this.stackNumber = sourceCard.stackNumber;
         this.DefenseHealth = sourceCard.DefenseHealth;
-       
+        this.HandPosition = sourceCard.HandPosition;
 
         // Deep copy lists
         this.ModifyingCards = new List<int>(sourceCard.ModifyingCards);
