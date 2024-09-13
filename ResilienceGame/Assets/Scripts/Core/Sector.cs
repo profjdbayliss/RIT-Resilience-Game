@@ -180,7 +180,7 @@ public class Sector : MonoBehaviour
 
         for (int j = 3; j < 6; j++) {
             if (Enum.TryParse(values[j], out PlayerSector enumName)) {
-                facility.products[j - 3] = enumName;
+                facility.dependancies[j - 3] = enumName;
             }
             else {
                 Debug.Log($"Dependency not parsed: {values[j]}");

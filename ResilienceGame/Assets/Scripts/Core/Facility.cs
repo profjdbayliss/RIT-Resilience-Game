@@ -23,9 +23,11 @@ public class Facility : MonoBehaviour
 
     public FacilityType facilityType;
     public string facilityName;
-    public PlayerSector[] products;
+    public PlayerSector[] dependancies;
     public GameObject facilityCanvas;
     public Sector sectorItsAPartOf;
+
+    public Image[] dependencyIcons;
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     private int physicalPoints, finacialPoints, networkPoints;
@@ -40,12 +42,9 @@ public class Facility : MonoBehaviour
     public void Initialize()
     {
         facilityCanvas = this.transform.gameObject;
-        products = new PlayerSector[3];
+        dependancies = new PlayerSector[3];
         pointsUI = new TextMeshProUGUI[3];
         effect = FacilityEffect.None;
-
-        
-
         for (int i = 0; i < 3; i++)
         {
             pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
