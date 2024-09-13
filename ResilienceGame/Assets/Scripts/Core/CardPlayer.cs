@@ -9,7 +9,6 @@ using static UnityEngine.PlayerLoop.PreUpdate;
 using Image = UnityEngine.UI.Image;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
-using kcp2k;
 
 #region Enums
 // Enum to track player type
@@ -87,7 +86,6 @@ public class CardPlayer : MonoBehaviour {
     public string DeckName = "";
     public bool IsDraggingCard { get; private set; } = false;
     public GameObject hoveredDropLocation;
-    private GameObject previousHoveredFacility;
     public Dictionary<string, GameObject> cardDropLocations = new();
 
     //Meeples
@@ -97,7 +95,7 @@ public class CardPlayer : MonoBehaviour {
     int mMeeplesSpent = 0;
 
     public int CardsDiscardedThisPhase { get; private set; } = 0;
-   // private int MAX_DISCARD_PER_PHASE = 3;
+    private int MAX_DISCARD_PER_PHASE = 3;
 
     //Vector2 discardDropMin;
     //Vector2 discardDropMax;
@@ -172,12 +170,11 @@ public class CardPlayer : MonoBehaviour {
 
         var dropZones = FindObjectsOfType<CardDropLocation>();
         dropZones.ToList().ForEach(dropZone => {
-            
+            Debug.Log(dropZone.name);
             var tag = dropZone.tag;
             if (cardDropLocations.ContainsKey(tag)) {
                 tag += ++facilityCount;
             }
-          
             cardDropLocations.Add(tag, dropZone.gameObject);
 
         });
@@ -342,9 +339,9 @@ public class CardPlayer : MonoBehaviour {
         }*/
 
 
-        tempCardObj.GetComponent<Slippy>().DraggableObject = tempCardObj;
+        tempCardObj.GetComponent<slippy>().DraggableObject = tempCardObj;
         if (!allowSlippy) {
-            Slippy tempSlippy = tempCardObj.GetComponent<Slippy>();
+            slippy tempSlippy = tempCardObj.GetComponent<slippy>();
             tempSlippy.enabled = false;
         }
         tempCard.state = CardState.CardDrawn;
@@ -381,60 +378,26 @@ public class CardPlayer : MonoBehaviour {
     }
     //updates the hoverDropLocation class field to hold the object the card is hovering over
     void UpdateHoveredDropLocation() {
-        GameObject currentHoveredFacility = null;
-        bool isOverAnyDropLocation = false;
 
-        //check all drop locations to see if the mouse is over any of them
+
         foreach (KeyValuePair<string, GameObject> kvp in cardDropLocations) {
-           
-            if (kvp.Value.TryGetComponent(out Collider2D collider)) {                       //grab colliders
-                Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
-                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
-                    isOverAnyDropLocation = true;
+            if (kvp.Value.TryGetComponent(out Collider2D collider)) {
+                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {
+                    //the facilities hitboxes are children of their script objects
                     GameObject hoveredObject = kvp.Value;
-                  //  Debug.Log("Hovered over " + hoveredObject.name);
-                    // Handle fade in if we've moved over a facility
                     if (kvp.Key.Contains("FacilityDropLocation")) {
                         if (GameManager.instance.CanStationsBeHighlighted()) {
-                            currentHoveredFacility = kvp.Value;
-                            if (currentHoveredFacility != previousHoveredFacility) {
-                                if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                                  //  Debug.Log("Hightlight on");
-                                    hoverActivateObject.StartFadeIn();
-                                }
-                                else {
-                                    Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
-                                }
-                            }
+                           // hoveredObject.GetComponent<HoverActivateObject>().OnPointerEnter(null);
                         }
                         hoveredObject = kvp.Value.transform.parent.gameObject;
                     }
-
                     hoveredDropLocation = hoveredObject;
                     // Debug.Log("Hovered over " + hoveredDropLocation.name);
-                    break;
+                    return;
                 }
             }
         }
-
-        // Handle fade out if we've moved off a facility
-        if (previousHoveredFacility != null && previousHoveredFacility != currentHoveredFacility) {
-            if (previousHoveredFacility.TryGetComponent(out HoverActivateObject previousHoverActivateObject)) {
-             //   Debug.Log("Highlight off");
-                previousHoverActivateObject.StartFadeOut();
-            }
-            else {
-                Debug.LogError("Missing hover on faciltiy " + previousHoverActivateObject.name);
-            }
-
-            
-        }
-        // If we're not over any drop location, set hoveredDropLocation to null
-        if (!isOverAnyDropLocation) {
-            hoveredDropLocation = null;
-        }
-
-        previousHoveredFacility = currentHoveredFacility;
+        hoveredDropLocation = null;
     }
     #endregion
 
@@ -706,14 +669,13 @@ public class CardPlayer : MonoBehaviour {
                 card.state = CardState.CardDiscarded;
 
                 // change parent and rescale
-                //TODO replace with new scaling?
-                //   activeCardObject.GetComponentInParent<HoverScale>().previousScale = Vector2.zero;
-                //  activeCardObject.GetComponentInParent<HoverScale>().ResetScale();
-                activeCardObject.GetComponentInParent<Slippy>().enabled = false;
-                activeCardObject.GetComponentInParent<Slippy>().ResetScale();
+                activeCardObject.GetComponentInParent<HoverScale>().previousScale = Vector2.zero;
+                activeCardObject.GetComponentInParent<HoverScale>().ResetScale();
+                activeCardObject.GetComponentInParent<slippy>().enabled = false;
+                activeCardObject.GetComponentInParent<slippy>().ResetScale();
                 activeCardObject.GetComponent<HoverScale>().enabled = false;
-                activeCardObject.GetComponent<Slippy>().ResetScale();
-                activeCardObject.GetComponent<Slippy>().enabled = false;
+                activeCardObject.GetComponent<slippy>().ResetScale();
+                activeCardObject.GetComponent<slippy>().enabled = false;
                 activeCardObject.transform.SetParent(discardDropZone.transform, false);
                 activeCardObject.transform.localPosition = new Vector3();
                 activeCardObject.transform.localScale = new Vector3(1, 1, 1);
@@ -911,10 +873,9 @@ public class CardPlayer : MonoBehaviour {
             }*/
             addedObject.transform.SetAsLastSibling();
 
-            addedObject.GetComponent<Slippy>().enabled = false;
-            //TODO replace with new scaling?
-         //   addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
-        //    addedObject.GetComponent<HoverScale>().SlippyOff = true;
+            addedObject.GetComponent<slippy>().enabled = false;
+            addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
+            addedObject.GetComponent<HoverScale>().SlippyOff = true;
 
         }
         else {
@@ -929,11 +890,11 @@ public class CardPlayer : MonoBehaviour {
             tempCanvas.transform.localScale = new Vector3(ORIGINAL_SCALE, ORIGINAL_SCALE, 1.0f);
 
             // turn slippy off - needs to be here???
-            if (addedObject.GetComponentInParent<Slippy>() != null) {
-                addedObject.GetComponentInParent<Slippy>().enabled = false;
+            if (addedObject.GetComponentInParent<slippy>() != null) {
+                addedObject.GetComponentInParent<slippy>().enabled = false;
             }
-            if (stationObject.GetComponentInParent<Slippy>() != null) {
-                stationObject.GetComponentInParent<Slippy>().enabled = false;
+            if (stationObject.GetComponentInParent<slippy>() != null) {
+                stationObject.GetComponentInParent<slippy>().enabled = false;
             }
 
             // now reset scale on all the cards under the canvas!
@@ -969,17 +930,16 @@ public class CardPlayer : MonoBehaviour {
             stationCard.stackNumber += 1;
 
             // reset some hoverscale info
-            //TODO replace with new scaling?
-            // addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
-            //  addedObject.GetComponent<HoverScale>().SlippyOff = true;
-            //  stationObject.GetComponent<HoverScale>().SlippyOff = true;
-            //  stationObject.GetComponent<HoverScale>().previousScale = Vector2.one;
+            addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
+            addedObject.GetComponent<HoverScale>().SlippyOff = true;
+            stationObject.GetComponent<HoverScale>().SlippyOff = true;
+            stationObject.GetComponent<HoverScale>().previousScale = Vector2.one;
 
             // add the canvas to the played card holder
             tempCanvas.transform.SetParent(dropZone.transform, false);
             tempCanvas.SetActive(true);
 
-            addedObject.GetComponent<Slippy>().enabled = false;
+            addedObject.GetComponent<slippy>().enabled = false;
         }
 
     }
@@ -1019,8 +979,8 @@ public class CardPlayer : MonoBehaviour {
     }
     public void ChangeScaleAndPosition(Vector2 scale, GameObject objToScale) {
         Transform parent = objToScale.transform.parent;
-        Slippy parentSlippy = objToScale.GetComponentInParent<Slippy>();
-        Slippy areaSlippy = objToScale.GetComponent<Slippy>();
+        slippy parentSlippy = objToScale.GetComponentInParent<slippy>();
+        slippy areaSlippy = objToScale.GetComponent<slippy>();
 
         if (parent != null && parentSlippy != null) {
             objToScale.transform.SetParent(null, true);
@@ -1216,7 +1176,7 @@ public class CardPlayer : MonoBehaviour {
         foreach (Updates update in updates) {
             GameObject facility;
             Facility selectedFacility = null;
-          //  int index = -1;
+            int index = -1;
             Debug.Log("number of active facilities are " + ActiveFacilities.Count);
 
             // find unique facility in facilities list

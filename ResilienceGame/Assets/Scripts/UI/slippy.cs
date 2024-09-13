@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-public class Slippy : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler {
+public class slippy : MonoBehaviour, IDragHandler, IScrollHandler, IBeginDragHandler, IEndDragHandler {
     public GameObject gameCanvas;
     public GameObject DraggableObject;
     public float maxScale;
@@ -69,14 +69,14 @@ public class Slippy : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHa
         );
     }
 
-    //// Handles scrolling to zoom in/out
-    //public void OnScroll(PointerEventData pointer) {
-    //    Vector2 tempScale = DraggableObject.transform.localScale;
-    //    float scaleDelta = pointer.scrollDelta.y > 0 ? 0.05f : -0.05f;
-    //    tempScale += new Vector2(scaleDelta, scaleDelta);
-    //    DraggableObject.transform.localScale = tempScale;
-    //    EnforceScaleLimits();
-    //}
+    // Handles scrolling to zoom in/out
+    public void OnScroll(PointerEventData pointer) {
+        Vector2 tempScale = DraggableObject.transform.localScale;
+        float scaleDelta = pointer.scrollDelta.y > 0 ? 0.05f : -0.05f;
+        tempScale += new Vector2(scaleDelta, scaleDelta);
+        DraggableObject.transform.localScale = tempScale;
+        EnforceScaleLimits();
+    }
 
     // Handles dragging of the object
     public void OnDrag(PointerEventData eventData) {
