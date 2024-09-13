@@ -331,6 +331,8 @@ public class CardPlayer : MonoBehaviour {
         handSize++;
         tempCardObj.transform.position = tempPos2;
         tempCardObj.SetActive(true);
+
+
         if (!activeDeck.TryAdd(tempCard.UniqueID, tempCardObj)) {
             Debug.Log("number of cards in draw active deck are: " + activeDeck.Count);
             foreach (GameObject gameObject in activeDeck.Values) {

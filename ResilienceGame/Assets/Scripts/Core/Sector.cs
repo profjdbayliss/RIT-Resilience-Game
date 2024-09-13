@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
+using TMPro;
 
 public class Sector : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class Sector : MonoBehaviour
     public float blueMeeples;
     public float blackMeeples;
     public float purpleMeeples;
+
+    public const int STARTING_MEEPLES = 2;
+
+    public TextMeshProUGUI[] meeplesAmountText;
 
     // filename - directory path is assumed to be Application.streamingAssetsPath
     // extension is assumed to be csv
@@ -30,16 +35,27 @@ public class Sector : MonoBehaviour
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
         sectorName = sector;
-        blackMeeples = blueMeeples = purpleMeeples = 2;
-        facilities = new Facility[3];
+        blackMeeples = blueMeeples = purpleMeeples = STARTING_MEEPLES;
+        //facilities = new Facility[3];
 
-        for (int i = 0; i < sectorCanvas.transform.childCount; i++) // TODO: If children added change count to 3
-        {
-            facilities[i] = sectorCanvas.transform.GetChild(i).GetComponent<Facility>();
-            facilities[i].Initialize();
-            facilities[i].facilityCanvas = sectorCanvas.transform.GetChild(i).gameObject;
-            facilities[i].sectorItsAPartOf = this;
+        //for (int i = 0; i < sectorCanvas.transform.childCount; i++) // TODO: If children added change count to 3
+        //{
+        //    facilities[i] = sectorCanvas.transform.GetChild(i).GetComponent<Facility>();
+        //    facilities[i].Initialize();
+        //    facilities[i].facilityCanvas = sectorCanvas.transform.GetChild(i).gameObject;
+        //    facilities[i].sectorItsAPartOf = this;
+        //}
+        //I really don't like writing it like this but its ok i guess....
+        meeplesAmountText = sectorCanvas.transform.GetChild(3).GetComponentsInChildren<TextMeshProUGUI>();
+
+        //added a child so swapping to this
+        facilities = sectorCanvas.GetComponentsInChildren<Facility>();
+        foreach (Facility facility in facilities) {
+            facility.Initialize();
+            facility.sectorItsAPartOf = this;
+            facility.facilityCanvas = facility.gameObject;
         }
+
 
         CSVRead();
 
@@ -78,11 +94,20 @@ public class Sector : MonoBehaviour
             blueMeeples -= card.data.blueCost;
             blackMeeples -= card.data.blackCost;
             purpleMeeples -= card.data.purpleCost;
+            UpdateMeepleAmountUI();
             return true;
         }
         return false;
     }
-
+    private void UpdateMeepleAmountUI() {
+        meeplesAmountText[0].text = blackMeeples.ToString();
+        meeplesAmountText[1].text = blueMeeples.ToString();
+        meeplesAmountText[2].text = purpleMeeples.ToString();
+    }
+    public void ResetMeepleCount() {
+        blueMeeples = blackMeeples = purpleMeeples = STARTING_MEEPLES;
+        UpdateMeepleAmountUI();
+    }
     private void CSVRead()
     {
         fileLocation = Application.streamingAssetsPath + "/" + csvFileName;
