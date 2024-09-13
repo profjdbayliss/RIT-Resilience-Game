@@ -340,16 +340,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #region Update
     // Update is called once per frame
     void Update() {
-        //if (DEBUG_ENABLED) {
-        //    if (Keyboard.current.f1Key.wasPressedThisFrame) {
-        //        Debug.Log("Add card to hand");
-        //        actualPlayer.ForceDrawCard();
-        //    }
-        //    else if (Keyboard.current.f2Key.wasPressedThisFrame) {
-        //        Debug.Log("Add card to discard");
-        //        actualPlayer.ForceDiscardRandomCard();
-        //    }
-        //}
+        if (DEBUG_ENABLED) {
+            if (Keyboard.current.f1Key.wasPressedThisFrame) {
+                Debug.Log("Add card to hand");
+                actualPlayer.ForceDrawCard();
+            }
+            else if (Keyboard.current.f2Key.wasPressedThisFrame) {
+                Debug.Log("Add card to discard");
+                actualPlayer.ForceDiscardRandomCard();
+            }
+        }
         if (isInit) {
             if (gameStarted) {
                 HandlePhases(MGamePhase);
