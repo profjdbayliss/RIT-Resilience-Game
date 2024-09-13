@@ -84,7 +84,7 @@ public class CardPlayer : MonoBehaviour {
     public bool IsDraggingCard { get; private set; } = false;
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
-    public List<List<GameObject>> dropLocations = new();
+    public List<List<GameObject>> dropLocations = new List<List<GameObject>>();
 
     //Meeples
     // TODO: Move to Sector.cs if needed
