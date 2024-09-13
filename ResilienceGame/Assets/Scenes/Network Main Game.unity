@@ -1121,7 +1121,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -3837,6 +3837,7 @@ MonoBehaviour:
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
+  sectorItsAPartOf: {fileID: 0}
   effect: 0
   isDown: 0
 --- !u!1 &327071780
@@ -5777,6 +5778,7 @@ MonoBehaviour:
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
+  sectorItsAPartOf: {fileID: 0}
   effect: 0
   isDown: 0
 --- !u!1 &520008979
@@ -5913,7 +5915,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -13093,6 +13095,7 @@ MonoBehaviour:
   facilityName: 0
   products: 
   facilityCanvas: {fileID: 0}
+  sectorItsAPartOf: {fileID: 0}
   effect: 0
   isDown: 0
 --- !u!1 &1358697067
@@ -19118,8 +19121,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 270.5, y: -337.99997}
-  m_SizeDelta: {x: 1000, y: 210}
+  m_AnchoredPosition: {x: 270.5, y: -337.99994}
+  m_SizeDelta: {x: 1000, y: 268.5882}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2036154774
 MonoBehaviour:
@@ -20046,7 +20049,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

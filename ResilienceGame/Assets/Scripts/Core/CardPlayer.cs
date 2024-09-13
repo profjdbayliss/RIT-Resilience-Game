@@ -388,6 +388,9 @@ public class CardPlayer : MonoBehaviour {
                 //HandlePlayCard(card, hoveredDropLocation);
                 //set card state to played
                 card.state = CardState.CardDrawnDropped;
+                handPositioner.cards.Remove(card.gameObject);
+                card.transform.transform.SetParent(hoveredDropLocation.transform);
+                Debug.Log($"Set {card.front.name} State to CardDrawnDropped");
             }
             else {
                 //reset card positions
@@ -398,8 +401,9 @@ public class CardPlayer : MonoBehaviour {
         return null;
     }
     private bool ValidateCardPlay(Card card) {
-
-        var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
+        //TODO: reimplement card validation maybe or just leave it to playCard as before
+        // var canPlay = CardPlayValidator.CanPlayCard(this, card, hoveredDropLocation);
+        var canPlay = true;
 
         Debug.Log($"Playing {card} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
