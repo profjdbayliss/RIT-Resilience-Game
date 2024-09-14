@@ -23,7 +23,7 @@ public class Facility : MonoBehaviour
 
     public FacilityType facilityType;
     public string facilityName;
-    public PlayerSector[] dependancies;
+    public PlayerSector[] dependencies;
     public GameObject facilityCanvas;
     public Sector sectorItsAPartOf;
 
@@ -42,7 +42,7 @@ public class Facility : MonoBehaviour
     public void Initialize()
     {
         facilityCanvas = this.transform.gameObject;
-        dependancies = new PlayerSector[3];
+        dependencies = new PlayerSector[3];
         pointsUI = new TextMeshProUGUI[3];
         effect = FacilityEffect.None;
         for (int i = 0; i < 3; i++)
