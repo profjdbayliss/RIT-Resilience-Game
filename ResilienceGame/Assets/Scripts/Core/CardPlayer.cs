@@ -486,9 +486,14 @@ public class CardPlayer : MonoBehaviour {
         return canPlay;
     }
     private bool ValidateActionPlay(Card card) {
-        //if this is an "effect" card check the facility for the effects or whatever
-
-        //if its just a "facility" card - these dont apply effects? so we can just play as before
+        //check prereq effects on cards
+        if (card.data.preReqEffect != FacilityEffect.None) {
+            Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
+            if (facility.effect != card.data.preReqEffect) {
+                Debug.Log("Facility effect does not match card prereq effect");
+                return false;
+            }
+        }
         return playerSector.TrySpendMeeples(card, ref mMeeplesSpent); //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
     }
 
