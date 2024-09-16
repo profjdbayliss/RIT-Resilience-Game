@@ -8,6 +8,7 @@ using static UnityEngine.PlayerLoop.PreUpdate;
 using Image = UnityEngine.UI.Image;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using System.Linq;
 
 // Enum to track player type
 public enum PlayerTeam {
@@ -88,7 +89,7 @@ public class CardPlayer : MonoBehaviour {
     int facilityCount = 0;
     //Meeples
     // TODO: Move to Sector.cs if needed
-    public int blueMeepleCount= 2, blackMeepleCount= 2, purpleMeepleCount = 2;
+    public int blueMeepleCount = 2, blackMeepleCount = 2, purpleMeepleCount = 2;
     int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
@@ -368,24 +369,28 @@ public class CardPlayer : MonoBehaviour {
                 if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
                     isOverAnyDropLocation = true;
                     GameObject hoveredObject = kvp.Value;
-                    //  Debug.Log("Hovered over " + hoveredObject.name);
-                    // Handle fade in if we've moved over a facility
-                    if (kvp.Key.Contains("FacilityDropLocation")) {
-                        if (GameManager.instance.CanStationsBeHighlighted()) {
-                            currentHoveredFacility = kvp.Value;
-                            if (currentHoveredFacility != previousHoveredFacility) {
-                                if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                                    //  Debug.Log("Hightlight on");
-                                    hoverActivateObject.ActivateHover();
-                                }
-                                else {
-                                    Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
+                    // Debug.Log("Hovered over " + hoveredObject.name);
+
+                    //check if the card being dragged is a facility card
+                    if (handPositioner.CardsBeingDragged.First().target == CardTarget.Facility) {
+
+                        // Handle fade in if we've moved over a facility
+                        if (kvp.Key.Contains("FacilityDropLocation")) {
+                            if (GameManager.instance.CanStationsBeHighlighted()) {
+                                currentHoveredFacility = kvp.Value;
+                                if (currentHoveredFacility != previousHoveredFacility) {
+                                    if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                                        //Debug.Log("Hightlight on");
+                                        hoverActivateObject.ActivateHover();
+                                    }
+                                    else {
+                                        Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
+                                    }
                                 }
                             }
+                            hoveredObject = kvp.Value.transform.parent.gameObject;
                         }
-                        hoveredObject = kvp.Value.transform.parent.gameObject;
                     }
-
                     hoveredDropLocation = hoveredObject;
                     // Debug.Log("Hovered over " + hoveredDropLocation.name);
                     break;
@@ -421,12 +426,12 @@ public class CardPlayer : MonoBehaviour {
             if (cardDropLocations.ContainsKey(tag)) {
                 tag += ++facilityCount;
             }
-            cardDropLocations.Add(dropZone.tag, dropZone.gameObject);
+            cardDropLocations.Add(tag, dropZone.gameObject);
         }
-        
+
 
     }
-    public GameObject HandleCardDrop(Card card) {
+    public Card HandleCardDrop(Card card) {
 
         //  Debug.Log("CardPlayer HandleCardDrop");
 
@@ -439,9 +444,10 @@ public class CardPlayer : MonoBehaviour {
                 //HandlePlayCard(card, hoveredDropLocation);
                 //set card state to played
                 card.state = CardState.CardDrawnDropped;
-                handPositioner.cards.Remove(card.gameObject);
+                handPositioner.cards.Remove(card);
                 card.transform.transform.SetParent(hoveredDropLocation.transform);
                 Debug.Log($"Set {card.front.name} State to CardDrawnDropped");
+                return card;
             }
             else {
                 //reset card positions
@@ -466,7 +472,7 @@ public class CardPlayer : MonoBehaviour {
         return canPlay;
     }
     private bool CanDiscardCard() {
-        return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; 
+        return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS;
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?

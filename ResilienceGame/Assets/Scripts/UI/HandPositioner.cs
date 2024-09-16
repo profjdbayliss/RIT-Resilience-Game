@@ -20,7 +20,7 @@ public class CardHoverEvent : UnityEvent<Card> { }
 public class HandPositioner : MonoBehaviour {
 
     private CardHoverEvent onCardHover = new CardHoverEvent();
-    public List<GameObject> cards = new List<GameObject>();
+    public List<Card> cards = new List<Card>();
     public float arcRadius = 3300f;     //the size of the arc/curve the cards will be placed on
     public float arcAngle = 20f;
     public float cardAngle = 5f;
@@ -37,9 +37,10 @@ public class HandPositioner : MonoBehaviour {
     private const int MAX_CARDS = 10;
 
 
-    private GameObject currentHoveredCard;
+    public Card CurrentHoveredCard;
+    public Card DraggedCard;
     public bool IsDraggingCard { get; private set; } = false;
-    private HashSet<GameObject> cardsBeingDragged = new HashSet<GameObject>();
+    public HashSet<Card> CardsBeingDragged = new HashSet<Card>();
 
     private void Start() {
         rect = GetComponent<RectTransform>();
@@ -52,11 +53,11 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="card">The game object of the card being dragged</param>
     public void NotifyCardDragStart(GameObject card) {
-        cardsBeingDragged.Add(card);
+        CardsBeingDragged.Add(card.GetComponent<Card>());
         IsDraggingCard = true;
         card.transform.localRotation = Quaternion.identity;
-        if (currentHoveredCard == card) {
-            currentHoveredCard = null;
+        if (CurrentHoveredCard == card) {
+            CurrentHoveredCard = null;
         }
     }
 
@@ -76,7 +77,7 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="card">The card that was dropped</param>
     public void NotifyCardDragEnd(GameObject card) {
-        cardsBeingDragged.Remove(card);
+        CardsBeingDragged.Remove(card.GetComponent<Card>());
         IsDraggingCard = false;
         ////card was played somewhere, so we need to do something with it
         //var dropLoc = GameManager.instance.actualPlayer.hoveredDropLocation;
@@ -95,7 +96,7 @@ public class HandPositioner : MonoBehaviour {
     }
 
     public void DiscardCard(GameObject card) {
-        cards.Remove(card);
+        cards.Remove(card.GetComponent<Card>());
         //  Destroy(card);
     }
 
@@ -113,31 +114,31 @@ public class HandPositioner : MonoBehaviour {
     private void HandleNewCards() {
         // Get all the child cards of the hand positioner
         Card[] childCards = GetComponentsInChildren<Card>();
-        List<GameObject> newCards = new List<GameObject>();
+        List<Card> newCards = new List<Card>();
         foreach (Card card in childCards) {
-            newCards.Add(card.gameObject);
+            newCards.Add(card);
         }
 
         // Filter the cards list and create lists for new cards and cards to remove
-        List<GameObject> cardsToAdd = new List<GameObject>();
-        List<GameObject> cardsToRemove = new List<GameObject>();
+        List<Card> cardsToAdd = new List<Card>();
+        List<Card> cardsToRemove = new List<Card>();
 
         // Find cards to add
-        foreach (GameObject card in newCards) {
+        foreach (var card in newCards) {
             if (!cards.Contains(card)) {
                 cardsToAdd.Add(card);
             }
         }
 
         // Find cards to remove
-        foreach (GameObject card in cards) {
+        foreach (var card in cards) {
             if (!newCards.Contains(card)) {
                 cardsToRemove.Add(card);
             }
         }
 
         // Set the scale of the new cards to the default scale
-        foreach (GameObject card in cardsToAdd) {
+        foreach (var card in cardsToAdd) {
             card.transform.localScale = Vector3.one * defaultScale;
         }
 
@@ -149,7 +150,7 @@ public class HandPositioner : MonoBehaviour {
 
         // If there are cards to remove, remove them and update positions
         if (cardsToRemove.Count > 0) {
-            foreach (GameObject card in cardsToRemove) {
+            foreach (var card in cardsToRemove) {
                 cards.Remove(card);
             }
             UpdateCardPositions();
@@ -188,9 +189,9 @@ public class HandPositioner : MonoBehaviour {
 
         // Loop through all the cards and position them
         for (int i = 0; i < cardCount; i++) {
-            GameObject card = cards[i];
+            var card = cards[i];
             // Skip cards that are being dragged
-            if (cardsBeingDragged.Contains(card)) continue;
+            if (CardsBeingDragged.Contains(card)) continue;
 
             //calculate the angle and x position of the card
             float angle = startAngle + (i * angleStep);
@@ -202,7 +203,7 @@ public class HandPositioner : MonoBehaviour {
             Quaternion targetRotation = Quaternion.Euler(0, 0, -angle);
 
             //if the card is the current hover card, rotate it to straight and push it up a bit
-            if (card == currentHoveredCard) {
+            if (card == CurrentHoveredCard) {
                 targetPosition.y += hoverHeight;
                 targetRotation = Quaternion.identity;
             }
@@ -219,7 +220,7 @@ public class HandPositioner : MonoBehaviour {
                     Time.deltaTime * hoverTransitionSpeed));
 
             // Smooth scale transition
-            float targetScale = card == currentHoveredCard ? hoverScale : defaultScale;
+            float targetScale = card == CurrentHoveredCard ? hoverScale : defaultScale;
             card.transform.localScale = Vector3.Lerp(card.transform.localScale, Vector3.one * targetScale, Time.deltaTime * hoverTransitionSpeed);
         }
     }
@@ -232,25 +233,25 @@ public class HandPositioner : MonoBehaviour {
     /// Handles determining which card is being hovered over
     /// </summary>
     private void HandleHovering() {
-        GameObject newHoveredCard = null;
+        Card newHoveredCard = null;
 
         // If no cards are being dragged, check which card is under the mouse
-        if (cardsBeingDragged.Count == 0) {
+        if (CardsBeingDragged.Count == 0) {
             Vector2 localMousePosition = rect.InverseTransformPoint(Mouse.current.position.ReadValue());
             newHoveredCard = GetCardUnderMouse(localMousePosition.x);
         }
 
-        if (newHoveredCard != currentHoveredCard) {
-            currentHoveredCard = newHoveredCard;
+        if (newHoveredCard != CurrentHoveredCard) {
+            CurrentHoveredCard = newHoveredCard;
 
-            if (currentHoveredCard != null) {
-                currentHoveredCard.transform.SetAsLastSibling();
+            if (CurrentHoveredCard != null) {
+                CurrentHoveredCard.transform.SetAsLastSibling();
             }
             else {
                 ResetCardSiblingIndices();
             }
 
-            onCardHover.Invoke(currentHoveredCard?.GetComponent<Card>());
+            onCardHover.Invoke(CurrentHoveredCard?.GetComponent<Card>());
         }
     }
 
@@ -280,14 +281,14 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="mouseX">The local x position of the mouse</param>
     /// <returns>A game object, the card in the hand that is closest the the x position of the mouse</returns>
-    private GameObject GetCardUnderMouse(float mouseX) {
+    private Card GetCardUnderMouse(float mouseX) {
 
         if (!IsMouseInsideRect()) return null; //dont hover if the mouse is outside of the hand area
 
         float minDistance = float.MaxValue;
-        GameObject closestCard = null;
+        Card closestCard = null;
 
-        foreach (GameObject card in cards) {
+        foreach (var card in cards) {
             float cardX = card.transform.localPosition.x;
             float distance = Mathf.Abs(mouseX - cardX);
 

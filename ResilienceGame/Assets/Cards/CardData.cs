@@ -20,7 +20,6 @@ public struct CardData
 {
     public int numberInDeck;
     public CardType cardType;
-    public CardTarget playableTarget;
     public float percentSuccess;
     public int cardID;
     public int teamID; // TODO: Use for SD

@@ -577,6 +577,8 @@ public class GameManager : MonoBehaviour, IRGObservable
         }
         //Moved this from player setup so that it updates the opponents game canvas as well
         //is this correct?
+
+        // TODO: Set randomly
         actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
         actualPlayer.playerSector.Initialize(PlayerSector.Water);
 
