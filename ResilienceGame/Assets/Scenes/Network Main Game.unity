@@ -2599,7 +2599,7 @@ GameObject:
   - component: {fileID: 180208932}
   - component: {fileID: 180208933}
   - component: {fileID: 180208934}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: DiscardDrop
   m_TagString: DiscardDropLocation
   m_Icon: {fileID: 0}
@@ -6669,7 +6669,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 131.47559, y: -26.078789}
+  m_Offset: {x: 131.47559, y: -23.547882}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -6680,7 +6680,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1235.492, y: 214.76463}
+  m_Size: {x: 1235.492, y: 219.82645}
   m_EdgeRadius: 0
 --- !u!114 &520008986
 MonoBehaviour:
@@ -16727,7 +16727,7 @@ GameObject:
   - component: {fileID: 1599086100}
   - component: {fileID: 1599086099}
   m_Layer: 6
-  m_Name: Transmission Facility Box
+  m_Name: Production Facility Box
   m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16782,7 +16782,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 131.47559, y: -26.078789}
+  m_Offset: {x: 131.47559, y: -28.792175}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -16793,7 +16793,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1235.492, y: 214.76463}
+  m_Size: {x: 1235.492, y: 220.1914}
   m_EdgeRadius: 0
 --- !u!114 &1599086101
 MonoBehaviour:
@@ -19393,7 +19393,7 @@ GameObject:
   - component: {fileID: 1920413918}
   - component: {fileID: 1920413922}
   - component: {fileID: 1920413923}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: PlayerDropLocation
   m_TagString: FreePlayDropLocation
   m_Icon: {fileID: 0}

@@ -85,7 +85,7 @@ public class CardPlayer : MonoBehaviour {
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
-    public Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
+    private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
 
     int facilityCount = 0;
     //Meeples
@@ -362,68 +362,72 @@ public class CardPlayer : MonoBehaviour {
     }
     //updates the hoverDropLocation class field to hold the object the card is hovering over
     void UpdateHoveredDropLocation() {
-        GameObject currentHoveredFacility = null;
+        GameObject currentHoveredFacility = null; // Reset at the beginning of each update
         bool isOverAnyDropLocation = false;
         Vector2 mousePosition = Mouse.current.position.ReadValue();
-        Collider2D hoveredCollider = Physics2D.OverlapPoint(mousePosition, LayerMask.NameToLayer("Facility"));
-        Debug.Log(hoveredCollider?.name);
 
-        //check all drop locations to see if the mouse is over any of them
-        foreach (KeyValuePair<string, Collider2D> kvp in cardDropColliders) {
+        Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(mousePosition, LayerMask.GetMask("CardDrop"));
 
-            //grab colliders
-            var hoveredObject = kvp.Value;                                                                        // Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
-            if (hoveredObject.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
-                isOverAnyDropLocation = true;
-                GameObject hoveredGameObject = null;
-                // Debug.Log("Hovered over " + hoveredObject.name);
+        if (hoveredColliders != null && hoveredColliders.Length > 0) {
+            isOverAnyDropLocation = true;
+            Collider2D hoveredFacilityCollider = null;
 
-                //check if the card being dragged is a facility card
-                var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
-                if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
-
-                    hoveredGameObject = hoveredObject.gameObject;
-                    // Handle fade in if we've moved over a facility
-                    if (kvp.Key.Contains("FacilityDropLocation")) {
-                        if (GameManager.instance.CanStationsBeHighlighted()) {
-                            currentHoveredFacility = hoveredObject.gameObject;
-                            if (currentHoveredFacility != previousHoveredFacility) {
-                                if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                                    //Debug.Log("Hightlight on");
-                                    hoverActivateObject.ActivateHover();
-                                }
-                                else {
-                                    Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
-                                }
-                            }
-                        }
-                        hoveredGameObject = hoveredObject.transform.parent.gameObject;
+            // Check for a facility collider if there are multiple
+            if (hoveredColliders.Length == 2) {
+                foreach (var collider in hoveredColliders) {
+                    if (collider.CompareTag(CardDropZoneTag.FACILITY)) {
+                        hoveredFacilityCollider = collider;
+                        break;
                     }
                 }
-                hoveredDropLocation = hoveredGameObject;
-                // Debug.Log("Hovered over " + hoveredDropLocation.name);
-                break;
+                // If no facility collider is found, process the other collider
+                if (hoveredFacilityCollider == null) {
+                    hoveredFacilityCollider = hoveredColliders.First();
+                }
+            }
+            else {
+                // Only one collider, process that
+                hoveredFacilityCollider = hoveredColliders.First();
             }
 
+            // Process the hovered facility collider
+            if (hoveredFacilityCollider != null) {
+                var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
+                // Check if the card being dragged is a facility card
+                if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
+                    if (GameManager.instance.CanStationsBeHighlighted()) {
+                        // Activate the hover effect
+                        if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                            hoverActivateObject.ActivateHover();
+                            currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
+                        }
+                    }
+                }
+                hoveredDropLocation = hoveredFacilityCollider.gameObject;
+            }
         }
 
         // Handle fade out if we've moved off a facility
         if (previousHoveredFacility != null && previousHoveredFacility != currentHoveredFacility) {
             if (previousHoveredFacility.TryGetComponent(out HoverActivateObject previousHoverActivateObject)) {
-                //   Debug.Log("Highlight off");
                 previousHoverActivateObject.DeactivateHover();
             }
             else {
-                Debug.LogError("Missing hover on faciltiy " + previousHoverActivateObject.name);
+                Debug.LogError("Missing hover on facility " + previousHoveredFacility.name);
             }
         }
+
         // If we're not over any drop location, set hoveredDropLocation to null
         if (!isOverAnyDropLocation) {
             hoveredDropLocation = null;
         }
 
+       // Debug.Log("Hovered Drop Location: " + hoveredDropLocation);
+
+        // Update previous hovered facility
         previousHoveredFacility = currentHoveredFacility;
     }
+
     #endregion
     void InitDropLocations() {
 
@@ -454,7 +458,7 @@ public class CardPlayer : MonoBehaviour {
                 card.state = CardState.CardDrawnDropped;
                 handPositioner.cards.Remove(card);
                 card.transform.transform.SetParent(hoveredDropLocation.transform);
-                Debug.Log($"Set {card.front.name} State to CardDrawnDropped");
+                //Debug.Log($"Set {card.front.name} State to CardDrawnDropped");
                 return card;
             }
             else {
@@ -474,7 +478,10 @@ public class CardPlayer : MonoBehaviour {
             _ => false,
         };
         //var canPlay = true;
-
+        //deactivate the hover effect when dropping on a facility
+        if (hoveredDropLocation.CompareTag("FacilityDropLocation")) {
+            hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
+        }
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
         return canPlay;
