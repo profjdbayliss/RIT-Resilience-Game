@@ -8,6 +8,7 @@ using System.Linq;
 using Yarn.Unity;
 using System.Xml;
 using UnityEngine.InputSystem;
+using System.IO;
 
 public class GameManager : MonoBehaviour, IRGObservable
 {
@@ -21,6 +22,8 @@ public class GameManager : MonoBehaviour, IRGObservable
     public bool mCreateWaterAtlas = false;
     public List<Card> redCards;
     public List<Card> blueCards;
+
+    public List<string> messageLog = new List<string>();
 
     // where are we in game phases?
     public GamePhase MGamePhase = GamePhase.Start;
@@ -366,8 +369,9 @@ public class GameManager : MonoBehaviour, IRGObservable
                         // do nothing - most common scenario
                     } 
                     else
-                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetTotalMeeples())
+                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples())
                     {
+                        Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
                         mIsActionAllowed = false;
                         DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
                     } else
@@ -607,6 +611,20 @@ public class GameManager : MonoBehaviour, IRGObservable
         endGameCanvas.SetActive(true);
         endGameText.text = mPlayerName.text + " ends the game with score " + actualPlayer.GetScore() +
             " and " + mOpponentName.text + " ends the game with score " + opponentPlayer.GetScore();
+
+        
+    }
+    public void WriteListToFile(string filePath, List<string> stringList) {
+        // Ensure the directory exists
+        string directory = Path.GetDirectoryName(filePath);
+        if (!Directory.Exists(directory)) {
+            Directory.CreateDirectory(directory);
+        }
+
+        // Write all the lines to the file
+        File.WriteAllLines(filePath, stringList);
+
+        Debug.Log("File written successfully to: " + filePath);
     }
 
     public bool HasReceivedEndGame()
@@ -968,6 +986,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                 foreach (IRGObserver o in mObservers)
                 {
                     o.UpdateObserver(m);
+                    messageLog.Add(m.ToString());
                 }
             }
         }

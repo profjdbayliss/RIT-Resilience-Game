@@ -76,11 +76,11 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("click happened on card");
+        Debug.Log("click release on card");
         if (this.state == CardState.CardDrawn)
         {
             // note that click consumes the release of most drag and release motions
-            Debug.Log("potentially card dropped.");
+            //Debug.Log("potentially card dropped.");
             state = CardState.CardDrawnDropped;
             mDroppedPosition = new Vector2(this.transform.position.x, this.transform.position.y);
         }
@@ -117,6 +117,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     // Play all of a cards actions
     public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
     {
+        Debug.Log("Executing card actions");
         foreach(ICardAction action in ActionList)
         {
             action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);

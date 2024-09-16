@@ -84,14 +84,15 @@ public class CardPlayer : MonoBehaviour {
     public bool IsDraggingCard { get; private set; } = false;
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
+    private GameObject cardDroppedOnObject;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
     //private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
 
     int facilityCount = 0;
     //Meeples
     // TODO: Move to Sector.cs if needed
-    public int blueMeepleCount = 2, blackMeepleCount = 2, purpleMeepleCount = 2;
-    int mTotalMeepleValue = 0;
+   // public int blueMeepleCount = 2, blackMeepleCount = 2, purpleMeepleCount = 2;
+    //int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
     Vector2 discardDropMin;
@@ -422,7 +423,7 @@ public class CardPlayer : MonoBehaviour {
             hoveredDropLocation = null;
         }
 
-       // Debug.Log("Hovered Drop Location: " + hoveredDropLocation);
+        // Debug.Log("Hovered Drop Location: " + hoveredDropLocation);
 
         // Update previous hovered facility
         previousHoveredFacility = currentHoveredFacility;
@@ -454,6 +455,8 @@ public class CardPlayer : MonoBehaviour {
                 hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
             if (ValidateCardPlay(card)) {
+                //set var to hold where the card was dropped
+                cardDroppedOnObject = hoveredDropLocation;
                 //set card state to played
                 card.state = CardState.CardDrawnDropped;
                 //remove card from hand
@@ -482,11 +485,11 @@ public class CardPlayer : MonoBehaviour {
 
         return canPlay;
     }
-    
+
     private bool CanDiscardCard() {
         //draw phase checks if the player is discarding a card and if they havent discard more than allowed this phase
         if (GameManager.instance.MGamePhase == GamePhase.Draw) {
-            return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; 
+            return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS;
         }
         return GameManager.instance.MIsDiscardAllowed;  //if not in draw phase, discard is determined by the game manager
     }
@@ -659,98 +662,185 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public int GetTotalMeeples() {
-        return blueMeepleCount + purpleMeepleCount + blackMeepleCount;
+        return playerSector.GetTotalMeeples(); 
+    }
+    public int GetMaxMeeples() {
+        return playerSector.GetMaxMeeples();
     }
 
-    //TODO rework the AABB to use the hoveredDropZoneCollider
+    private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+        switch (phase) {
+            case GamePhase.Draw:
+                Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
+
+                // change parent and rescale
+                card.state = CardState.CardNeedsToBeDiscarded;
+                playCount = 1;
+                break;
+            case GamePhase.Action:
+                break;
+        }
+    }
+
+    private void HandleFacilityDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+        
+        Facility facility = FacilityPlayedOn();
+        Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
+        switch (phase) {
+            case GamePhase.Action:
+               // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
+                card.state = CardState.CardInPlay;
+                ActiveCards.Add(card.UniqueID, card.gameObject);
+                mUpdatesThisPhase.Add(new Updates {
+                    WhatToDo = AddOrRem.Add,
+                    UniqueFacilityID = card.UniqueID,
+                    CardID = card.data.cardID
+                });
+
+                card.Play(this, opponentPlayer, facility, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
+                playCount = 1;
+                playKey = card.UniqueID;
+
+                /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
+                {
+                    GameObject selected = GetHighlightedStation();
+                    Card selectedCard = selected.GetComponent<Card>();
+                    StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
+                    card.state = CardState.CardInPlay;
+                    ActiveCards.Add(card.UniqueID, gameObjectCard);
+
+                    selectedCard.ModifyingCards.Add(card.UniqueID);
+                    mUpdatesThisPhase.Add(new Updates
+                    {
+                        WhatToDo=AddOrRem.Add,
+                        UniqueFacilityID=selectedCard.UniqueID,
+                        CardID=card.data.cardID
+                    });
+
+                    // we should play the card's effects
+                    card.Play(this, opponentPlayer, selectedCard);
+                    playCount = 1;
+                    selectedCard.OutlineImage.SetActive(false);
+                    playKey = card.UniqueID;
+                }
+                else
+                {
+                    card.state = CardState.CardDrawn;
+                    manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
+                }*/
+                break;
+
+            //break;
+            default:
+                // we're not in the right phase, so
+                // reset the dropped state
+                //card.state = CardState.CardDrawn;
+                ResetCardToInHand(card);
+                break;
+        }
+    }
+    private Facility FacilityPlayedOn() {
+        Facility facility = null;
+        if (cardDroppedOnObject != null) {
+            facility = cardDroppedOnObject.GetComponentInParent<Facility>();
+        }
+        return facility;
+    }
+    private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+        Debug.Log($"Handling non facility card - {card.front.title}");
+        switch (phase) {
+            case GamePhase.Action:
+                card.state = CardState.CardInPlay;
+                ActiveCards.Add(card.UniqueID, card.gameObject);
+                mUpdatesThisPhase.Add(new Updates {
+                    WhatToDo = AddOrRem.Add,
+                    UniqueFacilityID = card.UniqueID,
+                    CardID = card.data.cardID
+                });
+
+                card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
+                playCount = 1;
+                playKey = card.UniqueID;
+                /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
+                {
+                    GameObject selected = GetHighlightedStation();
+                    Card selectedCard = selected.GetComponent<Card>();
+                    StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
+                    card.state = CardState.CardInPlay;
+                    ActiveCards.Add(card.UniqueID, gameObjectCard);
+
+                    selectedCard.ModifyingCards.Add(card.UniqueID);
+                    mUpdatesThisPhase.Add(new Updates
+                    {
+                        WhatToDo=AddOrRem.Add,
+                        UniqueFacilityID=selectedCard.UniqueID,
+                        CardID=card.data.cardID
+                    });
+
+                    // we should play the card's effects
+                    card.Play(this, opponentPlayer, selectedCard);
+                    playCount = 1;
+                    selectedCard.OutlineImage.SetActive(false);
+                    playKey = card.UniqueID;
+                }
+                else
+                {
+                    card.state = CardState.CardDrawn;
+                    manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
+                }*/
+                break;
+
+            //break;
+            default:
+                // we're not in the right phase, so
+                // reset the dropped state
+                //card.state = CardState.CardDrawn;
+                ResetCardToInHand(card);
+                break;
+        }
+    }
+
     public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
         int playCount = 0;
         int playKey = 0;
 
         if (HandCards.Count != 0) {
+            //Debug.Log(phase);
             foreach (GameObject gameObjectCard in HandCards.Values) {
                 Card card = gameObjectCard.GetComponent<Card>();
                 if (card.state == CardState.CardDrawnDropped) {
-                    Debug.Log("card dropped in cardhandle");
-                    // card has been dropped somewhere - where?
-                    Vector2 cardPosition = card.getDroppedPosition();
-
                     
+                    // card has been dropped somewhere - where?
+                    // Vector2 cardPosition = card.getDroppedPosition();
 
-                    // DO a AABB collision test to see if the card is on the discard drop
-                    if ((cardPosition.y < discardDropMax.y &&
-                       cardPosition.y > discardDropMin.y &&
-                       cardPosition.x < discardDropMax.x &&
-                       cardPosition.x > discardDropMin.x)) {
-                        switch (phase) {
-                            case GamePhase.Draw:
-                                Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
-
-                                // change parent and rescale
-                                card.state = CardState.CardNeedsToBeDiscarded;
-                                playCount = 1;
-                                break;
-                            case GamePhase.Action:
-                                break;
-                        }
-                    }
-
-                    // DO a AABB collision test to see if the card is on the player's drop
-                    else if (cardPosition.y < playedDropMax.y &&
-                       cardPosition.y > playedDropMin.y &&
-                       cardPosition.x < playedDropMax.x &&
-                       cardPosition.x > playedDropMin.x) {
-                        Debug.Log("collision with played area");
-                        switch (phase) {
-                            case GamePhase.Action:
-                                /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
-                                {
-                                    GameObject selected = GetHighlightedStation();
-                                    Card selectedCard = selected.GetComponent<Card>();
-                                    StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
-                                    card.state = CardState.CardInPlay;
-                                    ActiveCards.Add(card.UniqueID, gameObjectCard);
-
-                                    selectedCard.ModifyingCards.Add(card.UniqueID);
-                                    mUpdatesThisPhase.Add(new Updates
-                                    {
-                                        WhatToDo=AddOrRem.Add,
-                                        UniqueFacilityID=selectedCard.UniqueID,
-                                        CardID=card.data.cardID
-                                    });
-
-                                    // we should play the card's effects
-                                    card.Play(this, opponentPlayer, selectedCard);
-                                    playCount = 1;
-                                    selectedCard.OutlineImage.SetActive(false);
-                                    playKey = card.UniqueID;
-                                }
-                                else
-                                {
-                                    card.state = CardState.CardDrawn;
-                                    manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
-                                }*/
-                                break;
-
-                            //break;
-                            default:
-                                // we're not in the right phase, so
-                                // reset the dropped state
-                                //card.state = CardState.CardDrawn;
-                                ResetCardToInHand(card);
-                                break;
-                        }
-
-                    }
-
-                    else {
+                    if (cardDroppedOnObject == null) {
                         Debug.Log("card not dropped in card drop zone");
-                        // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
-                        //  gameObjectCard.transform.SetParent(handDropZone.transform, false);
-                        //  card.state = CardState.CardDrawn;
                         handPositioner.ReturnCardToHand(card);
                         gameObjectCard.GetComponentInParent<slippy>().enabled = true;
                         gameObjectCard.GetComponent<HoverScale>().Drop();
+                        return playCount;
+                       // Debug.LogError("Card was dropped on null object?");
+                    }
+                    Debug.Log("Valid card play made somewhere!");
+                    //check where the card was dropped based on the tag
+                    switch (cardDroppedOnObject.tag) {
+                        case CardDropZoneTag.DISCARD:
+                            HandleDiscardDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            break;
+                        case CardDropZoneTag.FACILITY:
+                            if (card.target == CardTarget.Facility || card.target == CardTarget.Effect) {
+                                HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            }
+                            else {
+                                HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey); 
+                            }
+                            break;
+                        default:
+                            Debug.Log("card not dropped in card drop zone");
+                            handPositioner.ReturnCardToHand(card);
+                            gameObjectCard.GetComponentInParent<slippy>().enabled = true;
+                            gameObjectCard.GetComponent<HoverScale>().Drop();
+                            break;
                     }
                 }
 
@@ -1206,7 +1296,8 @@ public class CardPlayer : MonoBehaviour {
         ActiveCards.Clear();
         ActiveFacilities.Clear();
         handSize = 0;
-        mTotalMeepleValue = 0;
+        //mTotalMeepleValue = 0;
+        //TODO: reset meeples? clear out sector? reset player sector?
         mMeeplesSpent = 0;
         mFinalScore = 0;
         mUpdatesThisPhase.Clear();
