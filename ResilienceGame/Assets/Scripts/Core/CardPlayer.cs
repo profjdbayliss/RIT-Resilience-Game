@@ -452,6 +452,10 @@ public class CardPlayer : MonoBehaviour {
             return null;
         }
         else {
+            //clear the hover effect
+            if (hoveredDropLocation.CompareTag("FacilityDropLocation")) {
+                hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
+            }
             if (ValidateCardPlay(card)) {
                 //HandlePlayCard(card, hoveredDropLocation);
                 //set card state to played
@@ -479,9 +483,7 @@ public class CardPlayer : MonoBehaviour {
         };
         //var canPlay = true;
         //deactivate the hover effect when dropping on a facility
-        if (hoveredDropLocation.CompareTag("FacilityDropLocation")) {
-            hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
-        }
+        
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
         return canPlay;
