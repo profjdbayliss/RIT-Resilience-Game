@@ -11,6 +11,8 @@ public class Sector : MonoBehaviour
     public PlayerSector sectorName; // TODO: Move playersector here
     public Facility[] facilities;
     public bool isCore;
+    public int overTimeCharges; //keeps track of the amount of times a sector can mandate overtime
+
     public float blueMeeples;
     public float blackMeeples;
     public float purpleMeeples;
@@ -57,6 +59,8 @@ public class Sector : MonoBehaviour
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
         sectorName = sector;
+        overTimeCharges = 3;
+
         blackMeeples = blueMeeples = purpleMeeples = STARTING_MEEPLES;
         //facilities = new Facility[3];
 
