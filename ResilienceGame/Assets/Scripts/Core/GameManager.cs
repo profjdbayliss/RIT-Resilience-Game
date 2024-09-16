@@ -612,7 +612,7 @@ public class GameManager : MonoBehaviour, IRGObservable
         endGameText.text = mPlayerName.text + " ends the game with score " + actualPlayer.GetScore() +
             " and " + mOpponentName.text + " ends the game with score " + opponentPlayer.GetScore();
 
-        
+        //WriteListToFile(Path.Combine(Application.streamingAssetsPath, "messages.log"), messageLog);
     }
     public void WriteListToFile(string filePath, List<string> stringList) {
         // Ensure the directory exists
@@ -986,7 +986,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                 foreach (IRGObserver o in mObservers)
                 {
                     o.UpdateObserver(m);
-                    messageLog.Add(m.ToString());
+                    //messageLog.Add(m.ToString()); not correct spot?
                 }
             }
         }
