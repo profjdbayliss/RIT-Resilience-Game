@@ -117,7 +117,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     // Play all of a cards actions
     public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
     {
-        Debug.Log("Executing card actions");
+        Debug.Log($"Executing card actions for card: {front.name}");
         foreach(ICardAction action in ActionList)
         {
             action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);

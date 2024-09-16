@@ -22,7 +22,7 @@ using System.Linq;
                                 case "ShuffleCardsFromDiscard":*/
 public class DrawAndDiscardCards : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " played.");
         // TODO: Get data from card reader to loop
@@ -32,8 +32,10 @@ public class DrawAndDiscardCards : ICardAction
         }
         // TODO: Select Card(s) to Discard / reactivate discard box
         player.DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
+
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -41,15 +43,15 @@ public class DrawAndDiscardCards : ICardAction
 
 public class ShuffleAndDrawCards : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " played to mitigate a card on the selected station.");
         // TODO: Get data from card reader to loop
         player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
         // TODO: Select Shuffled Card
-
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -57,12 +59,13 @@ public class ShuffleAndDrawCards : ICardAction
 
 public class ChangeNetworkPoints : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         facilityActedUpon.ChangeFacilityPoints("network", card.data.facilityAmount);
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -70,12 +73,13 @@ public class ChangeNetworkPoints : ICardAction
 
 public class ChangeFinancialPoints : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         facilityActedUpon.ChangeFacilityPoints("financial", card.data.facilityAmount);
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -83,12 +87,13 @@ public class ChangeFinancialPoints : ICardAction
 
 public class ChangePhysicalPoints : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         facilityActedUpon.ChangeFacilityPoints("physical", card.data.facilityAmount);
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -96,7 +101,7 @@ public class ChangePhysicalPoints : ICardAction
 
 public class AddEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         //need to find a way to implement amount of turns this effect is active for
         if(!facilityActedUpon.effectNegated)
@@ -106,9 +111,10 @@ public class AddEffect : ICardAction
             facilityActedUpon.AddOrRemoveEffect(card.data.effect, false);
             facilityActedUpon.effectNegated = false;
         }
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -116,12 +122,13 @@ public class AddEffect : ICardAction
 
 public class NegateEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         facilityActedUpon.effectNegated = true;
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -129,12 +136,13 @@ public class NegateEffect : ICardAction
 
 public class RemoveEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         facilityActedUpon.AddOrRemoveEffect(card.data.effect, false);
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -142,7 +150,7 @@ public class RemoveEffect : ICardAction
 
 public class SpreadEffect : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         for(int i = 0; i < facilityActedUpon.sectorItsAPartOf.facilities.Length; i++)
         {
@@ -150,9 +158,10 @@ public class SpreadEffect : ICardAction
             //and excluding it from this but i don't think its worth the effort
             facilityActedUpon.sectorItsAPartOf.facilities[i].effect = facilityActedUpon.effect; 
         }
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -160,14 +169,15 @@ public class SpreadEffect : ICardAction
 
 public class ChangeMeepleAmount : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         facilityActedUpon.sectorItsAPartOf.blackMeeples += card.data.meepleAmount;
         facilityActedUpon.sectorItsAPartOf.blueMeeples += card.data.meepleAmount;
         facilityActedUpon.sectorItsAPartOf.purpleMeeples += card.data.meepleAmount;
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -175,12 +185,12 @@ public class ChangeMeepleAmount : ICardAction
 
 public class IncreaseOvertimeAmount : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
-
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
@@ -194,7 +204,7 @@ public class IncreaseOvertimeAmount : ICardAction
 /// </summary>
 public class ShuffleCardsFromDiscard : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         GameObject[] cardsShuffledFromDiscard = new GameObject[5];
         if(player.Discards.Count == 0)
@@ -215,18 +225,18 @@ public class ShuffleCardsFromDiscard : ICardAction
             }
             player.HandCards.Add(key, cardsShuffledFromDiscard[i]);
         }
-
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
 
-public class ReduceCardCost : ICardAction
+public  class ReduceCardCost : ICardAction
 {
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         for (int i = 0; i < cardActedUpon.data.meepleType.Length; i++)
         {
@@ -249,9 +259,10 @@ public class ReduceCardCost : ICardAction
                     break;
             }
         }
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         Debug.Log("card " + card.front.title + " canceled.");
     }
