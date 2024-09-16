@@ -59,32 +59,31 @@ public class Facility : MonoBehaviour
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
     }
-    public void ChangeFacilityPoints(string target, int value)
-    {
+    public void ChangeFacilityPoints(string target, int value) {
         target = target.ToLower().Trim();
-        switch (target)
-        {
 
-            case "physical": 
+        switch (target) {
+            case "physical":
                 physicalPoints += value;
-                physicalPoints = (physicalPoints > maxPhysicalPoints) ? maxPhysicalPoints : (physicalPoints < 0) ? 0 : physicalPoints; //If any problems check here
-                                           // if >max                  //Set to max        //else if <0      //Set to 0  //Else set self
+                physicalPoints = Mathf.Clamp(physicalPoints, 0, maxPhysicalPoints);
                 break;
-            case "finacial": 
+            case "finacial":
                 finacialPoints += value;
-                finacialPoints = (finacialPoints > maxFinacialPoints) ? maxFinacialPoints : (finacialPoints < 0) ? 0 : finacialPoints;
+                finacialPoints = Mathf.Clamp(finacialPoints, 0, maxFinacialPoints);
                 break;
-            case "network": 
+            case "network":
                 networkPoints += value;
-                networkPoints = (networkPoints > maxNetworkPoints) ? maxNetworkPoints : (networkPoints < 0) ? 0 : networkPoints;
+                networkPoints = Mathf.Clamp(networkPoints, 0, maxNetworkPoints);
                 break;
         }
 
-        if (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0) { isDown = true; }
-        else { isDown = false; }
+        // Update isDown based on points
+        isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
 
         UpdateUI();
     }
+
+
 
     public void SetFacilityPoints(int physical, int finacial, int network)
     {
