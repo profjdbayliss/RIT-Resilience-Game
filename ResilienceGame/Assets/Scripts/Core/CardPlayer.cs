@@ -85,6 +85,7 @@ public class CardPlayer : MonoBehaviour {
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
+    public Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
 
     int facilityCount = 0;
     //Meeples
@@ -104,6 +105,7 @@ public class CardPlayer : MonoBehaviour {
     static int sUniqueIDCount = 0;
     int mFinalScore = 0;
     List<Updates> mUpdatesThisPhase = new List<Updates>(6);
+
 
 
 
@@ -362,43 +364,47 @@ public class CardPlayer : MonoBehaviour {
     void UpdateHoveredDropLocation() {
         GameObject currentHoveredFacility = null;
         bool isOverAnyDropLocation = false;
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Collider2D hoveredCollider = Physics2D.OverlapPoint(mousePosition, LayerMask.NameToLayer("Facility"));
+        Debug.Log(hoveredCollider?.name);
 
         //check all drop locations to see if the mouse is over any of them
-        foreach (KeyValuePair<string, GameObject> kvp in cardDropLocations) {
+        foreach (KeyValuePair<string, Collider2D> kvp in cardDropColliders) {
 
-            if (kvp.Value.TryGetComponent(out Collider2D collider)) {                       //grab colliders
-                                                                                            // Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
-                if (collider.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
-                    isOverAnyDropLocation = true;
-                    GameObject hoveredObject = kvp.Value;
-                    // Debug.Log("Hovered over " + hoveredObject.name);
+            //grab colliders
+            var hoveredObject = kvp.Value;                                                                        // Debug.Log("Checking for overlap with " + kvp.Value.name + " at " + Mouse.current.position.ReadValue());
+            if (hoveredObject.OverlapPoint(Mouse.current.position.ReadValue())) {            //see if the mouse is inside the collider
+                isOverAnyDropLocation = true;
+                GameObject hoveredGameObject = null;
+                // Debug.Log("Hovered over " + hoveredObject.name);
 
-                    //check if the card being dragged is a facility card
-                    var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
-                    if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
+                //check if the card being dragged is a facility card
+                var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
+                if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
 
-                        // Handle fade in if we've moved over a facility
-                        if (kvp.Key.Contains("FacilityDropLocation")) {
-                            if (GameManager.instance.CanStationsBeHighlighted()) {
-                                currentHoveredFacility = kvp.Value;
-                                if (currentHoveredFacility != previousHoveredFacility) {
-                                    if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                                        //Debug.Log("Hightlight on");
-                                        hoverActivateObject.ActivateHover();
-                                    }
-                                    else {
-                                        Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
-                                    }
+                    hoveredGameObject = hoveredObject.gameObject;
+                    // Handle fade in if we've moved over a facility
+                    if (kvp.Key.Contains("FacilityDropLocation")) {
+                        if (GameManager.instance.CanStationsBeHighlighted()) {
+                            currentHoveredFacility = hoveredObject.gameObject;
+                            if (currentHoveredFacility != previousHoveredFacility) {
+                                if (currentHoveredFacility.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                                    //Debug.Log("Hightlight on");
+                                    hoverActivateObject.ActivateHover();
+                                }
+                                else {
+                                    Debug.LogError("Missing hover on faciltiy " + kvp.Value.name);
                                 }
                             }
-                            hoveredObject = kvp.Value.transform.parent.gameObject;
                         }
+                        hoveredGameObject = hoveredObject.transform.parent.gameObject;
                     }
-                    hoveredDropLocation = hoveredObject;
-                    // Debug.Log("Hovered over " + hoveredDropLocation.name);
-                    break;
                 }
+                hoveredDropLocation = hoveredGameObject;
+                // Debug.Log("Hovered over " + hoveredDropLocation.name);
+                break;
             }
+
         }
 
         // Handle fade out if we've moved off a facility
@@ -410,8 +416,6 @@ public class CardPlayer : MonoBehaviour {
             else {
                 Debug.LogError("Missing hover on faciltiy " + previousHoverActivateObject.name);
             }
-
-
         }
         // If we're not over any drop location, set hoveredDropLocation to null
         if (!isOverAnyDropLocation) {
@@ -430,6 +434,7 @@ public class CardPlayer : MonoBehaviour {
                 tag += ++facilityCount;
             }
             cardDropLocations.Add(tag, dropZone.gameObject);
+            cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
 
 
@@ -715,7 +720,7 @@ public class CardPlayer : MonoBehaviour {
                                     manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
                                 }*/
                                 break;
-                            
+
                             //break;
                             default:
                                 // we're not in the right phase, so
@@ -726,7 +731,7 @@ public class CardPlayer : MonoBehaviour {
                         }
 
                     }
-                    
+
                     else {
                         Debug.Log("card not dropped in card drop zone");
                         // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again

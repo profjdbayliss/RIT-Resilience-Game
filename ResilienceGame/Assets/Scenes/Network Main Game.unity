@@ -1056,7 +1056,7 @@ GameObject:
   - component: {fileID: 92073679}
   - component: {fileID: 92073680}
   - component: {fileID: 92073681}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Distribution Facility Box
   m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
@@ -6548,7 +6548,7 @@ GameObject:
   - component: {fileID: 520008984}
   - component: {fileID: 520008985}
   - component: {fileID: 520008986}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Transmission Facility Box
   m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
@@ -16726,7 +16726,7 @@ GameObject:
   - component: {fileID: 1599086101}
   - component: {fileID: 1599086100}
   - component: {fileID: 1599086099}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Transmission Facility Box
   m_TagString: FacilityDropLocation
   m_Icon: {fileID: 0}
