@@ -91,7 +91,7 @@ public class CardPlayer : MonoBehaviour {
     int facilityCount = 0;
     //Meeples
     // TODO: Move to Sector.cs if needed
-   // public int blueMeepleCount = 2, blackMeepleCount = 2, purpleMeepleCount = 2;
+    // public int blueMeepleCount = 2, blackMeepleCount = 2, purpleMeepleCount = 2;
     //int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
@@ -173,7 +173,14 @@ public class CardPlayer : MonoBehaviour {
             int count = HandCards.Count;
             for (int i = 0; i < maxHandSize - count; i++) {
                 if (DeckIDs.Count > 0) {
-                    DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+                    DrawCard(
+                        random: true,
+                        cardId: 0,
+                        uniqueId: -1,
+                        deckToDrawFrom: ref DeckIDs,
+                        dropZone: handDropZone,
+                        allowSlippy: true,
+                        activeDeck: ref HandCards);
 
                 }
                 else {
@@ -673,7 +680,7 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public int GetTotalMeeples() {
-        return playerSector.GetTotalMeeples(); 
+        return playerSector.GetTotalMeeples();
     }
     public int GetMaxMeeples() {
         return playerSector.GetMaxMeeples();
@@ -694,12 +701,12 @@ public class CardPlayer : MonoBehaviour {
     }
 
     private void HandleFacilityDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
-        
+
         Facility facility = FacilityPlayedOn();
         Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
         switch (phase) {
             case GamePhase.Action:
-               // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
+                // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
                 card.state = CardState.CardInPlay;
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 mUpdatesThisPhase.Add(new Updates {
@@ -820,7 +827,7 @@ public class CardPlayer : MonoBehaviour {
             foreach (GameObject gameObjectCard in HandCards.Values) {
                 Card card = gameObjectCard.GetComponent<Card>();
                 if (card.state == CardState.CardDrawnDropped) {
-                    
+
                     // card has been dropped somewhere - where?
                     // Vector2 cardPosition = card.getDroppedPosition();
 
@@ -830,7 +837,7 @@ public class CardPlayer : MonoBehaviour {
                         gameObjectCard.GetComponentInParent<slippy>().enabled = true;
                         gameObjectCard.GetComponent<HoverScale>().Drop();
                         return playCount;
-                       // Debug.LogError("Card was dropped on null object?");
+                        // Debug.LogError("Card was dropped on null object?");
                     }
                     Debug.Log("Valid card play made somewhere!");
                     //check where the card was dropped based on the tag
@@ -843,7 +850,7 @@ public class CardPlayer : MonoBehaviour {
                                 HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
                             }
                             else {
-                                HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey); 
+                                HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
                             }
                             break;
                         default:
