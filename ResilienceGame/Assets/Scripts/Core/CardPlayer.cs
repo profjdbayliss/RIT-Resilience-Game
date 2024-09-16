@@ -205,6 +205,10 @@ public class CardPlayer : MonoBehaviour {
         card.transform.SetParent(discardDropZone.transform, false);
         card.transform.localPosition = new Vector3();
     }
+    //This is for testing to force draw a specific card
+    public void DisplayCardSelectionMenu() {
+
+    }
 
     public virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy,

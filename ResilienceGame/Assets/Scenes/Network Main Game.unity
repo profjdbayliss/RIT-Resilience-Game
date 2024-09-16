@@ -4124,6 +4124,7 @@ MonoBehaviour:
   - {fileID: 988311466}
   facilityNameText: {fileID: 310921094}
   effect: 0
+  effectNegated: 0
   isDown: 0
 --- !u!1 &327071780
 GameObject:
@@ -6532,6 +6533,7 @@ MonoBehaviour:
   - {fileID: 606468166}
   facilityNameText: {fileID: 96068603}
   effect: 0
+  effectNegated: 0
   isDown: 0
 --- !u!1 &520008979
 GameObject:
@@ -7944,9 +7946,6 @@ MonoBehaviour:
   cardStackingCanvas: {fileID: 2138364093}
   DeckName: 
   hoveredDropLocation: {fileID: 0}
-  blueMeepleCount: 0
-  blackMeepleCount: 0
-  purpleMeepleCount: 0
 --- !u!1 &689357524
 GameObject:
   m_ObjectHideFlags: 0
@@ -12933,9 +12932,6 @@ MonoBehaviour:
   cardStackingCanvas: {fileID: 2138364093}
   DeckName: 
   hoveredDropLocation: {fileID: 0}
-  blueMeepleCount: 0
-  blackMeepleCount: 0
-  purpleMeepleCount: 0
 --- !u!1 &1134896414
 GameObject:
   m_ObjectHideFlags: 0
@@ -13224,6 +13220,7 @@ MonoBehaviour:
   - {fileID: 470503063}
   facilityNameText: {fileID: 426345553}
   effect: 0
+  effectNegated: 0
   isDown: 0
 --- !u!114 &1186955220 stripped
 MonoBehaviour:
@@ -16651,7 +16648,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1598268462
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19115,6 +19112,7 @@ MonoBehaviour:
   sectorName: 0
   facilities: []
   isCore: 0
+  overTimeCharges: 0
   blueMeeples: 0
   blackMeeples: 0
   purpleMeeples: 0
@@ -21863,10 +21861,10 @@ MonoBehaviour:
   mCreateWaterAtlas: 0
   redCards: []
   blueCards: []
+  messageLog: []
   MGamePhase: 0
   playerDeckList: {fileID: 1570887177}
   gameStarted: 0
-  MNumberDiscarded: 0
   actualPlayer: {fileID: 1125198114}
   opponentPlayer: {fileID: 680164116}
   opponentPlayedZone: {fileID: 1445810747}
