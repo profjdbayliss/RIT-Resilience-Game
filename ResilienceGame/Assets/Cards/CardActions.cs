@@ -187,7 +187,7 @@ public class IncreaseOvertimeAmount : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        facilityActedUpon.sectorItsAPartOf.overTimeCharges++;
     }
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
