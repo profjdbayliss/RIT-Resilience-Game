@@ -478,12 +478,18 @@ public class CardPlayer : MonoBehaviour {
         var canPlay = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(),
             GamePhase.Bonus => false, //TODO get clarification on this phase
-            GamePhase.Action => playerSector.TrySpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
+            GamePhase.Action => ValidateActionPlay(card),
             _ => false,
         };
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
         return canPlay;
+    }
+    private bool ValidateActionPlay(Card card) {
+        //if this is an "effect" card check the facility for the effects or whatever
+        
+        //if its just a "facility" card - these dont apply effects? so we can just play as before
+        return playerSector.TrySpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
     }
 
     private bool CanDiscardCard() {
