@@ -191,10 +191,6 @@ public class CardReader : MonoBehaviour
                                     tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
                                     tempCard.ActionList.Add(new AddEffect());
                                     break;
-                                case "RemoveEffectByTeam":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new RemoveEffectByTeam());
-                                    break;
                                 case "NegateEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new NegateEffect());

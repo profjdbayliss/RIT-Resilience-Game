@@ -114,19 +114,6 @@ public class AddEffect : ICardAction
     }
 }
 
-public class RemoveEffectByTeam : ICardAction
-{
-    public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
-
-    }
-
-    public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
 public class NegateEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
