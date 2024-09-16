@@ -29,6 +29,28 @@ public class Sector : MonoBehaviour
 
     [SerializeField] private GameObject sectorCanvas;
     public RawImage icon;
+    public string spriteSheetName = "sectorIconAtlas.png";
+    public Texture2D texture;
+
+    private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
+        { PlayerSector.Communications, 3 },
+        { PlayerSector.Energy, 7 },
+        { PlayerSector.Water, 15 },
+        { PlayerSector.Information, 13 },
+        { PlayerSector.Chemical, 1 },
+        { PlayerSector.Commercial, 2 },
+        { PlayerSector.Manufacturing, 11 },
+        { PlayerSector.Dams, 4 },
+        { PlayerSector.Defense, 5 },
+        { PlayerSector.Emergency, 6 },
+        { PlayerSector.Financial, 8 },
+        { PlayerSector.Agriculture, 0 },
+        { PlayerSector.Government, 9 },
+        { PlayerSector.Healthcare, 10 },
+        { PlayerSector.Nuclear, 12 },
+        { PlayerSector.Transport, 14 }
+    };
+
 
     public void Initialize(PlayerSector sector)
     {
@@ -58,12 +80,46 @@ public class Sector : MonoBehaviour
 
 
         CSVRead();
+        UpdateFacilityDependencyIcons();
 
+        //assign sector icon
         Texture2D tex = new Texture2D(1, 1);
         byte[] tempBytes = File.ReadAllBytes(Application.streamingAssetsPath + "/Images/" + sector.ToString() + ".png");
         tex.LoadImage(tempBytes);
         icon.texture = tex;
         //Debug.Log(Application.streamingAssetsPath + "/images/" + sector.ToString() + ".png");
+    }
+    void UpdateFacilityDependencyIcons() {
+        string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
+        LoadTexture(filePath);
+
+        Sprite[] sprites = SliceSpriteSheet(texture, 256, 256, 4, 4); // Slices into 16 sprites
+
+        //assign the sprites to the facilities
+        foreach (Facility facility in facilities) {
+            for (int i = 0; i < facility.dependencies.Length; i++) {
+                facility.dependencyIcons[i].sprite = sprites[ICON_INDICIES[facility.dependencies[i]]];
+            }
+        }
+
+    }
+    void LoadTexture(string filePath) {
+        byte[] fileData = File.ReadAllBytes(filePath);
+        texture = new Texture2D(2, 2);
+        texture.LoadImage(fileData);
+    }
+
+    Sprite[] SliceSpriteSheet(Texture2D texture, int spriteWidth, int spriteHeight, int columns, int rows) {
+        Sprite[] sprites = new Sprite[columns * rows];
+
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < columns; x++) {
+                Rect rect = new Rect(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
+                sprites[y * columns + x] = Sprite.Create(texture, rect, new Vector2(0.5f, 0.5f));
+            }
+        }
+
+        return sprites;
     }
 
     public Facility[] CheckDownedFacilities()

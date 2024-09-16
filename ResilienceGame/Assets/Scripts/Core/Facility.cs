@@ -21,6 +21,7 @@ public class Facility : MonoBehaviour
         Distribution
     };
 
+
     public FacilityType facilityType;
     public string facilityName;
     public PlayerSector[] dependencies;

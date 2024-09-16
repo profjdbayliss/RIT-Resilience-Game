@@ -195,9 +195,9 @@ public class GameManager : MonoBehaviour, IRGObservable
             actualPlayer.playerTeam = PlayerTeam.Blue;
             actualPlayer.DeckName = "blue";
 
-            // TODO: Set randomly
-            actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
-            actualPlayer.playerSector.Initialize(PlayerSector.Water);
+            //// TODO: Set randomly
+            //actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
+            //actualPlayer.playerSector.Initialize(PlayerSector.Water);
         }
 
         // Initialize the deck info and set various
@@ -575,6 +575,10 @@ public class GameManager : MonoBehaviour, IRGObservable
             }
             opponentPlayer.InitializeCards();
         }
+        //Moved this from player setup so that it updates the opponents game canvas as well
+        //is this correct?
+        actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
+        actualPlayer.playerSector.Initialize(PlayerSector.Water);
 
         // in this game people go in parallel to each other
         // per phase
