@@ -265,6 +265,7 @@ public class CardReader : MonoBehaviour
                         // 6: set up the card title
                         // WORK: do we really need to set both of these?
                         tempCardFront.title = tempCardObj.name = individualCSVObjects[6];
+                        tempCard.data.name = individualCSVObjects[6];
 
                         // Set up the card color. Could be done using csv
                         switch (DeckName.ToLower())

@@ -189,6 +189,11 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
+    public virtual void ForceDrawSpecificCard(int id) {
+        if (DeckIDs.Count > 0) {
+            DrawCard(false, id, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+        }
+    }
 
     //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawCard() {
@@ -370,6 +375,28 @@ public class CardPlayer : MonoBehaviour {
 
         if (IsDraggingCard) {
             UpdateHoveredDropLocation();
+        }
+        if (GameManager.instance.DEBUG_ENABLED) {
+            if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
+                HandleMenuToggle();
+            }
+        }
+    }
+    public void HandleMenuToggle() {
+        if (this != GameManager.instance.actualPlayer) {
+            return;
+        }
+        var cardMenu = FindObjectOfType<CardSelectionMenu>();
+        if (cardMenu != null) {
+            if (cardMenu.IsMenuActive) {
+                Debug.Log("Hiding card selection menu");
+                cardMenu.DisableMenu();
+            }
+            else {
+                Debug.Log("Showing card selection menu");
+                var cardsList = new List<Card>(cards.Values);
+                cardMenu.EnableMenu(cardsList);
+            }
         }
     }
     //updates the hoverDropLocation class field to hold the object the card is hovering over
