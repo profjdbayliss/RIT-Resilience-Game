@@ -366,8 +366,9 @@ public class GameManager : MonoBehaviour, IRGObservable
                         // do nothing - most common scenario
                     } 
                     else
-                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetTotalMeeples())
+                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples())
                     {
+                        Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
                         mIsActionAllowed = false;
                         DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
                     } else

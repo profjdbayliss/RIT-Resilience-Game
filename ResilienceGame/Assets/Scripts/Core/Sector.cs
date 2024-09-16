@@ -89,6 +89,12 @@ public class Sector : MonoBehaviour
         icon.texture = tex;
         //Debug.Log(Application.streamingAssetsPath + "/images/" + sector.ToString() + ".png");
     }
+    public int GetTotalMeeples() {
+        return (int)(blueMeeples + blackMeeples + purpleMeeples);
+    }
+    public int GetMaxMeeples() {
+        return STARTING_MEEPLES * 3;
+    }
     void UpdateFacilityDependencyIcons() {
         string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
         LoadTexture(filePath);
