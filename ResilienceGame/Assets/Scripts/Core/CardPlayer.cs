@@ -97,8 +97,8 @@ public class CardPlayer : MonoBehaviour {
     Vector2 discardDropMax;
     Vector2 playedDropMin;
     Vector2 playedDropMax;
-    Vector2 opponentDropMin;
-    Vector2 opponentDropMax;
+    //Vector2 opponentDropMin;
+    //Vector2 opponentDropMax;
     // the var is static to make sure the id's don't overlap between
     // multiple card players
     static int sUniqueIDCount = 0;
@@ -133,12 +133,12 @@ public class CardPlayer : MonoBehaviour {
         playedDropMax.x = playedRectTransform.position.x + (playedRectTransform.rect.width / 2);
         playedDropMax.y = playedRectTransform.position.y + (playedRectTransform.rect.height / 2);
 
-        // playing on opponent area rectangle information
-        RectTransform opponentRectTransform = opponentDropZone.GetComponent<RectTransform>();
-        opponentDropMin.x = opponentRectTransform.position.x - (opponentRectTransform.rect.width / 2);
-        opponentDropMin.y = opponentRectTransform.position.y - (opponentRectTransform.rect.height / 2);
-        opponentDropMax.x = opponentRectTransform.position.x + (opponentRectTransform.rect.width / 2);
-        opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
+        //// playing on opponent area rectangle information
+        //RectTransform opponentRectTransform = opponentDropZone.GetComponent<RectTransform>();
+        //opponentDropMin.x = opponentRectTransform.position.x - (opponentRectTransform.rect.width / 2);
+        //opponentDropMin.y = opponentRectTransform.position.y - (opponentRectTransform.rect.height / 2);
+        //opponentDropMax.x = opponentRectTransform.position.x + (opponentRectTransform.rect.width / 2);
+        //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
 
@@ -465,7 +465,7 @@ public class CardPlayer : MonoBehaviour {
         var canPlay = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(),
             GamePhase.Bonus => false, //TODO get clarification on this phase
-            GamePhase.Action => playerSector.SpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not will also spend the meeples on the sector
+            GamePhase.Action => playerSector.SpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not, will also spend the meeples on the sector
             _ => false,
         };
         //var canPlay = true;
@@ -715,41 +715,7 @@ public class CardPlayer : MonoBehaviour {
                                     manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
                                 }*/
                                 break;
-                            //case GamePhase.Mitigate:
-                            /*if (card.data.cardType == CardType.Mitigation && CheckHighlightedStations())
-                            {
-                                Debug.Log("trying to mitigate");
-                                GameObject selected = GetHighlightedStation();
-                                Card selectedCard = selected.GetComponent<Card>();
-
-                                ActiveCards.Add(card.UniqueID, gameObjectCard);
-
-                                // we should play the card's effects
-                                card.Play(this, opponentPlayer, selectedCard);
-
-                                if (card.state == CardState.CardNeedsToBeDiscarded)
-                                {
-                                    //HandleDiscard(ActiveCards, playerDropZone, selectedCard.UniqueID, false);
-                                    //opponentPlayer.HandleDiscard(opponentPlayer.ActiveCards, playerDropZone, selectedCard.UniqueID, true);
-                                    DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, false, selectedCard.UniqueID);
-                                    opponentPlayer.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, selectedCard.UniqueID);
-                                    playCount = 1;
-                                    playKey = card.UniqueID;
-                                    selectedCard.OutlineImage.SetActive(false);
-                                }
-                                else
-                                {
-                                    // remove what we just added
-                                    ActiveCards.Remove(card.UniqueID);
-                                    card.state = CardState.CardDrawn;
-                                    manager.DisplayGameStatus("Please select a card that can mitigate a vulnerability card on a chosen facility.");
-                                }
-                            }
-                            else
-                            {
-                                card.state = CardState.CardDrawn;
-                                manager.DisplayGameStatus("Please select a single opponent facility and play a vulnerability card.");
-                            }*/
+                            
                             //break;
                             default:
                                 // we're not in the right phase, so
@@ -760,65 +726,7 @@ public class CardPlayer : MonoBehaviour {
                         }
 
                     }
-                    else if (cardPosition.y < opponentDropMax.y &&
-                       cardPosition.y > opponentDropMin.y &&
-                       cardPosition.x < opponentDropMax.x &&
-                       cardPosition.x > opponentDropMin.x) {
-                        Debug.Log("card dropped in opponent zone");
-                        switch (phase) {
-                            //case GamePhase.Vulnerability:
-                            /* if (card.data.cardType == CardType.Vulnerability && opponentPlayer.CheckHighlightedStations() &&
-                                 ((mValueSpentOnVulnerabilities + card.data.blueCost) <= mTotalFacilityValue))
-                             {
-                                 GameObject selected = opponentPlayer.GetHighlightedStation();
-                                 Card selectedCard = selected.GetComponent<Card>();
-                                 if (!DuplicateCardPlayed(selectedCard, card))
-                                 {
-                                     StackCards(selected, gameObjectCard, opponentDropZone, GamePhase.Vulnerability);
-                                     card.state = CardState.CardInPlay;
-                                     ActiveCards.Add(card.UniqueID, gameObjectCard);
-
-                                     selectedCard.AttackingCards.Add(new CardIDInfo
-                                     {
-                                         CardID = card.data.cardID,
-                                         UniqueID = card.UniqueID
-                                     });
-                                     mUpdatesThisPhase.Add(new Updates
-                                     {
-                                         WhatToDo = AddOrRem.Add,
-                                         UniqueFacilityID = selectedCard.UniqueID,
-                                         CardID = card.data.cardID
-                                     });
-
-                                     // we don't play vuln effects until the attack phase
-                                     playCount = 1;
-                                     playKey = card.UniqueID;
-                                     selectedCard.OutlineImage.SetActive(false);
-                                     mValueSpentOnVulnerabilities += card.data.blueCost;
-                                     Debug.Log("Amount spent on vuln is " + mValueSpentOnVulnerabilities + " with total facility worth of " + mTotalFacilityValue);
-
-                                 }
-                                 else
-                                 {
-                                     card.state = CardState.CardDrawn;
-                                     manager.DisplayGameStatus("Can't play multiples of the same card on a station.");
-
-                                 }
-                             }
-                             else
-                             {
-                                 card.state = CardState.CardDrawn;
-                                 manager.DisplayGameStatus("Please select a single opponent facility and play a vulnerability card less than the total worth of your facility cards.");
-                             }*/
-                            //break;
-                            default:
-                                // we're not in the right phase, so
-                                // reset the dropped state
-                                //card.state = CardState.CardDrawn;
-                                ResetCardToInHand(card);
-                                break;
-                        }
-                    }
+                    
                     else {
                         Debug.Log("card not dropped in card drop zone");
                         // If it fails, parent it back to the hand location and then set its state to be in hand and make it grabbable again
