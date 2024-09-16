@@ -85,7 +85,7 @@ public class CardPlayer : MonoBehaviour {
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
-    private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
+    //private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
 
     int facilityCount = 0;
     //Meeples
@@ -438,15 +438,12 @@ public class CardPlayer : MonoBehaviour {
                 tag += ++facilityCount;
             }
             cardDropLocations.Add(tag, dropZone.gameObject);
-            cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
+            //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
 
 
     }
     public Card HandleCardDrop(Card card) {
-
-        //  Debug.Log("CardPlayer HandleCardDrop");
-
         if (hoveredDropLocation == null) {
             Debug.Log("No drop location found");
             return null;
@@ -457,12 +454,12 @@ public class CardPlayer : MonoBehaviour {
                 hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
             if (ValidateCardPlay(card)) {
-                //HandlePlayCard(card, hoveredDropLocation);
                 //set card state to played
                 card.state = CardState.CardDrawnDropped;
+                //remove card from hand
                 handPositioner.cards.Remove(card);
+                //set the parent to where it was played
                 card.transform.transform.SetParent(hoveredDropLocation.transform);
-                //Debug.Log($"Set {card.front.name} State to CardDrawnDropped");
                 return card;
             }
             else {
@@ -478,18 +475,20 @@ public class CardPlayer : MonoBehaviour {
         var canPlay = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(),
             GamePhase.Bonus => false, //TODO get clarification on this phase
-            GamePhase.Action => playerSector.SpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not, will also spend the meeples on the sector
+            GamePhase.Action => playerSector.TrySpendMeeples(card, ref mMeeplesSpent), //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
             _ => false,
         };
-        //var canPlay = true;
-        //deactivate the hover effect when dropping on a facility
-        
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
 
         return canPlay;
     }
+    
     private bool CanDiscardCard() {
-        return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS;
+        //draw phase checks if the player is discarding a card and if they havent discard more than allowed this phase
+        if (GameManager.instance.MGamePhase == GamePhase.Draw) {
+            return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS; 
+        }
+        return GameManager.instance.MIsDiscardAllowed;  //if not in draw phase, discard is determined by the game manager
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?
@@ -663,6 +662,7 @@ public class CardPlayer : MonoBehaviour {
         return blueMeepleCount + purpleMeepleCount + blackMeepleCount;
     }
 
+    //TODO rework the AABB to use the hoveredDropZoneCollider
     public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
         int playCount = 0;
         int playKey = 0;
@@ -674,6 +674,8 @@ public class CardPlayer : MonoBehaviour {
                     Debug.Log("card dropped in cardhandle");
                     // card has been dropped somewhere - where?
                     Vector2 cardPosition = card.getDroppedPosition();
+
+                    
 
                     // DO a AABB collision test to see if the card is on the discard drop
                     if ((cardPosition.y < discardDropMax.y &&
