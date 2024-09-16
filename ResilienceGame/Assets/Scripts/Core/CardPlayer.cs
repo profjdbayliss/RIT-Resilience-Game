@@ -374,7 +374,8 @@ public class CardPlayer : MonoBehaviour {
                     // Debug.Log("Hovered over " + hoveredObject.name);
 
                     //check if the card being dragged is a facility card
-                    if (handPositioner.CardsBeingDragged.First().target == CardTarget.Facility) {
+                    var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
+                    if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
 
                         // Handle fade in if we've moved over a facility
                         if (kvp.Key.Contains("FacilityDropLocation")) {
