@@ -234,6 +234,8 @@ public class CardPlayer : MonoBehaviour {
         Card tempCard = tempCardObj.GetComponent<Card>();
         tempCard.cardZone = dropZone;
         tempCard.data = actualCard.data;
+        tempCard.ActionList = new List<ICardAction>(actualCard.ActionList); // Copy action list
+        tempCard.target = actualCard.target; // Copy the target type
         if (uniqueId != -1) {
             tempCard.UniqueID = uniqueId;
             Debug.Log("setting unique id for facility " + uniqueId);
