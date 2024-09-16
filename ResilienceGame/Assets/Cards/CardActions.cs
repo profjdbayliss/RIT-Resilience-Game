@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 // TODO: Rewrite card actions for Sector Down
 /*
@@ -192,10 +193,35 @@ public class IncreaseOvertimeAmount : ICardAction
     }
 }
 
+/// <summary>
+/// Takes 5 random cards from Discard and adds them back into the hand.
+/// NOTE: At the moment, the number 5 is hard coded cause there's only one card that
+/// has this mechanic but a new variable would have to be created if this were to be 
+/// expanded upon.
+/// </summary>
 public class ShuffleCardsFromDiscard : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        GameObject[] cardsShuffledFromDiscard = new GameObject[5];
+        if(player.Discards.Count == 0)
+        {
+            Debug.LogWarning("The discard pile is empty");
+            return;
+        }
+
+        for(int i = 0; i < cardsShuffledFromDiscard.Length; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, player.Discards.Count);
+            cardsShuffledFromDiscard[i] = player.Discards.ElementAt(randomIndex).Value;
+            int key = player.Discards.ElementAt(randomIndex).Key;
+            player.Discards.Remove(key);
+            while(player.HandCards.ContainsKey(key))
+            {
+                key++;
+            }
+            player.HandCards.Add(key, cardsShuffledFromDiscard[i]);
+        }
 
     }
 
@@ -237,5 +263,37 @@ public class ReduceCardCost : ICardAction
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
+
+public class HelperMethods
+{
+    // Function to get a random GameObject from the Discards dictionary
+    public GameObject GetRandomDiscard(Dictionary<int, GameObject> Discards)
+    {
+        if (Discards.Count == 0)
+        {
+            Debug.LogWarning("Discards dictionary is empty.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, Discards.Count);
+        return Discards.ElementAt(randomIndex).Value;
+    }
+
+    // Function to remove an object from Discards when given the correct key
+    public bool RemoveDiscard(int key, Dictionary<int, GameObject> Discards)
+    {
+        if (Discards.ContainsKey(key))
+        {
+            Discards.Remove(key);
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning($"No discard found with key: {key}");
+            return false;
+        }
+    }
+}
+
 
 
