@@ -42,9 +42,10 @@ public class GameManager : MonoBehaviour, IRGObservable
     // var's for game rules
     public readonly int MAX_DISCARDS = 3;
     public readonly int MAX_DEFENSE = 1;
-    public int MNumberDiscarded = 0;
+
+    public int MNumberDiscarded { get; private set; } = 0;
     int mNumberDefense = 0;
-    bool mIsDiscardAllowed = false;
+    public bool MIsDiscardAllowed { get; private set; } = false;
     bool mIsActionAllowed = false;
     bool mReceivedEndGame = false;
     bool mStartGameRun = false;
@@ -290,7 +291,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                 {
                     //reset player discard amounts
                     
-                    mIsDiscardAllowed = true;
+                    MIsDiscardAllowed = true;
                     // draw cards if necessary
                     actualPlayer.DrawCards();
                     // set the discard area to work if necessary
@@ -309,7 +310,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                     }
                     else
                     {
-                        if (mIsDiscardAllowed)
+                        if (MIsDiscardAllowed)
                         {
                             MNumberDiscarded += actualPlayer.HandlePlayCard(GamePhase.Draw, opponentPlayer);
                         }
@@ -698,7 +699,7 @@ public class GameManager : MonoBehaviour, IRGObservable
                     actualPlayer.DrawCards();
                     // set the discard area to work if necessary
                     actualPlayer.discardDropZone.SetActive(false);
-                    mIsDiscardAllowed = false;
+                    MIsDiscardAllowed = false;
 
                     // clear any remaining drops since we're ending the phase now
                     actualPlayer.ClearDropState();
@@ -1022,7 +1023,7 @@ public class GameManager : MonoBehaviour, IRGObservable
         gameStarted = false;
         MNumberDiscarded = 0;
         mNumberDefense = 0;
-        mIsDiscardAllowed = false;
+        MIsDiscardAllowed = false;
         mIsActionAllowed = false;
         mReceivedEndGame = false;
         mStartGameRun = false;

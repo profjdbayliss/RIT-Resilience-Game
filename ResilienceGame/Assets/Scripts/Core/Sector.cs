@@ -145,7 +145,7 @@ public class Sector : MonoBehaviour
             card.data.blackCost <= blackMeeples &&
             card.data.purpleCost <= purpleMeeples;
     }
-    public bool SpendMeeples(Card card, ref int numMeeplesSpent) {
+    public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
         if (CanAffordCardPlay(card)) {
             blueMeeples -= card.data.blueCost;
             blackMeeples -= card.data.blackCost;
