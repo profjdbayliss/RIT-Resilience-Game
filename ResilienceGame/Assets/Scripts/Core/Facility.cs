@@ -36,6 +36,7 @@ public class Facility : MonoBehaviour
     [SerializeField] private TextMeshProUGUI facilityNameText;
 
     public FacilityEffect effect;
+    public bool effectNegated;
 
     public bool isDown;
 
@@ -46,6 +47,8 @@ public class Facility : MonoBehaviour
         dependencies = new PlayerSector[3];
         pointsUI = new TextMeshProUGUI[3];
         effect = FacilityEffect.None;
+        effectNegated = false;
+
         for (int i = 0; i < 3; i++)
         {
             pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();

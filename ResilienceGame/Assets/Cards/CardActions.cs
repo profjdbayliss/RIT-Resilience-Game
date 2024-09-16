@@ -99,7 +99,13 @@ public class AddEffect : ICardAction
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         //need to find a way to implement amount of turns this effect is active for
-        facilityActedUpon.AddOrRemoveEffect(card.data.effect, true);
+        if(!facilityActedUpon.effectNegated)
+            facilityActedUpon.AddOrRemoveEffect(card.data.effect, true);
+        else
+        {
+            facilityActedUpon.AddOrRemoveEffect(card.data.effect, false);
+            facilityActedUpon.effectNegated = false;
+        }
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
@@ -125,7 +131,7 @@ public class NegateEffect : ICardAction
 {
     public void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
-
+        facilityActedUpon.effectNegated = true;
     }
 
     public void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
@@ -264,36 +270,6 @@ public class ReduceCardCost : ICardAction
     }
 }
 
-public class HelperMethods
-{
-    // Function to get a random GameObject from the Discards dictionary
-    public GameObject GetRandomDiscard(Dictionary<int, GameObject> Discards)
-    {
-        if (Discards.Count == 0)
-        {
-            Debug.LogWarning("Discards dictionary is empty.");
-            return null;
-        }
-
-        int randomIndex = UnityEngine.Random.Range(0, Discards.Count);
-        return Discards.ElementAt(randomIndex).Value;
-    }
-
-    // Function to remove an object from Discards when given the correct key
-    public bool RemoveDiscard(int key, Dictionary<int, GameObject> Discards)
-    {
-        if (Discards.ContainsKey(key))
-        {
-            Discards.Remove(key);
-            return true;
-        }
-        else
-        {
-            Debug.LogWarning($"No discard found with key: {key}");
-            return false;
-        }
-    }
-}
 
 
 
