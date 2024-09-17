@@ -60,6 +60,7 @@ public enum DiscardFromWhere {
 
 public class CardPlayer : MonoBehaviour {
     // Establish necessary fields
+    public string playerName;
     public GameManager manager;
     public PlayerTeam playerTeam = PlayerTeam.Any;
     public Sector playerSector;
