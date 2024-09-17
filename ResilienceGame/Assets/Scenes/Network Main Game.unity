@@ -1539,6 +1539,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonPrefab: {fileID: 8156651783898354202, guid: f686284b7e42d4146a2a33d13f398d9c, type: 3}
   buttonContainer: {fileID: 459485743}
+  blueButtonColor: {r: 0.38922507, g: 0.5857397, b: 0.754717, a: 1}
+  redButtonColor: {r: 0.7075472, g: 0.35822353, b: 0.35822353, a: 1}
 --- !u!1 &107734141
 GameObject:
   m_ObjectHideFlags: 0
