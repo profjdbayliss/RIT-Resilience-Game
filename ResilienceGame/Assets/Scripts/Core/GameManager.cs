@@ -9,6 +9,7 @@ using Yarn.Unity;
 using System.Xml;
 using UnityEngine.InputSystem;
 using System.IO;
+using System;
 
 public class GameManager : MonoBehaviour, IRGObservable {
     //allow for spawning of cards
@@ -51,6 +52,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     bool mIsActionAllowed = false;
     bool mReceivedEndGame = false;
     bool mStartGameRun = false;
+
+    bool isDoomClockActive = false;
 
     // has everything been set?
     bool isInit = false;
@@ -114,6 +117,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     static bool hasStartedAlready = false;
 
+    public static event Action OnRoundEnd;
 
     public void Awake() {
         instance = this;
@@ -825,7 +829,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 nextPhase = GamePhase.Draw;
                 break;
             case GamePhase.Draw:
-                nextPhase = GamePhase.Bonus;
+                nextPhase = isDoomClockActive ? GamePhase.Bonus : GamePhase.Action; //skip bonus phase outside of doom clock
                 break;
             case GamePhase.Bonus:
                 nextPhase = GamePhase.Action;
@@ -837,6 +841,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     nextPhase = GamePhase.End;
                 }
                 else {
+                    //invoke event for round end to inform all observers of the end of the round
+                    OnRoundEnd?.Invoke();
                     nextPhase = GamePhase.Draw;
                 }
                 break;
