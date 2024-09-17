@@ -7,8 +7,9 @@ public class FacilityEffectManager {
     public Facility facility;
     private bool hasNegatedEffectThisRound = false;
 
-    public FacilityEffectManager() {
+    public FacilityEffectManager(Facility facility) {
         activeEffects = new List<FacilityEffect>();
+        this.facility = facility;
     }
 
     public List<FacilityEffect> GetEffects() {
