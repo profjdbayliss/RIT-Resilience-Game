@@ -174,21 +174,63 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                         // we've played so we're no longer on the ready list
                         int playerIndex = localPlayerID;
                         playerTurnTakenFlags[playerIndex] = true;
+
+                        PlayerTeam localPlayerTeam = playerTypes[playerIndex];
+
                         // find next player to ok to play and send them a message
-                        int nextPlayerId = -1;
-                        for (int i = 0; i < playerTurnTakenFlags.Count; i++)
+                        int nextRedPlayerId = -1;
+                        int nextBluePlayerId = -1;
+
+                        bool isItRedTurn = true;
+                        if (localPlayerTeam == PlayerTeam.Red)
+                            isItRedTurn = manager.myTurn;
+                        else if (localPlayerTeam == PlayerTeam.Blue)
+                            isItRedTurn = !manager.myTurn;
+                            
+                        if(isItRedTurn)
                         {
-                            if (!playerTurnTakenFlags[i])
+                            for (int i = 0; i < playerTurnTakenFlags.Count; i++)
                             {
-                                nextPlayerId = i;
-                                Debug.Log("first player not done is " + i);
-                                break;
+                                if (playerTypes[i] == PlayerTeam.Red)
+                                {
+                                    if (!playerTurnTakenFlags[i])
+                                    {
+                                        nextRedPlayerId = i;
+                                        Debug.Log("first red player not done is " + i);
+                                        break;
+                                    }
+                                }
+                                else
+                                    continue;
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < playerTurnTakenFlags.Count; i++)
+                            {
+                                if (playerTypes[i] == PlayerTeam.Blue)
+                                {
+                                    if (!playerTurnTakenFlags[i])
+                                    {
+                                        nextBluePlayerId = i;
+                                        Debug.Log("first player not done is " + i);
+                                        break;
+                                    }
+                                }
+                                else
+                                    continue;
                             }
                         }
 
-                        if (nextPlayerId == -1)
+                        if (nextRedPlayerId == -1 || nextBluePlayerId == -1)
                         {
-                            Debug.Log("update observer everybody has ended phase!");
+                            if(isItRedTurn)
+                            {
+                                Debug.Log("update observer everybody on the red team has ended phase!");
+
+                            }
+                            
+                            //TUNING OUT FOR TODAY MUKUND OF 9/18 START CODING FROM HERE
                             GamePhase nextPhase = manager.GetNextPhase();
 
                             // need to increment the turn and set all the players to ready again
