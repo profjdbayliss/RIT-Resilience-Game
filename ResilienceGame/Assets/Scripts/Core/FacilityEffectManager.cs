@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class FacilityEffectManager {
     private List<FacilityEffect> activeEffects;
@@ -62,27 +63,50 @@ public class FacilityEffectManager {
     public void RemoveAllEffects() {
         activeEffects.Clear();
     }
-    //called by the facility's add/remove method
-    public void AddEffect(FacilityEffectType effectType, FacilityEffectTarget target, int magnitude, int duration = -1) {
-        if (facility.IsFortified && effectType == FacilityEffectType.ReducePoints && !hasNegatedEffectThisRound) {
+
+    public void AddEffect(FacilityEffect effect) {
+        Debug.Log("Facility effect manager recieved new effect to add: " + effect.ToString());
+        
+        if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {   //Null reference?
             hasNegatedEffectThisRound = true;
             return;
         }
-
-        FacilityEffect existingEffect = activeEffects.Find(e => e.EffectType == effectType && e.Target == target && e.Magnitude == magnitude);
+        FacilityEffect existingEffect = activeEffects.Find(e => e.CreatedEffectID == effect.CreatedEffectID);
 
         if (existingEffect != null) {
             existingEffect.AddStack();
             ApplyAddedEffect(existingEffect);
         }
         else {
-            FacilityEffect newEffect = new FacilityEffect(effectType, target, magnitude, duration);
+            //deep copy to new effect object
+            FacilityEffect newEffect = new FacilityEffect(effect.EffectType, effect.Target, effect.Magnitude, effect.Duration);
             activeEffects.Add(newEffect);
             ApplyAddedEffect(newEffect);
         }
-
-
     }
+
+    //called by the facility's add/remove method
+    //public void AddEffect(FacilityEffectType effectType, FacilityEffectTarget target, int magnitude, int duration = -1) {
+    //    Debug.Log("Facility effect manager recieved new effect to add: " + effectType + " " + target + " " + magnitude + " " + duration);
+    //    if (facility.IsFortified && effectType == FacilityEffectType.ReducePoints && !hasNegatedEffectThisRound) {
+    //        hasNegatedEffectThisRound = true;
+    //        return;
+    //    }
+
+    //    FacilityEffect existingEffect = activeEffects.Find(e => e.EffectType == effectType && e.Target == target && e.Magnitude == magnitude);
+
+    //    if (existingEffect != null) {
+    //        existingEffect.AddStack();
+    //        ApplyAddedEffect(existingEffect);
+    //    }
+    //    else {
+    //        FacilityEffect newEffect = new FacilityEffect(effectType, target, magnitude, duration);
+    //        activeEffects.Add(newEffect);
+    //        ApplyAddedEffect(newEffect);
+    //    }
+
+
+    //}
 
     //public void RemoveEffect(FacilityEffectType effectType, FacilityEffectTarget target, int magnitude) {
     //    FacilityEffect existingEffect = activeEffects.Find(e => e.EffectType == effectType && e.Target == target && e.Magnitude == magnitude);
@@ -125,7 +149,7 @@ public class FacilityEffectManager {
         }
     }
 
-    public void ApplyAddedEffect(FacilityEffect effect) {
+    private void ApplyAddedEffect(FacilityEffect effect) {
         switch (effect.EffectType) {
             case FacilityEffectType.Backdoor:
                 AddRemoveBackdoor();
@@ -153,6 +177,7 @@ public class FacilityEffectManager {
     #region Effect Functions
 
     void ChangeFacilityPoints(FacilityEffectTarget target, int magnitude, bool remove = false, bool negative = false) {
+        Debug.Log("changing facility points due to effect add/remove");
         int value = magnitude * (negative ? -1 : 1) * (remove ? -1 : 1);
         facility.ChangeFacilityPoints(target.ToString(), value);
     }

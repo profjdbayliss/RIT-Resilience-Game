@@ -113,7 +113,7 @@ public class Facility : MonoBehaviour
     {
 
         if (isAddingEffect) {
-            effectManager.AddEffect(effectToAdd.EffectType, effectToAdd.Target, effectToAdd.Magnitude, effectToAdd.Duration);
+            effectManager.AddEffect(effectToAdd);
         }
         else {
             effectManager.RemoveEffectByCreatedId(effectToAdd.CreatedEffectID);
@@ -126,6 +126,7 @@ public class Facility : MonoBehaviour
     //called by the Card.Play() function
     public void AddRemoveEffectByID(int id, bool isAddingEffect, FacilityTeam team) {
         FacilityEffect effect = FacilityEffect.CreateEffectFromID(id);
+        effect.CreatedByTeam = team;
         AddOrRemoveEffect(effect, isAddingEffect, team);
     }
     public void AddRemoveAllEffectsByIdString(string idString, bool isAddingEffect, FacilityTeam team) {

@@ -20,12 +20,15 @@ public enum FacilityEffectType {
 }
 public enum FacilityTeam {
     Blue,
-    Red
+    Red,
+    None
 }
 
 public class FacilityEffect {
     public FacilityEffectType EffectType { get; private set; }
     public FacilityEffectTarget Target { get; private set; }
+
+    public FacilityTeam CreatedByTeam { get; set; } = FacilityTeam.None;
     public int Magnitude { get; private set; } // Integer magnitude instead of enum
     public int Duration { get; set; }  // -1 for infinite
     public int Stack { get; private set; } = 1;
@@ -126,6 +129,7 @@ public class FacilityEffect {
         if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
             duration = 3;
         }
+        Debug.Log($"Creating effect: {effectType}, {target}, {amount}, {duration}");
         return new FacilityEffect(effectType, target, amount, duration);
     }
 
