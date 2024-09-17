@@ -94,21 +94,8 @@ public class ChangePhysicalPoints : ICardAction {
 
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        ////need to find a way to implement amount of turns this effect is active for
-        //if(!facilityActedUpon.effectNegated)
-        //    facilityActedUpon.AddOrRemoveEffect(card.data.effect, true);
-        //else
-        //{
-        //    facilityActedUpon.AddOrRemoveEffect(card.data.effect, false);
-        //    facilityActedUpon.effectNegated = false;
-        //}
-        var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityEffectType.Blue : FacilityEffectType.Red;
-        var effectsToAdd = card.data.effectNames.Split(';')
-                    .Select(effectName => (FacilityEffect)Enum.Parse(typeof(FacilityEffect), effectName))
-                    .ToList();
-        effectsToAdd.ForEach(effect => {
-            facilityActedUpon.AddOrRemoveEffect(effect, true, effectType);
-        });
+        FacilityTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
+        
 
         
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
@@ -122,13 +109,10 @@ public class AddEffect : ICardAction {
 //TODO: These are the same, should be combined, difference is handled in the FacilityEffectManager
 public class NegateEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        var effectList = facilityActedUpon.effectManager.GetEffects();
-        var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityEffectType.Blue : FacilityEffectType.Red;
-        //creating this to remove random effect from the facility - almost definitely not the best way to do this, player should get to chose
-        if (effectList.Count > 0) {
-            var randomEffect = effectList[UnityEngine.Random.Range(0, effectList.Count)];
-            facilityActedUpon.AddOrRemoveEffect(effectToAdd: randomEffect.effect, isAddingEffect: false, effectType);
-        }
+       
+        var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
+        
+        facilityActedUpon.AddRemoveAllEffectsByIdString(card.data.effectIds, true, effectType);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -140,12 +124,13 @@ public class NegateEffect : ICardAction {
 public class RemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         var effectList = facilityActedUpon.effectManager.GetEffects();
-        var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityEffectType.Blue : FacilityEffectType.Red;
+        var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
         //creating this to remove random effect from the facility - almost definitely not the best way to do this, player should get to chose
         if (effectList.Count > 0) {
             var randomEffect = effectList[UnityEngine.Random.Range(0, effectList.Count)];
-            facilityActedUpon.AddOrRemoveEffect(effectToAdd: randomEffect.effect, isAddingEffect: false, effectType);
+            facilityActedUpon.AddRemoveEffectByID(randomEffect.CreatedEffectID, false, effectType);
         }
+
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

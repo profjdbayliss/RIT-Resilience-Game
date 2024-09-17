@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -84,8 +85,11 @@ public class Facility : MonoBehaviour
         UpdateUI();
     }
 
-    public bool HasEffect(FacilityEffect effect) {
-        return effectManager.HasEffect(effect);
+    public bool HasEffect(FacilityEffectType type, FacilityEffectTarget target) {
+        return effectManager.HasEffect(type, target);
+    }
+    public bool HasEffect(int id) {
+        return effectManager.HasEffect(id);
     }
 
     public void SetFacilityPoints(int physical, int finacial, int network)
@@ -101,17 +105,34 @@ public class Facility : MonoBehaviour
         var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
         effectIcon.color = newColor;
     }
-    public void NegateEffect(FacilityEffect effectToNegate, FacilityEffectType type) {
-        effectManager.NegateEffect(effectToNegate, type);
+    public void NegateEffect(FacilityEffect effectToNegate) {
+        effectManager.NegateEffect(effectToNegate);
     }
-    public void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect, FacilityEffectType type)
+    //called below after creating the effect from ID
+    private void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect, FacilityTeam type)
     {
 
         if (isAddingEffect) {
-            effectManager.AddEffect(effectToAdd, type);
+            effectManager.AddEffect(effectToAdd.EffectType, effectToAdd.Target, effectToAdd.Magnitude, effectToAdd.Duration);
         }
         else {
-            effectManager.RemoveEffect(effectToAdd);
+            effectManager.RemoveEffectByCreatedId(effectToAdd.CreatedEffectID);
+        }
+    }
+    private void RemoveEffectByCreatedId(int id) {
+        effectManager.RemoveEffectByCreatedId(id);
+        
+    }
+    //called by the Card.Play() function
+    public void AddRemoveEffectByID(int id, bool isAddingEffect, FacilityTeam team) {
+        FacilityEffect effect = FacilityEffect.CreateEffectFromID(id);
+        AddOrRemoveEffect(effect, isAddingEffect, team);
+    }
+    public void AddRemoveAllEffectsByIdString(string idString, bool isAddingEffect, FacilityTeam team) {
+        var effectsToAdd = idString.Split(';').ToList().Select(s => int.Parse(s));
+        
+        foreach (var effectId in effectsToAdd) {
+            AddRemoveEffectByID(effectId, isAddingEffect, team);
         }
     }
 

@@ -175,7 +175,7 @@ public class CardReader : MonoBehaviour {
                                     break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.data.effectNames = individualCSVObjects[19];
+                                    tempCard.data.effectIds = individualCSVObjects[19];
                                     tempCard.ActionList.Add(new AddEffect());
                                     break;
                                 case "NegateEffect":
@@ -185,7 +185,7 @@ public class CardReader : MonoBehaviour {
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
-                                    tempCard.data.effectNames = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
+                                    tempCard.data.effectIds = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
                                     tempCard.ActionList.Add(new RemoveEffect());
                                     break;
                                 case "SpreadEffect":
@@ -320,13 +320,13 @@ public class CardReader : MonoBehaviour {
 
                         // 19:  Effect
                         //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19].Trim());
-                        tempCard.data.effectNames = individualCSVObjects[19].Trim();
+                        tempCard.data.effectIds = individualCSVObjects[19].Trim();
 
-                        // 20:  Number of Effects
+                        // 20:  Number of Effects TODO: this line is wrong in csv if its actually used anywhere
                         tempCard.data.effectCount = int.Parse(individualCSVObjects[20].Trim());
 
                         // 21:  Prereq Effect
-                        tempCard.data.preReqEffect = (FacilityEffect)int.Parse(individualCSVObjects[21].Trim());
+                        tempCard.data.preReqEffectId = int.Parse(individualCSVObjects[21].Trim());
 
                         // 22:  Duration
                         tempCard.data.duration = int.Parse(individualCSVObjects[22].Trim());
