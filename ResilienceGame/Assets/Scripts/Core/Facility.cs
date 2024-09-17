@@ -1,16 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum FacilityEffect
-{
-    None,
-    Backdoor,
-    Fortify,
-    MeepleReduction
-}
+
 
 public class Facility : MonoBehaviour
 {
@@ -35,22 +30,25 @@ public class Facility : MonoBehaviour
 
     private TextMeshProUGUI[] pointsUI;
     [SerializeField] private TextMeshProUGUI facilityNameText;
-    [SerializeField] private Image effectIcon;
-    public FacilityEffect effect;
-    public bool effectNegated;
+    public Image effectIcon;
+    public FacilityEffectManager effectManager;
+    // public FacilityEffect effect;
+    //   public bool effectNegated;
 
     public bool isDown;
+    public bool IsFortified { get; set; } = false;
+    public bool IsBackdoored { get; set; } = false;
 
-    
 
     // Start is called before the first frame update
     public void Initialize()
     {
+        effectManager = new FacilityEffectManager();
         facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
         pointsUI = new TextMeshProUGUI[3];
-        effect = FacilityEffect.None;
-        effectNegated = false;
+     //   effect = FacilityEffect.None;
+     //   effectNegated = false;
 
         for (int i = 0; i < 3; i++)
         {
@@ -86,7 +84,9 @@ public class Facility : MonoBehaviour
         UpdateUI();
     }
 
-
+    public bool HasEffect(FacilityEffect effect) {
+        return effectManager.HasEffect(effect);
+    }
 
     public void SetFacilityPoints(int physical, int finacial, int network)
     {
@@ -96,26 +96,23 @@ public class Facility : MonoBehaviour
 
         UpdateUI();
     }
-
-    private Color ToggleColorAlpha(Color color) {
-        return color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
+    public void ToggleEffectImageAlpha() {
+        Color color = effectIcon.color;
+        var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
+        effectIcon.color = newColor;
     }
-    public void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect)
+    public void NegateEffect(FacilityEffect effectToNegate, FacilityEffectType type) {
+        effectManager.NegateEffect(effectToNegate, type);
+    }
+    public void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect, FacilityEffectType type)
     {
 
         if (isAddingEffect) {
-            effect = effectToAdd;
-            effectIcon.sprite = effectToAdd switch {
-                FacilityEffect.Backdoor => Sector.EffectSprites[0],
-                FacilityEffect.Fortify => Sector.EffectSprites[1],
-                _ => null
-            };
-            
+            effectManager.AddEffect(effectToAdd, type);
         }
         else {
-            effect = FacilityEffect.None; 
+            effectManager.RemoveEffect(effectToAdd);
         }
-        effectIcon.color = ToggleColorAlpha(effectIcon.color);
     }
 
     private void UpdateUI()
@@ -128,5 +125,26 @@ public class Facility : MonoBehaviour
         {
             // TODO: Change UI to show that the facility is down
         }
+    }
+
+    public void LogFacilityDebug() {
+        StringBuilder facilityInfo = new StringBuilder();
+        facilityInfo.Append($"Facility Name: {facilityName} ");
+        facilityInfo.Append($"Physical Points: {physicalPoints}/{maxPhysicalPoints} ");
+        facilityInfo.Append($"Financial Points: {finacialPoints}/{maxFinacialPoints} ");
+        facilityInfo.Append($"Network Points: {networkPoints}/{maxNetworkPoints} ");
+
+        var effects = effectManager.GetEffects();
+        if (effects.Count > 0) {
+            facilityInfo.Append("Active Effects: ");
+            foreach (var effect in effects) {
+                facilityInfo.Append(effect.ToString()).Append(" ");
+            }
+        }
+        else {
+            facilityInfo.Append("No active effects.");
+        }
+
+        Debug.Log(facilityInfo.ToString());
     }
 }

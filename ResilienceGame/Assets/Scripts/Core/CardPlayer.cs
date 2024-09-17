@@ -381,6 +381,9 @@ public class CardPlayer : MonoBehaviour {
             if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
                 HandleMenuToggle();
             }
+            if (Mouse.current.rightButton.wasReleasedThisFrame) {
+                TryLogFacilityInfo();
+            }
         }
     }
     public void HandleMenuToggle() {
@@ -528,7 +531,7 @@ public class CardPlayer : MonoBehaviour {
         //check prereq effects on cards
         if (card.data.preReqEffect != FacilityEffect.None) {
             Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
-            if (facility.effect != card.data.preReqEffect) {
+            if (!facility.HasEffect(card.data.preReqEffect)) {
                 Debug.Log("Facility effect does not match card prereq effect");
                 return false;
             }
@@ -1353,5 +1356,15 @@ public class CardPlayer : MonoBehaviour {
         mMeeplesSpent = 0;
         mFinalScore = 0;
         mUpdatesThisPhase.Clear();
+    }
+    void TryLogFacilityInfo() {
+        if (this != GameManager.instance.actualPlayer) return;
+        var hitFacility = cardDropLocations.Values.ToList().Find(x => x.GetComponent<Collider2D>().OverlapPoint(Mouse.current.position.ReadValue()));
+        if (hitFacility) {
+            var faciltiy = hitFacility.GetComponentInParent<Facility>();
+            if (faciltiy) {
+                faciltiy.LogFacilityDebug(); 
+            }
+        }
     }
 }
