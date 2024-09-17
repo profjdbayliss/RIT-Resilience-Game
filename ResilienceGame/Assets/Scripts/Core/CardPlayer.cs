@@ -516,7 +516,7 @@ public class CardPlayer : MonoBehaviour {
         //much simpler card validation
         var canPlay = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(),
-            GamePhase.Bonus => false, //turn only happens during overtime? where you can allocate overtime
+            GamePhase.Bonus => false, //turn only happens during Doomclock? where you can allocate overtime
             GamePhase.Action => ValidateActionPlay(card),
             _ => false,
         };
@@ -554,6 +554,7 @@ public class CardPlayer : MonoBehaviour {
         mMeeplesSpent = 0;
     }
 
+    #region old
     public void HandleAttackPhase(CardPlayer opponent) {
         List<int> facilitiesToRemove = new List<int>(8);
 
@@ -639,7 +640,8 @@ public class CardPlayer : MonoBehaviour {
         DiscardAllInactiveCards(DiscardFromWhere.MyFacility, false, -1);
 
     }
-
+    #endregion
+  
     public GameObject GetActiveCardObject(CardIDInfo cardIdInfo) {
         GameObject cardObject = null;
         if (ActiveCards.ContainsKey(cardIdInfo.UniqueID)) {

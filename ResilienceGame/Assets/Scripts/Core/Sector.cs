@@ -32,7 +32,12 @@ public class Sector : MonoBehaviour
     [SerializeField] private GameObject sectorCanvas;
     public RawImage icon;
     public string spriteSheetName = "sectorIconAtlas.png";
-    public Texture2D texture;
+    public Texture2D iconAtlasTexture;
+
+    private const string BACKDOOR_ICON_PATH = "images/Backdoor.png";
+    private const string FORTIFY_ICON_PATH = "images/Fortified.png";
+    public static Sprite[] EffectSprites;
+   
 
     private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
         { PlayerSector.Communications, 3 },
@@ -56,6 +61,7 @@ public class Sector : MonoBehaviour
 
     public void Initialize(PlayerSector sector)
     {
+        InitEffectSprites();
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
         sectorName = sector;
@@ -101,9 +107,9 @@ public class Sector : MonoBehaviour
     }
     void UpdateFacilityDependencyIcons() {
         string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
-        LoadTexture(filePath);
+        LoadIconAtlasTexture(filePath);
 
-        Sprite[] sprites = SliceSpriteSheet(texture, 256, 256, 4, 4); // Slices into 16 sprites
+        Sprite[] sprites = SliceSpriteSheet(iconAtlasTexture, 256, 256, 4, 4); // Slices into 16 sprites
 
         //assign the sprites to the facilities
         foreach (Facility facility in facilities) {
@@ -113,10 +119,10 @@ public class Sector : MonoBehaviour
         }
 
     }
-    void LoadTexture(string filePath) {
+    void LoadIconAtlasTexture(string filePath) {
         byte[] fileData = File.ReadAllBytes(filePath);
-        texture = new Texture2D(2, 2);
-        texture.LoadImage(fileData);
+        iconAtlasTexture = new Texture2D(2, 2);
+        iconAtlasTexture.LoadImage(fileData);
     }
 
     Sprite[] SliceSpriteSheet(Texture2D texture, int spriteWidth, int spriteHeight, int columns, int rows) {
@@ -130,6 +136,41 @@ public class Sector : MonoBehaviour
         }
 
         return sprites;
+    }
+    private void InitEffectSprites() {
+        EffectSprites = new Sprite[2];
+
+        // Load Backdoor icon
+        string backdoorFilePath = Path.Combine(Application.streamingAssetsPath, BACKDOOR_ICON_PATH);
+        Texture2D backdoorTexture = LoadTextureFromFile(backdoorFilePath);
+        if (backdoorTexture != null) {
+            EffectSprites[0] = Sprite.Create(backdoorTexture, new Rect(0, 0, backdoorTexture.width, backdoorTexture.height), new Vector2(0.5f, 0.5f));
+        }
+
+        // Load Fortified icon
+        string fortifyFilePath = Path.Combine(Application.streamingAssetsPath, FORTIFY_ICON_PATH);
+        Texture2D fortifyTexture = LoadTextureFromFile(fortifyFilePath);
+        if (fortifyTexture != null) {
+            EffectSprites[1] = Sprite.Create(fortifyTexture, new Rect(0, 0, fortifyTexture.width, fortifyTexture.height), new Vector2(0.5f, 0.5f));
+        }
+    }
+
+    // Helper function to load Texture2D from file
+    private Texture2D LoadTextureFromFile(string filePath) {
+        if (File.Exists(filePath)) {
+            byte[] fileData = File.ReadAllBytes(filePath);
+            Texture2D texture = new Texture2D(2, 2);
+            if (texture.LoadImage(fileData)) {
+                return texture;
+            }
+            else {
+                Debug.LogError("Failed to load image from: " + filePath);
+            }
+        }
+        else {
+            Debug.LogError("File not found: " + filePath);
+        }
+        return null;
     }
 
     public Facility[] CheckDownedFacilities()

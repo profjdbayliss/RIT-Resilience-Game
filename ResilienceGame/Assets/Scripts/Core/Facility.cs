@@ -32,13 +32,16 @@ public class Facility : MonoBehaviour
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     private int physicalPoints, finacialPoints, networkPoints;
+
     private TextMeshProUGUI[] pointsUI;
     [SerializeField] private TextMeshProUGUI facilityNameText;
-
+    [SerializeField] private Image effectIcon;
     public FacilityEffect effect;
     public bool effectNegated;
 
     public bool isDown;
+
+    
 
     // Start is called before the first frame update
     public void Initialize()
@@ -94,12 +97,25 @@ public class Facility : MonoBehaviour
         UpdateUI();
     }
 
+    private Color ToggleColorAlpha(Color color) {
+        return color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
+    }
     public void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect)
     {
-        if (isAddingEffect)
+
+        if (isAddingEffect) {
             effect = effectToAdd;
-        else
-            effect = FacilityEffect.None;
+            effectIcon.sprite = effectToAdd switch {
+                FacilityEffect.Backdoor => Sector.EffectSprites[0],
+                FacilityEffect.Fortify => Sector.EffectSprites[1],
+                _ => null
+            };
+            
+        }
+        else {
+            effect = FacilityEffect.None; 
+        }
+        effectIcon.color = ToggleColorAlpha(effectIcon.color);
     }
 
     private void UpdateUI()
