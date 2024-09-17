@@ -131,20 +131,20 @@ public class FacilityEffectManager {
         if (negate) {
             switch (effect.EffectType) {
                 case FacilityEffectType.RestorePoints:
-                    ChangeFacilityPoints(effect.Target, effect.Magnitude, true, false); // Reverse restore effect
+                    ChangeFacilityPoints(effect, true); // Reverse restore effect
                     break;
                 case FacilityEffectType.ReducePoints:
-                    ChangeFacilityPoints(effect.Target, effect.Magnitude, true, true);  // Reverse reduce effect
+                    ChangeFacilityPoints(effect, false);  // Reverse reduce effect
                     break;
             }
         }
         else {
             switch (effect.EffectType) {
                 case FacilityEffectType.RestorePoints:
-                    ChangeFacilityPoints(effect.Target, effect.Magnitude, false, false); // Reapply restore effect
+                    ChangeFacilityPoints(effect, false); // Reapply restore effect
                     break;
                 case FacilityEffectType.ReducePoints:
-                    ChangeFacilityPoints(effect.Target, effect.Magnitude, false, true);  // Reapply reduce effect
+                    ChangeFacilityPoints(effect, true);  // Reapply reduce effect
                     break;
             }
         }
@@ -160,7 +160,7 @@ public class FacilityEffectManager {
                 break;
             case FacilityEffectType.RestorePoints:
             case FacilityEffectType.ReducePoints:
-                ChangeFacilityPoints(effect.Target, effect.Magnitude, false, effect.EffectType == FacilityEffectType.ReducePoints);
+                ChangeFacilityPoints(effect, false);
                 break;
         }
     }
@@ -177,9 +177,10 @@ public class FacilityEffectManager {
 
     #region Effect Functions
 
-    void ChangeFacilityPoints(FacilityEffectTarget target, int magnitude, bool remove = false, bool negative = false) {
+    void ChangeFacilityPoints(FacilityEffect effect, bool remove = false) {
         Debug.Log("changing facility points due to effect add/remove");
-        int value = magnitude * (negative ? -1 : 1) * (remove ? -1 : 1);
+        int sign = effect.EffectType == FacilityEffectType.RestorePoints ? 1 : -1;
+        int value = effect.Magnitude * sign * (remove ? -1 : 1);
         facility.ChangeFacilityPoints(target.ToString(), value);
     }
 
