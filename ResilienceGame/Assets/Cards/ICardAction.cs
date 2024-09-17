@@ -19,6 +19,6 @@ public abstract class ICardAction
         };
 
 
-        Debug.Log($"Executing action {GetType()} from {player.playerName}{targetInfo}");
+        Debug.Log($"Executing action {GetType()} from {player.playerName} {targetInfo}");
     }
 }
