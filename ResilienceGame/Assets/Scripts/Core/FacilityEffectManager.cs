@@ -66,9 +66,9 @@ public class FacilityEffectManager {
             case FacilityEffectType.Fortify:
                 facility.UpdateEffectUI(effect);
                 break;
-            case FacilityEffectType.RestorePoints:
-            case FacilityEffectType.ReducePoints:
-                ChangeFacilityPoints(effect, false);
+            case FacilityEffectType.ModifyPoints:
+            case FacilityEffectType.ModifyPointsPerTurn:
+                ChangeFacilityPoints(effect);
                 break;
         }
     }
@@ -79,21 +79,21 @@ public class FacilityEffectManager {
             case FacilityEffectType.Fortify:
                 facility.UpdateEffectUI(null); // Clear the effect UI
                 break;
-            case FacilityEffectType.RestorePoints:
-            case FacilityEffectType.ReducePoints:
+            case FacilityEffectType.ModifyPoints:
+            case FacilityEffectType.ModifyPointsPerTurn:
                 ChangeFacilityPoints(effect, true);
                 break;
         }
     }
 
-    
+
     /// <summary>
     /// Called when the round is ended by the game manager
     /// </summary>
     public void OnRoundEnded() {
         foreach (var effect in activeEffects.ToList()) {
-            if (effect.EffectType == FacilityEffectType.ReducePointsPerTurn) {
-                var newEffect = new FacilityEffect(FacilityEffectType.ReducePoints, effect.Target, effect.Magnitude, 1);
+            if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
+                var newEffect = new FacilityEffect(FacilityEffectType.ModifyPoints, effect.Target, effect.CreatedEffectID, effect.Magnitude, 1);
                 AddEffect(newEffect);
             }
 
@@ -127,43 +127,28 @@ public class FacilityEffectManager {
 
     private void ApplyNegationChangeToFacility(FacilityEffect effect, bool negate) {
         if (negate) {
-            switch (effect.EffectType) {
-                case FacilityEffectType.RestorePoints:
-                    ChangeFacilityPoints(effect, true); // Reverse restore effect
-                    break;
-                case FacilityEffectType.ReducePoints:
-                    ChangeFacilityPoints(effect, false);  // Reverse reduce effect
-                    break;
-            }
+            ChangeFacilityPoints(effect, true); // Reverse effect
         }
         else {
-            switch (effect.EffectType) {
-                case FacilityEffectType.RestorePoints:
-                    ChangeFacilityPoints(effect, false); // Reapply restore effect
-                    break;
-                case FacilityEffectType.ReducePoints:
-                    ChangeFacilityPoints(effect, true);  // Reapply reduce effect
-                    break;
-            }
+            ChangeFacilityPoints(effect); // Reapply effect
         }
     }
     #endregion
 
     #region Effect Functions
-    private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving) {
-        int sign = effect.EffectType == FacilityEffectType.RestorePoints ? 1 : -1;
-        int value = effect.Magnitude * sign * (isRemoving ? -1 : 1);
+    private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
+        int value = effect.Magnitude * (isRemoving ? -1 : 1);
         facility.ChangeFacilityPoints(effect.Target.ToString(), value);
     }
     public void NegateEffect(FacilityEffect effect) {
-        if (facility.IsFortified && effect.EffectType == FacilityEffectType.ReducePoints && !hasNegatedEffectThisRound) {
+        if (facility.IsFortified && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
             return;
         }
 
         if (!effect.IsNegated) {
             effect.IsNegated = true;
-            ApplyNegationChangeToFacility(effect, true); // Apply negation (remove effect)
+            ApplyNegationChangeToFacility(effect, true); // Apply negation (reverse effect)
         }
     }
 

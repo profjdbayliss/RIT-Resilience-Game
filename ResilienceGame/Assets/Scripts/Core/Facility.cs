@@ -63,13 +63,13 @@ public class Facility : MonoBehaviour
     }
     public void ChangeFacilityPoints(string target, int value) {
         target = target.ToLower().Trim();
-
+        Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
         switch (target) {
             case "physical":
                 physicalPoints += value;
                 physicalPoints = Mathf.Clamp(physicalPoints, 0, maxPhysicalPoints);
                 break;
-            case "finacial":
+            case "financial":
                 finacialPoints += value;
                 finacialPoints = Mathf.Clamp(finacialPoints, 0, maxFinacialPoints);
                 break;
@@ -78,7 +78,7 @@ public class Facility : MonoBehaviour
                 networkPoints = Mathf.Clamp(networkPoints, 0, maxNetworkPoints);
                 break;
         }
-
+        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
         // Update isDown based on points
         isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
 

@@ -66,10 +66,23 @@ public class AddEffect : ICardAction {
 //TODO: These are the same, should be combined, difference is handled in the FacilityEffectManager
 public class NegateEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-       
-        var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
-        
-        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectIds, true, effectType);
+       // var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
+
+        // Get all active effects on the facility
+        var activeEffects = facilityActedUpon.effectManager.GetEffects();
+
+        // If there are any active effects, negate a random one
+        if (activeEffects.Count > 0) {
+            int randomIndex = UnityEngine.Random.Range(0, activeEffects.Count);
+            var effectToNegate = activeEffects[randomIndex];
+            facilityActedUpon.effectManager.NegateEffect(effectToNegate);
+
+            Debug.Log($"Negated random effect: {effectToNegate.EffectType} on {facilityActedUpon.facilityName}");
+        }
+        else {
+            Debug.Log($"No active effects to negate on {facilityActedUpon.facilityName}");
+        }
+
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

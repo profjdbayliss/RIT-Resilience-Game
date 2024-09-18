@@ -12,9 +12,8 @@ public enum FacilityEffectTarget {
 public enum FacilityEffectType {
     Backdoor,
     Fortify,
-    RestorePoints,
-    ReducePoints,
-    ReducePointsPerTurn,
+    ModifyPoints,
+    ModifyPointsPerTurn,
     Negate,
     None
 }
@@ -82,39 +81,34 @@ public class FacilityEffect {
         int duration = -1;
         int amount = 0;
 
-        /* parses an int ID from the csv into a proper facility effect
-         * 
-         * 3 to 8 are for RestorePoints and ReducePoints with amounts 1 and 2.
-         * 9 to 14 are for ReducePointsPerTurn with the same targets and amounts.
-         */
         (effectType, target, amount) = id switch {
             0 => (FacilityEffectType.None, FacilityEffectTarget.None, 0),
             1 => (FacilityEffectType.Backdoor, FacilityEffectTarget.None, 0),
             2 => (FacilityEffectType.Fortify, FacilityEffectTarget.None, 0),
-            // RestorePoints - Amount 1
-            3 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Physical, 1),
-            4 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Network, 1),
-            5 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Financial, 1),
-            // RestorePoints - Amount 2
-            6 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Physical, 2),
-            7 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Network, 2),
-            8 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Financial, 2),
-            // ReducePoints - Amount 1
-            9 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Physical, 1),
-            10 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Network, 1),
-            11 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Financial, 1),
-            // ReducePoints - Amount 2
-            12 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Physical, 2),
-            13 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Network, 2),
-            14 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Financial, 2),
-            // ReducePointsPerTurn - Amount 1
-            15 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Physical, 1),
-            16 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Network, 1),
-            17 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Financial, 1),
-            // ReducePointsPerTurn - Amount 2
-            18 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Physical, 2),
-            19 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Network, 2),
-            20 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Financial, 2),
+            // ModifyPoints - Amount +1
+            3 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 1),
+            4 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 1),
+            5 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 1),
+            // ModifyPoints - Amount +2
+            6 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 2),
+            7 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 2),
+            8 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 2),
+            // ModifyPoints - Amount -1
+            9 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -1),
+            10 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -1),
+            11 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -1),
+            // ModifyPoints - Amount -2
+            12 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -2),
+            13 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -2),
+            14 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -2),
+            // ModifyPointsPerTurn - Amount -1
+            15 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -1),
+            16 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -1),
+            17 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -1),
+            // ModifyPointsPerTurn - Amount -2
+            18 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -2),
+            19 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -2),
+            20 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -2),
             21 => (FacilityEffectType.Negate, FacilityEffectTarget.None, 0),
             _ => (FacilityEffectType.None, FacilityEffectTarget.None, 0)
         };
@@ -122,36 +116,51 @@ public class FacilityEffect {
             duration = 3;
         }
         Debug.Log($"Creating effect: {effectType}, {target}, {amount}, {duration}");
-        return new FacilityEffect(effectType, target, amount, duration);
+        return new FacilityEffect(effectType, target, id, amount, duration);
     }
 
     public static string GetEffectInfoFromId(int id) {
         FacilityEffectType effectType = FacilityEffectType.None;
         FacilityEffectTarget target = FacilityEffectTarget.None;
+        int magnitude = 0;
 
         /* parses an int ID from the csv into a proper facility effect
          * 
-         * 3 to 5 are for RestorePoints with targets Physical, Network, and Financial.
-            6 to 8 are for ReducePoints with the same targets.
-            9 to 11 are for ReducePointsPerTurn with the same targets.
+         * 3 to 8 are for ModifyPoints with targets Physical, Network, and Financial, and magnitudes +1 and +2.
+         * 9 to 14 are for ModifyPoints with the same targets, and magnitudes -1 and -2.
+         * 15 to 20 are for ModifyPointsPerTurn with the same targets and magnitudes -1 and -2.
          */
-        (effectType, target) = id switch {
-            0 => (FacilityEffectType.None, FacilityEffectTarget.None),
-            1 => (FacilityEffectType.Backdoor, FacilityEffectTarget.None),
-            2 => (FacilityEffectType.Fortify, FacilityEffectTarget.None),
-            3 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Physical),
-            4 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Network),
-            5 => (FacilityEffectType.RestorePoints, FacilityEffectTarget.Financial),
-            6 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Physical),
-            7 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Network),
-            8 => (FacilityEffectType.ReducePoints, FacilityEffectTarget.Financial),
-            9 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Physical),
-            10 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Network),
-            11 => (FacilityEffectType.ReducePointsPerTurn, FacilityEffectTarget.Financial),
-            _ => (FacilityEffectType.None, FacilityEffectTarget.None)
+        (effectType, target, magnitude) = id switch {
+            0 => (FacilityEffectType.None, FacilityEffectTarget.None, 0),
+            1 => (FacilityEffectType.Backdoor, FacilityEffectTarget.None, 0),
+            2 => (FacilityEffectType.Fortify, FacilityEffectTarget.None, 0),
+            3 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 1),
+            4 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 1),
+            5 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 1),
+            6 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 2),
+            7 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 2),
+            8 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 2),
+            9 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -1),
+            10 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -1),
+            11 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -1),
+            12 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -2),
+            13 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -2),
+            14 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -2),
+            15 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -1),
+            16 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -1),
+            17 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -1),
+            18 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -2),
+            19 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -2),
+            20 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -2),
+            21 => (FacilityEffectType.Negate, FacilityEffectTarget.None, 0),
+            _ => (FacilityEffectType.None, FacilityEffectTarget.None, 0)
         };
 
-        return $"Effect: {effectType}, Target: {target}";
+        string effectInfo = $"Effect: {effectType}, Target: {target}";
+        if (magnitude != 0) {
+            effectInfo += $", Magnitude: {magnitude}";
+        }
+        return effectInfo;
     }
 
 
