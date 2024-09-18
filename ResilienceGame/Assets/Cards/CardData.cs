@@ -31,8 +31,8 @@ public struct CardData
     public int removeAmount;
     public int targetAmount;
     public int facilityAmount;
-    public FacilityEffect effect;
-    public FacilityEffect preReqEffect;
+    public string effectIds;
+    public int preReqEffectId;
     public int effectCount;
     public int duration;
     public bool hasDoomEffect;

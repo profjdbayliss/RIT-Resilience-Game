@@ -248,6 +248,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
     }
+    
 
     // Handle all the card game phases with
     // this simple state machine.
