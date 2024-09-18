@@ -85,9 +85,6 @@ public class Facility : MonoBehaviour
         UpdateUI();
     }
 
-    public bool HasEffect(FacilityEffectType type, FacilityEffectTarget target) {
-        return effectManager.HasEffect(type, target);
-    }
     public bool HasEffect(int id) {
         return effectManager.HasEffect(id);
     }
