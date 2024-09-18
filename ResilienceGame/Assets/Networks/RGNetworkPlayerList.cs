@@ -5,6 +5,9 @@ using System;
 using System.Linq;
 using System.Text;
 using UnityEngine.InputSystem.Utilities;
+using static Facility;
+using UnityEngine.PlayerLoop;
+using System.Xml;
 
 // many messages actually have no arguments
 public struct RGNetworkShortMessage : NetworkMessage
@@ -119,11 +122,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         if (!isServer) return;
 
-        playerIDs.Remove(id);
-        playerNames.RemoveAt(id);
-        playerTypes.RemoveAt(id);
-        playerNetworkReadyFlags.RemoveAt(id);
-        playerTurnTakenFlags.RemoveAt(id);
+        int index = playerIDs.FindIndex(x => x == id);
+        if (index != -1)
+        {
+            playerIDs.Remove(id);
+            playerNames.RemoveAt(index);
+            playerTypes.RemoveAt(index);
+            playerNetworkReadyFlags.RemoveAt(index);
+            playerTurnTakenFlags.RemoveAt(index);
+        }
     }
 
     public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload)
@@ -297,6 +304,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 }
                 break;
             case CardMessageType.ShareDiscardNumber:
+            case CardMessageType.CardUpdate:
+            case CardMessageType.ReduceCost:
+            case CardMessageType.RestorePoints:
+            case CardMessageType.RemoveEffect:
+            case CardMessageType.DiscardCard:
+            case CardMessageType.MeepleShare:
                 {
                     RGNetworkLongMessage msg = new RGNetworkLongMessage
                     {
@@ -309,35 +322,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     if (!isServer)
                     {                   
                         NetworkClient.Send(msg);
-                        Debug.Log("CLIENT IS SHOWING THEIR DISCOUNT AMOUNT AS " + data.ToString());
+                        Debug.Log("CLIENT sent type: " + data.Type + " with value " + data.ToString());
                     } else
                     {
                         // share it with everybody
                         NetworkServer.SendToAll(msg);
-                    }
-                }
-                break;
-            case CardMessageType.SendCardUpdates:
-                {
-                    RGNetworkLongMessage msg = new RGNetworkLongMessage
-                    {
-                        indexId = (uint)localPlayerID,
-                        type = (uint)data.Type,
-                        count = (uint)data.arguments.Count,
-                        payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
-                    };
-                    Debug.Log("update observer called share updates");
-
-                    if (isServer)
-                    {
-                        // send to all
-                        NetworkServer.SendToAll(msg);
-                        Debug.Log("SERVER SENT GAME PLAY UPDATES");
-                    }
-                    else
-                    {
-                        NetworkClient.Send(msg);
-                        Debug.Log("CLIENT SENT GAMEPLAY UPDATES");
+                        Debug.Log("SERVER sent type: " + data.Type + " with value " + data.ToString());
                     }
                 }
                 break;
@@ -357,27 +347,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     {
                         NetworkClient.Send(msg);
                         Debug.Log("CLIENT SENT GAME END MESSAGE FIRST");
-                    }
-                }
-                break;
-            case CardMessageType.SendPlayedFacility:
-                {
-                    RGNetworkLongMessage msg = new RGNetworkLongMessage
-                    {
-                        indexId = (uint)localPlayerID,
-                        type = (uint)data.Type,
-                        count = (uint)data.arguments.Count(),
-                        payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
-                    };
-                    if (isServer)
-                    {
-                        NetworkServer.SendToAll(msg);
-                        Debug.Log("SERVER SENT PLAYED FACILITY MESSAGE");
-                    }
-                    else
-                    {
-                        NetworkClient.Send(msg);
-                        Debug.Log("CLIENT SENT PLAYED FACILITY MESSAGE");
                     }
                 }
                 break;
@@ -579,57 +548,153 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 
                             Debug.Log("setting player discard to " + discardCount);
 
-                            // share with other players
-                            //NetworkServer.SendToAll(msg);
-
                             // let the game manager display the new info
                             manager.DisplayGameStatus("Player " + playerNames[playerIndex] +
                                 " discarded " + discardCount + " cards.");
                         }
                     }
                     break;
-                case CardMessageType.SendCardUpdates:
+                case CardMessageType.CardUpdate:
                     {
                         int element = 0;
-                        List<Updates> updates = new List<Updates>(6);
-                        int numberOfUpdates = GetIntFromByteArray(element, msg.payload);
-                        element += 4; 
-                        GamePhase gamePhase =(GamePhase)GetIntFromByteArray(element, msg.payload);
+                        GamePhase gamePhase = (GamePhase) GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        for (int i = 0; i < numberOfUpdates; i++)
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update
                         {
-                            int whatToDo = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            int facilityId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            int cardId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            
-                            updates.Add(new Updates
-                            {
-                                WhatToDo=(AddOrRem)whatToDo,
-                                UniqueFacilityID=facilityId,
-                                CardID=cardId
-                            });
-                            Debug.Log("client received update message from opponent containing : " + facilityId + " and cardid " + cardId + "for game phase " + gamePhase);
-                        }
-                        manager.AddUpdatesFromOpponent(ref updates, gamePhase);
-                        
+                            Type = CardMessageType.CardUpdate,
+                            UniqueID = uniqueId,
+                            CardID = cardId
+                        };
+                        Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
-                case CardMessageType.SendPlayedFacility:
+                case CardMessageType.ReduceCost:
                     {
                         int element = 0;
-                        if (msg.count == 2)
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int amount = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update
                         {
-                            int uniqueId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;             
-                            int facilityId = GetIntFromByteArray(element, msg.payload);
+                            Type = CardMessageType.ReduceCost,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            Amount = amount,
+                        };
+                        Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                            manager.AddOpponentFacility(facilityId, uniqueId);
-                            Debug.Log("received facility message from opponent with unique id " + uniqueId + " and card facility id " + facilityId);
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.RestorePoints:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
 
-                        }
+                        int amount = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.RestorePoints,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            Amount = amount,
+                            FacilityType = (FacilityEffectTarget) facilityType,
+                        };
+                        //Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.RemoveEffect:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int effect = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.ReduceCost,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            FacilityType = (FacilityEffectTarget) facilityType,
+                            Effect = (FacilityEffectType) effect,
+                        };
+                        Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.DiscardCard:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                       
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.DiscardCard,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                        };
+                        Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.MeepleShare:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int playerToShareWith = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int meepleColor = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int amount = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.MeepleShare,
+                            UniqueID = playerToShareWith,
+                            CardID = meepleColor,
+                            Amount = amount,
+                        };
+                        Debug.Log("client received update message from opponent containing player to share with : " + playerToShareWith + 
+                            " and meeple color " + meepleColor + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
                 default:
@@ -711,50 +776,146 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                         }
                     }
                     break;
-                case CardMessageType.SendCardUpdates:
+                case CardMessageType.CardUpdate:
                     {
                         int element = 0;
-                        List<Updates> updates = new List<Updates>(6);
-                        int numberOfUpdates = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
 
-                        for (int i = 0; i < numberOfUpdates; i++)
+                        Update update = new Update
                         {
-                            int whatToDo = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            int facilityId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            int cardId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            updates.Add(new Updates
-                            {
-                                WhatToDo = (AddOrRem)whatToDo,
-                                UniqueFacilityID = facilityId,
-                                CardID = cardId
-                            });
-                            Debug.Log(whatToDo + " server received update message from opponent containing : " + facilityId + " and cardid " + cardId);
+                            Type = CardMessageType.CardUpdate,
+                            UniqueID = uniqueId,
+                            CardID = cardId
+                        };
+                        Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        }
-                        manager.AddUpdatesFromOpponent(ref updates, gamePhase);
-                        Debug.Log("received update message from opponent of size " + numberOfUpdates);
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
-               
-                case CardMessageType.SendPlayedFacility:
+                case CardMessageType.ReduceCost:
                     {
                         int element = 0;
-                        if (msg.count == 2)
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int amount = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update
                         {
-                            int uniqueId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            int facilityId = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            manager.AddOpponentFacility(facilityId, uniqueId);
-                            Debug.Log("received facility message from opponent with unique id " + uniqueId + " and card facility id " + facilityId);
+                            Type = CardMessageType.ReduceCost,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            Amount = amount,
+                        };
+                        Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        }
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.RestorePoints:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        int amount = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.RestorePoints,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            Amount = amount,
+                            FacilityType = (FacilityEffectTarget)facilityType,
+                        };
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.RemoveEffect:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int effect = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.ReduceCost,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            FacilityType = (FacilityEffectTarget)facilityType,
+                            Effect = (FacilityEffectType)effect,
+                        };
+                        Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.DiscardCard:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.DiscardCard,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                        };
+                        Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.MeepleShare:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int playerToShareWith = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int meepleColor = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int amount = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update
+                        {
+                            Type = CardMessageType.MeepleShare,
+                            UniqueID = playerToShareWith,
+                            CardID = meepleColor,
+                            Amount = amount,
+                        };
+                        Debug.Log("server received update message from opponent containing player to share with : " + playerToShareWith +
+                            " and meeple color " + meepleColor + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
                 default:

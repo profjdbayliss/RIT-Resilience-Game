@@ -13,8 +13,12 @@ public enum CardMessageType
     IncrementTurn,
     SharePlayerType,
     ShareDiscardNumber,
-    SendCardUpdates,  
-    SendPlayedFacility,
+    CardUpdate,
+    ReduceCost,
+    RestorePoints,
+    RemoveEffect,
+    DiscardCard,
+    MeepleShare,
     EndGame,
     None
 }

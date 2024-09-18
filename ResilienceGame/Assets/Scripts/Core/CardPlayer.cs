@@ -9,6 +9,8 @@ using Image = UnityEngine.UI.Image;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 using System.Linq;
+using UnityEngine.PlayerLoop;
+using static UnityEngine.PlayerLoop.EarlyUpdate;
 
 // Enum to track player type
 public enum PlayerTeam {
@@ -40,15 +42,18 @@ public enum PlayerSector {
     All
 };
 
-public enum AddOrRem {
-    Add,
-    Remove
-};
+//public enum AddOrRem {
+//    Add,
+//    Remove
+//};
 
-public struct Updates {
-    public AddOrRem WhatToDo;
-    public int UniqueFacilityID;
+public struct Update {
+    public CardMessageType Type;
     public int CardID;
+    public int UniqueID;
+    public int Amount;
+    public FacilityEffectTarget FacilityType;
+    public FacilityEffectType Effect;
 };
 
 public enum DiscardFromWhere {
@@ -106,7 +111,7 @@ public class CardPlayer : MonoBehaviour {
     // multiple card players
     static int sUniqueIDCount = 0;
     int mFinalScore = 0;
-    List<Updates> mUpdatesThisPhase = new List<Updates>(6);
+    Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
 
 
@@ -692,9 +697,9 @@ public class CardPlayer : MonoBehaviour {
                 card.cardZone = discardDropZone;
                 if (addUpdate) {
                     Debug.Log("adding update for opponent to get");
-                    mUpdatesThisPhase.Add(new Updates {
-                        WhatToDo = AddOrRem.Remove,
-                        UniqueFacilityID = uniqueFacilityID,
+                    mUpdatesThisPhase.Enqueue(new Update {
+                        Type = CardMessageType.DiscardCard,
+                        UniqueID = uniqueFacilityID,
                         CardID = card.data.cardID
                     });
                 }
@@ -746,9 +751,11 @@ public class CardPlayer : MonoBehaviour {
                 // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
                 card.state = CardState.CardInPlay;
                 ActiveCards.Add(card.UniqueID, card.gameObject);
-                mUpdatesThisPhase.Add(new Updates {
-                    WhatToDo = AddOrRem.Add,
-                    UniqueFacilityID = card.UniqueID,
+                // NOTE: TO DO - need to add the correct update for the card played since some of them
+                // need different info
+                mUpdatesThisPhase.Enqueue(new Update {
+                    Type = CardMessageType.CardUpdate,
+                    UniqueID = card.UniqueID,
                     CardID = card.data.cardID
                 });
 
@@ -807,9 +814,10 @@ public class CardPlayer : MonoBehaviour {
             case GamePhase.Action:
                 card.state = CardState.CardInPlay;
                 ActiveCards.Add(card.UniqueID, card.gameObject);
-                mUpdatesThisPhase.Add(new Updates {
-                    WhatToDo = AddOrRem.Add,
-                    UniqueFacilityID = card.UniqueID,
+                // NOTE TO DO: need to add proper data and message type for the card here
+                mUpdatesThisPhase.Enqueue(new Update {
+                    Type = CardMessageType.CardUpdate,
+                    UniqueID = card.UniqueID,
                     CardID = card.data.cardID
                 });
 
@@ -1148,127 +1156,44 @@ public class CardPlayer : MonoBehaviour {
         return hasCardType;
     }
 
-    public void AddUpdate(Updates update, GameObject cardGameObject, GameObject dropZone, GamePhase phase, bool getRidOfFacility) {
-        GameObject facility = null;
-        Card facilityCard = null;
 
-        // find unique facility in facilities list
-        if (ActiveFacilities.TryGetValue(update.UniqueFacilityID, out facility)) {
-            facilityCard = facility.GetComponent<Card>();
-            // if we found the right facility
-            if (cardGameObject != null && update.WhatToDo == AddOrRem.Add) {
-                Debug.Log("card add called with phase " + phase);
-                // create card to be displayed
-                Card card = cardGameObject.GetComponent<Card>();
-                if (phase == GamePhase.Action) {
-                    Debug.Log("adding attack with card id : " + card.data.cardID);
-                    facilityCard.AttackingCards.Add(new CardIDInfo {
-                        CardID = card.data.cardID,
-                        UniqueID = card.UniqueID
-                    });
-                    cardGameObject.SetActive(false);
+    // NOTE: TO DO - needs to be updated for new card effects without
+    // facilities
+    public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent)
+    {
+        //GameObject facility;
+        //Facility selectedFacility = null;
+        //int index = -1;
+        //Debug.Log("number of active facilities are " + ActiveFacilities.Count);
 
-                    // add card to its displayed cards
-                    StackCards(facility, cardGameObject, dropZone, phase);
-                    card.state = CardState.CardInPlay;
-                    cardGameObject.SetActive(true);
-                }
+        //// find unique facility in facilities list
+        //if (ActiveFacilities.TryGetValue(update.UniqueID, out facility))
+        //{
+        //    selectedFacility = facility.GetComponent<Facility>();
 
-            }
-            else if (update.WhatToDo == AddOrRem.Remove) {
-                if (phase == GamePhase.Action) {
-                    if (!getRidOfFacility) {
-                        Debug.Log("removing attack  for mitigation with card id " + update.CardID);
-                        int cardIndex = facilityCard.AttackingCards.FindIndex(x => x.CardID == update.CardID);
+        //    // if we found the right facility
+           
+        //    // facilities
+        //    if (update.Type == CardMessageType.CardUpdate)
+        //    {
+        //        // create card to be displayed
+        //        Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, opponentDropZone, true, ref ActiveCards);
+        //        GameObject cardGameObject = ActiveCards[card.UniqueID];
+        //        cardGameObject.SetActive(false);
 
-                        if (cardIndex != -1) {
-                            CardIDInfo cardInfo = facilityCard.AttackingCards[cardIndex];
-                            Debug.Log("facilities attacking cards contained the unique card info " + cardInfo.CardID + " with unique id " + cardInfo.UniqueID);
-                            // discard it
-                            GameObject cardObject = manager.actualPlayer.GetActiveCardObject(cardInfo);
-                            if (cardObject != null) {
-                                Card discardCard = cardObject.GetComponent<Card>();
-                                discardCard.state = CardState.CardNeedsToBeDiscarded;
-                                //manager.actualPlayer.HandleDiscard(manager.actualPlayer.HandCards, manager.actualPlayer.playerDropZone,
-                                //    facilityCard.UniqueID, false);
-                                //manager.actualPlayer.HandleDiscard(manager.actualPlayer.ActiveCards, manager.actualPlayer.playerDropZone,
-                                //facilityCard.UniqueID, false);
-                                manager.actualPlayer.DiscardAllInactiveCards(DiscardFromWhere.Hand, false, facilityCard.UniqueID);
-                                manager.actualPlayer.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, false, facilityCard.UniqueID);
-                            }
-                            else {
-                                Debug.Log("an attack card couldn't be found in the hand at 1139 in CardPlayer. " + cardInfo);
-                            }
+        //        // add card to its displayed cards
+        //        StackCards(facility, cardGameObject, opponentDropZone, GamePhase.Action);
+        //        card.state = CardState.CardInPlay;
+        //        Debug.Log("opponent player updates added " + card.data.cardID + " to the active list of size " + ActiveCards.Count);
+        //        card.Play(this, opponent, selectedFacility);
+        //        cardGameObject.SetActive(true);
+        //    }
 
-                            //manager.actualPlayer.DiscardSingleActiveCard(facilityCard.UniqueID, cardInfo, false);
-                            // remove the card info from the facility
-                            facilityCard.AttackingCards.RemoveAt(cardIndex);
-                        }
-                    }
-                    else {
-                        // discard all the cards attacking this now dead facility
-                        foreach (CardIDInfo cardInfo in facilityCard.AttackingCards) {
-                            GameObject cardObject = manager.actualPlayer.GetActiveCardObject(cardInfo);
-                            if (cardObject != null) {
-                                Card cardToDispose = cardObject.GetComponent<Card>();
-                                Debug.Log("handling all attack cards on defunct facility : this one's id is " + cardToDispose.UniqueID);
-                                cardToDispose.state = CardState.CardNeedsToBeDiscarded;
-
-                            }
-                            else {
-                                Debug.Log("attack card with id " + cardInfo.CardID + " wasn't found in the pile of cards on a defunct facility.");
-                            }
-                            //opponent.HandleDiscard(opponent.ActiveCards, opponent.opponentDropZone, facilityCard.UniqueID, true);
-                        }
-                        // let's discard all the cards on the facility in question
-                        manager.actualPlayer.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, facilityCard.UniqueID);
-                        facilityCard.AttackingCards.Clear();
-                        facilityCard.state = CardState.CardNeedsToBeDiscarded;
-
-                        // now discard the facility itself
-                        //HandleDiscard(ActiveFacilities, dropZone, facilityCard.UniqueID, false);
-                        DiscardAllInactiveCards(DiscardFromWhere.MyFacility, false, facilityCard.UniqueID);
-                    }
-                }
-            }
-        }
-        else {
-            Debug.Log("a facility wasn't found for an opponent play - there's a bug somewhere OR the facility just ran out of points and got nixed.");
-        }
-    }
-
-    public void AddUpdates(ref List<Updates> updates, GamePhase phase, CardPlayer opponent) {
-        foreach (Updates update in updates) {
-            GameObject facility;
-            Facility selectedFacility = null;
-            int index = -1;
-            Debug.Log("number of active facilities are " + ActiveFacilities.Count);
-
-            // find unique facility in facilities list
-            if (ActiveFacilities.TryGetValue(update.UniqueFacilityID, out facility)) {
-                selectedFacility = facility.GetComponent<Facility>();
-
-                // if we found the right facility
-                if (update.WhatToDo == AddOrRem.Add) {
-                    // create card to be displayed
-                    Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, opponentDropZone, true, ref ActiveCards);
-                    GameObject cardGameObject = ActiveCards[card.UniqueID];
-                    cardGameObject.SetActive(false);
-
-                    // add card to its displayed cards
-                    StackCards(facility, cardGameObject, opponentDropZone, GamePhase.Action);
-                    card.state = CardState.CardInPlay;
-                    Debug.Log("opponent player updates added " + card.data.cardID + " to the active list of size " + ActiveCards.Count);
-                    card.Play(this, opponent, selectedFacility);
-                    cardGameObject.SetActive(true);
-                }
-
-            }
-            else {
-                Debug.Log("a facility was not found for an opponent play - there's a bug somewhere.");
-            }
-        }
-
+        //}
+        //else
+        //{
+        //    Debug.Log("a facility was not found for an opponent play - there's a bug somewhere.");
+        //}
     }
 
     void CalculateScore() {
@@ -1285,23 +1210,42 @@ public class CardPlayer : MonoBehaviour {
     }
 
     // an update message consists of:
-    // a. count of updates - 1 per card
-    // b. what game phase this is happening for
-    // c. the list of updates in the order of: add/remove, unique facility id, card id
-    public void GetUpdatesInMessageFormat(ref List<int> playsForMessage, GamePhase phase) {
-        playsForMessage.Add(mUpdatesThisPhase.Count);
-        playsForMessage.Add((int)phase);
-
-        foreach (Updates update in mUpdatesThisPhase) {
-            playsForMessage.Add((int)update.WhatToDo);
-            playsForMessage.Add(update.UniqueFacilityID);
+    // a. phase it happened in
+    // b. unique card id for a specific player
+    // c. id of the card played
+    // d. other unique info for special cards
+    public CardMessageType GetNextUpdateInMessageFormat(ref List<int> playsForMessage, GamePhase phase) {
+        if (mUpdatesThisPhase.Count > 0)
+        {
+            playsForMessage.Add((int)phase);
+            Update update = mUpdatesThisPhase.Dequeue();
+            playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
-            //Debug.Log("adding update to send to opponent: " + update.UniqueFacilityID + " and card id " + update.CardID + " for phase " + phase);
-        }
 
-        // we've given the updates away, so let's make sure to 
-        // clear the list
-        mUpdatesThisPhase.Clear();
+            if (update.Type == CardMessageType.ReduceCost)
+            {
+                playsForMessage.Add(update.Amount);
+            }
+            else if (update.Type == CardMessageType.RemoveEffect)
+            {
+                playsForMessage.Add((int)update.FacilityType);
+                playsForMessage.Add((int)update.Effect);
+            }
+            else if (update.Type == CardMessageType.RestorePoints)
+            {
+                playsForMessage.Add(update.Amount);
+                playsForMessage.Add((int)update.FacilityType);
+            }
+            else if (update.Type == CardMessageType.MeepleShare)
+            {
+                // unique id is the player to share with
+                // card id is actually the meeple color
+                // amount is the number of meeples to share
+                playsForMessage.Add(update.Amount);
+            }
+            return update.Type;
+        }
+        return CardMessageType.None;
     }
 
     // Reset the variables in this class to allow for a new

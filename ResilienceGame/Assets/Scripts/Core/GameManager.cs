@@ -739,25 +739,28 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
-        // send a message with defense cards played and where they were played
-        Message msg;
-        List<int> tmpList = new List<int>(4);
-        player.GetUpdatesInMessageFormat(ref tmpList, phase);
-        msg = new Message(CardMessageType.SendCardUpdates, tmpList);
-        AddMessage(msg);
+        while (player.HasUpdates())
+        {
+            Message msg;
+            List<int> tmpList = new List<int>(4);
+            CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
+            if (messageType != CardMessageType.None)
+            {
+                msg = new Message(messageType, tmpList);
+                AddMessage(msg);
+            }
+        }
+      
     }
 
-    public void AddUpdatesFromOpponent(ref List<Updates> updates, GamePhase phase) {
-        if (updates.Count == 0) {
-            DisplayGameStatus("Opponent did not play any cards during their turn in phase " + phase);
-        }
-        else {
-            DisplayGameStatus("Opponent played " + updates.Count + " cards during their turn in phase " + phase);
-        }
+    public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
         switch (phase) {
-            case GamePhase.Action:
-                opponentPlayer.AddUpdates(ref updates, phase, actualPlayer);
+
+           case GamePhase.Action:
+                // NOTE: TO DO - needs code to do the right thing depending on
+                // whether it's a red or blue player
+                opponentPlayer.AddUpdate(update, phase, actualPlayer);
                 break;
             /*case GamePhase.Vulnerability:
                 // This phase is more painful since it's an opponent card on top of a player facility
