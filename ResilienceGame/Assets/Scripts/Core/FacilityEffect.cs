@@ -50,14 +50,6 @@ public class FacilityEffect {
         CreatedEffectID = createdEffectID;
     }
 
-    public bool DecreaseDuration() {
-        if (Duration > 0) {
-            Duration--;
-            if (Duration == 0) return true; // Effect expires
-        }
-        return false; // Effect still active
-    }
-
     public void AddStack() {
         Stack++;
     }

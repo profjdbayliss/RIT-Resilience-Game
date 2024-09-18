@@ -54,7 +54,7 @@ public class ShuffleAndDrawCards : ICardAction {
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         FacilityTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
-        facilityActedUpon.AddRemoveAllEffectsByIdString(card.data.effectIds, true, playedTeam);
+        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectIds, true, playedTeam);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -69,7 +69,7 @@ public class NegateEffect : ICardAction {
        
         var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
         
-        facilityActedUpon.AddRemoveAllEffectsByIdString(card.data.effectIds, true, effectType);
+        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectIds, true, effectType);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -82,10 +82,11 @@ public class RemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         var effectList = facilityActedUpon.effectManager.GetEffects();
         var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
-        //creating this to remove random effect from the facility - almost definitely not the best way to do this, player should get to chose
+
+        // TODO: Implement user selection for effect removal
         if (effectList.Count > 0) {
             var randomEffect = effectList[UnityEngine.Random.Range(0, effectList.Count)];
-            facilityActedUpon.AddRemoveEffectByID(randomEffect.CreatedEffectID, false, effectType);
+            facilityActedUpon.AddRemoveEffectsByIdString(randomEffect.CreatedEffectID.ToString(), false, effectType);
         }
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
@@ -98,18 +99,14 @@ public class RemoveEffect : ICardAction {
 
 public class SpreadEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        for (int i = 0; i < facilityActedUpon.sectorItsAPartOf.facilities.Length; i++) {
-            //can probably slightly optimize this by finding out which of the facilities in the sector is facility acted upon
-            //and excluding it from this but i don't think its worth the effort
-            // facilityActedUpon.sectorItsAPartOf.facilities[i].effect = facilityActedUpon.effect; 
-            //TODO:
-
-            /* Description:
-             *  If a facility has a Backdoor; add Backdoors to all facilities in the connected Sectors. These new Backdoors last for 3 turns. You can only play 1 Lateral movement per turn. 
-             * 
-             * makes me think this will scan the dependencies, then find those sectors, and infect them with the effect, not just facilities in the current sector
-             */
+        // TODO: Implement effect spreading to connected sectors
+        foreach (var dependency in facilityActedUpon.dependencies) {
+            // Placeholder: Apply the effect to all facilities in the connected sector
+            //foreach (var facility in dependency.facilities) {
+            //    facility.AddRemoveEffectsByIdString(card.data.effectIds, true, card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red);
+            //}
         }
+
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

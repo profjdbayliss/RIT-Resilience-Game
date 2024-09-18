@@ -108,33 +108,27 @@ public class Facility : MonoBehaviour
     public void NegateEffect(FacilityEffect effectToNegate) {
         effectManager.NegateEffect(effectToNegate);
     }
-    //called below after creating the effect from ID
-    private void AddOrRemoveEffect(FacilityEffect effectToAdd, bool isAddingEffect, FacilityTeam type)
-    {
-
-        if (isAddingEffect) {
-            effectManager.AddEffect(effectToAdd);
-        }
-        else {
-            effectManager.RemoveEffectByCreatedId(effectToAdd.CreatedEffectID);
+    
+    public void AddRemoveEffectsByIdString(string idString, bool isAdding, FacilityTeam team) {
+        var effectIds = idString.Split(';').Select(int.Parse).ToList();
+        foreach (var id in effectIds) {
+            FacilityEffect effect = FacilityEffect.CreateEffectFromID(id);
+            effect.CreatedByTeam = team;
+            effectManager.AddRemoveEffect(effect, isAdding);
         }
     }
-    private void RemoveEffectByCreatedId(int id) {
-        effectManager.RemoveEffectByCreatedId(id);
-        
-    }
-    //called by the Card.Play() function
-    public void AddRemoveEffectByID(int id, bool isAddingEffect, FacilityTeam team) {
-        FacilityEffect effect = FacilityEffect.CreateEffectFromID(id);
-        effect.CreatedByTeam = team;
-        AddOrRemoveEffect(effect, isAddingEffect, team);
-    }
-    public void AddRemoveAllEffectsByIdString(string idString, bool isAddingEffect, FacilityTeam team) {
-        var effectsToAdd = idString.Split(';').ToList().Select(s => int.Parse(s));
-        
-        foreach (var effectId in effectsToAdd) {
-            AddRemoveEffectByID(effectId, isAddingEffect, team);
+    public void UpdateEffectUI(FacilityEffect effect) {
+        // Update UI based on effect type
+        switch (effect.EffectType) {
+            case FacilityEffectType.Backdoor:
+                effectIcon.sprite = Sector.EffectSprites[0];
+                break;
+            case FacilityEffectType.Fortify:
+                effectIcon.sprite = Sector.EffectSprites[1];
+                break;
+                // Add more cases for other effect types
         }
+        ToggleEffectImageAlpha();
     }
 
     private void UpdateUI()
@@ -158,9 +152,9 @@ public class Facility : MonoBehaviour
 
         var effects = effectManager.GetEffects();
         if (effects.Count > 0) {
-            facilityInfo.Append("Active Effects: ");
+            facilityInfo.Append($"Active Effects ({effects.Count}): ");
             foreach (var effect in effects) {
-                facilityInfo.Append(effect.ToString()).Append(" ");
+                facilityInfo.Append("\n  ").Append(effect.ToString());
             }
         }
         else {
