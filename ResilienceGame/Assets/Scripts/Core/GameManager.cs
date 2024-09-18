@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     GamePhase mPreviousGamePhase = GamePhase.Start;
 
     // Various turn and game info.
-    bool myTurn = false;
+    public bool myTurn = false;
     int turnTotal = 0;
 
 
@@ -556,7 +556,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         // in this game people go in parallel to each other
         // per phase
-        myTurn = true;
+        if (playerType == PlayerTeam.Red)
+            myTurn = true;
+        else if (playerType == PlayerTeam.Blue)
+            myTurn = false;
+        else
+        {
+            myTurn = false;
+            Debug.LogWarning("For some reason, player is neither blue team nor red team!");
+        }
         gameStarted = true;
 
         // go on to the next phase
