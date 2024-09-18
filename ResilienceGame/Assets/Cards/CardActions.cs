@@ -51,47 +51,6 @@ public class ShuffleAndDrawCards : ICardAction {
     }
 }
 
-public class ChangeNetworkPoints : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        // facilityActedUpon.ChangeFacilityPoints("network", card.data.facilityAmount);
-        string target = "Network";
-        string amount = card.data.facilityAmount switch {
-            0 => "Zero",
-            1 => "One",
-            2 => "Two",
-            _ => ""
-        };
-
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
-
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
-public class ChangeFinancialPoints : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        facilityActedUpon.ChangeFacilityPoints("financial", card.data.facilityAmount);
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
-
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
-public class ChangePhysicalPoints : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        facilityActedUpon.ChangeFacilityPoints("physical", card.data.facilityAmount);
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
-
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
-}
-
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         FacilityTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;

@@ -181,7 +181,7 @@ public class FacilityEffectManager {
         Debug.Log("changing facility points due to effect add/remove");
         int sign = effect.EffectType == FacilityEffectType.RestorePoints ? 1 : -1;
         int value = effect.Magnitude * sign * (remove ? -1 : 1);
-        facility.ChangeFacilityPoints(target.ToString(), value);
+        facility.ChangeFacilityPoints(effect.Target.ToString(), value);
     }
 
     void AddRemoveBackdoor(bool remove = false) {

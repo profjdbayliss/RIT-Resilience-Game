@@ -161,18 +161,6 @@ public class CardReader : MonoBehaviour {
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ReduceCardCost());
                                     break;
-                                case "ChangeNetworkPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangeNetworkPoints());
-                                    break;
-                                case "ChangeFinancialPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangeFinancialPoints());
-                                    break;
-                                case "ChangePhysicalPoints":
-                                    //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new ChangePhysicalPoints());
-                                    break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.data.effectIds = individualCSVObjects[19];
