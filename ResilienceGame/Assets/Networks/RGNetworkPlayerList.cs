@@ -467,7 +467,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId
                         };
-                        Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
@@ -488,7 +488,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId,
                             Amount = amount,
                         };
-                        Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
