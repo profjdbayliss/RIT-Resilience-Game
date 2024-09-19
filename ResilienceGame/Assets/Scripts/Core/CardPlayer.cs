@@ -522,37 +522,50 @@ public class CardPlayer : MonoBehaviour {
         return null;
     }
     private bool ValidateCardPlay(Card card) {
+
         //much simpler card validation
-        var canPlay = GameManager.instance.MGamePhase switch {
+        (string response, bool canPlay) = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(),
-            GamePhase.Bonus => false, //turn only happens during Doomclock? where you can allocate overtime
+            GamePhase.Bonus => ("Cannot discard cards during bonus phase", false), //turn only happens during Doomclock? where you can allocate overtime
             GamePhase.ActionRed or GamePhase.ActionBlue => ValidateActionPlay(card),
-            _ => false,
+            _ => ("", false)
         };
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
+        if (!canPlay) {
+            Debug.Log(response);
+        }
 
         return canPlay;
     }
-    private bool ValidateActionPlay(Card card) {
+    private (string,bool) ValidateActionPlay(Card card) {
         if (!GameManager.instance.IsActualPlayersTurn())
-            return false;
+            return ($"It is not this {playerTeam}'s turn", false);
         //check prereq effects on cards
         if (card.data.preReqEffectId != 0) {
             Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
             if (!facility.HasEffect(card.data.preReqEffectId)) {
-                Debug.Log("Facility effect does not match card prereq effect");
-                return false;
+                //Debug.Log("Facility effect does not match card prereq effect");
+                return ("Facility effect does not match card prereq effect", false);
             }
         }
-        return playerSector.TrySpendMeeples(card, ref mMeeplesSpent); //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
+        if (!playerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
+            return ("Not enough meeples to play card", false);
+        }
+        return ("", true); //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
     }
 
-    private bool CanDiscardCard() {
+    private (string, bool) CanDiscardCard() {
         //draw phase checks if the player is discarding a card and if they havent discard more than allowed this phase
         if (GameManager.instance.MGamePhase == GamePhase.Draw) {
-            return hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS;
+            if (hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS) {
+                return ("", true);
+            }
+            return ("Cannot discard more than " + GameManager.instance.MAX_DISCARDS + " cards per turn", false);
         }
-        return GameManager.instance.MIsDiscardAllowed;  //if not in draw phase, discard is determined by the game manager
+        if (GameManager.instance.MIsDiscardAllowed) {
+            return ("", true);
+        }
+        return ("You do not need to discard cards currently", false);
     }
     public bool IsPlayerTurn() {
         //replace with call to game manager?
