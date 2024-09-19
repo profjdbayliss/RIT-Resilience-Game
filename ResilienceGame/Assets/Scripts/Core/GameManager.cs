@@ -248,7 +248,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
     }
-    
+
 
     // Handle all the card game phases with
     // this simple state machine.
@@ -271,7 +271,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // handled with specialty code outside of this
                 break;
             case GamePhase.Draw:
-             
+
 
                 if (phaseJustChanged) {
                     //reset player discard amounts
@@ -303,7 +303,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                
+
 
                 if (!phaseJustChanged) {
                     if (!mIsActionAllowed) {
@@ -569,12 +569,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.ActionBlue:
-            case GamePhase.ActionRed: 
-                    SendUpdatesToOpponent(MGamePhase, actualPlayer);
-                    // reset the defense var's for the next turn
-                    mIsActionAllowed = false;
-                    mNumberDefense = 0;
+            case GamePhase.ActionRed:
                 
+                SendUpdatesToOpponent(MGamePhase, actualPlayer);
+                // reset the defense var's for the next turn
+                mIsActionAllowed = false;
+                mNumberDefense = 0;
+
                 break;
             case GamePhase.End:
                 break;
@@ -592,31 +593,29 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
-        while (player.HasUpdates())
-        {
+        while (player.HasUpdates()) {
             Message msg;
             List<int> tmpList = new List<int>(4);
             CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
-            if (messageType != CardMessageType.None)
-            {
+            if (messageType != CardMessageType.None) {
                 msg = new Message(messageType, tmpList);
                 AddMessage(msg);
             }
         }
-      
+
     }
 
     public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
         switch (phase) {
 
-           case GamePhase.ActionRed:
+            case GamePhase.ActionRed:
             case GamePhase.ActionBlue:
                 // NOTE: TO DO - needs code to do the right thing depending on
                 // whether it's a red or blue player
                 opponentPlayer.AddUpdate(update, phase, actualPlayer);
                 break;
-            
+
             default:
                 break;
         }
