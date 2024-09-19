@@ -442,6 +442,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // TODO: Set randomly
         actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
         actualPlayer.playerSector.Initialize(PlayerSector.Water);
+        //if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+        //    mEndPhaseButton.SetActive(false);
+        //}
 
         // in this game people go in parallel to each other
         // per phase
@@ -449,7 +452,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         gameStarted = true;
 
         // go on to the next phase
-        MGamePhase = GamePhase.DrawRed;
+        // MGamePhase = GamePhase.DrawRed;
+        StartNextPhase();
 
     }
 
@@ -646,6 +650,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Increments a turn. Note that turns consist of multiple phases.
     public void IncrementTurn() {
+        OnRoundEnd?.Invoke(); //inform listeners that the round ended
         turnTotal++;
         mTurnText.text = "Turn: " + GetTurn();
         if (isServer) {
@@ -653,16 +658,27 @@ public class GameManager : MonoBehaviour, IRGObservable {
             AddMessage(new Message(CardMessageType.IncrementTurn));
         }
     }
-
+    void ProgressPhase() {
+        MGamePhase = GetNextPhase();
+        if (IsActualPlayersTurn()) {
+            mEndPhaseButton.SetActive(true);
+        }
+        else {
+            EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
+        }
+    }
     // Starts the next phase.
     public void StartNextPhase() {
-        if (!myTurn) {
-            myTurn = true;
-            MGamePhase = GetNextPhase();
-          //  if (IsActualPlayersTurn()) {
-               mEndPhaseButton.SetActive(true);
-         //   }
-            
+        
+        if (MGamePhase == GamePhase.Start) {
+            ProgressPhase();
+        }
+        else {
+            if (!myTurn) {
+                myTurn = true;
+                ProgressPhase();
+
+            }
         }
 
     }
