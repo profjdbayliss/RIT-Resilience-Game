@@ -271,11 +271,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // handled with specialty code outside of this
                 break;
             case GamePhase.Draw:
-                /*if (phaseJustChanged && !skip)
-                {
-                    //runner.StartDialogue("DrawAndDiscard"); // TODO: NULL REF
-                    //background.SetActive(true);
-                }*/
+             
 
                 if (phaseJustChanged) {
                     //reset player discard amounts
@@ -304,46 +300,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.Bonus:
-            /*if (phaseJustChanged && !skip) 
-            { 
-                runner.StartDialogue("Defense"); 
-                background.SetActive(true);
-            }*//*
-
-            if (phaseJustChanged)
-            {
-                mIsActionAllowed = true;
-            }
-
-            if (!mIsActionAllowed)
-            {
-                // do nothing - most common case
-            } 
-            else
-            if (mNumberDefense >= MAX_DEFENSE)
-            {
-                mIsActionAllowed = false;
-                DisplayGameStatus(mPlayerName.text + " has played the maximum number of defense cards. Please hit end phase to continue.");
-            }/*
-            else
-            if (!actualPlayer.CheckForCardsOfType(CardType.Defense, actualPlayer.HandCards))
-            {
-                mIsDefenseAllowed = false;
-                // if player has no defense cards to play
-                // then let them know.
-                DisplayGameStatus(mPlayerName.text + " has no defense cards. Please hit end phase to continue.");
-            }
-            else  if (mIsDefenseAllowed)
-            { 
-                mNumberDefense += actualPlayer.HandlePlayCard(GamePhase.Defense, opponentPlayer);
-            }
-            break;*/
+                break;
             case GamePhase.Action:
-                /*if (phaseJustChanged && !skip) 
-                {
-                    runner.StartDialogue("Vulnerability");
-                    background.SetActive(true);
-                }*/
+                
 
                 if (!phaseJustChanged) {
                     if (!mIsActionAllowed) {
@@ -364,80 +323,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
 
                 break;
-            /*case GamePhase.Mitigate:
-                if (phaseJustChanged && !skip) 
-                { 
-                    //runner.StartDialogue("Mitigate");
-                    background.SetActive(true);
-                }
-
-                if (!phaseJustChanged)
-                {
-                    if (mAllowMitigationPlayed)
-                    {
-                        actualPlayer.HandlePlayCard(GamePhase.Mitigate, opponentPlayer);
-                    }
-                }
-                if (phaseJustChanged
-                    && !actualPlayer.CheckForCardsOfType(CardType.Mitigation, actualPlayer.HandCards))
-                {
-                    mAllowMitigationPlayed = false;
-                    // if player has no cards to play
-                    // let them know
-                    DisplayGameStatus(mPlayerName.text + " has no Mitigation cards. Please push End Phase to continue.");
-                }
-                else if (phaseJustChanged)
-                {
-                    mAllowMitigationPlayed = true;
-                }
-
-                break;*/
-            /*case GamePhase.Attack:
-                if (phaseJustChanged && !skip) 
-                { 
-                    //runner.StartDialogue("Attack");
-                    background.SetActive(true);
-                }
-
-                if (phaseJustChanged)
-                {
-                    actualPlayer.HandleAttackPhase(opponentPlayer);
-                    opponentPlayer.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, false, -1);
-                }  
-                
-                break;*/
-            /*case GamePhase.AddStation:
-                if (phaseJustChanged && !skip)
-                {
-                    //runner.StartDialogue("AddStation");
-                    background.SetActive(true);
-                    skip = true;
-                }
-
-                if (phaseJustChanged)
-                {
-                    // we only need one cycle for this particular
-                    // phase as it's automated.
-                    /*Card card = actualPlayer.DrawFacility(true, 0);
-                    // send message about what facility got drawn                 
-                    if (card != null)
-                    {
-                        AddMessage(new Message(CardMessageType.SendPlayedFacility, card.UniqueID, card.data.cardID));
-                        DisplayGameStatus("Both players drew a station card. Please push End Phase to continue.");
-                    }
-
-                }
-                break;*/
-            /*case GamePhase.AddConnections:
-                if (phaseJustChanged)
-                {
-                    mAllowConnections = true;
-                } else if (mAllowConnections)
-                {
-                    DisplayGameStatus("Connection phase is not yet implemented! Please push End Phase to continue.");
-                    mAllowConnections = false;
-                }          
-                break;*/
             case GamePhase.End:
                 // end of game phase
                 if (phaseJustChanged) {
@@ -697,32 +582,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     mNumberDefense = 0;
                 }
                 break;
-            /*case GamePhase.Vulnerability:
-                {
-                    // reset vulnerability allowance
-                    mAllowVulnerabilitiesPlayed = false;
-                    // we need to reset vulnerability costs to be used for next turn               
-                    SendUpdatesToOpponent(mGamePhase, actualPlayer);
-                    actualPlayer.ResetVulnerabilityCost();
-                }
-                break;
-            case GamePhase.Mitigate:
-                {
-                    mAllowMitigationPlayed = false;
-                    SendUpdatesToOpponent(mGamePhase, actualPlayer);
-                    SendUpdatesToOpponent(mGamePhase, opponentPlayer);
-                }
-                break;
-            case GamePhase.Attack:
-                {
-                    SendUpdatesToOpponent(mGamePhase, actualPlayer);
-                    SendUpdatesToOpponent(mGamePhase, opponentPlayer);
-                }
-                break;
-
-            case GamePhase.AddConnections:
-                // WORK
-                break;*/
             case GamePhase.End:
                 break;
             default:
@@ -762,65 +621,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // whether it's a red or blue player
                 opponentPlayer.AddUpdate(update, phase, actualPlayer);
                 break;
-            /*case GamePhase.Vulnerability:
-                // This phase is more painful since it's an opponent card on top of a player facility
-                foreach (Updates update in updates)
-                {
-                    // draw opponent card to place on player facility
-                    // create card to be displayed
-                    Card card = opponentPlayer.DrawCard(false, update.CardID, -1, ref opponentPlayer.DeckIDs, opponentPlayer.playerDropZone, true, ref opponentPlayer.ActiveCards);
-                    Debug.Log("phase vuln opponent card with id : " + update.CardID + " should be in active opponent list.");
-                    Debug.Log("opponent active list size is : " + opponentPlayer.ActiveCards.Count);
-                    GameObject cardGameObject = opponentPlayer.ActiveCards[card.UniqueID];
-                    actualPlayer.AddUpdate(update, cardGameObject, actualPlayer.playerDropZone, phase, false);
-                }
-                break;
-            case GamePhase.Mitigate:
-                // mitigation is also an opponent card on a player facility
-                // note: it's not enough to just have the card id - need to also 
-                // know which facility it's connected to
-                foreach (Updates update in updates)
-                {
-                    // draw opponent card to place on player facility
-                    // create card to be displayed
-                    Debug.Log("phase mitigate opponent card with id : " + update.CardID + " should be in active opponent list.");
-                    Debug.Log("opponent active list size is : " + opponentPlayer.ActiveCards.Count);
-                    opponentPlayer.AddUpdate(update, null, actualPlayer.playerDropZone, phase, false);
-                }
-                break;
-            case GamePhase.Attack:
-                foreach (Updates update in updates)
-                {
-                    bool getRidOfFacility = false;
-                    // first get card type for each update
-                    foreach(GameObject facility in opponentPlayer.ActiveFacilities.Values)
-                    {
-                        Card facilityCard = facility.GetComponent<Card>();
-                        if (facilityCard.data.cardID == update.CardID)
-                        {
-                            getRidOfFacility = true;
-                            break;
-                        }
-                    }
-                    if (getRidOfFacility)
-                    {
-                        Debug.Log("should be getting rid of facility");
-                        opponentPlayer.AddUpdate(update, null, actualPlayer.playerDropZone, phase, true);
-                    }
-                    else
-                    {
-                        // this card is owned by the player
-                        // NOTE: if facility died then this won't actually do anything except tell
-                        // us the facility isn't there in a debug message
-                        opponentPlayer.AddUpdate(update, null, actualPlayer.playerDropZone, phase, false);
-                    }
-
-                    Debug.Log("phase attack needs to change card with id : " + update.CardID + " should be in active opponent list.");
-                    Debug.Log("opponent active list size is : " + opponentPlayer.ActiveCards.Count);
-                    Debug.Log("player active list size is : " + actualPlayer.ActiveCards.Count);
-
-                }
-                break;*/
+            
             default:
                 break;
         }
