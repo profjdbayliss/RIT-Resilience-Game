@@ -270,7 +270,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // start of game phase
                 // handled with specialty code outside of this
                 break;
-            case GamePhase.Draw:
+            case GamePhase.DrawRed:
+            case GamePhase.DrawBlue:
 
 
                 if (phaseJustChanged) {
@@ -294,12 +295,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                     else {
                         if (MIsDiscardAllowed) {
-                            MNumberDiscarded += actualPlayer.HandlePlayCard(GamePhase.Draw, opponentPlayer);
+                            MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
                         }
                     }
                 }
                 break;
-            case GamePhase.Bonus:
+            case GamePhase.BonusRed:
+            case GamePhase.BonusBlue:
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
@@ -447,7 +449,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         gameStarted = true;
 
         // go on to the next phase
-        MGamePhase = GamePhase.Draw;
+        MGamePhase = GamePhase.DrawRed;
 
     }
 
@@ -548,7 +550,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Ends the phase.
     public void EndPhase() {
         switch (MGamePhase) {
-            case GamePhase.Draw: {
+            case GamePhase.DrawBlue:
+            case GamePhase.DrawRed: {
                     // make sure we have a full hand
                     actualPlayer.DrawCards();
                     // set the discard area to work if necessary
@@ -630,11 +633,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Gets the next phase.
     public GamePhase GetNextPhase() {
         return MGamePhase switch {
-            GamePhase.Start => GamePhase.Draw,
-            GamePhase.Draw => isDoomClockActive ? GamePhase.Bonus : GamePhase.ActionRed,
-            GamePhase.Bonus => GamePhase.ActionRed,
-            GamePhase.ActionRed => GamePhase.ActionBlue,
-            GamePhase.ActionBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.Draw,
+            GamePhase.Start => GamePhase.DrawRed,
+            GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
+            GamePhase.BonusRed => GamePhase.ActionRed,
+            GamePhase.ActionRed => GamePhase.DrawBlue,
+            GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
+            GamePhase.BonusBlue => GamePhase.ActionBlue,
+            GamePhase.ActionBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
             _ => GamePhase.End
         };
     }
@@ -654,9 +659,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (!myTurn) {
             myTurn = true;
             MGamePhase = GetNextPhase();
-            //if (CanPlayerEndPhase()) {
+          //  if (IsActualPlayersTurn()) {
                mEndPhaseButton.SetActive(true);
-            //}
+         //   }
             
         }
 
@@ -666,16 +671,20 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int GetTurn() {
         return turnTotal;
     }
-    //determines if the player can end the phase
-    public bool CanPlayerEndPhase() {
-        return IsActualPlayersTurn() || MGamePhase == GamePhase.Draw || MGamePhase == GamePhase.Bonus;
-    }
+    
+    
     public bool IsActualPlayersTurn() {
-        if (MGamePhase == GamePhase.ActionRed) {
-            return actualPlayer.playerTeam == PlayerTeam.Red;
+
+       
+        if (actualPlayer.playerTeam == PlayerTeam.Red) {
+            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.BonusRed;
         }
-        return actualPlayer.playerTeam == PlayerTeam.Blue;
+        else {
+            return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue;
+        }
+
     }
+    
 
     // Adds a message to the message queue for the network.
     public void AddMessage(Message msg) {
@@ -713,7 +722,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private void SkipTutorial() {
         if (!yarnSpinner.activeInHierarchy) { return; }
 
-        if ((skip && mPreviousGamePhase != GamePhase.Start && MGamePhase == GamePhase.Draw)
+        if ((skip && mPreviousGamePhase != GamePhase.Start && MGamePhase == GamePhase.DrawRed)
             || skipClicked) {
             skip = true;
             runner.Stop();

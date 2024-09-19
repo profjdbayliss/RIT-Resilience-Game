@@ -525,8 +525,8 @@ public class CardPlayer : MonoBehaviour {
 
         //much simpler card validation
         (string response, bool canPlay) = GameManager.instance.MGamePhase switch {
-            GamePhase.Draw => CanDiscardCard(),
-            GamePhase.Bonus => ("Cannot discard cards during bonus phase", false), //turn only happens during Doomclock? where you can allocate overtime
+            GamePhase.DrawRed or GamePhase.DrawBlue => CanDiscardCard(),
+            GamePhase.BonusRed or GamePhase.BonusBlue => ("Cannot discard cards during bonus phase", false), //turn only happens during Doomclock? where you can allocate overtime
             GamePhase.ActionRed or GamePhase.ActionBlue => ValidateActionPlay(card),
             _ => ("", false)
         };
@@ -539,7 +539,7 @@ public class CardPlayer : MonoBehaviour {
     }
     private (string,bool) ValidateActionPlay(Card card) {
         if (!GameManager.instance.IsActualPlayersTurn())
-            return ($"It is not this {playerTeam}'s turn", false);
+            return ($"It is not {playerTeam}'s turn", false);
         //check prereq effects on cards
         if (card.data.preReqEffectId != 0) {
             Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
@@ -555,8 +555,11 @@ public class CardPlayer : MonoBehaviour {
     }
 
     private (string, bool) CanDiscardCard() {
+        //check if it is the player's turn
+        if (!GameManager.instance.IsActualPlayersTurn())
+            return ($"It is not {playerTeam}'s turn", false);
         //draw phase checks if the player is discarding a card and if they havent discard more than allowed this phase
-        if (GameManager.instance.MGamePhase == GamePhase.Draw) {
+        if (GameManager.instance.MGamePhase == GamePhase.DrawBlue || GameManager.instance.MGamePhase == GamePhase.DrawRed) {
             if (hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.instance.MNumberDiscarded < GameManager.instance.MAX_DISCARDS) {
                 return ("", true);
             }
@@ -746,7 +749,8 @@ public class CardPlayer : MonoBehaviour {
 
     private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
         switch (phase) {
-            case GamePhase.Draw:
+            case GamePhase.DrawBlue:    
+            case GamePhase.DrawRed:
                 Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
 
                 // change parent and rescale
@@ -934,7 +938,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         if (playCount > 0) {
-            if (phase == GamePhase.Draw) {
+            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue) {
                 // we're not discarding a facility or sharing what we're discarding with the opponent
                 DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
             }

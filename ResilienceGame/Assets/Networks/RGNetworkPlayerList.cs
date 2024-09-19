@@ -181,7 +181,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             // server needs to start their next phase too
                             manager.StartNextPhase();
 
-                            if (nextPhase == GamePhase.Draw) {
+                            if (nextPhase == GamePhase.DrawRed) {
                                 manager.IncrementTurn();
                                 Debug.Log("Turn is done - incrementing and starting again.");
                             }
@@ -354,7 +354,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     // server needs to start next phase as well
                     manager.StartNextPhase();
                     Debug.Log("checking to make sure it's not the next turn");
-                    if (nextPhase == GamePhase.Draw) {
+                    if (nextPhase == GamePhase.DrawRed) {
                         manager.IncrementTurn();
                         Debug.Log("Turn is done - incrementing and starting again.");
                     }
