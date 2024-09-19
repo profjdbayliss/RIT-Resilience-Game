@@ -654,7 +654,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (!myTurn) {
             myTurn = true;
             MGamePhase = GetNextPhase();
-            mEndPhaseButton.SetActive(true);
+            //if (CanPlayerEndPhase()) {
+               mEndPhaseButton.SetActive(true);
+            //}
+            
         }
 
     }
@@ -663,7 +666,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int GetTurn() {
         return turnTotal;
     }
-
+    //determines if the player can end the phase
+    public bool CanPlayerEndPhase() {
+        return IsActualPlayersTurn() || MGamePhase == GamePhase.Draw || MGamePhase == GamePhase.Bonus;
+    }
     public bool IsActualPlayersTurn() {
         if (MGamePhase == GamePhase.ActionRed) {
             return actualPlayer.playerTeam == PlayerTeam.Red;
