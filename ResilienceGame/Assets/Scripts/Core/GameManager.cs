@@ -279,7 +279,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                     MIsDiscardAllowed = true;
                     // draw cards if necessary
-                    actualPlayer.DrawCards();
+                    if (IsActualPlayersTurn())
+                        actualPlayer.DrawCards();
                     // set the discard area to work if necessary
                     actualPlayer.discardDropZone.SetActive(true);
                     MNumberDiscarded = 0;
@@ -287,7 +288,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 else {
                     // draw cards if necessary
-                    actualPlayer.DrawCards();
+                    if (IsActualPlayersTurn())
+                        actualPlayer.DrawCards();
 
                     // check for discard and if there's a discard draw again
                     if (MNumberDiscarded == MAX_DISCARDS) {
@@ -660,12 +662,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
     void ProgressPhase() {
+        var curPhase = MGamePhase;
+        
         MGamePhase = GetNextPhase();
+        Debug.Log($"Progressing phase {curPhase} to {MGamePhase}");
         if (IsActualPlayersTurn()) {
             mEndPhaseButton.SetActive(true);
+            Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
         }
         else {
             EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
+            Debug.Log("Auto ending phase for " + actualPlayer.playerTeam);
         }
     }
     // Starts the next phase.

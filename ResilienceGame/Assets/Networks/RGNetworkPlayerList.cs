@@ -236,6 +236,14 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         count = (uint)data.arguments.Count,
                         payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
                     };
+                    // Log the message details before sending
+                    string argString = string.Join(", ", data.arguments);
+                    Debug.Log($"Sending {data.Type} message:" +
+                        $"\nPlayer ID: {localPlayerID}" +
+                        $"\nArgument Count: {data.arguments.Count}" +
+                        $"\nArguments: {argString}" +
+                        $"\nPayload size: {msg.payload.Count} bytes");
+
 
                     if (!isServer) {
                         NetworkClient.Send(msg);
