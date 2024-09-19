@@ -601,6 +601,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
         while (player.HasUpdates()) {
+            Debug.Log("Checking for updates to send to opponent");
             Message msg;
             List<int> tmpList = new List<int>(4);
             CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
@@ -688,7 +689,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         return turnTotal;
     }
     
-    
+    public bool CanHighlight() {
+        return actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed ||
+            actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue;
+    }
     public bool IsActualPlayersTurn() {
 
        

@@ -443,7 +443,7 @@ public class CardPlayer : MonoBehaviour {
                 var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
                 // Check if the card being dragged is a facility card
                 if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
-                    if (GameManager.instance.IsActualPlayersTurn()) {
+                    if (GameManager.instance.CanHighlight()) {
                         // Activate the hover effect
                         if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
                             hoverActivateObject.ActivateHover();
@@ -1017,7 +1017,7 @@ public class CardPlayer : MonoBehaviour {
 
         }
     }
-
+    #region Stack Cards (old)
     public void StackCards(GameObject stationObject, GameObject addedObject, GameObject dropZone, GamePhase phase) {
         Card stationCard = stationObject.GetComponent<Card>();
 
@@ -1121,7 +1121,8 @@ public class CardPlayer : MonoBehaviour {
         }
 
     }
-
+    #endregion
+    //returns any dropped cards to the hand
     public void ClearDropState() {
         if (HandCards.Count != 0) {
             foreach (GameObject cardGameObject in HandCards.Values) {
