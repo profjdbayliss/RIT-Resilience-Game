@@ -4,6 +4,7 @@ public enum GamePhase
     Start,
     Draw,
     Bonus,
-    Action,
+    ActionRed,
+    ActionBlue,
     End
 };

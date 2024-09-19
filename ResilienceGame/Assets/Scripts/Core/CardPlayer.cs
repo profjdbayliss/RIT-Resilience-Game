@@ -443,7 +443,7 @@ public class CardPlayer : MonoBehaviour {
                 var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
                 // Check if the card being dragged is a facility card
                 if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
-                    if (GameManager.instance.CanStationsBeHighlighted()) {
+                    if (GameManager.instance.IsActualPlayersTurn()) {
                         // Activate the hover effect
                         if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
                             hoverActivateObject.ActivateHover();
@@ -502,6 +502,7 @@ public class CardPlayer : MonoBehaviour {
                 hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
             if (ValidateCardPlay(card)) {
+                Debug.Log("Card is valid to play, dropping?");
                 //set var to hold where the card was dropped
                 cardDroppedOnObject = hoveredDropLocation;
                 //set card state to played
@@ -525,7 +526,7 @@ public class CardPlayer : MonoBehaviour {
         var canPlay = GameManager.instance.MGamePhase switch {
             GamePhase.Draw => CanDiscardCard(),
             GamePhase.Bonus => false, //turn only happens during Doomclock? where you can allocate overtime
-            GamePhase.Action => ValidateActionPlay(card),
+            GamePhase.ActionRed or GamePhase.ActionBlue => ValidateActionPlay(card),
             _ => false,
         };
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
@@ -533,6 +534,8 @@ public class CardPlayer : MonoBehaviour {
         return canPlay;
     }
     private bool ValidateActionPlay(Card card) {
+        if (!GameManager.instance.IsActualPlayersTurn())
+            return false;
         //check prereq effects on cards
         if (card.data.preReqEffectId != 0) {
             Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
@@ -737,7 +740,8 @@ public class CardPlayer : MonoBehaviour {
                 card.state = CardState.CardNeedsToBeDiscarded;
                 playCount = 1;
                 break;
-            case GamePhase.Action:
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
                 break;
         }
     }
@@ -747,7 +751,8 @@ public class CardPlayer : MonoBehaviour {
         Facility facility = FacilityPlayedOn();
         Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
         switch (phase) {
-            case GamePhase.Action:
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
                 // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
                 card.state = CardState.CardInPlay;
                 ActiveCards.Add(card.UniqueID, card.gameObject);
@@ -811,7 +816,8 @@ public class CardPlayer : MonoBehaviour {
     private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
         Debug.Log($"Handling non facility card - {card.front.title}");
         switch (phase) {
-            case GamePhase.Action:
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
                 card.state = CardState.CardInPlay;
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 // NOTE TO DO: need to add proper data and message type for the card here

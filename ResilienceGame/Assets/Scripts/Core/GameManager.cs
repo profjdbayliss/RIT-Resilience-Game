@@ -301,7 +301,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.Bonus:
                 break;
-            case GamePhase.Action:
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
                 
 
                 if (!phaseJustChanged) {
@@ -315,7 +316,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
                     }
                     else {
-                        actualPlayer.HandlePlayCard(GamePhase.Action, opponentPlayer);
+                        actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
                     }
                 }
                 else if (phaseJustChanged) {
@@ -567,12 +568,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     AddMessage(msg);
                 }
                 break;
-            case GamePhase.Action: {
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed: 
                     SendUpdatesToOpponent(MGamePhase, actualPlayer);
                     // reset the defense var's for the next turn
                     mIsActionAllowed = false;
                     mNumberDefense = 0;
-                }
+                
                 break;
             case GamePhase.End:
                 break;
@@ -608,7 +610,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         switch (phase) {
 
-           case GamePhase.Action:
+           case GamePhase.ActionRed:
+            case GamePhase.ActionBlue:
                 // NOTE: TO DO - needs code to do the right thing depending on
                 // whether it's a red or blue player
                 opponentPlayer.AddUpdate(update, phase, actualPlayer);
@@ -627,38 +630,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Gets the next phase.
     public GamePhase GetNextPhase() {
-        GamePhase nextPhase = GamePhase.Start;
-
-        switch (MGamePhase) {
-            case GamePhase.Start:
-                nextPhase = GamePhase.Draw;
-                break;
-            case GamePhase.Draw:
-                nextPhase = isDoomClockActive ? GamePhase.Bonus : GamePhase.Action; //skip bonus phase outside of doom clock
-                break;
-            case GamePhase.Bonus:
-                nextPhase = GamePhase.Action;
-                break;
-            case GamePhase.Action:
-                // end the game if we're out of cards or have
-                // no stations left on the board
-                if (actualPlayer.DeckIDs.Count == 0 || (actualPlayer.ActiveFacilities.Count == 0)) {
-                    nextPhase = GamePhase.End;
-                }
-                else {
-                    //invoke event for round end to inform all observers of the end of the round
-                    OnRoundEnd?.Invoke();
-                    nextPhase = GamePhase.Draw;
-                }
-                break;
-            case GamePhase.End:
-                nextPhase = GamePhase.End;
-                break;
-            default:
-                break;
-        }
-
-        return nextPhase;
+        return MGamePhase switch {
+            GamePhase.Start => GamePhase.Draw,
+            GamePhase.Draw => isDoomClockActive ? GamePhase.Bonus : GamePhase.ActionRed,
+            GamePhase.Bonus => GamePhase.ActionRed,
+            GamePhase.ActionRed => GamePhase.ActionBlue,
+            GamePhase.ActionBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.Draw,
+            _ => GamePhase.End
+        };
     }
 
     // Increments a turn. Note that turns consist of multiple phases.
@@ -686,8 +665,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         return turnTotal;
     }
 
-    public bool CanStationsBeHighlighted() {
-        return MGamePhase == GamePhase.Bonus || MGamePhase == GamePhase.Action;
+    public bool IsActualPlayersTurn() {
+        if (MGamePhase == GamePhase.ActionRed) {
+            return actualPlayer.playerTeam == PlayerTeam.Red;
+        }
+        return actualPlayer.playerTeam == PlayerTeam.Blue;
     }
 
     // Adds a message to the message queue for the network.
