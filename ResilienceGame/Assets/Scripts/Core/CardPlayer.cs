@@ -1230,6 +1230,15 @@ public class CardPlayer : MonoBehaviour {
                 if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
                     if (facilityGo.TryGetComponent(out Facility facility)) {
                         Debug.Log($"Card played on facility: {facility.facilityName}");
+                       // create card to be displayed
+                        Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, facilityGo, true, ref ActiveCards);
+                        GameObject cardGameObject = ActiveCards[card.UniqueID];
+                        cardGameObject.SetActive(false);
+
+                        card.state = CardState.CardInPlay;
+                        Debug.Log("opponent player updates added " + card.data.cardID + " to the active list of size " + ActiveCards.Count);
+                        card.Play(this, opponent, facility);
+                        cardGameObject.SetActive(true);
                     }
                 }
             }
