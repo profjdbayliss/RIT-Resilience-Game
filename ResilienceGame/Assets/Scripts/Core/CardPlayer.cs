@@ -522,14 +522,23 @@ public class CardPlayer : MonoBehaviour {
         return null;
     }
     private bool ValidateCardPlay(Card card) {
+        string response = "";
+        bool canPlay = false;
 
-        //much simpler card validation
-        (string response, bool canPlay) = GameManager.instance.MGamePhase switch {
-            GamePhase.DrawRed or GamePhase.DrawBlue => CanDiscardCard(),
-            GamePhase.BonusRed or GamePhase.BonusBlue => ("Cannot discard cards during bonus phase", false), //turn only happens during Doomclock? where you can allocate overtime
-            GamePhase.ActionRed or GamePhase.ActionBlue => ValidateActionPlay(card),
-            _ => ("", false)
-        };
+        switch (GameManager.instance.MGamePhase) {
+            case GamePhase.DrawRed:
+            case GamePhase.DrawBlue:    
+                (response, canPlay) = CanDiscardCard();
+                break;
+            case GamePhase.BonusBlue:
+            case GamePhase.BonusRed:
+                (response, canPlay) = ("Cannot discard cards during bonus phase", false); //turn only happens during Doomclock? where you can allocate overtime
+                break;
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
+                (response, canPlay) = ValidateActionPlay(card);
+                break;
+        }
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
         if (!canPlay) {
             Debug.Log(response);
