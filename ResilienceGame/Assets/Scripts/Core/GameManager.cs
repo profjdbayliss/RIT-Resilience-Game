@@ -140,7 +140,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 CardPlayer.AddCards(blueCards);
                 //waterPlayer.playerTeam = PlayerTeam.Blue;
                 //waterPlayer.DeckName = "blue";
-                Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+                //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
             }
             else {
                 Debug.Log("Blue deck reader is null.");
@@ -155,7 +155,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 CardPlayer.AddCards(redCards);
                 //energyPlayer.playerTeam = PlayerTeam.Red;
                 //energyPlayer.DeckName = "red";
-                Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+             //   Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
 
             }
             else {

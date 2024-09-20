@@ -163,7 +163,7 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log("card count is: " + cards.Count);
         foreach (Card card in cards.Values) {
             if (card != null && card.DeckName.Equals(DeckName)) {
-                Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
+            //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
                 for (int j = 0; j < card.data.numberInDeck; j++) {
                     DeckIDs.Add(card.data.cardID);
                 }
@@ -231,7 +231,7 @@ public class CardPlayer : MonoBehaviour {
         if (random) {
             rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
             if (cards.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
-                Debug.Log("found proper card!");
+              //  Debug.Log("found proper card!");
             }
             indexForCard = rng;
         }
@@ -278,13 +278,13 @@ public class CardPlayer : MonoBehaviour {
 
         RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
         for (int i = 0; i < tempRaws.Length; i++) {
-            Debug.Log(tempRaws[i]);
+          //  Debug.Log(tempRaws[i]);
             if (tempRaws[i].name == "Image") {
                 tempRaws[i].texture = tempCard.front.img;
             }
             else if (tempRaws[i].name == "Background") {
                 tempRaws[i].color = tempCard.front.color;
-                Debug.Log(tempCard.front.color);
+             //   Debug.Log(tempCard.front.color);
             }
         }
 
@@ -364,7 +364,7 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log("number of cards in draw active deck are: " + activeDeck.Count);
             foreach (GameObject gameObject in activeDeck.Values) {
                 Card card = gameObject.GetComponent<Card>();
-                Debug.Log("active deck value: " + card.UniqueID);
+             //   Debug.Log("active deck value: " + card.UniqueID);
             }
         }
 
