@@ -479,15 +479,15 @@ public class CardPlayer : MonoBehaviour {
     #endregion
     void InitDropLocations() {
 
-        //var dropZones = FindObjectsOfType<CardDropLocation>();
-        //foreach (var dropZone in dropZones) {
-        //    var tag = dropZone.tag;
-        //    if (cardDropLocations.ContainsKey(tag)) {
-        //        tag += ++facilityCount;
-        //    }
-        //    cardDropLocations.Add(tag, dropZone.gameObject);
-        //    //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
-        //}
+        var dropZones = FindObjectsOfType<CardDropLocation>();
+        foreach (var dropZone in dropZones) {
+            var tag = dropZone.tag;
+            if (cardDropLocations.ContainsKey(tag)) {
+                tag += ++facilityCount;
+            }
+            cardDropLocations.Add(tag, dropZone.gameObject);
+            //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
+        }
 
 
     }
@@ -527,7 +527,7 @@ public class CardPlayer : MonoBehaviour {
 
         switch (GameManager.instance.MGamePhase) {
             case GamePhase.DrawRed:
-            case GamePhase.DrawBlue:
+            case GamePhase.DrawBlue:    
                 (response, canPlay) = CanDiscardCard();
                 break;
             case GamePhase.BonusBlue:
@@ -546,7 +546,7 @@ public class CardPlayer : MonoBehaviour {
 
         return canPlay;
     }
-    private (string, bool) ValidateActionPlay(Card card) {
+    private (string,bool) ValidateActionPlay(Card card) {
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
         //check prereq effects on cards
@@ -677,7 +677,7 @@ public class CardPlayer : MonoBehaviour {
 
     }
     #endregion
-
+  
     public GameObject GetActiveCardObject(CardIDInfo cardIdInfo) {
         GameObject cardObject = null;
         if (ActiveCards.ContainsKey(cardIdInfo.UniqueID)) {
@@ -758,7 +758,7 @@ public class CardPlayer : MonoBehaviour {
 
     private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
         switch (phase) {
-            case GamePhase.DrawBlue:
+            case GamePhase.DrawBlue:    
             case GamePhase.DrawRed:
                 Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
 
@@ -1192,7 +1192,8 @@ public class CardPlayer : MonoBehaviour {
 
     // NOTE: TO DO - needs to be updated for new card effects without
     // facilities
-    public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
+    public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent)
+    {
         //GameObject facility;
         //Facility selectedFacility = null;
         //int index = -1;
@@ -1204,7 +1205,7 @@ public class CardPlayer : MonoBehaviour {
         //    selectedFacility = facility.GetComponent<Facility>();
 
         //    // if we found the right facility
-
+           
         //    // facilities
         //    if (update.Type == CardMessageType.CardUpdate)
         //    {
@@ -1247,24 +1248,29 @@ public class CardPlayer : MonoBehaviour {
     // c. id of the card played
     // d. other unique info for special cards
     public CardMessageType GetNextUpdateInMessageFormat(ref List<int> playsForMessage, GamePhase phase) {
-        if (mUpdatesThisPhase.Count > 0) {
+        if (mUpdatesThisPhase.Count > 0)
+        {
             playsForMessage.Add((int)phase);
             Update update = mUpdatesThisPhase.Dequeue();
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
 
-            if (update.Type == CardMessageType.ReduceCost) {
+            if (update.Type == CardMessageType.ReduceCost)
+            {
                 playsForMessage.Add(update.Amount);
             }
-            else if (update.Type == CardMessageType.RemoveEffect) {
+            else if (update.Type == CardMessageType.RemoveEffect)
+            {
                 playsForMessage.Add((int)update.FacilityType);
                 playsForMessage.Add((int)update.Effect);
             }
-            else if (update.Type == CardMessageType.RestorePoints) {
+            else if (update.Type == CardMessageType.RestorePoints)
+            {
                 playsForMessage.Add(update.Amount);
                 playsForMessage.Add((int)update.FacilityType);
             }
-            else if (update.Type == CardMessageType.MeepleShare) {
+            else if (update.Type == CardMessageType.MeepleShare)
+            {
                 // unique id is the player to share with
                 // card id is actually the meeple color
                 // amount is the number of meeples to share
@@ -1330,18 +1336,12 @@ public class CardPlayer : MonoBehaviour {
     }
     void TryLogFacilityInfo() {
         if (this != GameManager.instance.actualPlayer) return;
-        //var hitFacility = cardDropLocations.Values.ToList().FindAll(x => x.GetComponent<Collider2D>().OverlapPoint(Mouse.current.position.ReadValue()));
-        var hitFacility = Physics2D.OverlapPoint(Mouse.current.position.ReadValue(), LayerMask.GetMask("CardDrop"));
+        var hitFacility = cardDropLocations.Values.ToList().Find(x => x.GetComponent<Collider2D>().OverlapPoint(Mouse.current.position.ReadValue()));
         if (hitFacility) {
-            if (hitFacility.TryGetComponent(out Facility facility)) {
-                facility.LogFacilityDebug();
+            var faciltiy = hitFacility.GetComponentInParent<Facility>();
+            if (faciltiy) {
+                faciltiy.LogFacilityDebug(); 
             }
-            else {
-                Debug.Log($"no facility found on collider: {hitFacility.name}");
-            }
-        }
-        else {
-            Debug.Log("no facility found"); 
         }
     }
 }

@@ -1,4 +1,3 @@
-using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +8,14 @@ using UnityEngine.UI;
 
 
 
-public class Facility : NetworkBehaviour {
+public class Facility : MonoBehaviour
+{
     public enum FacilityType
     {
         Production,
         Transmission,
         Distribution
     };
-    [SyncVar]
-    public int UniqueID;
 
 
     public FacilityType facilityType;
@@ -42,10 +40,6 @@ public class Facility : NetworkBehaviour {
     public bool IsFortified { get; set; } = false;
     public bool IsBackdoored { get; set; } = false;
 
-    [Server]
-    private void RegisterWithGameState() {
-        this.UniqueID = GameState.Instance.AddFacility(this);
-    }
 
     // Start is called before the first frame update
     public void Initialize()
@@ -61,8 +55,6 @@ public class Facility : NetworkBehaviour {
         {
             pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
         }
-        RegisterWithGameState();
-
 
         UpdateUI();
     }
@@ -151,7 +143,6 @@ public class Facility : NetworkBehaviour {
     public void LogFacilityDebug() {
         StringBuilder facilityInfo = new StringBuilder();
         facilityInfo.Append($"Facility Name: {facilityName} ");
-        facilityInfo.Append($"Facility UID: {UniqueID} ");
         facilityInfo.Append($"Physical Points: {physicalPoints}/{maxPhysicalPoints} ");
         facilityInfo.Append($"Financial Points: {finacialPoints}/{maxFinacialPoints} ");
         facilityInfo.Append($"Network Points: {networkPoints}/{maxNetworkPoints} ");

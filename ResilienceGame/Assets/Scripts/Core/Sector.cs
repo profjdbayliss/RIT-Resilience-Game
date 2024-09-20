@@ -5,13 +5,9 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 using TMPro;
-using Mirror;
 
-public class Sector : NetworkBehaviour {
-
-    [SyncVar]
-    public int UniqueID;
-
+public class Sector : MonoBehaviour
+{
     public PlayerSector sectorName; // TODO: Move playersector here
     public Facility[] facilities;
     public bool isCore;
@@ -62,20 +58,10 @@ public class Sector : NetworkBehaviour {
         { PlayerSector.Transport, 14 }
     };
 
-    private void OnServerInitialized() {
-        
-    }
-
-    [Server]
-    void RegisterWithGameState() {
-        UniqueID = GameState.Instance.AddSector(this);
-    }
 
     public void Initialize(PlayerSector sector)
     {
         InitEffectSprites();
-        RegisterWithGameState();
-
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
         sectorName = sector;

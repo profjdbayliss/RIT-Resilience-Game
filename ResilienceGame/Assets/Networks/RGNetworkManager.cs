@@ -8,8 +8,7 @@ using TMPro;
 public class RGNetworkManager : NetworkManager
 {
     public GameObject playerListPrefab;
-    public GameObject gameStatePrefab;
-
+   
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -17,10 +16,6 @@ public class RGNetworkManager : NetworkManager
         GameObject obj = Instantiate(playerListPrefab);
         playerListPrefab.transform.localScale = Vector3.one;
         NetworkServer.Spawn(obj);
-
-        // Spawn the GameState
-        GameObject gameStateObject = Instantiate(gameStatePrefab);
-        NetworkServer.Spawn(gameStateObject);
     }
 
 
