@@ -54,7 +54,6 @@ public struct Update {
     public int Amount;
     public FacilityEffectTarget FacilityType;
     public FacilityEffectType Effect;
-    public int FacilityPlayedOnID;
 };
 
 public enum DiscardFromWhere {
@@ -503,7 +502,7 @@ public class CardPlayer : MonoBehaviour {
                 hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
             if (ValidateCardPlay(card)) {
-              //  Debug.Log("Card is valid to play, dropping?");
+                Debug.Log("Card is valid to play, dropping?");
                 //set var to hold where the card was dropped
                 cardDroppedOnObject = hoveredDropLocation;
                 //set card state to played
@@ -776,19 +775,19 @@ public class CardPlayer : MonoBehaviour {
     private void HandleFacilityDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
 
         Facility facility = FacilityPlayedOn();
-      //  Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
+        Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
         switch (phase) {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
+                // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
                 card.state = CardState.CardInPlay;
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 // NOTE: TO DO - need to add the correct update for the card played since some of them
                 // need different info
                 mUpdatesThisPhase.Enqueue(new Update {
-                    Type = CardMessageType.CardUpdateWithFacility,
-                    UniqueID = card.UniqueID,   
-                    CardID = card.data.cardID,
-                    FacilityPlayedOnID = facility.UniqueID
+                    Type = CardMessageType.CardUpdate,
+                    UniqueID = card.UniqueID,
+                    CardID = card.data.cardID
                 });
 
                 card.Play(this, opponentPlayer, facility, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
@@ -917,7 +916,7 @@ public class CardPlayer : MonoBehaviour {
                         return playCount;
                         // Debug.LogError("Card was dropped on null object?");
                     }
-                   // Debug.Log("Valid card play made somewhere!");
+                    Debug.Log("Valid card play made somewhere!");
                     //check where the card was dropped based on the tag
                     switch (cardDroppedOnObject.tag) {
                         case CardDropZoneTag.DISCARD:
@@ -928,7 +927,6 @@ public class CardPlayer : MonoBehaviour {
                                 HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
                             }
                             else {
-                                //HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
                                 HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
                             }
                             break;
@@ -1254,10 +1252,6 @@ public class CardPlayer : MonoBehaviour {
             Update update = mUpdatesThisPhase.Dequeue();
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
-
-            if (update.Type == CardMessageType.CardUpdateWithFacility) {
-                playsForMessage.Add(update.FacilityPlayedOnID);
-            }
 
             if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);

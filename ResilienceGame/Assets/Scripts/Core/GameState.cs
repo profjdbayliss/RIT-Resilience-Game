@@ -11,9 +11,11 @@ public class GameState : NetworkBehaviour {
     [SyncVar(hook = nameof(OnCurrentSectorIDChanged))]
     private int currentSectorID = 0;
 
-    public readonly SyncDictionary<int, Facility> AllFacilities = new SyncDictionary<int, Facility>();
+    [SyncVar]
+    public SyncDictionary<int, Facility> AllFacilities = new SyncDictionary<int, Facility>();
 
-    public readonly SyncDictionary<int, Sector> AllSectors = new SyncDictionary<int, Sector>();
+    [SyncVar]
+    public SyncDictionary<int, Sector> AllSectors = new SyncDictionary<int, Sector>();
 
     public override void OnStartServer() {
         base.OnStartServer();

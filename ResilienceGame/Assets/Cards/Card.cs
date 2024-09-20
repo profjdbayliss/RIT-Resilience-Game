@@ -8,7 +8,8 @@ using Unity.Collections;
 using System.Linq;
 
 // Enum to track the state of the card
-public enum CardState {
+public enum CardState
+{
     NotInDeck,
     CardInDeck,
     CardDrawn,
@@ -19,7 +20,8 @@ public enum CardState {
 };
 
 // Enum to indicate what the card is being played on
-public enum CardTarget {
+public enum CardTarget
+{
     Hand,
     Card,
     Effect,
@@ -27,15 +29,17 @@ public enum CardTarget {
     Sector
 };
 
-public struct CardIDInfo {
+public struct CardIDInfo
+{
     public int UniqueID;
     public int CardID;
 };
 
-public class Card : MonoBehaviour, IPointerClickHandler {
+public class Card : MonoBehaviour, IPointerClickHandler
+{
     public CardData data;
     // this card needs a unique id since multiples of the same card can be played
-    public int UniqueID;
+    public int UniqueID; 
     public CardFront front;
     public CardState state;
     public CardTarget target;
@@ -58,20 +62,23 @@ public class Card : MonoBehaviour, IPointerClickHandler {
     // cards from the other player's deck.
     //public List<string> MitigatesWhatCards = new List<string>(10);
     Vector2 mDroppedPosition;
-    // GameManager mManager; 
+   // GameManager mManager; 
     public List<ICardAction> ActionList = new List<ICardAction>(6);
 
     // Start is called before the first frame update
-    void Start() {
+    void Start()
+    {
         originalPosition = this.gameObject.transform.position;
         //mManager = GameObject.FindObjectOfType<GameManager>();
         OutlineImage.SetActive(false);
     }
 
 
-    public void OnPointerClick(PointerEventData eventData) {
-       // Debug.Log("click release on card");
-        if (this.state == CardState.CardDrawn) {
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Debug.Log("click release on card");
+        if (this.state == CardState.CardDrawn)
+        {
             // note that click consumes the release of most drag and release motions
             //Debug.Log("potentially card dropped.");
             state = CardState.CardDrawnDropped;
@@ -96,7 +103,8 @@ public class Card : MonoBehaviour, IPointerClickHandler {
         }*/
     }
 
-    public bool OutlineActive() {
+    public bool OutlineActive()
+    {
         return OutlineImage.activeSelf;
     }
 
@@ -107,16 +115,20 @@ public class Card : MonoBehaviour, IPointerClickHandler {
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null) {
+    public void Play(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    {
         Debug.Log($"Executing card actions for card: {front.name}");
-        foreach (ICardAction action in ActionList) {
+        foreach(ICardAction action in ActionList)
+        {
             action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
         }
     }
 
     // Cancel this card
-    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null) {
-        foreach (ICardAction action in ActionList) {
+    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    {
+        foreach (ICardAction action in ActionList)
+        {
             action.Canceled(player, opponent, facilityActedUpon, cardActedUpon, this);
         }
     }
@@ -125,5 +137,5 @@ public class Card : MonoBehaviour, IPointerClickHandler {
         transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
     }
 
-
+    
 }
