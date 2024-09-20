@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using static Facility;
 
 /// <summary>
 /// The types of messages. 
@@ -160,32 +161,54 @@ public class Message
     /// </summary>
     /// <returns>A list of the type, sender id, and arguments in this message separated by colons.
     ///</returns>
-    public override string ToString()
-    {
-        StringBuilder str = new StringBuilder(type.ToString() + ":: ");
-        if (hasArgs)
-        {
-            int argcount = Count();
-            if (argcount != 0)
-            {
-                str.Append("::");
-                for (int i = 0; i < argcount; i++)
-                {
-                    if (i < argcount - 1)
-                    {
-                        str.Append(arguments[i] + ": ");
-                    }
-                    else
-                    {
-                        str.Append(arguments[i]);
+    public override string ToString() {
+        StringBuilder str = new StringBuilder($"MessageType: {type}");
+
+        if (hasArgs) {
+            str.Append(", Args: ");
+            if (isBytes) {
+                if (byteArguments != null && byteArguments.Count > 0) {
+                    for (int i = 0; i < byteArguments.Count; i++) {
+                        str.Append($"[{i}]={byteArguments[i]}");
+                        if (i < byteArguments.Count - 1) str.Append(", ");
                     }
                 }
-                
+                else {
+                    str.Append("(empty)");
+                }
             }
+            else {
+                if (arguments != null && arguments.Count > 0) {
+                    for (int i = 0; i < arguments.Count; i++) {
+                        str.Append($"[{GetUpdateNameFromInt(i)}]={arguments[i]}");
+                        if (type == CardMessageType.CardUpdate && i == 3) {
+                            // Assuming the 4th argument (index 3) is always FacilityType for CardUpdate
+                            str.Append($" (FacilityType: {(FacilityType)arguments[i]})");
+                        }
+                        if (i < arguments.Count - 1) str.Append(", ");
+                    }
+                }
+                else {
+                    str.Append("(empty)");
+                }
+            }
+        }
+        else {
+            str.Append(", No Args");
         }
 
         return str.ToString();
     }
-    
+
+    private string GetUpdateNameFromInt(int i) {
+        return i switch {
+            0 => "Player ID",
+            1 => "Unique Card ID",
+            3 => "Facility Type",
+            2 => "Card ID",
+            _ => ""
+        };
+    }
+
 
 }

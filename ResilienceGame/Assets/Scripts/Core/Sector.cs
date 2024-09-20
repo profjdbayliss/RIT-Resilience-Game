@@ -6,8 +6,7 @@ using System.IO;
 using UnityEngine.UI;
 using TMPro;
 
-public class Sector : MonoBehaviour
-{
+public class Sector : MonoBehaviour {
     public PlayerSector sectorName; // TODO: Move playersector here
     public Facility[] facilities;
     public bool isCore;
@@ -37,7 +36,7 @@ public class Sector : MonoBehaviour
     private const string BACKDOOR_ICON_PATH = "images/Backdoor.png";
     private const string FORTIFY_ICON_PATH = "images/Fortified.png";
     public static Sprite[] EffectSprites;
-   
+
 
     private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
         { PlayerSector.Communications, 3 },
@@ -59,8 +58,7 @@ public class Sector : MonoBehaviour
     };
 
 
-    public void Initialize(PlayerSector sector)
-    {
+    public void Initialize(PlayerSector sector) {
         InitEffectSprites();
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
@@ -173,16 +171,13 @@ public class Sector : MonoBehaviour
         return null;
     }
 
-    public Facility[] CheckDownedFacilities()
-    {
+    public Facility[] CheckDownedFacilities() {
         Facility[] facilitiesList = new Facility[3];
         int downedFacilities = 0;
         // TODO: check isDown;
         //I think this should work? - Mukund
-        for(int i = 0; i < facilities.Length; i++)
-        {
-            if(facilities[i].isDown)
-            {
+        for (int i = 0; i < facilities.Length; i++) {
+            if (facilities[i].isDown) {
                 facilitiesList[downedFacilities] = facilities[i];
                 downedFacilities++;
             }
@@ -190,7 +185,7 @@ public class Sector : MonoBehaviour
 
         return facilitiesList;
     }
-    
+
     public bool CanAffordCardPlay(Card card) {
         return card.data.blueCost <= blueMeeples &&
             card.data.blackCost <= blackMeeples &&
@@ -255,10 +250,9 @@ public class Sector : MonoBehaviour
 
             ProcessFacility(values);
 
-            // TODO: arent sectors core not facilities? Actually i just think this print statement is misleading, isCore is part of sector
             if (!string.IsNullOrEmpty(values[8])) {
                 isCore = bool.Parse(values[8].Trim());
-                Debug.Log($"Is it a core facility? {isCore}");
+                Debug.Log($"Is it a core sector? {isCore}");
             }
         }
         reader.Close();
@@ -273,18 +267,15 @@ public class Sector : MonoBehaviour
             Debug.Log($"Unknown facility type: {values[2]}");
             return;
         }
-
-        int index = (int)facilityType;
+        int index = ((int)facilityType) - 1;
         if (index < 0 || index >= facilities.Length) {
-            Debug.Log($"Invalid facility index: {index}");
+            Debug.LogError($"Invalid facility index: {index}");
             return;
         }
-
         Facility facility = facilities[index];
         facility.facilityType = facilityType;
         facility.facilityName = values[1];
         facility.UpdateNameText();
-
         for (int j = 3; j < 6; j++) {
             if (Enum.TryParse(values[j], out PlayerSector enumName)) {
                 facility.dependencies[j - 3] = enumName;
@@ -293,7 +284,6 @@ public class Sector : MonoBehaviour
                 Debug.Log($"Dependency not parsed: {values[j]}");
             }
         }
-
         facility.SetFacilityPoints(
             int.Parse(values[10]),
             int.Parse(values[11]),

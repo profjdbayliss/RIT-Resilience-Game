@@ -8,6 +8,7 @@ using UnityEngine.InputSystem.Utilities;
 using static Facility;
 using UnityEngine.PlayerLoop;
 using System.Xml;
+using UnityEngine.XR;
 
 // many messages actually have no arguments
 public struct RGNetworkShortMessage : NetworkMessage {
@@ -389,7 +390,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     public void OnClientReceiveLongMessage(RGNetworkLongMessage msg) {
-        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: " + msg.indexId + " " + msg.type);
+        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: " + msg.ToString());
         uint senderId = msg.indexId;
         CardMessageType type = (CardMessageType)msg.type;
 
@@ -461,11 +462,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
                         Update update = new Update {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
-                            CardID = cardId
+                            CardID = cardId,
+                            FacilityType = (FacilityType)facilityType,
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
@@ -512,7 +515,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                             Amount = amount,
-                            FacilityType = (FacilityEffectTarget)facilityType,
+                            FacilityType = (FacilityType)facilityType,
                         };
                         //Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
@@ -534,8 +537,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Type = CardMessageType.ReduceCost,
                             UniqueID = uniqueId,
                             CardID = cardId,
-                            FacilityType = (FacilityEffectTarget)facilityType,
-                            Effect = (FacilityEffectType)effect,
+                            FacilityType = (FacilityType)facilityType,
+                            EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
@@ -659,11 +662,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+
+                        element += 4;
 
                         Update update = new Update {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
-                            CardID = cardId
+                            CardID = cardId,
+                            FacilityType = (FacilityType)facilityType
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
@@ -710,7 +717,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                             Amount = amount,
-                            FacilityType = (FacilityEffectTarget)facilityType,
+                            FacilityType = (FacilityType)facilityType,
                         };
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
@@ -731,8 +738,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Type = CardMessageType.ReduceCost,
                             UniqueID = uniqueId,
                             CardID = cardId,
-                            FacilityType = (FacilityEffectTarget)facilityType,
-                            Effect = (FacilityEffectType)effect,
+                            FacilityType = (FacilityType)facilityType,
+                            EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 

@@ -11,6 +11,7 @@ using Vector3 = UnityEngine.Vector3;
 using System.Linq;
 using UnityEngine.PlayerLoop;
 using static UnityEngine.PlayerLoop.EarlyUpdate;
+using static Facility;
 
 // Enum to track player type
 public enum PlayerTeam {
@@ -52,8 +53,8 @@ public struct Update {
     public int CardID;
     public int UniqueID;
     public int Amount;
-    public FacilityEffectTarget FacilityType;
-    public FacilityEffectType Effect;
+    public FacilityType FacilityType;
+    public FacilityEffectType EffectTarget;
 };
 
 public enum DiscardFromWhere {
@@ -114,7 +115,7 @@ public class CardPlayer : MonoBehaviour {
     Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
 
-
+    bool registeredFacilities = false;
 
     //public GameObject hoveredDropLocation;
 
@@ -163,7 +164,7 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log("card count is: " + cards.Count);
         foreach (Card card in cards.Values) {
             if (card != null && card.DeckName.Equals(DeckName)) {
-            //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
+                //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
                 for (int j = 0; j < card.data.numberInDeck; j++) {
                     DeckIDs.Add(card.data.cardID);
                 }
@@ -171,6 +172,14 @@ public class CardPlayer : MonoBehaviour {
             }
         }
 
+    }
+    //add the facilities to the player's active facilities
+    public void RegisterFacilities() {
+        registeredFacilities = true;
+        foreach (Facility facility in playerSector.facilities) {
+          //  ActiveFacilities.Add((int)facility.facilityType, facility.gameObject);
+            FacilityIDs.Add((int)facility.facilityType);
+        }
     }
 
     public virtual void DrawCards() {
@@ -216,10 +225,6 @@ public class CardPlayer : MonoBehaviour {
         card.transform.SetParent(discardDropZone.transform, false);
         card.transform.localPosition = new Vector3();
     }
-    //This is for testing to force draw a specific card
-    public void DisplayCardSelectionMenu() {
-
-    }
 
     public virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy,
@@ -231,7 +236,7 @@ public class CardPlayer : MonoBehaviour {
         if (random) {
             rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
             if (cards.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
-              //  Debug.Log("found proper card!");
+                //  Debug.Log("found proper card!");
             }
             indexForCard = rng;
         }
@@ -278,13 +283,13 @@ public class CardPlayer : MonoBehaviour {
 
         RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
         for (int i = 0; i < tempRaws.Length; i++) {
-          //  Debug.Log(tempRaws[i]);
+            //  Debug.Log(tempRaws[i]);
             if (tempRaws[i].name == "Image") {
                 tempRaws[i].texture = tempCard.front.img;
             }
             else if (tempRaws[i].name == "Background") {
                 tempRaws[i].color = tempCard.front.color;
-             //   Debug.Log(tempCard.front.color);
+                //   Debug.Log(tempCard.front.color);
             }
         }
 
@@ -364,7 +369,7 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log("number of cards in draw active deck are: " + activeDeck.Count);
             foreach (GameObject gameObject in activeDeck.Values) {
                 Card card = gameObject.GetComponent<Card>();
-             //   Debug.Log("active deck value: " + card.UniqueID);
+                //   Debug.Log("active deck value: " + card.UniqueID);
             }
         }
 
@@ -378,6 +383,14 @@ public class CardPlayer : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         IsDraggingCard = handPositioner.IsDraggingCard;
+
+        //init once sector is ready
+        if (!registeredFacilities) {
+            if (playerSector != null) {
+                if (playerSector.facilities != null && playerSector.facilities.Length > 0)
+                    RegisterFacilities();
+            }
+        }
 
         if (IsDraggingCard) {
             UpdateHoveredDropLocation();
@@ -486,6 +499,7 @@ public class CardPlayer : MonoBehaviour {
                 tag += ++facilityCount;
             }
             cardDropLocations.Add(tag, dropZone.gameObject);
+
             //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
 
@@ -527,7 +541,7 @@ public class CardPlayer : MonoBehaviour {
 
         switch (GameManager.instance.MGamePhase) {
             case GamePhase.DrawRed:
-            case GamePhase.DrawBlue:    
+            case GamePhase.DrawBlue:
                 (response, canPlay) = CanDiscardCard();
                 break;
             case GamePhase.BonusBlue:
@@ -546,7 +560,7 @@ public class CardPlayer : MonoBehaviour {
 
         return canPlay;
     }
-    private (string,bool) ValidateActionPlay(Card card) {
+    private (string, bool) ValidateActionPlay(Card card) {
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
         //check prereq effects on cards
@@ -677,7 +691,7 @@ public class CardPlayer : MonoBehaviour {
 
     }
     #endregion
-  
+
     public GameObject GetActiveCardObject(CardIDInfo cardIdInfo) {
         GameObject cardObject = null;
         if (ActiveCards.ContainsKey(cardIdInfo.UniqueID)) {
@@ -695,7 +709,7 @@ public class CardPlayer : MonoBehaviour {
         Dictionary<int, GameObject> discardFromArea = where switch {
             DiscardFromWhere.Hand => HandCards,
             DiscardFromWhere.MyPlayZone => ActiveCards,
-            DiscardFromWhere.MyFacility => ActiveFacilities,
+            // DiscardFromWhere.MyFacility => ActiveFacilities,
             _ => HandCards,
         };
         foreach (GameObject activeCardObject in discardFromArea.Values) {
@@ -758,7 +772,7 @@ public class CardPlayer : MonoBehaviour {
 
     private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
         switch (phase) {
-            case GamePhase.DrawBlue:    
+            case GamePhase.DrawBlue:
             case GamePhase.DrawRed:
                 Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
 
@@ -787,7 +801,8 @@ public class CardPlayer : MonoBehaviour {
                 mUpdatesThisPhase.Enqueue(new Update {
                     Type = CardMessageType.CardUpdate,
                     UniqueID = card.UniqueID,
-                    CardID = card.data.cardID
+                    CardID = card.data.cardID,
+                    FacilityType = facility.facilityType
                 });
 
                 card.Play(this, opponentPlayer, facility, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
@@ -1143,90 +1158,82 @@ public class CardPlayer : MonoBehaviour {
         }
     }
 
-    public bool CheckHighlightedStations() {
-        bool singleHighlighted = false;
-        int countHighlighted = 0;
+    //public bool CheckHighlightedStations() {
+    //    bool singleHighlighted = false;
+    //    int countHighlighted = 0;
 
-        foreach (GameObject gameObject in ActiveFacilities.Values) {
-            Card card = gameObject.GetComponent<Card>();
-            if (card.OutlineImage.activeSelf) {
-                countHighlighted++;
-            }
-        }
+    //    foreach (GameObject gameObject in ActiveFacilities.Values) {
+    //        Card card = gameObject.GetComponent<Card>();
+    //        if (card.OutlineImage.activeSelf) {
+    //            countHighlighted++;
+    //        }
+    //    }
 
-        if (countHighlighted == 1)
-            singleHighlighted = true;
+    //    if (countHighlighted == 1)
+    //        singleHighlighted = true;
 
-        return singleHighlighted;
-    }
+    //    return singleHighlighted;
+    //}
 
-    public GameObject GetHighlightedStation() {
-        GameObject station = null;
+    //public GameObject GetHighlightedStation() {
+    //    GameObject station = null;
 
-        foreach (GameObject gameObject in ActiveFacilities.Values) {
-            Card card = gameObject.GetComponent<Card>();
-            if (card.OutlineImage.activeSelf) {
-                station = gameObject;
-                break;
-            }
-        }
+    //    foreach (GameObject gameObject in ActiveFacilities.Values) {
+    //        Card card = gameObject.GetComponent<Card>();
+    //        if (card.OutlineImage.activeSelf) {
+    //            station = gameObject;
+    //            break;
+    //        }
+    //    }
 
-        return station;
-    }
+    //    return station;
+    //}
 
 
-    public bool CheckForCardsOfType(CardType cardType, Dictionary<int, GameObject> listToCheck) {
-        bool hasCardType = false;
+    //public bool CheckForCardsOfType(CardType cardType, Dictionary<int, GameObject> listToCheck) {
+    //    bool hasCardType = false;
 
-        foreach (GameObject gameObject in listToCheck.Values) {
-            Card card = gameObject.GetComponent<Card>();
-            if (card.data.cardType == cardType) {
-                hasCardType = true;
-                break;
-            }
-        }
+    //    foreach (GameObject gameObject in listToCheck.Values) {
+    //        Card card = gameObject.GetComponent<Card>();
+    //        if (card.data.cardType == cardType) {
+    //            hasCardType = true;
+    //            break;
+    //        }
+    //    }
 
-        return hasCardType;
-    }
+    //    return hasCardType;
+    //}
 
 
     // NOTE: TO DO - needs to be updated for new card effects without
     // facilities
-    public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent)
-    {
-        //GameObject facility;
-        //Facility selectedFacility = null;
-        //int index = -1;
-        //Debug.Log("number of active facilities are " + ActiveFacilities.Count);
+    public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
+        Debug.Log("adding an update for the opponent to get");
 
-        //// find unique facility in facilities list
-        //if (ActiveFacilities.TryGetValue(update.UniqueID, out facility))
-        //{
-        //    selectedFacility = facility.GetComponent<Facility>();
+        Debug.Log($"Update Type: {update.Type}");
 
-        //    // if we found the right facility
-           
-        //    // facilities
-        //    if (update.Type == CardMessageType.CardUpdate)
-        //    {
-        //        // create card to be displayed
-        //        Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, opponentDropZone, true, ref ActiveCards);
-        //        GameObject cardGameObject = ActiveCards[card.UniqueID];
-        //        cardGameObject.SetActive(false);
-
-        //        // add card to its displayed cards
-        //        StackCards(facility, cardGameObject, opponentDropZone, GamePhase.Action);
-        //        card.state = CardState.CardInPlay;
-        //        Debug.Log("opponent player updates added " + card.data.cardID + " to the active list of size " + ActiveCards.Count);
-        //        card.Play(this, opponent, selectedFacility);
-        //        cardGameObject.SetActive(true);
-        //    }
-
-        //}
-        //else
-        //{
-        //    Debug.Log("a facility was not found for an opponent play - there's a bug somewhere.");
-        //}
+        if (update.Type == CardMessageType.CardUpdate) {
+            if (update.FacilityType == FacilityType.None) {
+                Debug.Log("None facility card played");
+            }
+            else {
+                Debug.Log($"Card played on facility type: {update.FacilityType}");
+                Dictionary<int, GameObject> facilityList = null;
+                if (ActiveFacilities != null && ActiveFacilities.Count > 0) {
+                    facilityList = ActiveFacilities;
+                }
+                else {
+                    facilityList = opponent.ActiveFacilities;
+                }
+                Debug.Log($"Active facilities: {facilityList.Count}");
+                if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
+                    if (facilityGo.TryGetComponent(out Facility facility)) {
+                        Debug.Log($"Card played on facility: {facility.facilityName}");
+                    }
+                }
+            }
+        }
+        
     }
 
     void CalculateScore() {
@@ -1248,29 +1255,28 @@ public class CardPlayer : MonoBehaviour {
     // c. id of the card played
     // d. other unique info for special cards
     public CardMessageType GetNextUpdateInMessageFormat(ref List<int> playsForMessage, GamePhase phase) {
-        if (mUpdatesThisPhase.Count > 0)
-        {
+        if (mUpdatesThisPhase.Count > 0) {
             playsForMessage.Add((int)phase);
             Update update = mUpdatesThisPhase.Dequeue();
+            //public CardMessageType Type;int CardID;int UniqueID;int Amount;FacilityType FacilityType;FacilityEffectType Effect;
+            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|facility type:{update.FacilityType}|effect target:{update.EffectTarget}");
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
+            playsForMessage.Add((int)update.FacilityType);
+            
 
-            if (update.Type == CardMessageType.ReduceCost)
-            {
+            if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);
             }
-            else if (update.Type == CardMessageType.RemoveEffect)
-            {
+            else if (update.Type == CardMessageType.RemoveEffect) {
                 playsForMessage.Add((int)update.FacilityType);
-                playsForMessage.Add((int)update.Effect);
+                playsForMessage.Add((int)update.EffectTarget);
             }
-            else if (update.Type == CardMessageType.RestorePoints)
-            {
+            else if (update.Type == CardMessageType.RestorePoints) {
                 playsForMessage.Add(update.Amount);
                 playsForMessage.Add((int)update.FacilityType);
             }
-            else if (update.Type == CardMessageType.MeepleShare)
-            {
+            else if (update.Type == CardMessageType.MeepleShare) {
                 // unique id is the player to share with
                 // card id is actually the meeple color
                 // amount is the number of meeples to share
@@ -1340,7 +1346,7 @@ public class CardPlayer : MonoBehaviour {
         if (hitFacility) {
             var faciltiy = hitFacility.GetComponentInParent<Facility>();
             if (faciltiy) {
-                faciltiy.LogFacilityDebug(); 
+                faciltiy.LogFacilityDebug();
             }
         }
     }

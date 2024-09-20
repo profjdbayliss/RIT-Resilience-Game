@@ -19813,13 +19813,13 @@ GameObject:
   - component: {fileID: 1920413918}
   - component: {fileID: 1920413922}
   - component: {fileID: 1920413923}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: PlayerDropLocation
   m_TagString: FreePlayDropLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1920413918
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ public class Facility : MonoBehaviour
 {
     public enum FacilityType
     {
+        None,
         Production,
         Transmission,
         Distribution
