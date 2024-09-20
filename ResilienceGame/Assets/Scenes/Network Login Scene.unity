@@ -2664,6 +2664,7 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 4942807824831339288, guid: 8973b49dc5494744299fb38eb03854c4, type: 3}
+  - {fileID: 8184782950529613975, guid: 80b554f548307f74299f655e5d95eaa5, type: 3}
   snapshotSettings:
     bufferTimeMultiplier: 2
     bufferLimit: 32
@@ -2678,6 +2679,7 @@ MonoBehaviour:
   connectionQualityInterval: 3
   timeInterpolationGui: 0
   playerListPrefab: {fileID: 4942807824831339288, guid: 8973b49dc5494744299fb38eb03854c4, type: 3}
+  gameStatePrefab: {fileID: 8184782950529613975, guid: 80b554f548307f74299f655e5d95eaa5, type: 3}
 --- !u!1 &2143458411
 GameObject:
   m_ObjectHideFlags: 0
