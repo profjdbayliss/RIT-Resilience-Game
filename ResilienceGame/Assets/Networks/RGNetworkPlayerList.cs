@@ -225,6 +225,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 break;
             case CardMessageType.ShareDiscardNumber:
             case CardMessageType.CardUpdate:
+            case CardMessageType.CardUpdateWithFacility:
             case CardMessageType.ReduceCost:
             case CardMessageType.RestorePoints:
             case CardMessageType.RemoveEffect:
@@ -278,7 +279,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     public void OnClientReceiveShortMessage(RGNetworkShortMessage msg) {
-        Debug.Log("CLIENT RECEIVED SHORT MESSAGE::: " + msg.indexId + " " + msg.type);
+        Debug.Log("CLIENT RECEIVED SHORT MESSAGE::: " + msg.indexId + " " + (CardMessageType)msg.type);
         uint senderId = msg.indexId;
         CardMessageType type = (CardMessageType)msg.type;
 
@@ -314,7 +315,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
-        Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.indexId + " " + msg.type);
+        Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.indexId + " " + (CardMessageType)msg.type);
         uint senderId = msg.indexId;
         CardMessageType type = (CardMessageType)msg.type;
 
@@ -389,7 +390,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     public void OnClientReceiveLongMessage(RGNetworkLongMessage msg) {
-        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: " + msg.indexId + " " + msg.type);
+        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: " + msg.indexId + " " + (CardMessageType)msg.type);
         uint senderId = msg.indexId;
         CardMessageType type = (CardMessageType)msg.type;
 
@@ -468,6 +469,28 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.CardUpdateWithFacility: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update {
+                            Type = CardMessageType.CardUpdateWithFacility,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            FacilityPlayedOnID = facilityId
+                        };
+                        Debug.Log($"Client received update message from opponent containing playerID: {uniqueId} played card id: {cardId} on facility id: {facilityId} in game phase {gamePhase}");
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }

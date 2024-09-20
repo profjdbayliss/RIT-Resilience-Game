@@ -1129,7 +1129,6 @@ GameObject:
   - component: {fileID: 92073678}
   - component: {fileID: 92073677}
   - component: {fileID: 92073676}
-  - component: {fileID: 92073679}
   m_Layer: 6
   m_Name: Distribution Facility Box
   m_TagString: FacilityDropLocation
@@ -1225,19 +1224,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 92073674}
   m_CullTransparentMesh: 1
---- !u!114 &92073679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 92073674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hoverImage: {fileID: 912450324}
 --- !u!1 &92478569
 GameObject:
   m_ObjectHideFlags: 0
@@ -4205,6 +4191,7 @@ GameObject:
   - component: {fileID: 325979393}
   - component: {fileID: 325979394}
   - component: {fileID: 325979395}
+  - component: {fileID: 325979396}
   m_Layer: 6
   m_Name: TransmissionFacility
   m_TagString: FacilityDropLocation
@@ -4297,6 +4284,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &325979396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325979391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverImage: {fileID: 2138288044}
 --- !u!1 &327071780
 GameObject:
   m_ObjectHideFlags: 0
@@ -6758,6 +6758,7 @@ GameObject:
   - component: {fileID: 510286171}
   - component: {fileID: 510286172}
   - component: {fileID: 510286173}
+  - component: {fileID: 510286174}
   m_Layer: 6
   m_Name: DistributionFacility
   m_TagString: FacilityDropLocation
@@ -6850,6 +6851,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &510286174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510286169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverImage: {fileID: 912450324}
 --- !u!1 &520008979
 GameObject:
   m_ObjectHideFlags: 0
@@ -6862,7 +6876,6 @@ GameObject:
   - component: {fileID: 520008983}
   - component: {fileID: 520008982}
   - component: {fileID: 520008981}
-  - component: {fileID: 520008984}
   m_Layer: 6
   m_Name: Transmission Facility Box
   m_TagString: FacilityDropLocation
@@ -6958,19 +6971,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 520008979}
   m_CullTransparentMesh: 1
---- !u!114 &520008984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 520008979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hoverImage: {fileID: 2138288044}
 --- !u!1 &522352602
 GameObject:
   m_ObjectHideFlags: 0
@@ -13527,6 +13527,7 @@ GameObject:
   - component: {fileID: 1173674370}
   - component: {fileID: 1173674371}
   - component: {fileID: 1173674372}
+  - component: {fileID: 1173674373}
   m_Layer: 6
   m_Name: ProductionFacility
   m_TagString: FacilityDropLocation
@@ -13619,6 +13620,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1173674373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173674368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverImage: {fileID: 476417662}
 --- !u!114 &1186955220 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6323935187928403899, guid: 638e885a48f1a46c29aaa1b64688b208, type: 3}
@@ -17118,7 +17132,6 @@ GameObject:
   - component: {fileID: 1599086104}
   - component: {fileID: 1599086103}
   - component: {fileID: 1599086102}
-  - component: {fileID: 1599086101}
   m_Layer: 6
   m_Name: Production Facility Box
   m_TagString: FacilityDropLocation
@@ -17150,19 +17163,6 @@ RectTransform:
   m_AnchoredPosition: {x: -87.74608, y: 163.38623}
   m_SizeDelta: {x: 866, y: 123.6}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1599086101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599086097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca1089fb8f2e0624d82940eb60cee511, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hoverImage: {fileID: 476417662}
 --- !u!114 &1599086102
 MonoBehaviour:
   m_ObjectHideFlags: 0

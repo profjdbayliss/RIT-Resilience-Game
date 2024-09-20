@@ -115,7 +115,7 @@ public class FacilityEffect {
         if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
             duration = 3;
         }
-        Debug.Log($"Creating effect: {effectType}, {target}, {amount}, {duration}");
+      //  Debug.Log($"Creating effect: {effectType}, {target}, {amount}, {duration}");
         return new FacilityEffect(effectType, target, id, amount, duration);
     }
 

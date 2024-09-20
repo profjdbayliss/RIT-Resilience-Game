@@ -71,7 +71,7 @@ public class Facility : NetworkBehaviour {
     }
     public void ChangeFacilityPoints(string target, int value) {
         target = target.ToLower().Trim();
-        Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
+      //  Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
         switch (target) {
             case "physical":
                 physicalPoints += value;
@@ -86,7 +86,7 @@ public class Facility : NetworkBehaviour {
                 networkPoints = Mathf.Clamp(networkPoints, 0, maxNetworkPoints);
                 break;
         }
-        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
+    //    Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
         // Update isDown based on points
         isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
 
