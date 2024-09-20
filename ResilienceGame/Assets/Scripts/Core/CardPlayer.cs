@@ -176,8 +176,9 @@ public class CardPlayer : MonoBehaviour {
     //add the facilities to the player's active facilities
     public void RegisterFacilities() {
         registeredFacilities = true;
+        Debug.Log($"Player {playerName} of team {playerTeam} registering facilities");
         foreach (Facility facility in playerSector.facilities) {
-          //  ActiveFacilities.Add((int)facility.facilityType, facility.gameObject);
+            ActiveFacilities.Add((int)facility.facilityType, facility.gameObject);
             FacilityIDs.Add((int)facility.facilityType);
         }
     }
@@ -1233,7 +1234,7 @@ public class CardPlayer : MonoBehaviour {
                 }
             }
         }
-        
+
     }
 
     void CalculateScore() {
@@ -1263,7 +1264,7 @@ public class CardPlayer : MonoBehaviour {
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
             playsForMessage.Add((int)update.FacilityType);
-            
+
 
             if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);
