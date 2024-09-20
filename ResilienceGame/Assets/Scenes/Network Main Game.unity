@@ -4292,8 +4292,6 @@ MonoBehaviour:
   - {fileID: 988311466}
   facilityNameText: {fileID: 310921094}
   effectIcon: {fileID: 1162327640}
-  effect: 0
-  effectNegated: 0
   isDown: 0
 --- !u!1 &327071780
 GameObject:
@@ -6803,8 +6801,6 @@ MonoBehaviour:
   - {fileID: 606468166}
   facilityNameText: {fileID: 96068603}
   effectIcon: {fileID: 67481886}
-  effect: 0
-  effectNegated: 0
   isDown: 0
 --- !u!1 &520008979
 GameObject:
@@ -13570,8 +13566,6 @@ MonoBehaviour:
   - {fileID: 470503063}
   facilityNameText: {fileID: 426345553}
   effectIcon: {fileID: 1672299466}
-  effect: 0
-  effectNegated: 0
   isDown: 0
 --- !u!114 &1186955220 stripped
 MonoBehaviour:

@@ -58,8 +58,8 @@ public class CardReader : MonoBehaviour {
                     if (singleLineCSVObjects.Length > 1) // excel adds an empty line at the end
                     {
                         //Debug.Log("number of items in a line is: " + singleLineCSVObjects.Length);
-                        if (!singleLineCSVObjects[5].Equals(string.Empty) && !singleLineCSVObjects[5].Equals("")) {
-                            filenames.Add(singleLineCSVObjects[5].Trim());
+                        if (!singleLineCSVObjects[27].Equals(string.Empty) && !singleLineCSVObjects[27].Equals("")) {
+                            filenames.Add(singleLineCSVObjects[27].Trim());
                         }
                         else {
                             filenames.Add(string.Empty);
