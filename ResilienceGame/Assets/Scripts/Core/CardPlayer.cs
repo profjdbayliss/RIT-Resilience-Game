@@ -1230,7 +1230,8 @@ public class CardPlayer : MonoBehaviour {
                 if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
                     if (facilityGo.TryGetComponent(out Facility facility)) {
                         Debug.Log($"Card played on facility: {facility.facilityName}");
-                       // create card to be displayed
+                        // create card to be displayed
+                        //TODO: Fix visuals/animation
                         Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, facilityGo, true, ref ActiveCards);
                         GameObject cardGameObject = ActiveCards[card.UniqueID];
                         cardGameObject.SetActive(false);
