@@ -1214,7 +1214,13 @@ public class CardPlayer : MonoBehaviour {
                         Debug.Log($"Card played on facility: {facility.facilityName}");
                         // create card to be displayed
                         //TODO: Fix visuals/animation
-                        Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, facilityGo, true, ref ActiveCards);
+                        Card card = DrawCard(random: false, 
+                            cardId: update.CardID, 
+                            uniqueId: -1, 
+                            deckToDrawFrom: ref DeckIDs,
+                            dropZone: facilityGo, 
+                            allowSlippy: false, 
+                            activeDeck: ref ActiveCards);
                         handSize--; // remove card from hand
                         GameObject cardGameObject = ActiveCards[card.UniqueID];
                         cardGameObject.SetActive(false);
@@ -1222,17 +1228,16 @@ public class CardPlayer : MonoBehaviour {
                         card.state = CardState.CardInPlay;
                         card.Play(this, opponent, facility);
 
+                        // Calculate the position for the card
+                        Vector3 facilityPosition = facilityGo.transform.position;
+                        Vector3 topCenterPosition = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1f, Camera.main.nearClipPlane));
+                        topCenterPosition.z = 0; // Ensure it's on the same Z-plane as other objects
 
-
-                        //// Set initial position at the top center of the screen
-                        //Vector3 startPosition = Vector3.zero;
-                        //startPosition.z = 0;
-                        //cardGameObject.transform.position = startPosition;
-                        //cardGameObject.transform.localScale = Vector3.one;
-
+                        // Set the card's position to the top center of the screen
+                        cardGameObject.transform.position = topCenterPosition;
                         cardGameObject.SetActive(true);
 
-                        Vector3 facilityPosition = facilityGo.transform.position;
+                        
                         //  StartCoroutine(card.AnimateOpponentCard(facilityPosition));
 
 
