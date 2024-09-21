@@ -76,6 +76,12 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         OutlineImage.SetActive(false);
     }
     
+    void Update() {
+        if (state == CardState.CardInPlay) {
+            Debug.Log($"World position: {transform.position}");
+            Debug.Log($"Local Position: {transform.localPosition}");
+        }
+    }
 
 
     public void OnPointerClick(PointerEventData eventData)

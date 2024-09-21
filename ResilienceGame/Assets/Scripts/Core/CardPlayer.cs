@@ -430,7 +430,7 @@ public class CardPlayer : MonoBehaviour {
         Vector2 mousePosition = Mouse.current.position.ReadValue();
 
         Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(mousePosition, LayerMask.GetMask("CardDrop"));
-        Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
+      //  Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
         if (hoveredColliders != null && hoveredColliders.Length > 0) {
             isOverAnyDropLocation = true;
             Collider2D hoveredFacilityCollider = null;
@@ -461,7 +461,7 @@ public class CardPlayer : MonoBehaviour {
                     if (GameManager.instance.CanHighlight()) {
                         // Activate the hover effect
                         if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                            Debug.Log("Hovering");
+                        //    Debug.Log("Hovering");
                             hoverActivateObject.ActivateHover();
                             currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
                         }
@@ -1228,14 +1228,29 @@ public class CardPlayer : MonoBehaviour {
                         GameObject cardGameObject = ActiveCards[card.UniqueID];
                         cardGameObject.SetActive(false);
 
-                        card.state = CardState.CardInPlay;
+                        //card.state = CardState.CardInPlay;
                         card.Play(this, opponent, facility);
 
-                        //// Calculate the position for the card
-                        Vector3 facilityPosition = facilityGo.transform.position;
-                        Vector3 topCenterPosition = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1f, Camera.main.nearClipPlane));
-                        card.transform.localPosition = Vector3.zero;
-                        card.transform.position = topCenterPosition;
+                        // Find the parent Canvas
+                        Canvas parentCanvas = GetComponentInParent<Canvas>();
+
+
+
+                        // Calculate center position of the Canvas
+                        //RectTransform canvasRect = parentCanvas.GetComponent<RectTransform>();
+                        //Vector2 centerPosition = canvasRect.rect.center;
+
+
+                        //card.transform.position = centerPosition;
+                        //what is happening
+                        //running these 4 lines once permanently fixed a bug that was causing cards to be pushed off the side of the screen despite them having a trigger collider
+                        //var cardCollider = cardGameObject.GetComponent<Collider2D>();
+                        //cardCollider.enabled = false;
+                        //cardCollider.isTrigger = true;
+                        //cardCollider.enabled = true;
+
+
+                        Debug.Log($"card position: {card.transform.position}");
                         // StartCoroutine(card.AnimateOpponentCard(topCenterPosition, facilityPosition));
 
                         //// Set the card's position to the top center of the screen
