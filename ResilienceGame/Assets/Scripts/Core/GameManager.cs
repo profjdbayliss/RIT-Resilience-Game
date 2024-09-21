@@ -12,6 +12,8 @@ using System.IO;
 using System;
 
 public class GameManager : MonoBehaviour, IRGObservable {
+
+    #region fields
     //allow for spawning of cards
     public bool DEBUG_ENABLED = true;
 
@@ -118,229 +120,37 @@ public class GameManager : MonoBehaviour, IRGObservable {
     static bool hasStartedAlready = false;
 
     public static event Action OnRoundEnd;
+    #endregion
 
-    public void Awake() {
-        instance = this;
-    }
-
-    // Start is called before the first frame update
-    void Start() {
-        mStartGameRun = false;
-        Debug.Log("start run on GameManager");
-        if (!hasStartedAlready) {
-            startScreen.SetActive(true);
-
-            //TODO: Read based on number of players/selection
-
-            // read water deck
-            CardReader reader = blueDeckReader.GetComponent<CardReader>();
-            if (reader != null) {
-                // TODO: Set with csv
-                blueCards = reader.CSVRead(mCreateWaterAtlas); // TODO: Remove var, single atlas
-                CardPlayer.AddCards(blueCards);
-                //waterPlayer.playerTeam = PlayerTeam.Blue;
-                //waterPlayer.DeckName = "blue";
-                //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+    #region Initialization
+    // Called by dropdown list box to set up the player type
+    public void SetPlayerType() {
+        if (playerDeckChoice == null) {
+            playerDeckChoice = playerDeckList.GetComponent<TMPro.TMP_Dropdown>();
+            if (playerDeckChoice == null) {
+                Debug.Log("deck choice is null!");
             }
-            else {
-                Debug.Log("Blue deck reader is null.");
-            }
-
-
-            // TODO: Remove, should be selected by csv
-            // read energy deck
-            reader = redDeckReader.GetComponent<CardReader>();
-            if (reader != null) {
-                redCards = reader.CSVRead(mCreateEnergyAtlas);
-                CardPlayer.AddCards(redCards);
-                //energyPlayer.playerTeam = PlayerTeam.Red;
-                //energyPlayer.DeckName = "red";
-             //   Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
-
-            }
-            else {
-                Debug.Log("Energy deck reader is null.");
-            }
-
-            // Set dialogue runner for tutorial
-            runner = yarnSpinner.GetComponent<DialogueRunner>();
-            background = yarnSpinner.transform.GetChild(0).GetChild(0).gameObject;
-            //Debug.Log(background);
-            hasStartedAlready = true;
         }
-        else {
-            Debug.Log("start is being run multiple times!");
+
+        if (playerDeckChoice != null) {
+            // set this player's type
+            switch (playerDeckChoice.value) {
+                // TODO: this is tied to the drop down menu
+                case 0:
+                    playerType = PlayerTeam.Red;
+                    break;
+                case 1:
+                    playerType = PlayerTeam.Blue;
+                    break;
+                default:
+                    break;
+            }
+
+            // display player type on view???
+            Debug.Log("player type set to be " + playerType);
         }
 
     }
-
-    // Set up the main player of the game
-
-    public void SetupActors() {
-        // we should know when choice they
-        // wanted by now and can set up
-        // appropriate values
-
-        // TODO: Change PlayerType
-        if (playerType == PlayerTeam.Red) {
-            //actualPlayer = energyPlayer;
-            actualPlayer.playerTeam = PlayerTeam.Red;
-            actualPlayer.DeckName = "red";
-
-        }
-        else if (playerType == PlayerTeam.Blue) {
-            //actualPlayer = waterPlayer;
-            actualPlayer.playerTeam = PlayerTeam.Blue;
-            actualPlayer.DeckName = "blue";
-
-            //// TODO: Set randomly
-            //actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
-            //actualPlayer.playerSector.Initialize(PlayerSector.Water);
-        }
-
-        // Initialize the deck info and set various
-        // player zones active
-        actualPlayer.InitializeCards();
-        actualPlayer.discardDropZone.SetActive(true);
-        actualPlayer.handDropZone.SetActive(true);
-        actualPlayer.playerDropZone.SetActive(true);
-    }
-
-    // Update is called once per frame
-    void Update() {
-        if (DEBUG_ENABLED) {
-            if (Keyboard.current.f1Key.wasPressedThisFrame) {
-                Debug.Log("Add card to hand");
-                actualPlayer.ForceDrawCard();
-            }
-            else if (Keyboard.current.f2Key.wasPressedThisFrame) {
-                Debug.Log("Add card to discard");
-                actualPlayer.ForceDiscardRandomCard();
-            }
-        }
-        if (isInit) {
-            if (gameStarted) {
-                HandlePhases(MGamePhase);
-            }
-
-            // always notify observers in case there's a message
-            // waiting to be processed.
-            NotifyObservers();
-
-        }
-        else {
-            // the network takes a while to start up and 
-            // we wait for it.
-            mRGNetworkPlayerList = RGNetworkPlayerList.instance;
-            if (mRGNetworkPlayerList != null) {
-                // means network init is done
-                // and we're joined
-                RegisterObserver(mRGNetworkPlayerList);
-                isServer = mRGNetworkPlayerList.isServer;
-                CardPlayer player = GameObject.FindObjectOfType<CardPlayer>();
-                if (player != null) {
-                    // player is initialized and ready to go
-                    // this follows the network init and also
-                    // takes a while to happen
-                    isInit = true;
-                }
-            }
-        }
-
-    }
-
-
-    // Handle all the card game phases with
-    // this simple state machine.
-    public void HandlePhases(GamePhase phase) {
-        // TODO: Implement team turns
-
-        // keep track of 
-        bool phaseJustChanged = false;
-        MGamePhase = phase;
-        if (!MGamePhase.Equals(mPreviousGamePhase)) {
-            phaseJustChanged = true;
-            mPhaseText.text = MGamePhase.ToString();
-            mPreviousGamePhase = phase;
-            //SkipTutorial();
-        }
-
-        switch (phase) {
-            case GamePhase.Start:
-                // start of game phase
-                // handled with specialty code outside of this
-                break;
-            case GamePhase.DrawRed:
-            case GamePhase.DrawBlue:
-
-
-                if (phaseJustChanged) {
-                    //reset player discard amounts
-
-                    MIsDiscardAllowed = true;
-                    // draw cards if necessary
-                    if (IsActualPlayersTurn())
-                        actualPlayer.DrawCards();
-                    // set the discard area to work if necessary
-                    actualPlayer.discardDropZone.SetActive(true);
-                    MNumberDiscarded = 0;
-                    DisplayGameStatus("[TEAM COLOR] has drawn " + actualPlayer.HandCards.Count + " cards each.");
-                }
-                else {
-                    // draw cards if necessary
-                    if (IsActualPlayersTurn())
-                        actualPlayer.DrawCards();
-
-                    // check for discard and if there's a discard draw again
-                    if (MNumberDiscarded == MAX_DISCARDS) {
-                        DisplayGameStatus(mPlayerName.text + " has reached the maximum discard number. Please hit end phase to continue.");
-                    }
-                    else {
-                        if (MIsDiscardAllowed) {
-                            MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
-                        }
-                    }
-                }
-                break;
-            case GamePhase.BonusRed:
-            case GamePhase.BonusBlue:
-                break;
-            case GamePhase.ActionBlue:
-            case GamePhase.ActionRed:
-
-
-                if (!phaseJustChanged) {
-                    if (!mIsActionAllowed) {
-                        // do nothing - most common scenario
-                    }
-                    else
-                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples()) {
-                        Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
-                        mIsActionAllowed = false;
-                        DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
-                    }
-                    else {
-                        actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
-                    }
-                }
-                else if (phaseJustChanged) {
-                    mIsActionAllowed = true;
-                }
-
-                break;
-            case GamePhase.End:
-                // end of game phase
-                if (phaseJustChanged) {
-                    Debug.Log("end game has happened. Sending message to other player.");
-                    int playerScore = actualPlayer.GetScore();
-                    AddMessage(new Message(CardMessageType.EndGame));
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
     // Called when pressing the button to start
     // Doesn't actually start the game until ALL
     // the players connected have pressed their start buttons.
@@ -458,7 +268,173 @@ public class GameManager : MonoBehaviour, IRGObservable {
         StartNextPhase();
 
     }
+    public void Awake() {
+        instance = this;
+    }
 
+    // Start is called before the first frame update
+    void Start() {
+        mStartGameRun = false;
+        Debug.Log("start run on GameManager");
+        if (!hasStartedAlready) {
+            startScreen.SetActive(true);
+
+            //TODO: Read based on number of players/selection
+
+            // read water deck
+            CardReader reader = blueDeckReader.GetComponent<CardReader>();
+            if (reader != null) {
+                // TODO: Set with csv
+                blueCards = reader.CSVRead(mCreateWaterAtlas); // TODO: Remove var, single atlas
+                CardPlayer.AddCards(blueCards);
+                //waterPlayer.playerTeam = PlayerTeam.Blue;
+                //waterPlayer.DeckName = "blue";
+                //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+            }
+            else {
+                Debug.Log("Blue deck reader is null.");
+            }
+
+
+            // TODO: Remove, should be selected by csv
+            // read energy deck
+            reader = redDeckReader.GetComponent<CardReader>();
+            if (reader != null) {
+                redCards = reader.CSVRead(mCreateEnergyAtlas);
+                CardPlayer.AddCards(redCards);
+                //energyPlayer.playerTeam = PlayerTeam.Red;
+                //energyPlayer.DeckName = "red";
+                //   Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+
+            }
+            else {
+                Debug.Log("Energy deck reader is null.");
+            }
+
+            // Set dialogue runner for tutorial
+            runner = yarnSpinner.GetComponent<DialogueRunner>();
+            background = yarnSpinner.transform.GetChild(0).GetChild(0).gameObject;
+            //Debug.Log(background);
+            hasStartedAlready = true;
+        }
+        else {
+            Debug.Log("start is being run multiple times!");
+        }
+
+    }
+
+    // Set up the main player of the game
+
+    public void SetupActors() {
+        // we should know when choice they
+        // wanted by now and can set up
+        // appropriate values
+
+        // TODO: Change PlayerType
+        if (playerType == PlayerTeam.Red) {
+            //actualPlayer = energyPlayer;
+            actualPlayer.playerTeam = PlayerTeam.Red;
+            actualPlayer.DeckName = "red";
+
+        }
+        else if (playerType == PlayerTeam.Blue) {
+            //actualPlayer = waterPlayer;
+            actualPlayer.playerTeam = PlayerTeam.Blue;
+            actualPlayer.DeckName = "blue";
+
+            //// TODO: Set randomly
+            //actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
+            //actualPlayer.playerSector.Initialize(PlayerSector.Water);
+        }
+
+        // Initialize the deck info and set various
+        // player zones active
+        actualPlayer.InitializeCards();
+        actualPlayer.discardDropZone.SetActive(true);
+        actualPlayer.handDropZone.SetActive(true);
+        actualPlayer.playerDropZone.SetActive(true);
+    }
+
+    #endregion
+
+    #region Update
+    // Update is called once per frame
+    void Update() {
+        if (DEBUG_ENABLED) {
+            if (Keyboard.current.f1Key.wasPressedThisFrame) {
+                Debug.Log("Add card to hand");
+                actualPlayer.ForceDrawCard();
+            }
+            else if (Keyboard.current.f2Key.wasPressedThisFrame) {
+                Debug.Log("Add card to discard");
+                actualPlayer.ForceDiscardRandomCard();
+            }
+        }
+        if (isInit) {
+            if (gameStarted) {
+                HandlePhases(MGamePhase);
+            }
+
+            // always notify observers in case there's a message
+            // waiting to be processed.
+            NotifyObservers();
+
+        }
+        else {
+            // the network takes a while to start up and 
+            // we wait for it.
+            mRGNetworkPlayerList = RGNetworkPlayerList.instance;
+            if (mRGNetworkPlayerList != null) {
+                // means network init is done
+                // and we're joined
+                RegisterObserver(mRGNetworkPlayerList);
+                isServer = mRGNetworkPlayerList.isServer;
+                CardPlayer player = GameObject.FindObjectOfType<CardPlayer>();
+                if (player != null) {
+                    // player is initialized and ready to go
+                    // this follows the network init and also
+                    // takes a while to happen
+                    isInit = true;
+                }
+            }
+        }
+
+    }
+    
+
+    #endregion
+
+    #region Interface Updates
+    // WORK: there is no menu?????
+    public void BackToMenu() {
+
+        if (NetworkServer.active && NetworkClient.isConnected) {
+            NetworkManager.singleton.StopHost();
+        }
+        else if (NetworkServer.active) {
+            NetworkManager.singleton.StopServer();
+        }
+        else if (NetworkClient.isConnected) {
+            NetworkManager.singleton.StopClient();
+        }
+        Destroy(RGNetworkManager.singleton.gameObject);
+        // SceneManager.LoadScene(0);
+
+    }
+
+
+
+    // Show the cards and game UI for player.
+    public void ShowPlayUI() {
+        actualPlayer.handDropZone.SetActive(true);
+        actualPlayer.discardDropZone.SetActive(true);
+    }
+
+    // Hide the cards and game UI for the player.
+    public void HidePlayUI() {
+        actualPlayer.handDropZone.SetActive(false);
+        actualPlayer.discardDropZone.SetActive(false);
+    }
     // display info about the game's status on the screen
     public void DisplayGameStatus(string message) {
         StatusText.text = message;
@@ -473,6 +449,24 @@ public class GameManager : MonoBehaviour, IRGObservable {
             " and " + mOpponentName.text + " ends the game with score " + opponentPlayer.GetScore();
 
         //WriteListToFile(Path.Combine(Application.streamingAssetsPath, "messages.log"), messageLog);
+    }
+    #endregion
+
+    #region Helpers
+    public bool CanHighlight() {
+        return actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed ||
+            actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue;
+    }
+    public bool IsActualPlayersTurn() {
+
+
+        if (actualPlayer.playerTeam == PlayerTeam.Red) {
+            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.BonusRed;
+        }
+        else {
+            return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue;
+        }
+
     }
     public void WriteListToFile(string filePath, List<string> stringList) {
         // Ensure the directory exists
@@ -494,65 +488,141 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void SetReceivedEndGame(bool value) {
         mReceivedEndGame = value;
     }
+    #endregion
 
-    // WORK: there is no menu?????
-    public void BackToMenu() {
+    #region Phase Handling
+    void ProgressPhase() {
+        var curPhase = MGamePhase;
 
-        if (NetworkServer.active && NetworkClient.isConnected) {
-            NetworkManager.singleton.StopHost();
+        MGamePhase = GetNextPhase();
+        Debug.Log($"Progressing phase {curPhase} to {MGamePhase}");
+        if (IsActualPlayersTurn()) {
+            mEndPhaseButton.SetActive(true);
+            Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
         }
-        else if (NetworkServer.active) {
-            NetworkManager.singleton.StopServer();
+        else {
+            EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
+            Debug.Log("Auto ending phase for " + actualPlayer.playerTeam);
         }
-        else if (NetworkClient.isConnected) {
-            NetworkManager.singleton.StopClient();
-        }
-        Destroy(RGNetworkManager.singleton.gameObject);
-        // SceneManager.LoadScene(0);
-
     }
+    // Starts the next phase.
+    public void StartNextPhase() {
 
-    // Called by dropdown list box to set up the player type
-    public void SetPlayerType() {
-        if (playerDeckChoice == null) {
-            playerDeckChoice = playerDeckList.GetComponent<TMPro.TMP_Dropdown>();
-            if (playerDeckChoice == null) {
-                Debug.Log("deck choice is null!");
+        if (MGamePhase == GamePhase.Start) {
+            ProgressPhase();
+        }
+        else {
+            if (!myTurn) {
+                myTurn = true;
+                ProgressPhase();
+
             }
         }
 
-        if (playerDeckChoice != null) {
-            // set this player's type
-            switch (playerDeckChoice.value) {
-                // TODO: this is tied to the drop down menu
-                case 0:
-                    playerType = PlayerTeam.Red;
-                    break;
-                case 1:
-                    playerType = PlayerTeam.Blue;
-                    break;
-                default:
-                    break;
-            }
+    }
+    // Gets the next phase.
+    public GamePhase GetNextPhase() {
+        return MGamePhase switch {
+            GamePhase.Start => GamePhase.DrawRed,
+            GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
+            GamePhase.BonusRed => GamePhase.ActionRed,
+            GamePhase.ActionRed => GamePhase.DrawBlue,
+            GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
+            GamePhase.BonusBlue => GamePhase.ActionBlue,
+            GamePhase.ActionBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
+            _ => GamePhase.End
+        };
+    }
+    // Handle all the card game phases with
+    // this simple state machine.
+    public void HandlePhases(GamePhase phase) {
+        // TODO: Implement team turns
 
-            // display player type on view???
-            Debug.Log("player type set to be " + playerType);
+        // keep track of 
+        bool phaseJustChanged = false;
+        MGamePhase = phase;
+        if (!MGamePhase.Equals(mPreviousGamePhase)) {
+            phaseJustChanged = true;
+            mPhaseText.text = MGamePhase.ToString();
+            mPreviousGamePhase = phase;
+            //SkipTutorial();
         }
 
-    }
+        switch (phase) {
+            case GamePhase.Start:
+                // start of game phase
+                // handled with specialty code outside of this
+                break;
+            case GamePhase.DrawRed:
+            case GamePhase.DrawBlue:
 
-    // Show the cards and game UI for player.
-    public void ShowPlayUI() {
-        actualPlayer.handDropZone.SetActive(true);
-        actualPlayer.discardDropZone.SetActive(true);
-    }
 
-    // Hide the cards and game UI for the player.
-    public void HidePlayUI() {
-        actualPlayer.handDropZone.SetActive(false);
-        actualPlayer.discardDropZone.SetActive(false);
-    }
+                if (phaseJustChanged) {
+                    //reset player discard amounts
 
+                    MIsDiscardAllowed = true;
+                    // draw cards if necessary
+                    if (IsActualPlayersTurn())
+                        actualPlayer.DrawCards();
+                    // set the discard area to work if necessary
+                    actualPlayer.discardDropZone.SetActive(true);
+                    MNumberDiscarded = 0;
+                    DisplayGameStatus("[TEAM COLOR] has drawn " + actualPlayer.HandCards.Count + " cards each.");
+                }
+                else {
+                    // draw cards if necessary
+                    if (IsActualPlayersTurn())
+                        actualPlayer.DrawCards();
+
+                    // check for discard and if there's a discard draw again
+                    if (MNumberDiscarded == MAX_DISCARDS) {
+                        DisplayGameStatus(mPlayerName.text + " has reached the maximum discard number. Please hit end phase to continue.");
+                    }
+                    else {
+                        if (MIsDiscardAllowed) {
+                            MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
+                        }
+                    }
+                }
+                break;
+            case GamePhase.BonusRed:
+            case GamePhase.BonusBlue:
+                break;
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
+
+
+                if (!phaseJustChanged) {
+                    if (!mIsActionAllowed) {
+                        // do nothing - most common scenario
+                    }
+                    else
+                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples()) {
+                        Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
+                        mIsActionAllowed = false;
+                        DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
+                    }
+                    else {
+                        actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
+                    }
+                }
+                else if (phaseJustChanged) {
+                    mIsActionAllowed = true;
+                }
+
+                break;
+            case GamePhase.End:
+                // end of game phase
+                if (phaseJustChanged) {
+                    Debug.Log("end game has happened. Sending message to other player.");
+                    int playerScore = actualPlayer.GetScore();
+                    AddMessage(new Message(CardMessageType.EndGame));
+                }
+                break;
+            default:
+                break;
+        }
+    }
     // Ends the phase.
     public void EndPhase() {
         switch (MGamePhase) {
@@ -579,8 +649,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                
-                SendUpdatesToOpponent(MGamePhase, actualPlayer);
+
+                //SendUpdatesToOpponent(MGamePhase, actualPlayer);
                 // reset the defense var's for the next turn
                 mIsActionAllowed = false;
                 mNumberDefense = 0;
@@ -600,119 +670,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
             myTurn = false;
         }
     }
+    #endregion
 
-    public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
-        while (player.HasUpdates()) {
-            Debug.Log("Checking for updates to send to opponent");
-            Message msg;
-            List<int> tmpList = new List<int>(4);
-            CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
-            if (messageType != CardMessageType.None) {
-                msg = new Message(messageType, tmpList);
-                AddMessage(msg);
-            }
-        }
-
-    }
-
-    public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
-
-        switch (phase) {
-
-            case GamePhase.ActionRed:
-            case GamePhase.ActionBlue:
-                // NOTE: TO DO - needs code to do the right thing depending on
-                // whether it's a red or blue player
-                opponentPlayer.AddUpdate(update, phase, actualPlayer);
-                break;
-
-            default:
-                break;
-        }
-
-    }
-
-    public void AddOpponentFacility(int facilityId, int uniqueId) {
-        opponentPlayer.DrawCard(false, facilityId, uniqueId, ref opponentPlayer.FacilityIDs, opponentPlayedZone,
-            false, ref opponentPlayer.ActiveFacilities);
-    }
-
-    // Gets the next phase.
-    public GamePhase GetNextPhase() {
-        return MGamePhase switch {
-            GamePhase.Start => GamePhase.DrawRed,
-            GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
-            GamePhase.BonusRed => GamePhase.ActionRed,
-            GamePhase.ActionRed => GamePhase.DrawBlue,
-            GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
-            GamePhase.BonusBlue => GamePhase.ActionBlue,
-            GamePhase.ActionBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
-            _ => GamePhase.End
-        };
-    }
-
-    // Increments a turn. Note that turns consist of multiple phases.
-    public void IncrementTurn() {
-        OnRoundEnd?.Invoke(); //inform listeners that the round ended
-        turnTotal++;
-        mTurnText.text = "Turn: " + GetTurn();
-        if (isServer) {
-            Debug.Log("server adding increment turn message");
-            AddMessage(new Message(CardMessageType.IncrementTurn));
-        }
-    }
-    void ProgressPhase() {
-        var curPhase = MGamePhase;
-        
-        MGamePhase = GetNextPhase();
-        Debug.Log($"Progressing phase {curPhase} to {MGamePhase}");
-        if (IsActualPlayersTurn()) {
-            mEndPhaseButton.SetActive(true);
-            Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
-        }
-        else {
-            EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
-            Debug.Log("Auto ending phase for " + actualPlayer.playerTeam);
-        }
-    }
-    // Starts the next phase.
-    public void StartNextPhase() {
-        
-        if (MGamePhase == GamePhase.Start) {
-            ProgressPhase();
-        }
-        else {
-            if (!myTurn) {
-                myTurn = true;
-                ProgressPhase();
-
-            }
-        }
-
-    }
-
-    // Gets which turn it is.
-    public int GetTurn() {
-        return turnTotal;
-    }
-    
-    public bool CanHighlight() {
-        return actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed ||
-            actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue;
-    }
-    public bool IsActualPlayersTurn() {
-
-       
-        if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.BonusRed;
-        }
-        else {
-            return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue;
-        }
-
-    }
-    
-
+    #region Networking
     // Adds a message to the message queue for the network.
     public void AddMessage(Message msg) {
         mMessageQueue.Enqueue(msg);
@@ -744,6 +704,67 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
     }
+    public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
+        while (player.HasUpdates()) {
+            Debug.Log("Checking for updates to send to opponent");
+            Message msg;
+            List<int> tmpList = new List<int>(4);
+            CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
+            if (messageType != CardMessageType.None) {
+                msg = new Message(messageType, tmpList);
+                AddMessage(msg);
+            }
+        }
+
+    }
+
+    public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
+
+        switch (phase) {
+
+            case GamePhase.ActionRed:
+            case GamePhase.ActionBlue:
+                // NOTE: TO DO - needs code to do the right thing depending on
+                // whether it's a red or blue player
+                opponentPlayer.AddUpdate(update, phase, actualPlayer);
+                break;
+
+            default:
+                break;
+        }
+
+    }
+    #endregion
+
+    #region Unused
+
+    public void AddOpponentFacility(int facilityId, int uniqueId) {
+        opponentPlayer.DrawCard(false, facilityId, uniqueId, ref opponentPlayer.FacilityIDs, opponentPlayedZone,
+            false, ref opponentPlayer.ActiveFacilities);
+    }
+
+    #endregion
+
+    #region Turn Handling
+
+    // Increments a turn. Note that turns consist of multiple phases.
+    public void IncrementTurn() {
+        OnRoundEnd?.Invoke(); //inform listeners that the round ended
+        turnTotal++;
+        mTurnText.text = "Turn: " + GetTurn();
+        if (isServer) {
+            Debug.Log("server adding increment turn message");
+            AddMessage(new Message(CardMessageType.IncrementTurn));
+        }
+    }
+    // Gets which turn it is.
+    public int GetTurn() {
+        return turnTotal;
+    }
+
+    #endregion
+
+    #region Tutorial
     //Sets dialogue to inactive
     // TODO: For all tutorial methods, rework to display different text depending on player
     private void SkipTutorial() {
@@ -775,6 +796,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log(MGamePhase.ToString());
         runner.StartDialogue(MGamePhase.ToString());
     }
+
+    #endregion
+
+    #region Reset
 
     public void ResetForNewGame() {
         actualPlayer.ResetForNewGame();
@@ -810,4 +835,5 @@ public class GameManager : MonoBehaviour, IRGObservable {
         RGNetworkPlayerList.instance.ResetAllPlayersToNotReady();
         RGNetworkPlayerList.instance.SetPlayerType(actualPlayer.playerTeam);
     }
+    #endregion
 }

@@ -803,10 +803,11 @@ public class CardPlayer : MonoBehaviour {
                     Type = CardMessageType.CardUpdate,
                     UniqueID = card.UniqueID,
                     CardID = card.data.cardID,
-                    FacilityType = facility.facilityType
+                    FacilityType = facility.facilityType //added facility type to update
                 });
+                GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
 
-                card.Play(this, opponentPlayer, facility, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
+                card.Play(this, opponentPlayer, facility);
                 playCount = 1;
                 playKey = card.UniqueID;
 
@@ -1237,7 +1238,6 @@ public class CardPlayer : MonoBehaviour {
                         cardGameObject.SetActive(false);
 
                         card.state = CardState.CardInPlay;
-                        Debug.Log("opponent player updates added " + card.data.cardID + " to the active list of size " + ActiveCards.Count);
                         card.Play(this, opponent, facility);
                         cardGameObject.SetActive(true);
                     }
