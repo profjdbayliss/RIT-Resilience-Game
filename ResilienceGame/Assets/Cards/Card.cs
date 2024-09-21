@@ -53,6 +53,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public int DefenseHealth = 0;
     public List<int> ModifyingCards = new List<int>(10);
     public List<CardIDInfo> AttackingCards = new List<CardIDInfo>(10);
+    private float timer = 0f;
+    private const float timeBetweenPositionLogs = 1f;
 
     [Header("Animation")]
     public bool isPaused = false;
@@ -78,8 +80,15 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     
     void Update() {
         if (state == CardState.CardInPlay) {
-            Debug.Log($"World position: {transform.position}");
-            Debug.Log($"Local Position: {transform.localPosition}");
+            if (timer > timeBetweenPositionLogs) {
+                Debug.Log($"Unique Card Id: {UniqueID}");
+                Debug.Log($"World position: {transform.position}");
+                Debug.Log($"Local Position: {transform.localPosition}");
+                timer = 0f;
+            }
+            else {
+                timer += Time.deltaTime;
+            }
         }
     }
 
@@ -171,7 +180,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         transform.localScale = endScale;
 
         // Disable or destroy the card
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
     public IEnumerator AnimateOpponentCard(Vector3 startPosition, Vector3 facilityPosition) {
         
@@ -231,8 +240,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         transform.position = facilityPosition;
         transform.localScale = Vector3.zero;
 
-        // Disable or destroy the card
-        gameObject.SetActive(false);
+       
+        Destroy(gameObject);
     }
 
     public void OnPointerEnter(PointerEventData eventData) {

@@ -1194,78 +1194,53 @@ public class CardPlayer : MonoBehaviour {
     // NOTE: TO DO - needs to be updated for new card effects without
     // facilities
     public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
-        Debug.Log("adding an update for the opponent to get");
+        Debug.Log($"Player {playerName} is Adding update: {update.Type}, FacilityType: {update.FacilityType}");
 
-        Debug.Log($"Update Type: {update.Type}");
+        if (update.Type == CardMessageType.CardUpdate && update.FacilityType != FacilityType.None) {
+            Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
 
-        if (update.Type == CardMessageType.CardUpdate) {
-            if (update.FacilityType == FacilityType.None) {
-                Debug.Log("None facility card played");
-            }
-            else {
-                Debug.Log($"Card played on facility type: {update.FacilityType}");
-                Dictionary<int, GameObject> facilityList = null;
-                if (ActiveFacilities != null && ActiveFacilities.Count > 0) {
-                    facilityList = ActiveFacilities;
+            if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
+                Debug.Log($"Creating card for facility: {facility.facilityName}");
+
+                Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
+                    deckToDrawFrom: ref DeckIDs, dropZone: facilityGo,
+                    allowSlippy: false, activeDeck: ref ActiveCards);
+
+                if (card != null) {
+                    GameObject cardGameObject = ActiveCards[card.UniqueID];
+                    RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
+
+                    // Set the card's parent to the facility
+                    cardRect.SetParent(facilityGo.transform, false);
+
+                    // Set the local position to zero (centered on facility)
+                    cardRect.localPosition = Vector3.zero;
+
+                    // Set the anchored position to zero
+                    cardRect.anchoredPosition = Vector2.zero;
+
+                    card.state = CardState.CardInPlay;
+                    card.Play(this, opponent, facility);
+
+                    Debug.Log($"Card positioned at - Local: {cardRect.localPosition}, Anchored: {cardRect.anchoredPosition}, World: {cardRect.position}");
+
+                    // Disable collider if necessary
+                    //var cardCollider = cardGameObject.GetComponent<Collider2D>();
+                    //if (cardCollider != null) cardCollider.enabled = false;
+
+                    cardGameObject.SetActive(true);
                 }
                 else {
-                    facilityList = opponent.ActiveFacilities;
-                }
-                Debug.Log($"Active facilities: {facilityList.Count}");
-                if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
-                    if (facilityGo.TryGetComponent(out Facility facility)) {
-                        Debug.Log($"Card played on facility: {facility.facilityName}");
-                        // create card to be displayed
-                        //TODO: Fix visuals/animation
-                        Card card = DrawCard(random: false,
-                            cardId: update.CardID,
-                            uniqueId: -1,
-                            deckToDrawFrom: ref DeckIDs,
-                            dropZone: facilityGo,
-                            allowSlippy: false,
-                            activeDeck: ref ActiveCards);
-                        handSize--; // remove card from hand
-                        GameObject cardGameObject = ActiveCards[card.UniqueID];
-                        cardGameObject.SetActive(false);
-
-                        //card.state = CardState.CardInPlay;
-                        card.Play(this, opponent, facility);
-
-                        // Find the parent Canvas
-                        Canvas parentCanvas = GetComponentInParent<Canvas>();
-
-
-
-                        // Calculate center position of the Canvas
-                        //RectTransform canvasRect = parentCanvas.GetComponent<RectTransform>();
-                        //Vector2 centerPosition = canvasRect.rect.center;
-
-
-                        //card.transform.position = centerPosition;
-                        //what is happening
-                        //running these 4 lines once permanently fixed a bug that was causing cards to be pushed off the side of the screen despite them having a trigger collider
-                        //var cardCollider = cardGameObject.GetComponent<Collider2D>();
-                        //cardCollider.enabled = false;
-                        //cardCollider.isTrigger = true;
-                        //cardCollider.enabled = true;
-
-
-                        Debug.Log($"card position: {card.transform.position}");
-                        // StartCoroutine(card.AnimateOpponentCard(topCenterPosition, facilityPosition));
-
-                        //// Set the card's position to the top center of the screen
-                        //cardGameObject.transform.position = topCenterPosition;
-                        cardGameObject.SetActive(true);
-
-
-
-
-
-                    }
+                    Debug.LogError($"Failed to create card with ID: {update.CardID}");
                 }
             }
+            else {
+                Debug.LogError($"Failed to find facility of type: {update.FacilityType}");
+            }
         }
-
+        else {
+            Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityType}");
+        }
     }
 
     void CalculateScore() {
