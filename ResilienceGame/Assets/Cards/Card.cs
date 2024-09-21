@@ -167,9 +167,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         // Disable or destroy the card
         gameObject.SetActive(false);
     }
-    public IEnumerator AnimateOpponentCard(Vector3 facilityPosition) {
-        // Use the actual current position as the start position
-        Vector3 startPosition = transform.position;
+    public IEnumerator AnimateOpponentCard(Vector3 startPosition, Vector3 facilityPosition) {
+        
 
         // Calculate center position
         Vector3 centerPosition = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, Camera.main.nearClipPlane));

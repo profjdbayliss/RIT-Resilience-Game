@@ -150,6 +150,7 @@ GameObject:
   - component: {fileID: 1113249254216686332}
   - component: {fileID: 9104204982774583798}
   - component: {fileID: 8569617905514962243}
+  - component: {fileID: 5532225760120825650}
   m_Layer: 0
   m_Name: BaseCard 1
   m_TagString: Untagged
@@ -216,6 +217,8 @@ MonoBehaviour:
   OutlineImage: {fileID: 4700192264946514504}
   DefenseHealth: 0
   ModifyingCards: 
+  isPaused: 0
+  skipAnimation: 0
 --- !u!222 &6600138518294792530
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -237,7 +240,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameCanvas: {fileID: 0}
-  cam: {fileID: 0}
   DraggableObject: {fileID: 2025509866969407830}
   maxScale: 3
   minScale: 0.15
@@ -262,6 +264,8 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   playerInput: {fileID: 0}
+  dragScale: {x: 0.5, y: 0.5}
+  dragSmoothTime: 0.1
 --- !u!114 &1113249254216686332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,6 +330,26 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 497.86, y: 660.46}
   m_EdgeRadius: 0
+--- !u!114 &5532225760120825650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025509866969407830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 1
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &2122640190388221680
 GameObject:
   m_ObjectHideFlags: 0

@@ -1217,12 +1217,12 @@ public class CardPlayer : MonoBehaviour {
                         Debug.Log($"Card played on facility: {facility.facilityName}");
                         // create card to be displayed
                         //TODO: Fix visuals/animation
-                        Card card = DrawCard(random: false, 
-                            cardId: update.CardID, 
-                            uniqueId: -1, 
+                        Card card = DrawCard(random: false,
+                            cardId: update.CardID,
+                            uniqueId: -1,
                             deckToDrawFrom: ref DeckIDs,
-                            dropZone: facilityGo, 
-                            allowSlippy: false, 
+                            dropZone: facilityGo,
+                            allowSlippy: false,
                             activeDeck: ref ActiveCards);
                         handSize--; // remove card from hand
                         GameObject cardGameObject = ActiveCards[card.UniqueID];
@@ -1231,17 +1231,19 @@ public class CardPlayer : MonoBehaviour {
                         card.state = CardState.CardInPlay;
                         card.Play(this, opponent, facility);
 
-                        // Calculate the position for the card
+                        //// Calculate the position for the card
                         Vector3 facilityPosition = facilityGo.transform.position;
                         Vector3 topCenterPosition = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1f, Camera.main.nearClipPlane));
-                        topCenterPosition.z = 0; // Ensure it's on the same Z-plane as other objects
+                        card.transform.localPosition = Vector3.zero;
+                        card.transform.position = topCenterPosition;
+                        // StartCoroutine(card.AnimateOpponentCard(topCenterPosition, facilityPosition));
 
-                        // Set the card's position to the top center of the screen
-                        cardGameObject.transform.position = topCenterPosition;
+                        //// Set the card's position to the top center of the screen
+                        //cardGameObject.transform.position = topCenterPosition;
                         cardGameObject.SetActive(true);
 
-                        
-                        //  StartCoroutine(card.AnimateOpponentCard(facilityPosition));
+
+
 
 
                     }
