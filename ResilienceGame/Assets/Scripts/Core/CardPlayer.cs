@@ -811,33 +811,13 @@ public class CardPlayer : MonoBehaviour {
                 playCount = 1;
                 playKey = card.UniqueID;
 
-                /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
-                {
-                    GameObject selected = GetHighlightedStation();
-                    Card selectedCard = selected.GetComponent<Card>();
-                    StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
-                    card.state = CardState.CardInPlay;
-                    ActiveCards.Add(card.UniqueID, gameObjectCard);
 
-                    selectedCard.ModifyingCards.Add(card.UniqueID);
-                    mUpdatesThisPhase.Add(new Updates
-                    {
-                        WhatToDo=AddOrRem.Add,
-                        UniqueFacilityID=selectedCard.UniqueID,
-                        CardID=card.data.cardID
-                    });
+                // Start the animation
+                
+                StartCoroutine(card.AnimateCardToFacility(facility.transform.position, 1.0f));
 
-                    // we should play the card's effects
-                    card.Play(this, opponentPlayer, selectedCard);
-                    playCount = 1;
-                    selectedCard.OutlineImage.SetActive(false);
-                    playKey = card.UniqueID;
-                }
-                else
-                {
-                    card.state = CardState.CardDrawn;
-                    manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
-                }*/
+
+
                 break;
 
             //break;

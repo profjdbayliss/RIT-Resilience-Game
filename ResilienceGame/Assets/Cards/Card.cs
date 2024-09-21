@@ -136,6 +136,33 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public void ToggleCardVisuals(bool enable) {
         transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
     }
+    public IEnumerator AnimateCardToFacility(Vector3 targetPosition, float duration) {
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = targetPosition;
+        Vector3 startScale = transform.localScale;
+        Vector3 endScale = Vector3.zero; // Scale down to zero
+        float elapsed = 0f;
 
-    
+        while (elapsed < duration) {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Smooth step interpolation
+            t = Mathf.SmoothStep(0f, 1f, t);
+
+            transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            transform.localScale = Vector3.Lerp(startScale, endScale, t);
+
+            yield return null;
+        }
+
+        // Ensure final position and scale are set
+        transform.position = endPosition;
+        transform.localScale = endScale;
+
+        // Disable or destroy the card
+        gameObject.SetActive(false);
+    }
+
+
 }
