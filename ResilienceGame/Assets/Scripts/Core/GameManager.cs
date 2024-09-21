@@ -341,7 +341,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         actualPlayer.InitializeCards();
         actualPlayer.discardDropZone.SetActive(true);
         actualPlayer.handDropZone.SetActive(true);
-        actualPlayer.playerDropZone.SetActive(true);
+       
     }
 
     #endregion

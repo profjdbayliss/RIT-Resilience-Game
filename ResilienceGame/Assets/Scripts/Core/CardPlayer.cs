@@ -84,7 +84,7 @@ public class CardPlayer : MonoBehaviour {
     public GameObject handDropZone;
     private HandPositioner handPositioner;
     public GameObject opponentDropZone;
-    public GameObject playerDropZone;
+   // public GameObject playerDropZone;
     public GameObject cardStackingCanvas;
     public readonly float ORIGINAL_SCALE = 0.2f;
     public string DeckName = "";
@@ -102,10 +102,10 @@ public class CardPlayer : MonoBehaviour {
     //int mTotalMeepleValue = 0;
     int mMeeplesSpent = 0;
 
-    Vector2 discardDropMin;
-    Vector2 discardDropMax;
-    Vector2 playedDropMin;
-    Vector2 playedDropMax;
+    //Vector2 discardDropMin;
+    //Vector2 discardDropMax;
+    //Vector2 playedDropMin;
+    //Vector2 playedDropMax;
     //Vector2 opponentDropMin;
     //Vector2 opponentDropMax;
     // the var is static to make sure the id's don't overlap between
@@ -129,19 +129,19 @@ public class CardPlayer : MonoBehaviour {
         }
 
         InitDropLocations();
-        // discard rectangle information for AABB collisions
-        RectTransform discardRectTransform = discardDropZone.GetComponent<RectTransform>();
-        discardDropMin.x = discardRectTransform.position.x - (discardRectTransform.rect.width / 2);
-        discardDropMin.y = discardRectTransform.position.y - (discardRectTransform.rect.height / 2);
-        discardDropMax.x = discardRectTransform.position.x + (discardRectTransform.rect.width / 2);
-        discardDropMax.y = discardRectTransform.position.y + (discardRectTransform.rect.height / 2);
+        //// discard rectangle information for AABB collisions
+        //RectTransform discardRectTransform = discardDropZone.GetComponent<RectTransform>();
+        //discardDropMin.x = discardRectTransform.position.x - (discardRectTransform.rect.width / 2);
+        //discardDropMin.y = discardRectTransform.position.y - (discardRectTransform.rect.height / 2);
+        //discardDropMax.x = discardRectTransform.position.x + (discardRectTransform.rect.width / 2);
+        //discardDropMax.y = discardRectTransform.position.y + (discardRectTransform.rect.height / 2);
 
-        // played area rectangle information for AABB collisions
-        RectTransform playedRectTransform = playerDropZone.GetComponent<RectTransform>();
-        playedDropMin.x = playedRectTransform.position.x - (playedRectTransform.rect.width / 2);
-        playedDropMin.y = playedRectTransform.position.y - (playedRectTransform.rect.height / 2);
-        playedDropMax.x = playedRectTransform.position.x + (playedRectTransform.rect.width / 2);
-        playedDropMax.y = playedRectTransform.position.y + (playedRectTransform.rect.height / 2);
+        //// played area rectangle information for AABB collisions
+        //RectTransform playedRectTransform = playerDropZone.GetComponent<RectTransform>();
+        //playedDropMin.x = playedRectTransform.position.x - (playedRectTransform.rect.width / 2);
+        //playedDropMin.y = playedRectTransform.position.y - (playedRectTransform.rect.height / 2);
+        //playedDropMax.x = playedRectTransform.position.x + (playedRectTransform.rect.width / 2);
+        //playedDropMax.y = playedRectTransform.position.y + (playedRectTransform.rect.height / 2);
 
         //// playing on opponent area rectangle information
         //RectTransform opponentRectTransform = opponentDropZone.GetComponent<RectTransform>();
@@ -501,12 +501,12 @@ public class CardPlayer : MonoBehaviour {
             if (cardDropLocations.ContainsKey(tag)) {
                 tag += ++facilityCount;
             }
-            Debug.Log($"Adding {tag} to cardDropLocations");
+            //Debug.Log($"Adding {tag} to cardDropLocations");
             cardDropLocations.Add(tag, dropZone.gameObject);
 
             //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
-        Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
+       // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
 
 
     }
@@ -1215,6 +1215,22 @@ public class CardPlayer : MonoBehaviour {
 
                     // Set the local position to zero (centered on facility)
                     cardRect.localPosition = Vector3.zero;
+
+                    //get the parent canvas rect
+                    var parentCanvasRect = facilityGo.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+                    Debug.Log($"Canvas object: {parentCanvasRect.gameObject.name}");
+                    Vector3[] corners = new Vector3[4];
+                    parentCanvasRect.GetWorldCorners(corners);
+
+                    Debug.Log("World space corners");
+                    corners.ToList().ForEach(corner => Debug.Log($"Corner: ({corner.x},{corner.y})"));
+
+                    for (int i = 0; i < 4; i++) {
+                        corners[i] = RectTransformUtility.WorldToScreenPoint(Camera.main, corners[i]);
+                    }
+                    Debug.Log("Screen space corners");
+                    corners.ToList().ForEach(corner => Debug.Log($"Corner: ({corner.x},{corner.y})"));
+
 
                     // Set the anchored position to zero
                     cardRect.anchoredPosition = Vector2.zero;
