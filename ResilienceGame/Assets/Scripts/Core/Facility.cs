@@ -30,7 +30,9 @@ public class Facility : MonoBehaviour
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     private int physicalPoints, finacialPoints, networkPoints;
 
-    private TextMeshProUGUI[] pointsUI;
+    // private TextMeshProUGUI[] pointsUI;
+    public Image[][] pointImages; // [0] for Physical, [1] for Financial, [2] for Network
+    private const int MAX_POINTS = 3;
     [SerializeField] private TextMeshProUGUI facilityNameText;
     public Image effectIcon;
     public FacilityEffectManager effectManager;
@@ -48,16 +50,53 @@ public class Facility : MonoBehaviour
         effectManager = new FacilityEffectManager(this);
         facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
-        pointsUI = new TextMeshProUGUI[3];
-     //   effect = FacilityEffect.None;
-     //   effectNegated = false;
+        // pointsUI = new TextMeshProUGUI[3];
+        //   effect = FacilityEffect.None;
+        //   effectNegated = false;
 
-        for (int i = 0; i < 3; i++)
-        {
-            pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
-        }
-
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
+        //}
+        SetupPointImages();
         UpdateUI();
+    }
+    private void SetupPointImages() {
+        pointImages = new Image[3][];
+        string[] pointTypes = { "PhysicalPoints", "FinancialPoints", "NetworkPoints" };
+
+        for (int i = 0; i < 3; i++) {
+            pointImages[i] = new Image[MAX_POINTS * 2]; // 2 images per point (empty and filled)
+            Transform pointsParent = transform.Find("Points").Find(pointTypes[i]);
+
+            for (int j = 0; j < MAX_POINTS; j++) {
+                Transform pointTransform = pointsParent.Find($"Point{j + 1}");
+                pointImages[i][j * 2] = pointTransform.Find("EmptyPoint").GetComponent<Image>();
+                pointImages[i][j * 2 + 1] = pointTransform.Find("FilledPoint").GetComponent<Image>();
+            }
+        }
+        
+    }
+    public void UpdatePointsUI() {
+        UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
+        UpdatePointTypeUI(1, finacialPoints, maxFinacialPoints);
+        UpdatePointTypeUI(2, networkPoints, maxNetworkPoints);
+    }
+
+    private void UpdatePointTypeUI(int typeIndex, int currentPoints, int maxPoints) {
+        for (int i = 0; i < MAX_POINTS; i++) {
+            bool shouldShow = i < maxPoints;
+            bool isFilled = i < currentPoints;
+
+            SetImageAlpha(pointImages[typeIndex][i * 2], shouldShow ? 1 : 0);     // Empty point
+            SetImageAlpha(pointImages[typeIndex][i * 2 + 1], isFilled ? 1 : 0);   // Filled point
+        }
+    }
+
+    private void SetImageAlpha(Image image, float alpha) {
+        Color color = image.color;
+        color.a = alpha;
+        image.color = color;
     }
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
@@ -131,11 +170,11 @@ public class Facility : MonoBehaviour
 
     private void UpdateUI()
     {
-        pointsUI[0].text = physicalPoints.ToString();
-        pointsUI[1].text = finacialPoints.ToString();
-        pointsUI[2].text = networkPoints.ToString();
-
-        if(isDown)
+        //pointsUI[0].text = physicalPoints.ToString();
+        //pointsUI[1].text = finacialPoints.ToString();
+        //pointsUI[2].text = networkPoints.ToString();
+        UpdatePointsUI();
+        if (isDown)
         {
             // TODO: Change UI to show that the facility is down
         }

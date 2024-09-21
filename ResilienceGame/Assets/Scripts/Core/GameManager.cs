@@ -14,112 +14,100 @@ using System;
 public class GameManager : MonoBehaviour, IRGObservable {
 
     #region fields
-    //allow for spawning of cards
+    // Static Members
+    public static GameManager instance;
+    private static bool hasStartedAlready = false;
+    public static event Action OnRoundEnd;
+
+    // Debug
     public bool DEBUG_ENABLED = true;
 
-    // Deck readers and resulting card lists.
-    public CardReader redDeckReader;
-    public CardReader blueDeckReader;
-    public bool mCreateEnergyAtlas = false;
-    public bool mCreateWaterAtlas = false;
-    public List<Card> redCards;
-    public List<Card> blueCards;
-
-    public List<string> messageLog = new List<string>();
-
-    // where are we in game phases?
+    // Game State
+    [Header("Game State")]
     public GamePhase MGamePhase = GamePhase.Start;
-    GamePhase mPreviousGamePhase = GamePhase.Start;
-
-    // Various turn and game info.
-    bool myTurn = false;
-    int turnTotal = 0;
-
-
-    // set up the proper player cards and type
-    PlayerTeam playerType = PlayerTeam.Any;
-    PlayerTeam opponentType = PlayerTeam.Any;
-
-    public GameObject playerDeckList;
-    TMPro.TMP_Dropdown playerDeckChoice;
+    private GamePhase mPreviousGamePhase = GamePhase.Start;
     public bool gameStarted = false;
+    private bool mStartGameRun = false;
+    private bool isInit = false;
+    private bool mReceivedEndGame = false;
 
-    // var's for game rules
-    public readonly int MAX_DISCARDS = 3;
-    public readonly int MAX_DEFENSE = 1;
-
-    public int MNumberDiscarded { get; private set; } = 0;
-    int mNumberDefense = 0;
-    public bool MIsDiscardAllowed { get; private set; } = false;
-    bool mIsActionAllowed = false;
-    bool mReceivedEndGame = false;
-    bool mStartGameRun = false;
-
-    bool isDoomClockActive = false;
-
-    // has everything been set?
-    bool isInit = false;
-
-    // keep track of all game messages
-    MessageQueue mMessageQueue = new MessageQueue();
-
-    // network connections
-    RGNetworkPlayerList mRGNetworkPlayerList;
-    bool isServer = true;
-
-    // other classes observe this one's gameplay data
-    List<IRGObserver> mObservers = new List<IRGObserver>(20);
-
-    // player types
-    //public CardPlayer energyPlayer;
-    //public CardPlayer waterPlayer;
-
-    // var's we use so we don't have to switch between
-    // the player types for generic stuff
+    // Players and Teams
+    [Header("Players and Teams")]
+    public PlayerTeam playerType = PlayerTeam.Any;
+    public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
     public CardPlayer opponentPlayer;
-    public GameObject opponentPlayedZone;
+    private bool myTurn = false;
+    public int activePlayerNumber;
+
+    // Decks and Cards
+    [Header("Decks and Cards")]
+    public CardReader redDeckReader;
+    public CardReader blueDeckReader;
+    public List<Card> redCards;
+    public List<Card> blueCards;
+    public GameObject playerDeckList;
+    private TMPro.TMP_Dropdown playerDeckChoice;
+
+    // Game Rules
+    [Header("Game Rules")]
+    public readonly int MAX_DISCARDS = 3;
+    public readonly int MAX_DEFENSE = 1;
+    public int MNumberDiscarded { get; private set; } = 0;
+    private int mNumberDefense = 0;
+    public bool MIsDiscardAllowed { get; private set; } = false;
+    private bool mIsActionAllowed = false;
+    private bool isDoomClockActive = false;
+
+    // UI Elements
+    [Header("UI Elements")]
+    public GameObject gameCanvas;
+    public GameObject startScreen;
+    public GameObject alertScreenParent;
+    public GameObject tiles;
+    public TextMeshProUGUI StatusText;
     public TextMeshProUGUI mTurnText;
     public TextMeshProUGUI mPhaseText;
     public TextMeshProUGUI mPlayerName;
     public TextMeshProUGUI mPlayerDeckType;
     public TextMeshProUGUI mOpponentName;
     public TextMeshProUGUI mOpponentDeckType;
-    public GameObject mEndPhaseButton;
-    public GameObject gameCanvas;
-    public GameObject startScreen;
-    public GameObject tiles;
-
-    // game status text
-    public TextMeshProUGUI StatusText;
-    // active player
     public TextMeshProUGUI activePlayerText;
     public Color activePlayerColor;
+    public GameObject mEndPhaseButton;
+    public GameObject opponentPlayedZone;
+    public Camera cam;
+    public TextMeshProUGUI titlee;
 
-    // Tutorial 
+    // End Game
+    [Header("End Game")]
+    public GameObject endGameCanvas;
+    public TMP_Text endGameText;
+
+    // Tutorial
+    [Header("Tutorial")]
     public GameObject yarnSpinner;
     private DialogueRunner runner;
     private GameObject background;
     private bool skip;
     private bool skipClicked;
 
+    // Networking
+    [Header("Networking")]
+    private RGNetworkPlayerList mRGNetworkPlayerList;
+    private bool isServer = true;
 
-    // end game info
-    public GameObject endGameCanvas;
-    public TMP_Text endGameText;
+    // Observers
+    private List<IRGObserver> mObservers = new List<IRGObserver>(20);
 
-    public int activePlayerNumber;
+    // Logging
+    public List<string> messageLog = new List<string>();
+    private MessageQueue mMessageQueue = new MessageQueue();
 
-    public Camera cam;
-
-    public TextMeshProUGUI titlee;
-
-    // static instance for this class
-    public static GameManager instance;
-
-    static bool hasStartedAlready = false;
-
-    public static event Action OnRoundEnd;
+    // Misc
+    public bool mCreateEnergyAtlas = false;
+    public bool mCreateWaterAtlas = false;
+    private int turnTotal = 0;
     #endregion
 
     #region Initialization
@@ -162,8 +150,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             SetupActors();
 
             // init various objects to be used in the game
-            gameCanvas.SetActive(true);
-            startScreen.SetActive(false); // Start menu isn't necessary now
+            //gameCanvas.SetActive(true);
+            alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
             turnTotal = 0;
             mTurnText.text = "Turn: " + GetTurn();
             mPhaseText.text = "Phase: " + MGamePhase.ToString();
@@ -190,7 +178,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void RealGameStart() {
         Debug.Log("running 2nd start of game");
-
+        gameCanvas.SetActive(true);
         // send out the starting message with all player info
         // and start the next phase
         if (isServer) {
@@ -266,6 +254,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // go on to the next phase
         // MGamePhase = GamePhase.DrawRed;
         StartNextPhase();
+        startScreen.SetActive(false);
 
     }
     public void Awake() {

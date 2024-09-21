@@ -430,7 +430,7 @@ public class CardPlayer : MonoBehaviour {
         Vector2 mousePosition = Mouse.current.position.ReadValue();
 
         Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(mousePosition, LayerMask.GetMask("CardDrop"));
-
+        Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
         if (hoveredColliders != null && hoveredColliders.Length > 0) {
             isOverAnyDropLocation = true;
             Collider2D hoveredFacilityCollider = null;
@@ -461,6 +461,7 @@ public class CardPlayer : MonoBehaviour {
                     if (GameManager.instance.CanHighlight()) {
                         // Activate the hover effect
                         if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                            Debug.Log("Hovering");
                             hoverActivateObject.ActivateHover();
                             currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
                         }
@@ -500,10 +501,12 @@ public class CardPlayer : MonoBehaviour {
             if (cardDropLocations.ContainsKey(tag)) {
                 tag += ++facilityCount;
             }
+            Debug.Log($"Adding {tag} to cardDropLocations");
             cardDropLocations.Add(tag, dropZone.gameObject);
 
             //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
+        Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
 
 
     }
