@@ -168,24 +168,30 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         gameObject.SetActive(false);
     }
     public IEnumerator AnimateOpponentCard(Vector3 facilityPosition) {
-        // Animate to center and scale up
+        // Use the actual current position as the start position
         Vector3 startPosition = transform.position;
-        Vector3 centerPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.nearClipPlane));
+
+        // Calculate center position
+        Vector3 centerPosition = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, Camera.main.nearClipPlane));
         centerPosition.z = 0;
+
         Vector3 endScale = Vector3.one; // Normal scale
         float duration = 1.0f;
         float elapsed = 0f;
 
+        // Debug logs
+        Debug.Log($"Start Position: {startPosition}");
+        Debug.Log($"Center Position: {centerPosition}");
+        Debug.Log($"End Position: {facilityPosition}");
+
+        // Animate to center and scale up
         while (elapsed < duration) {
             if (skipAnimation) break;
-
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             t = Mathf.SmoothStep(0f, 1f, t);
-
             transform.position = Vector3.Lerp(startPosition, centerPosition, t);
             transform.localScale = Vector3.Lerp(Vector3.zero, endScale, t);
-
             yield return null;
         }
 
@@ -204,24 +210,20 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         }
 
         // Animate to facility and scale down
-        Vector3 endPosition = facilityPosition;
         elapsed = 0f;
-
         while (elapsed < duration) {
             if (skipAnimation) break;
-
             if (!isPaused) {
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration;
                 t = Mathf.SmoothStep(0f, 1f, t);
-
-                transform.position = Vector3.Lerp(centerPosition, endPosition, t);
+                transform.position = Vector3.Lerp(centerPosition, facilityPosition, t);
                 transform.localScale = Vector3.Lerp(endScale, Vector3.zero, t);
             }
             yield return null;
         }
 
-        transform.position = endPosition;
+        transform.position = facilityPosition;
         transform.localScale = Vector3.zero;
 
         // Disable or destroy the card

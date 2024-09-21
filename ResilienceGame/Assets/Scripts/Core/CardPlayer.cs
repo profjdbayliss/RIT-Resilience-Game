@@ -357,12 +357,13 @@ public class CardPlayer : MonoBehaviour {
             tempSlippy.enabled = false;
         }
         tempCard.state = CardState.CardDrawn;
-        Vector3 tempPos = tempCardObj.transform.position;
-        tempCardObj.transform.position = tempPos;
+        //  Vector3 tempPos = tempCardObj.transform.position;
+        //  tempCardObj.transform.position = tempPos;
         tempCardObj.transform.SetParent(dropZone.transform, false);
-        Vector3 tempPos2 = dropZone.transform.position;
+        // Vector3 tempPos2 = dropZone.transform.position;
         handSize++;
-        tempCardObj.transform.position = tempPos2;
+        //  tempCardObj.transform.position = tempPos2;
+        tempCardObj.transform.localPosition = Vector3.zero;
         tempCardObj.SetActive(true);
 
 
@@ -813,7 +814,7 @@ public class CardPlayer : MonoBehaviour {
 
 
                 // Start the animation
-                
+
                 StartCoroutine(card.AnimateCardToFacility(facility.transform.position, 1.0f));
 
 
@@ -1214,24 +1215,25 @@ public class CardPlayer : MonoBehaviour {
                         // create card to be displayed
                         //TODO: Fix visuals/animation
                         Card card = DrawCard(false, update.CardID, -1, ref DeckIDs, facilityGo, true, ref ActiveCards);
+                        handSize--; // remove card from hand
                         GameObject cardGameObject = ActiveCards[card.UniqueID];
                         cardGameObject.SetActive(false);
 
                         card.state = CardState.CardInPlay;
                         card.Play(this, opponent, facility);
-                        
 
 
-                        // Set initial position at the top center of the screen
-                        Vector3 startPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height, Camera.main.nearClipPlane));
-                        startPosition.z = 0;
-                        cardGameObject.transform.position = startPosition;
-                        cardGameObject.transform.localScale = Vector3.zero;
+
+                        //// Set initial position at the top center of the screen
+                        //Vector3 startPosition = Vector3.zero;
+                        //startPosition.z = 0;
+                        //cardGameObject.transform.position = startPosition;
+                        //cardGameObject.transform.localScale = Vector3.one;
 
                         cardGameObject.SetActive(true);
 
                         Vector3 facilityPosition = facilityGo.transform.position;
-                        StartCoroutine(card.AnimateOpponentCard(facilityPosition));
+                        //  StartCoroutine(card.AnimateOpponentCard(facilityPosition));
 
 
                     }
