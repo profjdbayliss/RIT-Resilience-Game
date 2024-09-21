@@ -1211,34 +1211,33 @@ public class CardPlayer : MonoBehaviour {
                     RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
 
                     // Set the card's parent to the facility
-                    cardRect.SetParent(facilityGo.transform, false);
+                    cardRect.SetParent(null, true);
 
                     // Set the local position to zero (centered on facility)
-                    cardRect.localPosition = Vector3.zero;
+                   // cardRect.localPosition = Vector3.zero;
 
                     //get the parent canvas rect
                     var parentCanvasRect = facilityGo.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
-                    Debug.Log($"Canvas object: {parentCanvasRect.gameObject.name}");
+                    //Debug.Log($"Canvas object: {parentCanvasRect.gameObject.name}");
                     Vector3[] corners = new Vector3[4];
+
                     parentCanvasRect.GetWorldCorners(corners);
 
-                    Debug.Log("World space corners");
-                    corners.ToList().ForEach(corner => Debug.Log($"Corner: ({corner.x},{corner.y})"));
+                    Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+                   // Debug.Log($"Screen size: {screenSize}");
+                    Vector2 topMiddle = new Vector2(screenSize.x / 2, screenSize.y);
 
-                    for (int i = 0; i < 4; i++) {
-                        corners[i] = RectTransformUtility.WorldToScreenPoint(Camera.main, corners[i]);
-                    }
-                    Debug.Log("Screen space corners");
-                    corners.ToList().ForEach(corner => Debug.Log($"Corner: ({corner.x},{corner.y})"));
-
-
+                    //var topMiddle = new Vector2(parentCanvasRect.rect.center.x - cardRect.rect.width / 2, //should be middle of screen with center pivot/anchor but its not? so offset i guess
+                    //    parentCanvasRect.rect.max.y);//top of screen
+                    Debug.Log("top midde: " + topMiddle);
                     // Set the anchored position to zero
-                    cardRect.anchoredPosition = Vector2.zero;
+                    cardRect.anchoredPosition = topMiddle;
+                    cardRect.SetParent(facilityGo.transform, true);
 
                     card.state = CardState.CardInPlay;
                     card.Play(this, opponent, facility);
 
-                    Debug.Log($"Card positioned at - Local: {cardRect.localPosition}, Anchored: {cardRect.anchoredPosition}, World: {cardRect.position}");
+                    //Debug.Log($"Card positioned at - Local: {cardRect.localPosition}, Anchored: {cardRect.anchoredPosition}, World: {cardRect.position}");
 
                     // Disable collider if necessary
                     //var cardCollider = cardGameObject.GetComponent<Collider2D>();
