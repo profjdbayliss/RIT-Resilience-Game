@@ -35,8 +35,7 @@ public struct CardIDInfo
     public int CardID;
 };
 
-public class Card : MonoBehaviour, IPointerClickHandler
-{
+public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
     public CardData data;
     // this card needs a unique id since multiples of the same card can be played
     public int UniqueID; 
@@ -55,6 +54,10 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public List<int> ModifyingCards = new List<int>(10);
     public List<CardIDInfo> AttackingCards = new List<CardIDInfo>(10);
 
+    [Header("Animation")]
+    public bool isPaused = false;
+    public bool skipAnimation = false;
+
     public int HandPosition { get; set; } = 0;
 
 
@@ -72,6 +75,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         //mManager = GameObject.FindObjectOfType<GameManager>();
         OutlineImage.SetActive(false);
     }
+    
 
 
     public void OnPointerClick(PointerEventData eventData)
@@ -163,6 +167,84 @@ public class Card : MonoBehaviour, IPointerClickHandler
         // Disable or destroy the card
         gameObject.SetActive(false);
     }
+    public IEnumerator AnimateOpponentCard(Vector3 facilityPosition) {
+        // Animate to center and scale up
+        Vector3 startPosition = transform.position;
+        Vector3 centerPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.nearClipPlane));
+        centerPosition.z = 0;
+        Vector3 endScale = Vector3.one; // Normal scale
+        float duration = 1.0f;
+        float elapsed = 0f;
 
+        while (elapsed < duration) {
+            if (skipAnimation) break;
 
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            t = Mathf.SmoothStep(0f, 1f, t);
+
+            transform.position = Vector3.Lerp(startPosition, centerPosition, t);
+            transform.localScale = Vector3.Lerp(Vector3.zero, endScale, t);
+
+            yield return null;
+        }
+
+        if (skipAnimation) {
+            transform.position = centerPosition;
+            transform.localScale = endScale;
+        }
+
+        // Wait for 2 seconds or until skipped
+        float waitTime = 2.0f;
+        float waitElapsed = 0f;
+        while (waitElapsed < waitTime) {
+            if (skipAnimation) break;
+            if (!isPaused) waitElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Animate to facility and scale down
+        Vector3 endPosition = facilityPosition;
+        elapsed = 0f;
+
+        while (elapsed < duration) {
+            if (skipAnimation) break;
+
+            if (!isPaused) {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                t = Mathf.SmoothStep(0f, 1f, t);
+
+                transform.position = Vector3.Lerp(centerPosition, endPosition, t);
+                transform.localScale = Vector3.Lerp(endScale, Vector3.zero, t);
+            }
+            yield return null;
+        }
+
+        transform.position = endPosition;
+        transform.localScale = Vector3.zero;
+
+        // Disable or destroy the card
+        gameObject.SetActive(false);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        isPaused = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData) {
+        isPaused = false;
+    }
+
+    void OnMouseEnter() {
+        
+    }
+
+    void OnMouseExit() {
+        
+    }
+
+    void OnMouseDown() {
+        skipAnimation = true;
+    }
 }

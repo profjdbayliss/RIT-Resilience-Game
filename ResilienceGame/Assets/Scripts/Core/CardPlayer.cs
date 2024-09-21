@@ -1219,7 +1219,21 @@ public class CardPlayer : MonoBehaviour {
 
                         card.state = CardState.CardInPlay;
                         card.Play(this, opponent, facility);
+                        
+
+
+                        // Set initial position at the top center of the screen
+                        Vector3 startPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height, Camera.main.nearClipPlane));
+                        startPosition.z = 0;
+                        cardGameObject.transform.position = startPosition;
+                        cardGameObject.transform.localScale = Vector3.zero;
+
                         cardGameObject.SetActive(true);
+
+                        Vector3 facilityPosition = facilityGo.transform.position;
+                        StartCoroutine(card.AnimateOpponentCard(facilityPosition));
+
+
                     }
                 }
             }
