@@ -84,7 +84,7 @@ public class CardPlayer : MonoBehaviour {
     public GameObject handDropZone;
     private HandPositioner handPositioner;
     public GameObject opponentDropZone;
-   // public GameObject playerDropZone;
+    // public GameObject playerDropZone;
     public GameObject cardStackingCanvas;
     public readonly float ORIGINAL_SCALE = 0.2f;
     public string DeckName = "";
@@ -430,7 +430,7 @@ public class CardPlayer : MonoBehaviour {
         Vector2 mousePosition = Mouse.current.position.ReadValue();
 
         Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(mousePosition, LayerMask.GetMask("CardDrop"));
-      //  Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
+        //  Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
         if (hoveredColliders != null && hoveredColliders.Length > 0) {
             isOverAnyDropLocation = true;
             Collider2D hoveredFacilityCollider = null;
@@ -461,7 +461,7 @@ public class CardPlayer : MonoBehaviour {
                     if (GameManager.instance.CanHighlight()) {
                         // Activate the hover effect
                         if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                        //    Debug.Log("Hovering");
+                            //    Debug.Log("Hovering");
                             hoverActivateObject.ActivateHover();
                             currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
                         }
@@ -506,7 +506,7 @@ public class CardPlayer : MonoBehaviour {
 
             //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
-       // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
+        // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
 
 
     }
@@ -811,16 +811,14 @@ public class CardPlayer : MonoBehaviour {
                 });
                 GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
 
-                card.Play(this, opponentPlayer, facility);
+               // card.Play(this, opponentPlayer, facility);
                 playCount = 1;
                 playKey = card.UniqueID;
 
 
                 // Start the animation
 
-                StartCoroutine(card.AnimateCardToFacility(facility.transform.position, 1.0f));
-
-
+                StartCoroutine(card.AnimateCardToFacility(facility.transform.position, 1.0f, () => card.Play(this, opponentPlayer, facility)));
 
                 break;
 
@@ -1200,7 +1198,7 @@ public class CardPlayer : MonoBehaviour {
             Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
 
             if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
-                Debug.Log($"Creating card for facility: {facility.facilityName}");
+                Debug.Log($"Creating card played on facility: {facility.facilityName}");
 
                 Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
                     deckToDrawFrom: ref DeckIDs, dropZone: facilityGo,
@@ -1210,40 +1208,29 @@ public class CardPlayer : MonoBehaviour {
                     GameObject cardGameObject = ActiveCards[card.UniqueID];
                     RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
 
-                    // Set the card's parent to the facility
+                    // Set the card's parent to nothing, in order to position it in world space
                     cardRect.SetParent(null, true);
 
-                    // Set the local position to zero (centered on facility)
-                   // cardRect.localPosition = Vector3.zero;
-
-                    //get the parent canvas rect
-                    var parentCanvasRect = facilityGo.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
-                    //Debug.Log($"Canvas object: {parentCanvasRect.gameObject.name}");
-                    Vector3[] corners = new Vector3[4];
-
-                    parentCanvasRect.GetWorldCorners(corners);
 
                     Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-                   // Debug.Log($"Screen size: {screenSize}");
-                    Vector2 topMiddle = new Vector2(screenSize.x / 2, screenSize.y);
+                    Vector2 topMiddle = new Vector2(screenSize.x / 2, screenSize.y + cardRect.rect.height / 2); //top middle just off the screen
 
-                    //var topMiddle = new Vector2(parentCanvasRect.rect.center.x - cardRect.rect.width / 2, //should be middle of screen with center pivot/anchor but its not? so offset i guess
-                    //    parentCanvasRect.rect.max.y);//top of screen
-                    Debug.Log("top midde: " + topMiddle);
-                    // Set the anchored position to zero
                     cardRect.anchoredPosition = topMiddle;
-                    cardRect.SetParent(facilityGo.transform, true);
+                    card.transform.localRotation = Quaternion.Euler(0, 0, 180); //flip upside down as if played by opponent
 
-                    card.state = CardState.CardInPlay;
-                    card.Play(this, opponent, facility);
+                    // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
 
-                    //Debug.Log($"Card positioned at - Local: {cardRect.localPosition}, Anchored: {cardRect.anchoredPosition}, World: {cardRect.position}");
-
-                    // Disable collider if necessary
-                    //var cardCollider = cardGameObject.GetComponent<Collider2D>();
-                    //if (cardCollider != null) cardCollider.enabled = false;
-
+                    cardRect.SetParent(facilityGo.GetComponentInParent<Canvas>().transform, true); //set parent to game canvas and keep world position
                     cardGameObject.SetActive(true);
+
+                    StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () => {
+                        card.state = CardState.CardInPlay;
+                        card.Play(this, opponent, facility);    //play when animation completes
+                    }));
+
+                    
+
+
                 }
                 else {
                     Debug.LogError($"Failed to create card with ID: {update.CardID}");

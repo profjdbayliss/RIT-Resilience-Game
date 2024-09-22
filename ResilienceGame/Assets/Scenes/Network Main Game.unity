@@ -27600,8 +27600,13 @@ MonoBehaviour:
   OutlineImage: {fileID: 6945917863268426752}
   DefenseHealth: 0
   ModifyingCards: 
-  isPaused: 0
-  skipAnimation: 0
+  speed: 10
+  OpponentCardPlayAnimDuration: 1
+  rotationDurationPercent: 0.3
+  rotationDelayPercent: 0.35
+  scaleUpFactor: 1.5
+  waitTimeAtCenter: 1.5
+  shrinkDuration: 1.5
 --- !u!114 &8428484966745356290
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,12 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using Mirror;
-using System.Linq;
 using Yarn.Unity;
-using System.Xml;
 using UnityEngine.InputSystem;
 using System.IO;
 using System;
@@ -357,6 +353,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
             else if (Keyboard.current.f2Key.wasPressedThisFrame) {
                 Debug.Log("Add card to discard");
                 actualPlayer.ForceDiscardRandomCard();
+            }
+            if (Mouse.current.leftButton.wasPressedThisFrame) {
+                var mousePosition = Mouse.current.position.ReadValue();
+                Debug.Log($"Mouse screen position: {mousePosition}");
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
+                Debug.Log($"World Position: {worldPosition}");
             }
         }
         if (isInit) {
