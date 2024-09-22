@@ -66,7 +66,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public float scaleUpFactor = 1.5f;            // Increases size by 50%
     public float waitTimeAtCenter = 1.5f;           // Waits for 1.5 seconds at the center
     public float shrinkDuration = 1.5f;             // Duration of the shrink and move animation
-
+    private bool isAnimating = false;
+    private bool skipCurrentAnimation = false;
 
     public int HandPosition { get; set; } = 0;
 
@@ -87,18 +88,22 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     }
 
     void Update() {
-        //TODO: Remove
         if (state == CardState.CardInPlay) {
-            if (timer > timeBetweenPositionLogs) {
-                Debug.Log($"Unique Card Id: {UniqueID}");
-                Debug.Log($"World position: {transform.position}");
-                Debug.Log($"Local Position: {transform.localPosition}");
-                Debug.Log($"Anchored Position: {rectTransform.anchoredPosition}");
-                timer = 0f;
+            if (isAnimating) {
+                if (Mouse.current.leftButton.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame) {
+                    skipCurrentAnimation = true;
+                }
             }
-            else {
-                timer += Time.deltaTime;
-            }
+            //if (timer > timeBetweenPositionLogs) {
+            //    Debug.Log($"Unique Card Id: {UniqueID}");
+            //    Debug.Log($"World position: {transform.position}");
+            //    Debug.Log($"Local Position: {transform.localPosition}");
+            //    Debug.Log($"Anchored Position: {rectTransform.anchoredPosition}");
+            //    timer = 0f;
+            //}
+            //else {
+            //    timer += Time.deltaTime;
+            //}
         }
     }
 
@@ -159,6 +164,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
     }
     public IEnumerator AnimateCardToFacility(Vector3 targetPosition, float duration, Action onComplete = null) {
+        isAnimating = true;
         Vector3 startPosition = transform.position;
         Vector3 endPosition = targetPosition;
         Vector3 startScale = transform.localScale;
@@ -174,7 +180,9 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
             transform.position = Vector3.Lerp(startPosition, endPosition, t);
             transform.localScale = Vector3.Lerp(startScale, endScale, t);
-
+            if (skipCurrentAnimation) {
+                break;
+            }
             yield return null;
         }
 
@@ -192,6 +200,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     /// <param name="facilityPosition">The target position to move to after waiting at the center.</param>
     /// <param name="onComplete">Callback function to call before destroying the object.</param>
     public IEnumerator MoveAndRotateToCenter(RectTransform rectTransform, GameObject facilityTarget = null, Action onComplete = null) {
+        isAnimating = true;
         // Initial and target positions
         Vector2 startPosition = rectTransform.anchoredPosition;
         Vector2 centerPosition = Vector2.zero; // Center of the screen
@@ -232,46 +241,63 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
             }
 
             elapsedTime += Time.deltaTime;
+
+            if (skipCurrentAnimation) {
+
+                break;
+            }
             yield return null;
         }
+        if (skipCurrentAnimation) {
+            // Call the callback function
+            onComplete?.Invoke();
 
-        // Ensure final position, rotation, and scale are set
-        rectTransform.anchoredPosition = centerPosition;
-        rectTransform.localRotation = targetRotation;
-        rectTransform.localScale = targetScale;
-
-        // Wait at the center
-        yield return new WaitForSeconds(waitTimeAtCenter);
-
-        Vector2 endPosition = centerPosition; // Default to center if facilityTarget is null
-        if (facilityTarget != null) {
-            // Calculate the facility's position relative to the Canvas
-            endPosition = facilityTarget.transform.position;
-           // Debug.Log($"End Position (UI Local): {endPosition}");
+            // Destroy the game object
+            Destroy(rectTransform.gameObject);
         }
+        else {
+            // Ensure final position, rotation, and scale are set
+            rectTransform.anchoredPosition = centerPosition;
+            rectTransform.localRotation = targetRotation;
+            rectTransform.localScale = targetScale;
 
-        Vector3 endScale = Vector3.zero; // Scale down to zero
-        Vector3 sPos = transform.position;
-       // Debug.Log($"Moving to facility target: {endPosition}");
-        elapsedTime = 0f;
+            // Wait at the center
+            yield return new WaitForSeconds(waitTimeAtCenter);
 
-        while (elapsedTime < shrinkDuration) {
-            float t = elapsedTime / shrinkDuration;
-            float easedT = CubicEaseInOut(t);
+            Vector2 endPosition = centerPosition; // Default to center if facilityTarget is null
+            if (facilityTarget != null) {
+                // Calculate the facility's position relative to the Canvas
+                endPosition = facilityTarget.transform.position;
+                // Debug.Log($"End Position (UI Local): {endPosition}");
+            }
 
-            // Update position and scale
-            rectTransform.position = Vector2.Lerp(sPos, endPosition, easedT);
-            rectTransform.localScale = Vector3.Lerp(targetScale, endScale, easedT);
+            Vector3 endScale = Vector3.zero; // Scale down to zero
+            Vector3 sPos = transform.position;
+            // Debug.Log($"Moving to facility target: {endPosition}");
+            elapsedTime = 0f;
 
-            elapsedTime += Time.deltaTime;
-            yield return null;
+            while (elapsedTime < shrinkDuration) {
+                float t = elapsedTime / shrinkDuration;
+                float easedT = CubicEaseInOut(t);
+
+                // Update position and scale
+                rectTransform.position = Vector2.Lerp(sPos, endPosition, easedT);
+                rectTransform.localScale = Vector3.Lerp(targetScale, endScale, easedT);
+
+                elapsedTime += Time.deltaTime;
+
+                if (skipCurrentAnimation) {
+                    break;
+                }
+                yield return null;
+            }
+
+            // Call the callback function
+            onComplete?.Invoke();
+
+            // Destroy the game object
+            Destroy(rectTransform.gameObject);
         }
-
-        // Call the callback function
-        onComplete?.Invoke();
-
-        // Destroy the game object
-        Destroy(rectTransform.gameObject);
     }
 
     /// <summary>
