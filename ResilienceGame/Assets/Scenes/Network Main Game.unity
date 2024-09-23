@@ -24125,6 +24125,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseCard 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4700192264946514504, guid: c692d12daa4bfa74890672efcbedf5c2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9104204982774583797, guid: c692d12daa4bfa74890672efcbedf5c2, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

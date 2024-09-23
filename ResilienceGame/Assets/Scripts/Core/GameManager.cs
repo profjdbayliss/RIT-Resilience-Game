@@ -449,6 +449,18 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
+    public void AllowPlayerDiscard(CardPlayer player, int amount) {
+        if (actualPlayer == player) {
+            MIsDiscardAllowed = true;
+            player.AddDiscardEvent(amount);
+        }
+    }
+    public void DisablePlayerDiscard(CardPlayer player) {
+        if (actualPlayer == player) {
+            MIsDiscardAllowed = true;
+            player.StopDiscard();
+        }
+    }
     public bool CanHighlight() {
         return actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed ||
             actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue;

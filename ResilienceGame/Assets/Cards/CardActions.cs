@@ -24,13 +24,15 @@ using System;
 public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
+        List<Card> drawnCards = new List<Card>();
         // TODO: Get data from card reader to loop
         for (int i = 0; i < card.data.drawAmount; i++) {
-            player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
+            Card cardDrawn = player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
+           // cardDrawn.OutlineActive();
+            drawnCards.Add(cardDrawn);
         }
-        // TODO: Select Card(s) to Discard / reactivate discard box
-        player.DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
-
+        GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} cards", player); //display alert message
+        GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount);    //allow player to discard cards
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {

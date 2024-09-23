@@ -134,7 +134,7 @@ public class FacilityEffectManager {
         foreach (var effect in activeEffects.ToList()) {
             //If the effect is a modify points per turn effect, create its 
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
-                var newEffect = FacilityEffect.CreateEffectFromID(effect.CreatedEffectID - 6);//TODO: probably should store the id of the modify points effect in the modify points per turn effect
+                var newEffect = FacilityEffect.CreateEffectFromID(effect.CreatedEffectID - 6);
                 AddEffect(newEffect);
             }
 

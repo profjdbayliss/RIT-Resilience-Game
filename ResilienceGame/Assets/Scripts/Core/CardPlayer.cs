@@ -99,6 +99,9 @@ public class CardPlayer : MonoBehaviour {
     public Queue<(Update, GamePhase, CardPlayer)> opponentCardPlays = new Queue<(Update, GamePhase, CardPlayer)>();
     public bool IsAnimating { get; set; } = false;
 
+    public bool ForceDiscard { get; set; } = false;
+    public int AmountToDiscard { get; set; } = 0;
+
     int facilityCount = 0;
     //Meeples
     // TODO: Move to Sector.cs if needed
@@ -156,6 +159,16 @@ public class CardPlayer : MonoBehaviour {
         //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
+    public void AddDiscardEvent(int amount) {
+        ForceDiscard = true;
+        AmountToDiscard = amount;
+        discardDropZone.SetActive(true);
+    }
+    public void StopDiscard() {
+        ForceDiscard = false;
+        discardDropZone.SetActive(false);
+    }
+    
 
     public static void AddCards(List<Card> cardList) {
         foreach (Card card in cardList) {
@@ -784,14 +797,22 @@ public class CardPlayer : MonoBehaviour {
         switch (phase) {
             case GamePhase.DrawBlue:
             case GamePhase.DrawRed:
-                Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
-
-                // change parent and rescale
+               // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
                 card.state = CardState.CardNeedsToBeDiscarded;
                 playCount = 1;
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
+                //discarding here will be done by a card forcing the player to discard a number of cards
+                if (ForceDiscard) {
+                    card.state = CardState.CardNeedsToBeDiscarded;
+                    playCount = 1;
+                    //flag discard as done
+                    AmountToDiscard--;
+                    if (AmountToDiscard <= 0) {//check if we discard enough cards
+                        GameManager.instance.DisablePlayerDiscard(this); 
+                    }
+                }
                 break;
         }
     }
@@ -1147,55 +1168,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
 
-    //public bool CheckHighlightedStations() {
-    //    bool singleHighlighted = false;
-    //    int countHighlighted = 0;
-
-    //    foreach (GameObject gameObject in ActiveFacilities.Values) {
-    //        Card card = gameObject.GetComponent<Card>();
-    //        if (card.OutlineImage.activeSelf) {
-    //            countHighlighted++;
-    //        }
-    //    }
-
-    //    if (countHighlighted == 1)
-    //        singleHighlighted = true;
-
-    //    return singleHighlighted;
-    //}
-
-    //public GameObject GetHighlightedStation() {
-    //    GameObject station = null;
-
-    //    foreach (GameObject gameObject in ActiveFacilities.Values) {
-    //        Card card = gameObject.GetComponent<Card>();
-    //        if (card.OutlineImage.activeSelf) {
-    //            station = gameObject;
-    //            break;
-    //        }
-    //    }
-
-    //    return station;
-    //}
-
-
-    //public bool CheckForCardsOfType(CardType cardType, Dictionary<int, GameObject> listToCheck) {
-    //    bool hasCardType = false;
-
-    //    foreach (GameObject gameObject in listToCheck.Values) {
-    //        Card card = gameObject.GetComponent<Card>();
-    //        if (card.data.cardType == cardType) {
-    //            hasCardType = true;
-    //            break;
-    //        }
-    //    }
-
-    //    return hasCardType;
-    //}
-
-
-    // NOTE: TO DO - needs to be updated for new card effects without
-    // facilities
+    //called by the game manager to add an update to the player's queue from the opponent's actions
     public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Player {playerName} is Adding update: {update.Type}, FacilityType: {update.FacilityType}");
 
