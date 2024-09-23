@@ -168,6 +168,7 @@ public class CardPlayer : MonoBehaviour {
     public void StopDiscard() {
         ForceDiscard = false;
         discardDropZone.SetActive(false);
+        GameManager.instance.mAlertPanel.ResolveAlert();
         Debug.Log($"Disabling {playerName}'s discard");
     }
     public static void AddCards(List<Card> cardList) {

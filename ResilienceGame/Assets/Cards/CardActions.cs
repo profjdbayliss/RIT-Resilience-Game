@@ -31,7 +31,7 @@ public class DrawAndDiscardCards : ICardAction {
            // cardDrawn.OutlineActive();
             drawnCards.Add(cardDrawn);
         }
-       // GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} cards", player); //display alert message
+        GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} card{(card.data.removeAmount == 1 ? "" : "s")}", player); //display alert message
         GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount);    //allow player to discard cards
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }

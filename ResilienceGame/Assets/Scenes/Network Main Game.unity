@@ -3403,8 +3403,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6adb5e26f57a1334582d2578290b0d71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alertText: {fileID: 0}
-  alertPanel: {fileID: 0}
+  alertText: {fileID: 1513553827}
+  alertPanel: {fileID: 1795422238}
 --- !u!224 &228889692
 RectTransform:
   m_ObjectHideFlags: 0
