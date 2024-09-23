@@ -163,7 +163,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public void ToggleCardVisuals(bool enable) {
         transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
     }
-    public IEnumerator AnimateCardToFacility(Vector3 targetPosition, float duration, Action onComplete = null) {
+    public IEnumerator AnimateCardToPosition(Vector3 targetPosition, float duration, Action onComplete = null) {
         isAnimating = true;
         Vector3 startPosition = transform.position;
         Vector3 endPosition = targetPosition;

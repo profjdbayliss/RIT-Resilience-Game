@@ -355,12 +355,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 Debug.Log("Add card to discard");
                 actualPlayer.ForceDiscardRandomCard();
             }
-            if (Mouse.current.leftButton.wasPressedThisFrame) {
-                var mousePosition = Mouse.current.position.ReadValue();
-                Debug.Log($"Mouse screen position: {mousePosition}");
-                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
-                Debug.Log($"World Position: {worldPosition}");
-            }
+            
         }
         if (isInit) {
             if (gameStarted) {
@@ -451,6 +446,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #region Helpers
     public void AllowPlayerDiscard(CardPlayer player, int amount) {
         if (actualPlayer == player) {
+            Debug.Log($"Player {player.playerName} must discard {amount} cards");
             MIsDiscardAllowed = true;
             player.AddDiscardEvent(amount);
         }

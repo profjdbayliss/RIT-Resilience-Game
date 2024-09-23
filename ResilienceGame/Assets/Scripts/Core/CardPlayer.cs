@@ -163,13 +163,13 @@ public class CardPlayer : MonoBehaviour {
         ForceDiscard = true;
         AmountToDiscard = amount;
         discardDropZone.SetActive(true);
+        Debug.Log($"Enabling {playerName}'s discard temporarily");
     }
     public void StopDiscard() {
         ForceDiscard = false;
         discardDropZone.SetActive(false);
+        Debug.Log($"Disabling {playerName}'s discard");
     }
-    
-
     public static void AddCards(List<Card> cardList) {
         foreach (Card card in cardList) {
             cards.Add(card.data.cardID, card);
@@ -569,11 +569,17 @@ public class CardPlayer : MonoBehaviour {
                 break;
             case GamePhase.BonusBlue:
             case GamePhase.BonusRed:
+
                 (response, canPlay) = ("Cannot discard cards during bonus phase", false); //turn only happens during Doomclock? where you can allocate overtime
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                (response, canPlay) = ValidateActionPlay(card);
+                if (ForceDiscard) {
+                    (response, canPlay) = CanDiscardCard();
+                }
+                else {
+                    (response, canPlay) = ValidateActionPlay(card);
+                }
                 break;
         }
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
@@ -590,14 +596,13 @@ public class CardPlayer : MonoBehaviour {
         if (card.data.preReqEffectId != 0) {
             Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
             if (!facility.HasEffect(card.data.preReqEffectId)) {
-                //Debug.Log("Facility effect does not match card prereq effect");
                 return ("Facility effect does not match card prereq effect", false);
             }
         }
         if (!playerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
             return ("Not enough meeples to play card", false);
         }
-        return ("", true); //returns true if the card could be afforded, false if not, will also spend the meeples on the sector if possible
+        return ("", true);
     }
 
     private (string, bool) CanDiscardCard() {
@@ -797,7 +802,7 @@ public class CardPlayer : MonoBehaviour {
         switch (phase) {
             case GamePhase.DrawBlue:
             case GamePhase.DrawRed:
-               // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
+                // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
                 card.state = CardState.CardNeedsToBeDiscarded;
                 playCount = 1;
                 break;
@@ -810,7 +815,7 @@ public class CardPlayer : MonoBehaviour {
                     //flag discard as done
                     AmountToDiscard--;
                     if (AmountToDiscard <= 0) {//check if we discard enough cards
-                        GameManager.instance.DisablePlayerDiscard(this); 
+                        GameManager.instance.DisablePlayerDiscard(this);
                     }
                 }
                 break;
@@ -837,14 +842,14 @@ public class CardPlayer : MonoBehaviour {
                 });
                 GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
 
-               // card.Play(this, opponentPlayer, facility);
+                // card.Play(this, opponentPlayer, facility);
                 playCount = 1;
                 playKey = card.UniqueID;
 
 
                 // Start the animation
 
-                StartCoroutine(card.AnimateCardToFacility(facility.transform.position, 1.0f, () => card.Play(this, opponentPlayer, facility)));
+                StartCoroutine(card.AnimateCardToPosition(facility.transform.position, .6f, () => card.Play(this, opponentPlayer, facility)));
 
                 break;
 
@@ -877,37 +882,13 @@ public class CardPlayer : MonoBehaviour {
                     UniqueID = card.UniqueID,
                     CardID = card.data.cardID
                 });
+                GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
 
-                card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
+                //card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
                 playCount = 1;
                 playKey = card.UniqueID;
-                /*if (card.data.cardType==CardType.Defense && CheckHighlightedStations())
-                {
-                    GameObject selected = GetHighlightedStation();
-                    Card selectedCard = selected.GetComponent<Card>();
-                    StackCards(selected, gameObjectCard, playerDropZone, GamePhase.Defense);
-                    card.state = CardState.CardInPlay;
-                    ActiveCards.Add(card.UniqueID, gameObjectCard);
+                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer)));
 
-                    selectedCard.ModifyingCards.Add(card.UniqueID);
-                    mUpdatesThisPhase.Add(new Updates
-                    {
-                        WhatToDo=AddOrRem.Add,
-                        UniqueFacilityID=selectedCard.UniqueID,
-                        CardID=card.data.cardID
-                    });
-
-                    // we should play the card's effects
-                    card.Play(this, opponentPlayer, selectedCard);
-                    playCount = 1;
-                    selectedCard.OutlineImage.SetActive(false);
-                    playKey = card.UniqueID;
-                }
-                else
-                {
-                    card.state = CardState.CardDrawn;
-                    manager.DisplayGameStatus("Please select a single facility you own and play a defense card type.");
-                }*/
                 break;
 
             //break;
@@ -1231,8 +1212,7 @@ public class CardPlayer : MonoBehaviour {
                 cardGameObject.SetActive(true);
 
                 // Start the card animation
-                StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () =>
-                {
+                StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () => {
                     card.state = CardState.CardInPlay;
                     card.Play(this, opponent, facility);    // play when animation completes
 
