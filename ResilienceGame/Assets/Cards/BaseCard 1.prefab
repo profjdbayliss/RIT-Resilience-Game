@@ -214,13 +214,16 @@ MonoBehaviour:
   CanvasHolder: {fileID: 0}
   HasCanvas: 0
   stackNumber: 0
-  OutlineImage: {fileID: 4700192264946514504}
+  outlineImage: {fileID: 8251040826005801627}
   DefenseHealth: 0
   ModifyingCards: 
   speed: 10
   OpponentCardPlayAnimDuration: 1
   rotationDurationPercent: 0.3
   rotationDelayPercent: 0.3
+  scaleUpFactor: 1.5
+  waitTimeAtCenter: 1.5
+  shrinkDuration: 1.5
 --- !u!222 &6600138518294792530
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1252,7 +1255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 518acbd274e8dbc42aef5b6c2d45b37a, type: 2}
-  m_Color: {r: 1, g: 0.2887039, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.2887039, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

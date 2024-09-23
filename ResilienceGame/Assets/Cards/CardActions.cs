@@ -28,11 +28,16 @@ public class DrawAndDiscardCards : ICardAction {
         // TODO: Get data from card reader to loop
         for (int i = 0; i < card.data.drawAmount; i++) {
             Card cardDrawn = player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
-           // cardDrawn.OutlineActive();
-            drawnCards.Add(cardDrawn);
+            if (card.data.removeAmount > 0) {
+                cardDrawn.ToggleOutline(true);
+                drawnCards.Add(cardDrawn);
+            }
+            
         }
-        GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} card{(card.data.removeAmount == 1 ? "" : "s")}", player); //display alert message
-        GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount);    //allow player to discard cards
+        if (card.data.removeAmount > 0) {
+            GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
+            GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
+        }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {

@@ -66,7 +66,7 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="card">The card to enter the hand</param>
     public void ReturnCardToHand(Card card) {
-        card.state = CardState.CardDrawn;
+        card.SetCardState(CardState.CardDrawn);
         Debug.Log($"Sending {card.front.title} to hand");
         card.transform.SetParent(transform, false);
         card.transform.SetSiblingIndex(card.HandPosition);

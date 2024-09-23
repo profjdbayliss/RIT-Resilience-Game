@@ -93,18 +93,19 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [Header("Networking")]
     private RGNetworkPlayerList mRGNetworkPlayerList;
     private bool isServer = true;
-
+    private MessageQueue mMessageQueue = new MessageQueue();
     // Observers
     private List<IRGObserver> mObservers = new List<IRGObserver>(20);
 
     // Logging
     public List<string> messageLog = new List<string>();
-    private MessageQueue mMessageQueue = new MessageQueue();
+    
 
     // Misc
     public bool mCreateEnergyAtlas = false;
     public bool mCreateWaterAtlas = false;
     private int turnTotal = 0;
+    
     #endregion
 
     #region Initialization
@@ -409,8 +410,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
 
-
-
     // Show the cards and game UI for player.
     public void ShowPlayUI() {
         actualPlayer.handDropZone.SetActive(true);
@@ -444,11 +443,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
-    public void AllowPlayerDiscard(CardPlayer player, int amount) {
+    public void AllowPlayerDiscard(CardPlayer player, int amount, List<Card> cardsAllowedToDiscard = null) {
         if (actualPlayer == player) {
             Debug.Log($"Player {player.playerName} must discard {amount} cards");
             MIsDiscardAllowed = true;
-            player.AddDiscardEvent(amount);
+            player.AddDiscardEvent(amount, cardsAllowedToDiscard);
         }
     }
     public void DisablePlayerDiscard(CardPlayer player) {

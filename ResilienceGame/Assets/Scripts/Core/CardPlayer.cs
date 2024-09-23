@@ -102,6 +102,8 @@ public class CardPlayer : MonoBehaviour {
     public bool ForceDiscard { get; set; } = false;
     public int AmountToDiscard { get; set; } = 0;
 
+    public List<Card> CardsAllowedToBeDiscard;
+
     int facilityCount = 0;
     //Meeples
     // TODO: Move to Sector.cs if needed
@@ -159,14 +161,17 @@ public class CardPlayer : MonoBehaviour {
         //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
-    public void AddDiscardEvent(int amount) {
+    public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
         ForceDiscard = true;
         AmountToDiscard = amount;
         discardDropZone.SetActive(true);
+        CardsAllowedToBeDiscard = cardsAllowedToBeDiscard;
         Debug.Log($"Enabling {playerName}'s discard temporarily");
     }
     public void StopDiscard() {
         ForceDiscard = false;
+        CardsAllowedToBeDiscard?.ForEach(card => card.ToggleOutline(false));
+        CardsAllowedToBeDiscard = null;
         discardDropZone.SetActive(false);
         GameManager.instance.mAlertPanel.ResolveAlert();
         Debug.Log($"Disabling {playerName}'s discard");
@@ -241,7 +246,7 @@ public class CardPlayer : MonoBehaviour {
         var card = HandCards[num];
         HandCards.Remove(num);
         Discards.Add(num, card);
-        card.GetComponent<Card>().state = CardState.CardNeedsToBeDiscarded;
+        card.GetComponent<Card>().SetCardState(CardState.CardNeedsToBeDiscarded);
         card.transform.SetParent(discardDropZone.transform, false);
         card.transform.localPosition = new Vector3();
     }
@@ -375,7 +380,7 @@ public class CardPlayer : MonoBehaviour {
             slippy tempSlippy = tempCardObj.GetComponent<slippy>();
             tempSlippy.enabled = false;
         }
-        tempCard.state = CardState.CardDrawn;
+        tempCard.SetCardState(CardState.CardDrawn);
         //  Vector3 tempPos = tempCardObj.transform.position;
         //  tempCardObj.transform.position = tempPos;
         tempCardObj.transform.SetParent(dropZone.transform, false);
@@ -544,7 +549,7 @@ public class CardPlayer : MonoBehaviour {
                 //set var to hold where the card was dropped
                 cardDroppedOnObject = hoveredDropLocation;
                 //set card state to played
-                card.state = CardState.CardDrawnDropped;
+                card.SetCardState(CardState.CardDrawnDropped);
                 //remove card from hand
                 handPositioner.cards.Remove(card);
                 //set the parent to where it was played
@@ -566,7 +571,7 @@ public class CardPlayer : MonoBehaviour {
         switch (GameManager.instance.MGamePhase) {
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
-                (response, canPlay) = CanDiscardCard();
+                (response, canPlay) = CanDiscardCard(card);
                 break;
             case GamePhase.BonusBlue:
             case GamePhase.BonusRed:
@@ -575,12 +580,8 @@ public class CardPlayer : MonoBehaviour {
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                if (ForceDiscard) {
-                    (response, canPlay) = CanDiscardCard();
-                }
-                else {
-                    (response, canPlay) = ValidateActionPlay(card);
-                }
+                (response, canPlay) = ValidateActionPlay(card);
+
                 break;
         }
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
@@ -591,22 +592,36 @@ public class CardPlayer : MonoBehaviour {
         return canPlay;
     }
     private (string, bool) ValidateActionPlay(Card card) {
+        Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
-        //check prereq effects on cards
-        if (card.data.preReqEffectId != 0) {
-            Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
-            if (!facility.HasEffect(card.data.preReqEffectId)) {
-                return ("Facility effect does not match card prereq effect", false);
+        if (ForceDiscard && GameManager.instance.MIsDiscardAllowed) {
+            if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
+                if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
+                    return ("", true);
+                if (CardsAllowedToBeDiscard.Contains(card)) //only highlighted cards can be discarded
+                    return ("", true);
+                return ("Must discard one of the highlighted cards", false); //highlighted cards must be discarded
             }
+            return ("Must discard cards first", false); //didn't drop on the discard drop zone
         }
-        if (!playerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
-            return ("Not enough meeples to play card", false);
+        else {
+            //check prereq effects on cards
+            if (card.data.preReqEffectId != 0) {
+                Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
+                if (!facility.HasEffect(card.data.preReqEffectId)) {
+                    return ("Facility effect does not match card prereq effect", false);
+                }
+            }
+            if (!playerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
+                return ("Not enough meeples to play card", false);
+            }
         }
         return ("", true);
     }
 
-    private (string, bool) CanDiscardCard() {
+    private (string, bool) CanDiscardCard(Card card) {
+        Debug.Log("Checking if card can be discarded");
         //check if it is the player's turn
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
@@ -618,7 +633,13 @@ public class CardPlayer : MonoBehaviour {
             return ("Cannot discard more than " + GameManager.instance.MAX_DISCARDS + " cards per turn", false);
         }
         if (GameManager.instance.MIsDiscardAllowed) {
-            return ("", true);
+            //card effect caused the player to need to discard cards
+            if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
+                return ("", true);
+            if (CardsAllowedToBeDiscard.Contains(card))
+                return ("", true);
+            return ("Must discard one of the highlighted cards", false);
+
         }
         return ("You do not need to discard cards currently", false);
     }
@@ -632,94 +653,6 @@ public class CardPlayer : MonoBehaviour {
     public void ResetMeepleCost() {
         mMeeplesSpent = 0;
     }
-
-    #region old
-    public void HandleAttackPhase(CardPlayer opponent) {
-        List<int> facilitiesToRemove = new List<int>(8);
-
-        // for all active facilities
-        foreach (GameObject facilityGameObject in ActiveFacilities.Values) { }
-        //{
-        //    Facility facilityCard = facilityGameObject.GetComponent<Facility>();
-        //    // for all attacking cards on those facilities
-        //    foreach(CardIDInfo cardInfo in facilityCard.AttackingCards)
-        //    {
-        //        // TODO: Remove random
-
-
-        //        // run the effects of the card, but only if we roll between 11-20 on a d20 does the attack happen
-        //        // This is the same as 50-99 on a 0-100 random roll
-        //        int randomNumber = UnityEngine.Random.Range(0, 100);
-        //        if (randomNumber >= 50)
-        //        {
-        //            // get the card
-        //            GameObject opponentAttackObject = opponent.GetActiveCardObject(cardInfo);
-
-        //            // run the attack effects
-        //            if (opponentAttackObject != null)
-        //            {
-
-        //                Card opponentCard = opponentAttackObject.GetComponent<Card>();
-        //                Debug.Log("attacking card with value : " + opponentCard.data.facilityAmount);
-        //                opponentCard.Play(this, opponent, facilityCard);
-        //                mUpdatesThisPhase.Add(new Updates
-        //                {
-        //                    WhatToDo = AddOrRem.Remove,
-        //                    UniqueFacilityID = facilityCard.UniqueID,
-        //                    CardID = opponentCard.data.cardID
-        //                });
-        //            } else
-        //            {
-        //                Debug.Log("there's a problem because an opponent attack card wasn't in the opponent's active list.");
-        //            }
-        //        }
-        //    }
-
-        //    Debug.Log("facility worth is " + (facilityCard.data.facilityAmount + facilityCard.DefenseHealth));
-
-        //    // now check the total worth of the facility to see if it
-        //    // and do a removal of all cards that were spent in attacks
-        //    if (facilityCard.data.facilityAmount+facilityCard.DefenseHealth <= 0)
-        //    {
-        //        Debug.Log("we need to get rid of this facility");
-        //        // the facility needs to be removed along with all remaining
-        //        // attack cards on it
-        //        foreach(CardIDInfo cardInfo in facilityCard.AttackingCards)
-        //        {
-        //            GameObject cardObject = opponent.GetActiveCardObject(cardInfo);
-        //            if (cardObject != null)
-        //            {
-        //                Card cardToDispose = cardObject.GetComponent<Card>();
-        //                Debug.Log("handling all attack cards on defunct facility : this one's id is " + cardToDispose.UniqueID);
-        //                cardToDispose.state = CardState.CardNeedsToBeDiscarded;
-
-        //            } else
-        //            {
-        //                Debug.Log("attack card with id " + cardInfo.CardID + " wasn't found in the pile of cards on a defunct facility.");
-        //            }
-        //            //opponent.HandleDiscard(opponent.ActiveCards, opponent.opponentDropZone, facilityCard.UniqueID, true);
-        //        }
-        //        // let's discard all the cards on the facility in question
-        //        opponent.DiscardAllInactiveCards(DiscardFromWhere.MyPlayZone, true, facilityCard.UniqueID);
-        //        facilityCard.AttackingCards.Clear();
-        //        facilityCard.state = CardState.CardNeedsToBeDiscarded;
-
-        //        mUpdatesThisPhase.Add(new Updates
-        //        {
-        //            WhatToDo = AddOrRem.Remove,
-        //            UniqueFacilityID = facilityCard.UniqueID,
-        //            CardID = facilityCard.data.cardID
-        //        });
-
-        //    } 
-
-        //}
-
-        // now discard all facilities annihilated
-        DiscardAllInactiveCards(DiscardFromWhere.MyFacility, false, -1);
-
-    }
-    #endregion
 
     public GameObject GetActiveCardObject(CardIDInfo cardIdInfo) {
         GameObject cardObject = null;
@@ -745,10 +678,10 @@ public class CardPlayer : MonoBehaviour {
             //GameObject activeCardObject = ActiveCardList[i];
             Card card = activeCardObject.GetComponent<Card>();
 
-            if (card.state == CardState.CardNeedsToBeDiscarded) {
+            if (card.State == CardState.CardNeedsToBeDiscarded) {
                 Discards.Add(card.UniqueID, activeCardObject);
                 inactives.Add(card.UniqueID);
-                card.state = CardState.CardDiscarded;
+                card.SetCardState(CardState.CardDiscarded);
 
                 // change parent and rescale
                 activeCardObject.GetComponentInParent<HoverScale>().previousScale = Vector2.zero;
@@ -804,14 +737,14 @@ public class CardPlayer : MonoBehaviour {
             case GamePhase.DrawBlue:
             case GamePhase.DrawRed:
                 // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
-                card.state = CardState.CardNeedsToBeDiscarded;
+                card.SetCardState(CardState.CardNeedsToBeDiscarded);
                 playCount = 1;
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
                 //discarding here will be done by a card forcing the player to discard a number of cards
                 if (ForceDiscard) {
-                    card.state = CardState.CardNeedsToBeDiscarded;
+                    card.SetCardState(CardState.CardNeedsToBeDiscarded);
                     playCount = 1;
                     //flag discard as done
                     AmountToDiscard--;
@@ -831,7 +764,7 @@ public class CardPlayer : MonoBehaviour {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
                 // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
-                card.state = CardState.CardInPlay;
+                card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 // NOTE: TO DO - need to add the correct update for the card played since some of them
                 // need different info
@@ -875,7 +808,7 @@ public class CardPlayer : MonoBehaviour {
         switch (phase) {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                card.state = CardState.CardInPlay;
+                card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 // NOTE TO DO: need to add proper data and message type for the card here
                 mUpdatesThisPhase.Enqueue(new Update {
@@ -910,7 +843,7 @@ public class CardPlayer : MonoBehaviour {
             //Debug.Log(phase);
             foreach (GameObject gameObjectCard in HandCards.Values) {
                 Card card = gameObjectCard.GetComponent<Card>();
-                if (card.state == CardState.CardDrawnDropped) {
+                if (card.State == CardState.CardDrawnDropped) {
 
                     // card has been dropped somewhere - where?
                     // Vector2 cardPosition = card.getDroppedPosition();
@@ -970,7 +903,7 @@ public class CardPlayer : MonoBehaviour {
     }
     //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
     public void ResetCardToInHand(Card card) {
-        card.state = CardState.CardDrawn;
+        card.SetCardState(CardState.CardDrawn);
         handPositioner.ReturnCardToHand(card);
     }
 
@@ -1038,7 +971,7 @@ public class CardPlayer : MonoBehaviour {
         Card stationCard = stationObject.GetComponent<Card>();
 
         // unhighlight the outline if it's turned on
-        stationCard.OutlineImage.SetActive(false);
+        //stationCard.OutlineImage.SetActive(false);
         GameObject tempCanvas;
 
         if (stationCard.HasCanvas) {
@@ -1143,8 +1076,8 @@ public class CardPlayer : MonoBehaviour {
         if (HandCards.Count != 0) {
             foreach (GameObject cardGameObject in HandCards.Values) {
                 Card card = cardGameObject.GetComponent<Card>();
-                if (card.state == CardState.CardDrawnDropped) {
-                    card.state = CardState.CardDrawn;
+                if (card.State == CardState.CardDrawnDropped) {
+                    card.SetCardState(CardState.CardDrawn);
                 }
             }
         }
@@ -1214,7 +1147,7 @@ public class CardPlayer : MonoBehaviour {
 
                 // Start the card animation
                 StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () => {
-                    card.state = CardState.CardInPlay;
+                    card.SetCardState(CardState.CardInPlay);
                     card.Play(this, opponent, facility);    // play when animation completes
 
                     // After the current animation is done, check if there's another card queued
