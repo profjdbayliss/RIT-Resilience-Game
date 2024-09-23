@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public GameObject opponentPlayedZone;
     public Camera cam;
     public TextMeshProUGUI titlee;
+    public AlertPanel mAlertPanel;
 
     // End Game
     [Header("End Game")]
@@ -337,7 +338,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         actualPlayer.InitializeCards();
         actualPlayer.discardDropZone.SetActive(true);
         actualPlayer.handDropZone.SetActive(true);
-       
+
     }
 
     #endregion
@@ -391,7 +392,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
     }
-    
+
 
     #endregion
 
@@ -431,7 +432,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         StatusText.text = message;
     }
 
-
+    public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1) {
+        if (player == actualPlayer) {
+            mAlertPanel.ShowAlert(message, duration);
+        }
+    }
     // WORK: rewrite for this card game
     public void ShowEndGameCanvas() {
         MGamePhase = GamePhase.End;
