@@ -8,5 +8,7 @@ public enum GamePhase
     BonusBlue,
     ActionRed,
     ActionBlue,
+    DiscardRed,
+    DiscardBlue,
     End
 };

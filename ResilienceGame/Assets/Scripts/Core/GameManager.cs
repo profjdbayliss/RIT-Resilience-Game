@@ -99,13 +99,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Logging
     public List<string> messageLog = new List<string>();
-    
+
 
     // Misc
     public bool mCreateEnergyAtlas = false;
     public bool mCreateWaterAtlas = false;
     private int turnTotal = 0;
-    
+
     #endregion
 
     #region Initialization
@@ -356,7 +356,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 Debug.Log("Add card to discard");
                 actualPlayer.ForceDiscardRandomCard();
             }
-            
+
         }
         if (isInit) {
             if (gameStarted) {
@@ -461,13 +461,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
             actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue;
     }
     public bool IsActualPlayersTurn() {
-
-
         if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.BonusRed;
+            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.BonusRed || MGamePhase == GamePhase.DiscardRed;
         }
         else {
-            return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue;
+            return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue || MGamePhase == GamePhase.DiscardBlue;
         }
 
     }
@@ -500,8 +498,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         MGamePhase = GetNextPhase();
         Debug.Log($"Progressing phase {curPhase} to {MGamePhase}");
         if (IsActualPlayersTurn()) {
-            mEndPhaseButton.SetActive(true);
-            Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
+            if (!(MGamePhase == GamePhase.DiscardBlue || MGamePhase == GamePhase.DiscardRed)) {
+                mEndPhaseButton.SetActive(true);
+                Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
+            }
         }
         else {
             EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
@@ -529,10 +529,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.Start => GamePhase.DrawRed,
             GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
             GamePhase.BonusRed => GamePhase.ActionRed,
-            GamePhase.ActionRed => GamePhase.DrawBlue,
+            GamePhase.ActionRed => GamePhase.DiscardRed,
+            GamePhase.DiscardRed => GamePhase.DrawBlue,
             GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
             GamePhase.BonusBlue => GamePhase.ActionBlue,
-            GamePhase.ActionBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
+            GamePhase.ActionBlue => GamePhase.DiscardBlue,
+            GamePhase.DiscardBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
             _ => GamePhase.End
         };
     }
@@ -593,14 +595,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-
-
                 if (!phaseJustChanged) {
                     if (!mIsActionAllowed) {
                         // do nothing - most common scenario
                     }
-                    else
-                    if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples()) {
+                    else if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples()) {
                         Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
                         mIsActionAllowed = false;
                         DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
@@ -613,6 +612,37 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     mIsActionAllowed = true;
                 }
 
+                break;
+            case GamePhase.DiscardRed:
+            case GamePhase.DiscardBlue:
+                if (phaseJustChanged) {
+                    if (!actualPlayer.NeedsToDiscard()) {
+                        EndPhase(); //immediately end phase if no discards needed
+                        return;
+                    }
+                    //reset player discard amounts
+                    MIsDiscardAllowed = true;
+                    actualPlayer.discardDropZone.SetActive(true);
+                    MNumberDiscarded = 0;
+                    DisplayGameStatus(mPlayerName.text + " has " + actualPlayer.HandCards.Count + " cards in hand.");
+                    DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
+                }
+                else {
+
+                    if (MIsDiscardAllowed) {
+                        MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
+                        
+                        if (!actualPlayer.NeedsToDiscard()) {
+                            Debug.Log("Ending discard phase after finishing discarding");
+                            MIsDiscardAllowed = false;
+                            EndPhase(); //end phase when done discarding
+                        }
+                        //update alert when discarding
+                        if (MNumberDiscarded > 0) {
+                            DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
+                        }
+                    }
+                }
                 break;
             case GamePhase.End:
                 // end of game phase
@@ -628,11 +658,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     // Ends the phase.
     public void EndPhase() {
+        mAlertPanel.ResolveAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
         switch (MGamePhase) {
+            case GamePhase.DiscardRed:
+            case GamePhase.DiscardBlue:
             case GamePhase.DrawBlue:
             case GamePhase.DrawRed: {
                     // make sure we have a full hand
-                    actualPlayer.DrawCards();
+                    // actualPlayer.DrawCards();
                     // set the discard area to work if necessary
                     actualPlayer.discardDropZone.SetActive(false);
                     MIsDiscardAllowed = false;
@@ -640,7 +673,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     // clear any remaining drops since we're ending the phase now
                     actualPlayer.ClearDropState();
 
-                    Debug.Log("ending draw and discard game phase!");
+                   // Debug.Log("ending draw and discard game phase!");
 
                     // send a message with number of discards of the player
                     Message msg;

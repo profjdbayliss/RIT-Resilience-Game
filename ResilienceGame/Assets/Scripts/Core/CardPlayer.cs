@@ -80,7 +80,8 @@ public class CardPlayer : MonoBehaviour {
     public Dictionary<int, GameObject> ActiveCards = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> ActiveFacilities = new Dictionary<int, GameObject>();
     public int handSize;
-    public int maxHandSize = 4;
+    private const int MAX_DRAW_AMOUNT = 5;
+    public const int MAX_HAND_SIZE_AFTER_ACTION = 7;
     public GameObject cardPrefab;
     public GameObject discardDropZone;
     public GameObject handDropZone;
@@ -161,6 +162,9 @@ public class CardPlayer : MonoBehaviour {
         //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
+    public bool NeedsToDiscard() {
+        return HandCards.Count > MAX_HAND_SIZE_AFTER_ACTION;
+    }
     public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
         ForceDiscard = true;
         AmountToDiscard = amount;
@@ -208,26 +212,23 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public virtual void DrawCards() {
-        if (HandCards.Count < maxHandSize) // TODO: Liar???????
-        {
-            int count = HandCards.Count;
-            for (int i = 0; i < maxHandSize - count; i++) {
-                if (DeckIDs.Count > 0) {
-                    DrawCard(
-                        random: true,
-                        cardId: 0,
-                        uniqueId: -1,
-                        deckToDrawFrom: ref DeckIDs,
-                        dropZone: handDropZone,
-                        allowSlippy: true,
-                        activeDeck: ref HandCards);
-
-                }
-                else {
-                    break;
-                }
-            }
+        int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
+        if (numCards <= 0) {
+            return;
         }
+
+        if (DeckIDs.Count > 0) {
+            DrawCard(
+                random: true,
+                cardId: 0,
+                uniqueId: -1,
+                deckToDrawFrom: ref DeckIDs,
+                dropZone: handDropZone,
+                allowSlippy: true,
+                activeDeck: ref HandCards);
+
+        }
+
     }
     public virtual void ForceDrawSpecificCard(int id) {
         if (DeckIDs.Count > 0) {
@@ -575,21 +576,27 @@ public class CardPlayer : MonoBehaviour {
                 break;
             case GamePhase.BonusBlue:
             case GamePhase.BonusRed:
-
-                (response, canPlay) = ("Cannot discard cards during bonus phase", false); //turn only happens during Doomclock? where you can allocate overtime
+                (response, canPlay) = ("Cannot play cards during bonus phase", false); //turn only happens during Doomclock? where you can allocate overtime
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
                 (response, canPlay) = ValidateActionPlay(card);
-
+                break;
+            case GamePhase.DiscardRed:
+            case GamePhase.DiscardBlue:
+                (response, canPlay) = ValidateDiscardPlay(card);
                 break;
         }
         Debug.Log($"Playing {card.front.title} on {hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
-        if (!canPlay) {
-            Debug.Log(response);
-        }
+        Debug.Log(response);
 
         return canPlay;
+    }
+    private (string, bool) ValidateDiscardPlay(Card card) {
+        if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
+            return ("Can discard during discard phase", true);
+        }
+        return ("Must discard on the discard drop zone", false);
     }
     private (string, bool) ValidateActionPlay(Card card) {
         Debug.Log("Checking if card can be played in action phase");
@@ -598,9 +605,9 @@ public class CardPlayer : MonoBehaviour {
         if (ForceDiscard && GameManager.instance.MIsDiscardAllowed) {
             if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
                 if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
-                    return ("", true);
+                    return ("Discard any card allowed", true);
                 if (CardsAllowedToBeDiscard.Contains(card)) //only highlighted cards can be discarded
-                    return ("", true);
+                    return ("Discarded valid card", true);
                 return ("Must discard one of the highlighted cards", false); //highlighted cards must be discarded
             }
             return ("Must discard cards first", false); //didn't drop on the discard drop zone
@@ -617,7 +624,7 @@ public class CardPlayer : MonoBehaviour {
                 return ("Not enough meeples to play card", false);
             }
         }
-        return ("", true);
+        return ("Valid action play", true);
     }
 
     private (string, bool) CanDiscardCard(Card card) {
@@ -632,15 +639,15 @@ public class CardPlayer : MonoBehaviour {
             }
             return ("Cannot discard more than " + GameManager.instance.MAX_DISCARDS + " cards per turn", false);
         }
-        if (GameManager.instance.MIsDiscardAllowed) {
-            //card effect caused the player to need to discard cards
-            if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
-                return ("", true);
-            if (CardsAllowedToBeDiscard.Contains(card))
-                return ("", true);
-            return ("Must discard one of the highlighted cards", false);
+        //if (GameManager.instance.MIsDiscardAllowed) {
+        //    //card effect caused the player to need to discard cards
+        //    if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
+        //        return ("", true);
+        //    if (CardsAllowedToBeDiscard.Contains(card))
+        //        return ("", true);
+        //    return ("Must discard one of the highlighted cards", false);
 
-        }
+        //}
         return ("You do not need to discard cards currently", false);
     }
     public bool IsPlayerTurn() {
@@ -736,6 +743,8 @@ public class CardPlayer : MonoBehaviour {
         switch (phase) {
             case GamePhase.DrawBlue:
             case GamePhase.DrawRed:
+            case GamePhase.DiscardBlue:
+            case GamePhase.DiscardRed:
                 // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
                 card.SetCardState(CardState.CardNeedsToBeDiscarded);
                 playCount = 1;
@@ -887,7 +896,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         if (playCount > 0) {
-            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue) {
+            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue || phase == GamePhase.DiscardBlue || phase == GamePhase.DiscardRed) {
                 // we're not discarding a facility or sharing what we're discarding with the opponent
                 DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
             }
