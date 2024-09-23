@@ -12,6 +12,7 @@ using System.Linq;
 using UnityEngine.PlayerLoop;
 using static UnityEngine.PlayerLoop.EarlyUpdate;
 using static Facility;
+using System;
 
 // Enum to track player type
 public enum PlayerTeam {
@@ -64,6 +65,7 @@ public enum DiscardFromWhere {
     MyFacility
 };
 
+
 public class CardPlayer : MonoBehaviour {
     // Establish necessary fields
     public string playerName;
@@ -94,6 +96,8 @@ public class CardPlayer : MonoBehaviour {
     private GameObject cardDroppedOnObject;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
     //private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
+    public Queue<(Update, GamePhase, CardPlayer)> opponentCardPlays = new Queue<(Update, GamePhase, CardPlayer)>();
+    public bool IsAnimating { get; set; } = false;
 
     int facilityCount = 0;
     //Meeples
@@ -118,6 +122,7 @@ public class CardPlayer : MonoBehaviour {
     bool registeredFacilities = false;
 
     //public GameObject hoveredDropLocation;
+
 
 
     public void Start() {
@@ -1194,47 +1199,25 @@ public class CardPlayer : MonoBehaviour {
     public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Player {playerName} is Adding update: {update.Type}, FacilityType: {update.FacilityType}");
 
-        if (update.Type == CardMessageType.CardUpdate && update.FacilityType != FacilityType.None) {
-            Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
+        if (IsAnimating) {
+            Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
+            opponentCardPlays.Enqueue((update, phase, opponent));
+            return;
+        }
 
-            if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
-                Debug.Log($"Creating card played on facility: {facility.facilityName}");
-
-                Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
-                    deckToDrawFrom: ref DeckIDs, dropZone: facilityGo,
-                    allowSlippy: false, activeDeck: ref ActiveCards);
-
-                if (card != null) {
-                    GameObject cardGameObject = ActiveCards[card.UniqueID];
-                    RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
-
-                    // Set the card's parent to nothing, in order to position it in world space
-                    cardRect.SetParent(null, true);
-
-
-                    Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-                    Vector2 topMiddle = new Vector2(screenSize.x / 2, screenSize.y + cardRect.rect.height / 2); //top middle just off the screen
-
-                    cardRect.anchoredPosition = topMiddle;
-                    card.transform.localRotation = Quaternion.Euler(0, 0, 180); //flip upside down as if played by opponent
-
-                    // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
-
-                    cardRect.SetParent(facilityGo.GetComponentInParent<Canvas>().transform, true); //set parent to game canvas and keep world position
-                    cardGameObject.SetActive(true);
-
-                    StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () => {
-                        card.state = CardState.CardInPlay;
-                        card.Play(this, opponent, facility);    //play when animation completes
-                    }));
-
-                    
-
-
-                }
-                else {
-                    Debug.LogError($"Failed to create card with ID: {update.CardID}");
-                }
+        // If no animation is in progress, handle the card play immediately
+        ProcessCardPlay(update, phase, opponent);
+    }
+    void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
+        IsAnimating = true;
+        if (update.Type == CardMessageType.CardUpdate) {
+            //handle facility card play
+            if (update.FacilityType != FacilityType.None) {
+                HandleFacilityOpponentPlay(update, phase, opponent);
+            }
+            //handle non facility card
+            else if (update.FacilityType == FacilityType.None) {
+                HandleFreeOpponentPlay(update, phase, opponent);
             }
             else {
                 Debug.LogError($"Failed to find facility of type: {update.FacilityType}");
@@ -1242,6 +1225,58 @@ public class CardPlayer : MonoBehaviour {
         }
         else {
             Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityType}");
+        }
+    }
+    void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
+
+    }
+    void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
+        Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
+
+        if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
+            Debug.Log($"Creating card played on facility: {facility.facilityName}");
+
+            Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
+                deckToDrawFrom: ref DeckIDs, dropZone: facilityGo,
+                allowSlippy: false, activeDeck: ref ActiveCards);
+
+            if (card != null) {
+                GameObject cardGameObject = ActiveCards[card.UniqueID];
+                RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
+
+                // Set the card's parent to nothing, in order to position it in world space
+                cardRect.SetParent(null, true);
+
+                Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); //top middle just off the screen
+
+                cardRect.anchoredPosition = topMiddle;
+                card.transform.localRotation = Quaternion.Euler(0, 0, 180); //flip upside down as if played by opponent
+
+                // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
+
+                cardRect.SetParent(facilityGo.GetComponentInParent<Canvas>().transform, true); //set parent to game canvas and keep world position
+                cardGameObject.SetActive(true);
+
+                // Start the card animation
+                StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () =>
+                {
+                    card.state = CardState.CardInPlay;
+                    card.Play(this, opponent, facility);    // play when animation completes
+
+                    // After the current animation is done, check if there's another card queued
+                    OnAnimationComplete();
+                }));
+            }
+        }
+    }
+    //called when the card animation is complete to start the next animation
+    private void OnAnimationComplete() {
+        IsAnimating = false;
+
+        // Check if there are more cards in the queue
+        if (opponentCardPlays.Count > 0) {
+            var nextCardPlay = opponentCardPlays.Dequeue();
+            ProcessCardPlay(nextCardPlay.Item1, nextCardPlay.Item2, nextCardPlay.Item3);
         }
     }
 
