@@ -290,7 +290,7 @@ public class CardReader : MonoBehaviour {
                             tex3.Apply();
                         }
                         // TODO: Uncomment when a background Atlas is created
-                        //tempCardFront.background = tex3;
+                        tempCardFront.background = tex3;
 
                         // 11:  Meeple type changed
                         // TODO: May need enum implemented
