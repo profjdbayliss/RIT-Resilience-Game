@@ -14025,7 +14025,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeckName: white;positive
   cardFileName: SectorDownCards.csv
-  outputAtlasName: 
+  outputAtlasName: posWhiteAtlas.png
   cardPrefab: {fileID: 1938897582}
 --- !u!1 &970184693
 GameObject:
@@ -20061,7 +20061,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeckName: white;negative
   cardFileName: SectorDownCards.csv
-  outputAtlasName: 
+  outputAtlasName: negWhiteAtlas.png
   cardPrefab: {fileID: 1938897582}
 --- !u!1 &1556341610
 GameObject:
@@ -26997,8 +26997,8 @@ MonoBehaviour:
   activePlayerNumber: 0
   redDeckReader: {fileID: 839994437}
   blueDeckReader: {fileID: 545910554}
-  positiveWhiteDeckReader: {fileID: 0}
-  negativeWhiteDeckReader: {fileID: 0}
+  positiveWhiteDeckReader: {fileID: 969571136}
+  negativeWhiteDeckReader: {fileID: 1537699486}
   redCards: []
   blueCards: []
   positiveWhiteCards: []
@@ -27022,13 +27022,15 @@ MonoBehaviour:
   cam: {fileID: 1515608158}
   titlee: {fileID: 631575999}
   mAlertPanel: {fileID: 228889691}
-  deckSizeTracker: {fileID: 1488800424}
+  deckSizeTracker: {fileID: 0}
   endGameCanvas: {fileID: 1756113746}
   endGameText: {fileID: 894850864}
   yarnSpinner: {fileID: 2753718019496694862}
   messageLog: []
   mCreateEnergyAtlas: 0
   mCreateWaterAtlas: 0
+  mCreatePosWhiteAtlas: 0
+  mCreateNegWhiteAtlas: 0
 --- !u!4 &2133546054
 Transform:
   m_ObjectHideFlags: 0

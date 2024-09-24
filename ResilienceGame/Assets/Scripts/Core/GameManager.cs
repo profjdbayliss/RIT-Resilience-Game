@@ -109,6 +109,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Misc
     public bool mCreateEnergyAtlas = false;
     public bool mCreateWaterAtlas = false;
+    public bool mCreatePosWhiteAtlas = false;
+    public bool mCreateNegWhiteAtlas = false;
     private int turnTotal = 0;
 
     #endregion
@@ -301,6 +303,28 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             else {
                 Debug.Log("Energy deck reader is null.");
+            }
+
+            reader = positiveWhiteDeckReader.GetComponent<CardReader>();
+            if(reader != null)
+            {
+                positiveWhiteCards = reader.CSVRead(mCreatePosWhiteAtlas);
+                CardPlayer.AddCards(positiveWhiteCards);
+            }
+            else
+            {
+                Debug.Log("Positive white deck reader is null.");
+            }
+
+            reader = negativeWhiteDeckReader.GetComponent<CardReader>();
+            if(reader != null)
+            {
+                negativeWhiteCards = reader.CSVRead(mCreateNegWhiteAtlas); 
+                CardPlayer.AddCards(negativeWhiteCards);
+            }
+            else
+            {
+                Debug.Log("Negative white deck reader is null.");
             }
 
             // Set dialogue runner for tutorial
