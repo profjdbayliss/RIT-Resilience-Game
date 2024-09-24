@@ -47,10 +47,23 @@ public class DrawAndDiscardCards : ICardAction {
 
 public class ShuffleAndDrawCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log("card " + card.front.title + " played to mitigate a card on the selected station.");
-        // TODO: Get data from card reader to loop
-        player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
-        // TODO: Select Shuffled Card
+        Debug.Log("card " + card.front.title + " played.");
+
+        player.ForcePlayerReturnCardsToDeck(card.data.removeAmount, () => {
+            for (int i = 0; i < card.data.drawAmount; i++) {
+                player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
+            }
+        });
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        Debug.Log("card " + card.front.title + " canceled.");
+    }
+}
+public class ReturnHandToDeckAndDraw : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        Debug.Log("card " + card.front.title + " played.");
+        player.ReturnHandToDeckAndDraw(card.data.drawAmount);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {

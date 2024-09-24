@@ -103,7 +103,10 @@ public class CardPlayer : MonoBehaviour {
     public bool ForceDiscard { get; set; } = false;
     public int AmountToDiscard { get; set; } = 0;
 
+    public int AmountToReturnToDeck { get; private set; } = 0;
+
     public List<Card> CardsAllowedToBeDiscard;
+    public Action OnCardsReturnedToDeck { get; set; }
 
     int facilityCount = 0;
     //Meeples
@@ -546,16 +549,33 @@ public class CardPlayer : MonoBehaviour {
                 hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
             if (ValidateCardPlay(card)) {
-                Debug.Log("Card is valid to play, dropping?");
-                //set var to hold where the card was dropped
-                cardDroppedOnObject = hoveredDropLocation;
-                //set card state to played
-                card.SetCardState(CardState.CardDrawnDropped);
-                //remove card from hand
-                handPositioner.cards.Remove(card);
-                //set the parent to where it was played
-                card.transform.transform.SetParent(hoveredDropLocation.transform);
-                return card;
+                //check if the game is waiting for the player to return cards to the deck by playing them
+                if (AmountToReturnToDeck > 0) {
+                    Debug.Log("Returning card to deck");
+                    ReturnCardToDeck(card);
+                    AmountToReturnToDeck--;
+                    if (AmountToReturnToDeck > 0) {
+                        GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} more cards to the deck", this); //update alert message
+                    }
+                    else {
+                        OnCardsReturnedToDeck?.Invoke(); //Resolve the action after cards have been returned to deck
+                        GameManager.instance.mAlertPanel.ResolveAlert(); //remove alert message
+                    }
+
+                }
+                else {
+                    Debug.Log("Card is valid to play, dropping?");
+                    //set var to hold where the card was dropped
+                    cardDroppedOnObject = hoveredDropLocation;
+                    //set card state to played
+                    card.SetCardState(CardState.CardDrawnDropped);
+                    //remove card from hand
+                    handPositioner.cards.Remove(card);
+                    //set the parent to where it was played
+                    card.transform.transform.SetParent(hoveredDropLocation.transform);
+                    return card;
+                }
+
             }
             else {
                 //reset card positions
@@ -565,10 +585,28 @@ public class CardPlayer : MonoBehaviour {
         }
         return null;
     }
+    private void ReturnCardToDeck(Card card) {
+        handPositioner.cards.Remove(card);
+        DeckIDs.Add(card.data.cardID);//add it back to the deck
+        HandCards.Remove(card.UniqueID);
+        Destroy(card.gameObject);
+    }
+    public void ReturnHandToDeckAndDraw(int amount) {
+        HandCards.Values.ToList().ForEach(card => {
+            ReturnCardToDeck(card.GetComponent<Card>());
+        });
+        for (int i = 0; i < amount; i++) {
+            DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+        }
+    }
+
     private bool ValidateCardPlay(Card card) {
         string response = "";
         bool canPlay = false;
-
+        if (AmountToReturnToDeck > 0) {
+            Debug.Log($"Returning {card.front.title} to deck");
+            return true;
+        }
         switch (GameManager.instance.MGamePhase) {
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
@@ -915,7 +953,14 @@ public class CardPlayer : MonoBehaviour {
         card.SetCardState(CardState.CardDrawn);
         handPositioner.ReturnCardToHand(card);
     }
+    public void ForcePlayerReturnCardsToDeck(int amount, Action onCardsReturned) {
 
+        if (amount > 0) {
+            AmountToReturnToDeck = amount;
+            OnCardsReturnedToDeck = onCardsReturned;
+            GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} cards to the deck\nby dragging them to the play area", this);
+        }
+    }
     public bool DuplicateCardPlayed(Card facilityCard, Card cardToPlay) {
         bool duplicateCardFound = false;
 

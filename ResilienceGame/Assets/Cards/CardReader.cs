@@ -145,6 +145,10 @@ public class CardReader : MonoBehaviour {
                         string[] methods = individualCSVObjects[2].Split(';');
                         foreach (string type in methods) {
                             switch (type) {
+                                case "ReturnHandToDeckAndDraw":
+                                    tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
+                                    tempCard.ActionList.Add(new ReturnHandToDeckAndDraw());
+                                    break;
                                 case "DrawAndDiscardCards":
                                     // 17:  Cards drawn
                                     tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
