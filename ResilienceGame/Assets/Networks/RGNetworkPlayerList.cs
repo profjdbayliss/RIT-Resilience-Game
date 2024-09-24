@@ -688,7 +688,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                         };
-                        Debug.Log("client received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
+                        Debug.Log("server received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }

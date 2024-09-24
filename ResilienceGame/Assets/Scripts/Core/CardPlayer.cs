@@ -222,10 +222,10 @@ public class CardPlayer : MonoBehaviour {
         if (numCards <= 0) {
             return;
         }
-        DrawNumberOfCards(numCards);
+        DrawNumberOfCards(numCards, updateNetwork: true);
     }
     //add the number of cards from deck to player hand
-    public virtual void DrawNumberOfCards(int num, List<Card> cardsDrawn = null, bool highlight = false) {
+    public virtual void DrawNumberOfCards(int num, List<Card> cardsDrawn = null, bool highlight = false, bool updateNetwork = false) {
 
         Card cardDrawn = null;
         if (DeckIDs.Count > 0) {
@@ -237,7 +237,8 @@ public class CardPlayer : MonoBehaviour {
                     deckToDrawFrom: ref DeckIDs,
                     dropZone: handDropZone,
                     allowSlippy: true,
-                    activeDeck: ref HandCards);
+                    activeDeck: ref HandCards,
+                    sendUpdate: updateNetwork);
                 if (highlight) {
                     cardDrawn.ToggleOutline(true);
                 }
@@ -246,9 +247,10 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //These are for testing purposes to add/remove cards from the hand
-    public virtual void ForceDrawSpecificCard(int id) {
+    public virtual void DrawSpecificCard(int id, bool updateNetwork = false) {
+        Debug.Log($"{playerName} is trying to draw {GetCardNameFromID(id)} with id {id}");
         if (DeckIDs.Count > 0) {
-            DrawCard(false, id, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+            DrawCard(false, id, -1, ref DeckIDs, handDropZone, true, ref HandCards, updateNetwork);
         }
     }
     public virtual void ForceDrawCard() {
@@ -640,9 +642,10 @@ public class CardPlayer : MonoBehaviour {
         HandCards.Values.ToList().ForEach(card => {
             ReturnCardToDeck(card.GetComponent<Card>());
         });
-        for (int i = 0; i < amount; i++) {
-            DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
-        }
+        //for (int i = 0; i < amount; i++) {
+        //    DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+        //}
+        DrawNumberOfCards(amount, updateNetwork: true);
     }
 
     private bool ValidateCardPlay(Card card) {
@@ -1194,6 +1197,7 @@ public class CardPlayer : MonoBehaviour {
         switch (update.Type) {
             case CardMessageType.DrawCard:
                 Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
+                opponent.DrawSpecificCard(update.CardID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
                 break;
             default: //card update for now, maybe discard?
                 Debug.Log($"Player {playerName} is adding card update: {update.Type}, FacilityType: {update.FacilityType}");

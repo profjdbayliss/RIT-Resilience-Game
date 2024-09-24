@@ -421,7 +421,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Interface Updates
     public void UpdateDeckSizeText() {
-
+        //TODO: Add check for all red players
+        deckSizeTracker.UpdatePlayerDeckSize(actualPlayer.DeckIDs.Count);
+        deckSizeTracker.UpdateOpponentDeckSize(opponentPlayer.DeckIDs.Count);
     }
     // WORK: there is no menu?????
     public void BackToMenu() {
@@ -797,19 +799,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
-        opponentPlayer.AddUpdate(update, phase, actualPlayer);
-        //switch (phase) {
-
-        //    case GamePhase.ActionRed:
-        //    case GamePhase.ActionBlue:
-        //        // NOTE: TO DO - needs code to do the right thing depending on
-        //        // whether it's a red or blue player
-                
-        //        break;
-
-        //    default:
-        //        break;
-        //}
+        actualPlayer.AddUpdate(update, phase, opponentPlayer);
 
     }
     #endregion
