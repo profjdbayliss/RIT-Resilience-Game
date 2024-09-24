@@ -35,7 +35,7 @@ public class DrawAndDiscardCards : ICardAction {
             //    }
 
             //}
-            player.DrawNumberOfCards(card.data.drawAmount, drawnCards, true);
+            player.DrawNumberOfCards(card.data.drawAmount, drawnCards, true, updateNetwork: true);
             if (card.data.removeAmount > 0) {
                 GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
                 GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
@@ -53,7 +53,7 @@ public class ShuffleAndDrawCards : ICardAction {
         Debug.Log("card " + card.front.title + " played.");
         if (player == GameManager.instance.actualPlayer) {
             player.ForcePlayerReturnCardsToDeck(card.data.removeAmount, () => {
-                player.DrawNumberOfCards(card.data.drawAmount);
+                player.DrawNumberOfCards(card.data.drawAmount, updateNetwork: true);
             });
             base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
         }

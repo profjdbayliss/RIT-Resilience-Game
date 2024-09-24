@@ -797,19 +797,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
-        opponentPlayer.AddUpdate(update, phase, actualPlayer);
-        //switch (phase) {
-
-        //    case GamePhase.ActionRed:
-        //    case GamePhase.ActionBlue:
-        //        // NOTE: TO DO - needs code to do the right thing depending on
-        //        // whether it's a red or blue player
-                
-        //        break;
-
-        //    default:
-        //        break;
-        //}
+        actualPlayer.AddUpdate(update, phase, opponentPlayer);
 
     }
     #endregion
