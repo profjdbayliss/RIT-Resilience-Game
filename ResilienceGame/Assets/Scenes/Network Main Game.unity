@@ -27027,10 +27027,10 @@ MonoBehaviour:
   endGameText: {fileID: 894850864}
   yarnSpinner: {fileID: 2753718019496694862}
   messageLog: []
-  mCreateEnergyAtlas: 1
-  mCreateWaterAtlas: 1
-  mCreatePosWhiteAtlas: 1
-  mCreateNegWhiteAtlas: 1
+  mCreateEnergyAtlas: 0
+  mCreateWaterAtlas: 0
+  mCreatePosWhiteAtlas: 0
+  mCreateNegWhiteAtlas: 0
 --- !u!4 &2133546054
 Transform:
   m_ObjectHideFlags: 0

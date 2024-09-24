@@ -246,13 +246,15 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
-    //These are for testing purposes to add/remove cards from the hand
+    //Draws a specific card from the deck and adds it to the handParent by calling the CardDraw function
+    //Currently used to add a card to opponents hand when receiving a draw message from the network
     public virtual void DrawSpecificCard(int id, GameObject handParent, bool updateNetwork = false) {
         Debug.Log($"{playerName} is trying to draw {GetCardNameFromID(id)} with id {id}");
         if (DeckIDs.Count > 0) {
             DrawCard(false, id, -1, ref DeckIDs, handParent, true, ref HandCards, updateNetwork);
         }
     }
+    //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawCard() {
         if (DeckIDs.Count > 0) {
             DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
@@ -432,7 +434,7 @@ public class CardPlayer : MonoBehaviour {
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
 
-        // GameManager.instance.UpdateDeckSizeText(); //update UI
+         GameManager.instance.UpdateDeckSizeText(); //update UI
 
 
 
