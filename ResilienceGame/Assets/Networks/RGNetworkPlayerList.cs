@@ -230,6 +230,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.RestorePoints:
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
+            case CardMessageType.DrawCard:
             case CardMessageType.MeepleShare: {
                     RGNetworkLongMessage msg = new RGNetworkLongMessage {
                         indexId = (uint)localPlayerID,
@@ -454,6 +455,25 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
+                case CardMessageType.DrawCard: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update {
+                            Type = CardMessageType.DrawCard,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                        };
+                        Debug.Log("client received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
                 case CardMessageType.CardUpdate: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -652,6 +672,25 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             manager.DisplayGameStatus("Player " + playerNames[playerIndex] +
                                 " discarded " + discardCount + " cards.");
                         }
+                    }
+                    break;
+                case CardMessageType.DrawCard: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        Update update = new Update {
+                            Type = CardMessageType.DrawCard,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                        };
+                        Debug.Log("client received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
                 case CardMessageType.CardUpdate: {

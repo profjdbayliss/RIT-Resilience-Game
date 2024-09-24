@@ -575,7 +575,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     MIsDiscardAllowed = true;
                     // draw cards if necessary
                     if (IsActualPlayersTurn())
-                        actualPlayer.DrawCards();
+                        actualPlayer.DrawCardsToFillHand();
                     // set the discard area to work if necessary
                     actualPlayer.discardDropZone.SetActive(true);
                     MNumberDiscarded = 0;
@@ -584,7 +584,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 else {
                     // draw cards if necessary
                     if (IsActualPlayersTurn())
-                        actualPlayer.DrawCards();
+                        actualPlayer.DrawCardsToFillHand();
 
                     // check for discard and if there's a discard draw again
                     if (MNumberDiscarded == MAX_DISCARDS) {
@@ -773,29 +773,21 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
-        switch (phase) {
+        opponentPlayer.AddUpdate(update, phase, actualPlayer);
+        //switch (phase) {
 
-            case GamePhase.ActionRed:
-            case GamePhase.ActionBlue:
-                // NOTE: TO DO - needs code to do the right thing depending on
-                // whether it's a red or blue player
-                opponentPlayer.AddUpdate(update, phase, actualPlayer);
-                break;
+        //    case GamePhase.ActionRed:
+        //    case GamePhase.ActionBlue:
+        //        // NOTE: TO DO - needs code to do the right thing depending on
+        //        // whether it's a red or blue player
+                
+        //        break;
 
-            default:
-                break;
-        }
+        //    default:
+        //        break;
+        //}
 
     }
-    #endregion
-
-    #region Unused
-
-    public void AddOpponentFacility(int facilityId, int uniqueId) {
-        opponentPlayer.DrawCard(false, facilityId, uniqueId, ref opponentPlayer.FacilityIDs, opponentPlayedZone,
-            false, ref opponentPlayer.ActiveFacilities);
-    }
-
     #endregion
 
     #region Turn Handling

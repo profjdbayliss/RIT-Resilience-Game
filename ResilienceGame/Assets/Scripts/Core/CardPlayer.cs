@@ -107,7 +107,7 @@ public class CardPlayer : MonoBehaviour {
     public Queue<(Update, GamePhase, CardPlayer)> opponentCardPlays = new Queue<(Update, GamePhase, CardPlayer)>();
     public bool IsAnimating { get; set; } = false;
     public PlayerReadyState ReadyState { get; set; } = PlayerReadyState.ReadyToPlay;
-  //  public bool ForceDiscard { get; set; } = false;
+    //  public bool ForceDiscard { get; set; } = false;
     public int AmountToDiscard { get; set; } = 0;
 
     public int AmountToReturnToDeck { get; private set; } = 0;
@@ -136,10 +136,6 @@ public class CardPlayer : MonoBehaviour {
 
 
     bool registeredFacilities = false;
-
-    //public GameObject hoveredDropLocation;
-
-
 
     public void Start() {
 
@@ -220,33 +216,41 @@ public class CardPlayer : MonoBehaviour {
             FacilityIDs.Add((int)facility.facilityType);
         }
     }
-
-    public virtual void DrawCards() {
+    //draws enough cards until max hand size
+    public virtual void DrawCardsToFillHand() {
         int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
         if (numCards <= 0) {
             return;
         }
-
-        if (DeckIDs.Count > 0) {
-            DrawCard(
-                random: true,
-                cardId: 0,
-                uniqueId: -1,
-                deckToDrawFrom: ref DeckIDs,
-                dropZone: handDropZone,
-                allowSlippy: true,
-                activeDeck: ref HandCards);
-
-        }
-
+        DrawNumberOfCards(numCards);
     }
+    //add the number of cards from deck to player hand
+    public virtual void DrawNumberOfCards(int num, List<Card> cardsDrawn = null, bool highlight = false) {
+
+        Card cardDrawn = null;
+        if (DeckIDs.Count > 0) {
+            for (int i = 0; i < num; i++) {
+                cardDrawn = DrawCard(
+                    random: true,
+                    cardId: 0,
+                    uniqueId: -1,
+                    deckToDrawFrom: ref DeckIDs,
+                    dropZone: handDropZone,
+                    allowSlippy: true,
+                    activeDeck: ref HandCards);
+                if (highlight) {
+                    cardDrawn.ToggleOutline(true);
+                }
+                cardsDrawn?.Add(cardDrawn);
+            }
+        }
+    }
+    //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawSpecificCard(int id) {
         if (DeckIDs.Count > 0) {
             DrawCard(false, id, -1, ref DeckIDs, handDropZone, true, ref HandCards);
         }
     }
-
-    //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawCard() {
         if (DeckIDs.Count > 0) {
             DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
@@ -261,10 +265,10 @@ public class CardPlayer : MonoBehaviour {
         card.transform.SetParent(discardDropZone.transform, false);
         card.transform.localPosition = new Vector3();
     }
-
-    public virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
+    //Creates a card and adds it to the activeDeck from the deckToDrawFrom
+    protected virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy,
-        ref Dictionary<int, GameObject> activeDeck) {
+        ref Dictionary<int, GameObject> activeDeck, bool sendUpdate = false) {
         int rng = -1;
         Card actualCard;
         int indexForCard = -1;
@@ -414,6 +418,21 @@ public class CardPlayer : MonoBehaviour {
 
         // remove this card so we don't draw it again
         deckToDrawFrom.RemoveAt(indexForCard);
+
+        //send the update to the opponent about which card was drawn
+        if (sendUpdate) {
+            Update update = new Update() {
+                UniqueID = tempCard.UniqueID,
+                CardID = tempCard.data.cardID,
+                Type = CardMessageType.DrawCard
+            }; 
+            mUpdatesThisPhase.Enqueue(update);
+            GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
+        }
+
+
+
+
         return tempCard;
     }
 
@@ -1172,16 +1191,26 @@ public class CardPlayer : MonoBehaviour {
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
     public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
-        Debug.Log($"Player {playerName} is Adding update: {update.Type}, FacilityType: {update.FacilityType}");
+        switch (update.Type) {
+            case CardMessageType.DrawCard:
+                Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
+                break;
+            default: //card update for now, maybe discard?
+                Debug.Log($"Player {playerName} is adding card update: {update.Type}, FacilityType: {update.FacilityType}");
 
-        if (IsAnimating) {
-            Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
-            opponentCardPlays.Enqueue((update, phase, opponent));
-            return;
+                if (IsAnimating) {
+                    Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
+                    opponentCardPlays.Enqueue((update, phase, opponent));
+                    return;
+                }
+
+                // If no animation is in progress, handle the card play immediately
+                ProcessCardPlay(update, phase, opponent);
+                break;
+            
         }
 
-        // If no animation is in progress, handle the card play immediately
-        ProcessCardPlay(update, phase, opponent);
+        
     }
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         IsAnimating = true;
@@ -1202,77 +1231,46 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityType}");
         }
     }
-    void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
+    private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null) {
+        if (card != null) {
+            GameObject cardGameObject = ActiveCards[card.UniqueID];
+            RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
 
+            // Set the card's parent to nothing, in order to position it in world space
+            cardRect.SetParent(null, true);
+            Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); // top middle just off the screen
+            cardRect.anchoredPosition = topMiddle;
+            card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
+            cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); // set parent to game canvas and keep world position
+            cardGameObject.SetActive(true);
 
-            Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
-                deckToDrawFrom: ref DeckIDs, dropZone: null,
-                allowSlippy: false, activeDeck: ref ActiveCards);
-
-            if (card != null) {
-                GameObject cardGameObject = ActiveCards[card.UniqueID];
-                RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
-
-                // Set the card's parent to nothing, in order to position it in world space
-                cardRect.SetParent(null, true);
-
-                Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); //top middle just off the screen
-
-                cardRect.anchoredPosition = topMiddle;
-                card.transform.localRotation = Quaternion.Euler(0, 0, 180); //flip upside down as if played by opponent
-
-                // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
-
-                cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); //set parent to game canvas and keep world position
-                cardGameObject.SetActive(true);
-                
-                // Start the card animation
-                StartCoroutine(card.MoveAndRotateToCenter(cardRect, null, () => {
-                    card.SetCardState(CardState.CardInPlay);
-                    card.Play(opponent, this);    // play when animation completes
-
-                    // After the current animation is done, check if there's another card queued
-                    OnAnimationComplete();
-                }));
-            }
-        
+            // Start the card animation
+            StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
+                card.SetCardState(CardState.CardInPlay);
+                card.Play(opponent, this, facility);
+                // After the current animation is done, check if there's another card queued
+                OnAnimationComplete();
+            }));
+        }
     }
+
+    void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
+        Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
+            deckToDrawFrom: ref DeckIDs, dropZone: null,
+            allowSlippy: false, activeDeck: ref ActiveCards);
+
+        HandleOpponentCardPlay(card, null, opponent);
+    }
+
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
-
         if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
             Debug.Log($"Creating card played on facility: {facility.facilityName}");
-
             Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
                 deckToDrawFrom: ref DeckIDs, dropZone: facilityGo,
                 allowSlippy: false, activeDeck: ref ActiveCards);
 
-            if (card != null) {
-                GameObject cardGameObject = ActiveCards[card.UniqueID];
-                RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
-
-                // Set the card's parent to nothing, in order to position it in world space
-                cardRect.SetParent(null, true);
-
-                Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); //top middle just off the screen
-
-                cardRect.anchoredPosition = topMiddle;
-                card.transform.localRotation = Quaternion.Euler(0, 0, 180); //flip upside down as if played by opponent
-
-                // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
-
-                cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); //set parent to game canvas and keep world position
-                cardGameObject.SetActive(true);
-
-                // Start the card animation
-                StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () => {
-                    card.SetCardState(CardState.CardInPlay);
-                    card.Play(opponent, this, facility);    // play when animation completes
-
-                    // After the current animation is done, check if there's another card queued
-                    OnAnimationComplete();
-                }));
-            }
+            HandleOpponentCardPlay(card, facilityGo, opponent, facility);
         }
     }
     //called when the card animation is complete to start the next animation

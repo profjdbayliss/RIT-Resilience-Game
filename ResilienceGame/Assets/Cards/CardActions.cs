@@ -27,14 +27,15 @@ public class DrawAndDiscardCards : ICardAction {
         List<Card> drawnCards = new List<Card>();
         if (player == GameManager.instance.actualPlayer) {
 
-            for (int i = 0; i < card.data.drawAmount; i++) {
-                Card cardDrawn = player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
-                if (card.data.removeAmount > 0) {
-                    cardDrawn.ToggleOutline(true);
-                    drawnCards.Add(cardDrawn);
-                }
+            //for (int i = 0; i < card.data.drawAmount; i++) {
+            //    Card cardDrawn = player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
+            //    if (card.data.removeAmount > 0) {
+            //        cardDrawn.ToggleOutline(true);
+            //        drawnCards.Add(cardDrawn);
+            //    }
 
-            }
+            //}
+            player.DrawNumberOfCards(card.data.drawAmount, drawnCards, true);
             if (card.data.removeAmount > 0) {
                 GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
                 GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
@@ -52,9 +53,7 @@ public class ShuffleAndDrawCards : ICardAction {
         Debug.Log("card " + card.front.title + " played.");
         if (player == GameManager.instance.actualPlayer) {
             player.ForcePlayerReturnCardsToDeck(card.data.removeAmount, () => {
-                for (int i = 0; i < card.data.drawAmount; i++) {
-                    player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
-                }
+                player.DrawNumberOfCards(card.data.drawAmount);
             });
             base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
         }
