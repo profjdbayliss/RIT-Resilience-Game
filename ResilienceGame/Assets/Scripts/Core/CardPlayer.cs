@@ -1393,4 +1393,19 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
+
+    public void LogPlayerInfo() {
+        string s = $"Player info for: " + playerName + "\n";
+        s += $"Hand size: {HandCards.Count}\n";
+        foreach (Card card in HandCards.Values.Select(x => x.GetComponent<Card>())) {
+            s += "\t" + card.front.title + "\n";
+        }
+        s += $"Deck Size: {DeckIDs.Count}\n";
+        foreach (int cardId in DeckIDs) {
+            s += "\t" + cardId + "\n";
+        }
+        s += $"Active Facilities: {ActiveFacilities.Count}";
+        Debug.Log(s);
+
+    }
 }

@@ -354,13 +354,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
     void Update() {
         if (DEBUG_ENABLED) {
             if (Keyboard.current.f1Key.wasPressedThisFrame) {
-                Debug.Log("Add card to hand");
-                actualPlayer.ForceDrawCard();
+                Debug.Log($"{(isServer ? "**[SERVER]**" : "**[CLIENT]**")}");
+                actualPlayer.LogPlayerInfo();
+                opponentPlayer.LogPlayerInfo();
             }
-            else if (Keyboard.current.f2Key.wasPressedThisFrame) {
-                Debug.Log("Add card to discard");
-                actualPlayer.ForceDiscardRandomCard();
-            }
+            
 
         }
         if (isInit) {
@@ -398,6 +396,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
+    public void UpdateDeckSizeText() {
+
+    }
     // WORK: there is no menu?????
     public void BackToMenu() {
 
