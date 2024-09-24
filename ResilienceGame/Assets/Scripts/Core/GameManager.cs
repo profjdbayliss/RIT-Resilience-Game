@@ -79,6 +79,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public Camera cam;
     public TextMeshProUGUI titlee;
     public AlertPanel mAlertPanel;
+    public DeckSizeTracker deckSizeTracker;
 
     // End Game
     [Header("End Game")]

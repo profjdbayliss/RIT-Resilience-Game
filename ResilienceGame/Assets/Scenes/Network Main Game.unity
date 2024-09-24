@@ -26997,8 +26997,12 @@ MonoBehaviour:
   activePlayerNumber: 0
   redDeckReader: {fileID: 839994437}
   blueDeckReader: {fileID: 545910554}
+  positiveWhiteDeckReader: {fileID: 0}
+  negativeWhiteDeckReader: {fileID: 0}
   redCards: []
   blueCards: []
+  positiveWhiteCards: []
+  negativeWhiteCards: []
   playerDeckList: {fileID: 1570887177}
   gameCanvas: {fileID: 1994761812}
   startScreen: {fileID: 1214050761}
@@ -27018,6 +27022,7 @@ MonoBehaviour:
   cam: {fileID: 1515608158}
   titlee: {fileID: 631575999}
   mAlertPanel: {fileID: 228889691}
+  deckSizeTracker: {fileID: 1488800424}
   endGameCanvas: {fileID: 1756113746}
   endGameText: {fileID: 894850864}
   yarnSpinner: {fileID: 2753718019496694862}
