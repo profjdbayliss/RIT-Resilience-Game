@@ -421,7 +421,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Interface Updates
     public void UpdateDeckSizeText() {
-
+        //TODO: Add check for all red players
+        deckSizeTracker.UpdatePlayerDeckSize(actualPlayer.DeckIDs.Count);
+        deckSizeTracker.UpdateOpponentDeckSize(opponentPlayer.DeckIDs.Count);
     }
     // WORK: there is no menu?????
     public void BackToMenu() {
