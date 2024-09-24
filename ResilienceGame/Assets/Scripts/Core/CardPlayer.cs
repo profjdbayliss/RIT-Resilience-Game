@@ -13,7 +13,7 @@ using UnityEngine.PlayerLoop;
 using static UnityEngine.PlayerLoop.EarlyUpdate;
 using static Facility;
 using System;
-
+#region enums
 // Enum to track player type
 public enum PlayerTeam {
     Red,
@@ -65,20 +65,20 @@ public enum DiscardFromWhere {
     MyPlayZone,
     MyFacility
 };
-
+#endregion
 
 public class CardPlayer : MonoBehaviour {
-    public enum PlayerReadyState {
-        ReadyToPlay,
-        ReturnCardsToDeck,
-        DiscardCards,
-        SelectCardsForCostChange
-    }
-    // Establish necessary fields
+    #region Fields
+    [Header("Player Information")]
     public string playerName;
-    public GameManager manager;
     public PlayerTeam playerTeam = PlayerTeam.Any;
     public Sector playerSector;
+    public string DeckName = "";
+
+    [Header("Game References")]
+    public GameManager manager;
+
+    [Header("Card Collections")]
     public static Dictionary<int, Card> cards = new Dictionary<int, Card>();
     public List<int> FacilityIDs = new List<int>(10);
     public List<int> DeckIDs = new List<int>(52);
@@ -86,57 +86,63 @@ public class CardPlayer : MonoBehaviour {
     public Dictionary<int, GameObject> Discards = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> ActiveCards = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> ActiveFacilities = new Dictionary<int, GameObject>();
+
+    [Header("Card Limits")]
     public int handSize;
     private const int MAX_DRAW_AMOUNT = 5;
     public const int MAX_HAND_SIZE_AFTER_ACTION = 7;
+
+    [Header("Prefabs and UI Elements")]
     public GameObject cardPrefab;
     public GameObject discardDropZone;
     public GameObject handDropZone;
-    private HandPositioner handPositioner;
     public GameObject opponentDropZone;
-    // public GameObject playerDropZone;
     public GameObject cardStackingCanvas;
+
+    [Header("Card Positioning")]
     public readonly float ORIGINAL_SCALE = 0.2f;
-    public string DeckName = "";
-    public bool IsDraggingCard { get; private set; } = false;
+    private HandPositioner handPositioner;
+
+    [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
     private GameObject previousHoveredFacility;
     private GameObject cardDroppedOnObject;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
-    //private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
+    public bool IsDraggingCard { get; private set; } = false;
+
+    [Header("Game State")]
     public Queue<(Update, GamePhase, CardPlayer)> opponentCardPlays = new Queue<(Update, GamePhase, CardPlayer)>();
     public bool IsAnimating { get; set; } = false;
     public PlayerReadyState ReadyState { get; set; } = PlayerReadyState.ReadyToPlay;
-    //  public bool ForceDiscard { get; set; } = false;
     public int AmountToDiscard { get; set; } = 0;
-
     public int AmountToReturnToDeck { get; private set; } = 0;
-
     public List<Card> CardsAllowedToBeDiscard;
     public Action OnCardsReturnedToDeck { get; set; }
 
-    int facilityCount = 0;
-    //Meeples
-    // TODO: Move to Sector.cs if needed
-    // public int blueMeepleCount = 2, blackMeepleCount = 2, purpleMeepleCount = 2;
-    //int mTotalMeepleValue = 0;
-    int mMeeplesSpent = 0;
+    [Header("Facilities")]
+    private int facilityCount = 0;
+    private bool registeredFacilities = false;
 
-    //Vector2 discardDropMin;
-    //Vector2 discardDropMax;
-    //Vector2 playedDropMin;
-    //Vector2 playedDropMax;
-    //Vector2 opponentDropMin;
-    //Vector2 opponentDropMax;
-    // the var is static to make sure the id's don't overlap between
-    // multiple card players
-    static int sUniqueIDCount = 0;
-    int mFinalScore = 0;
-    Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
+    [Header("Meeples")]
+    private int mMeeplesSpent = 0;
 
+    [Header("Scoring")]
+    private int mFinalScore = 0;
 
-    bool registeredFacilities = false;
+    // Private fields
+    private static int sUniqueIDCount = 0;
+    private Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
+    // Enum definition
+    public enum PlayerReadyState {
+        ReadyToPlay,
+        ReturnCardsToDeck,
+        DiscardCards,
+        SelectCardsForCostChange
+    }
+    #endregion
+
+    #region Initialization
     public void Start() {
 
         if (handDropZone)
@@ -168,30 +174,6 @@ public class CardPlayer : MonoBehaviour {
         //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
-    public bool NeedsToDiscard() {
-        return HandCards.Count > MAX_HAND_SIZE_AFTER_ACTION;
-    }
-    public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
-        ReadyState = PlayerReadyState.DiscardCards;
-        AmountToDiscard = amount;
-        discardDropZone.SetActive(true);
-        CardsAllowedToBeDiscard = cardsAllowedToBeDiscard;
-        Debug.Log($"Enabling {playerName}'s discard temporarily");
-    }
-    public void StopDiscard() {
-        ReadyState = PlayerReadyState.ReadyToPlay;
-        CardsAllowedToBeDiscard?.ForEach(card => card.ToggleOutline(false));
-        CardsAllowedToBeDiscard = null;
-        discardDropZone.SetActive(false);
-        GameManager.instance.mAlertPanel.ResolveAlert();
-        Debug.Log($"Disabling {playerName}'s discard");
-    }
-    public static void AddCards(List<Card> cardList) {
-        foreach (Card card in cardList) {
-            cards.Add(card.data.cardID, card);
-        }
-    }
-
     public void InitializeCards() {
         DeckIDs.Clear();
         manager = GameObject.FindObjectOfType<GameManager>();
@@ -216,7 +198,150 @@ public class CardPlayer : MonoBehaviour {
             FacilityIDs.Add((int)facility.facilityType);
         }
     }
-    //draws enough cards until max hand size
+    public static void AddCards(List<Card> cardList) {
+        foreach (Card card in cardList) {
+            cards.Add(card.data.cardID, card);
+        }
+    }
+    void InitDropLocations() {
+
+        var dropZones = FindObjectsOfType<CardDropLocation>();
+        foreach (var dropZone in dropZones) {
+            var tag = dropZone.tag;
+            if (cardDropLocations.ContainsKey(tag)) {
+                tag += ++facilityCount;
+            }
+            //Debug.Log($"Adding {tag} to cardDropLocations");
+            cardDropLocations.Add(tag, dropZone.gameObject);
+
+            //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
+        }
+        // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
+
+
+    }
+    #endregion
+
+    #region Card Action Functions
+    //Sets the variables required to force the player to discard a certain amout of cards
+    public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
+        ReadyState = PlayerReadyState.DiscardCards;         //set the player state to discard cards
+        AmountToDiscard = amount;                           //set the amount of cards to discard
+        discardDropZone.SetActive(true);                    //enable the discard drop zone
+        CardsAllowedToBeDiscard = cardsAllowedToBeDiscard;  //holds the cards that are allowed to be discarded (like draw 3 discard 1 of them)
+        Debug.Log($"Enabling {playerName}'s discard temporarily");
+    }
+    //Returns the player to ready to play state by disabling necessary ui elements and setting player state
+    public void StopDiscard() {
+        ReadyState = PlayerReadyState.ReadyToPlay;
+        CardsAllowedToBeDiscard?.ForEach(card => card.ToggleOutline(false));    //turn off the outline on the cards that were allowed to be discarded
+        CardsAllowedToBeDiscard = null;             //dispose of the list
+        discardDropZone.SetActive(false);           //disable the discard drop zone
+        GameManager.instance.mAlertPanel.ResolveAlert();    //hide alert panel
+        Debug.Log($"Disabling {playerName}'s discard");
+    }
+    //returns the card from the hand to the deck
+    private void ReturnCardToDeck(Card card) {
+        //TODO: Might need to inform the opponent that a card was returned to the deck
+        handPositioner.cards.Remove(card);
+        DeckIDs.Add(card.data.cardID);//add it back to the deck
+        HandCards.Remove(card.UniqueID);
+        Destroy(card.gameObject);
+    }
+    //Called by a card action to return the entire hand to the deck and draw a new hand
+    public void ReturnHandToDeckAndDraw(int amount) {
+        //TODO: update opponent that this happened
+        //the size of the deck will update correctly, but the deck IDs will not be updated (i think)
+        HandCards.Values.ToList().ForEach(card => {
+            ReturnCardToDeck(card.GetComponent<Card>());
+        });
+        DrawNumberOfCards(amount, updateNetwork: true);
+    }
+    //Called by a card action to force the player to return cards to the deck by dragging them to the play area
+    public void ForcePlayerReturnCardsToDeck(int amount, Action onCardsReturned) {
+
+        if (amount > 0) {
+            AmountToReturnToDeck = amount;
+            OnCardsReturnedToDeck = onCardsReturned;
+            ReadyState = PlayerReadyState.ReturnCardsToDeck;
+            GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} cards to the deck\nby dragging them to the play area", this);
+        }
+    }
+    #endregion
+
+    #region Helpers
+    //returns any dropped cards to the hand
+    //public void ClearDropState() {
+    //    if (HandCards.Count != 0) {
+    //        foreach (GameObject cardGameObject in HandCards.Values) {
+    //            Card card = cardGameObject.GetComponent<Card>();
+    //            if (card.State == CardState.CardDrawnDropped) {
+    //                card.SetCardState(CardState.CardDrawn);
+    //            }
+    //        }
+    //    }
+    //}
+    //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
+    public void ResetCardToInHand(Card card) {
+        card.SetCardState(CardState.CardDrawn);
+        handPositioner.ReturnCardToHand(card);
+    }
+    //returns true if the player's cards are above the max hand size at the end of the action phase to force them to discard cards
+    public bool NeedsToDiscard() {
+        return HandCards.Count > MAX_HAND_SIZE_AFTER_ACTION;
+    }
+    public int GetMeeplesSpent() {
+        return mMeeplesSpent;
+    }
+    public int AddMeeplesSpent(int meeples) {
+        mMeeplesSpent += meeples;
+        return mMeeplesSpent;
+    }
+    public string GetCardNameFromID(int cardID) {
+        if (cards.TryGetValue(cardID, out Card card)) {
+            return card.data.name;
+        }
+        return "Card not found";
+    }
+    public int GetTotalMeeples() {
+        return playerSector.GetTotalMeeples();
+    }
+    public int GetMaxMeeples() {
+        return playerSector.GetMaxMeeples();
+    }
+    private Facility FacilityPlayedOn() {
+        Facility facility = null;
+        if (cardDroppedOnObject != null) {
+            facility = cardDroppedOnObject.GetComponentInParent<Facility>();
+        }
+        return facility;
+    }
+    private void OnAnimationComplete() {
+        IsAnimating = false;
+
+        // Check if there are more cards in the queue
+        if (opponentCardPlays.Count > 0) {
+            var nextCardPlay = opponentCardPlays.Dequeue();
+            ProcessCardPlay(nextCardPlay.Item1, nextCardPlay.Item2, nextCardPlay.Item3);
+        }
+    }
+    void CalculateScore() {
+        mFinalScore = 42;
+    }
+
+    public int GetScore() {
+        CalculateScore();
+        return mFinalScore;
+    }
+
+    public bool HasUpdates() {
+        return (mUpdatesThisPhase.Count != 0);
+    }
+
+    
+    #endregion
+
+    #region Card Drawing Functions
     public virtual void DrawCardsToFillHand() {
         int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
         if (numCards <= 0) {
@@ -253,21 +378,6 @@ public class CardPlayer : MonoBehaviour {
         if (DeckIDs.Count > 0) {
             DrawCard(false, id, -1, ref DeckIDs, handParent, true, ref HandCards, updateNetwork);
         }
-    }
-    //These are for testing purposes to add/remove cards from the hand
-    public virtual void ForceDrawCard() {
-        if (DeckIDs.Count > 0) {
-            DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
-        }
-    }
-    public virtual void ForceDiscardRandomCard() {
-        var num = UnityEngine.Random.Range(0, HandCards.Count);
-        var card = HandCards[num];
-        HandCards.Remove(num);
-        Discards.Add(num, card);
-        card.GetComponent<Card>().SetCardState(CardState.CardNeedsToBeDiscarded);
-        card.transform.SetParent(discardDropZone.transform, false);
-        card.transform.localPosition = new Vector3();
     }
     //Creates a card and adds it to the activeDeck from the deckToDrawFrom
     protected virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
@@ -434,7 +544,7 @@ public class CardPlayer : MonoBehaviour {
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
 
-         GameManager.instance.UpdateDeckSizeText(); //update UI
+        GameManager.instance.UpdateDeckSizeText(); //update UI
 
 
 
@@ -442,6 +552,26 @@ public class CardPlayer : MonoBehaviour {
         return tempCard;
     }
 
+    #endregion
+
+    #region Debug
+    //These are for testing purposes to add/remove cards from the hand
+    public virtual void ForceDrawCard() {
+        if (DeckIDs.Count > 0) {
+            DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+        }
+    }
+    public virtual void ForceDiscardRandomCard() {
+        var num = UnityEngine.Random.Range(0, HandCards.Count);
+        var card = HandCards[num];
+        HandCards.Remove(num);
+        Discards.Add(num, card);
+        card.GetComponent<Card>().SetCardState(CardState.CardNeedsToBeDiscarded);
+        card.transform.SetParent(discardDropZone.transform, false);
+        card.transform.localPosition = new Vector3();
+    }
+    #endregion
+    
     #region Update Functions
     // Update is called once per frame
     void Update() {
@@ -554,23 +684,81 @@ public class CardPlayer : MonoBehaviour {
     }
 
     #endregion
-    void InitDropLocations() {
 
-        var dropZones = FindObjectsOfType<CardDropLocation>();
-        foreach (var dropZone in dropZones) {
-            var tag = dropZone.tag;
-            if (cardDropLocations.ContainsKey(tag)) {
-                tag += ++facilityCount;
+    #region Card Play Functions
+
+    #region Play Update Loop
+    //original PlayCard function that is called from the update loop
+    public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
+        int playCount = 0;
+        int playKey = 0;
+
+        if (HandCards.Count != 0) {
+            //Debug.Log(phase);
+            foreach (GameObject gameObjectCard in HandCards.Values) {
+                Card card = gameObjectCard.GetComponent<Card>();
+                if (card.State == CardState.CardDrawnDropped) {
+
+                    // card has been dropped somewhere - where?
+                    // Vector2 cardPosition = card.getDroppedPosition();
+
+                    if (cardDroppedOnObject == null) {
+                        Debug.Log("card not dropped in card drop zone");
+                        handPositioner.ReturnCardToHand(card);
+                        gameObjectCard.GetComponentInParent<slippy>().enabled = true;
+                        gameObjectCard.GetComponent<HoverScale>().Drop();
+                        return playCount;
+                        // Debug.LogError("Card was dropped on null object?");
+                    }
+                    Debug.Log("Valid card play made somewhere!");
+                    //check where the card was dropped based on the tag
+                    switch (cardDroppedOnObject.tag) {
+                        case CardDropZoneTag.DISCARD:
+                            HandleDiscardDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            break;
+                        case CardDropZoneTag.FACILITY:
+                            if (card.target == CardTarget.Facility || card.target == CardTarget.Effect) {
+                                HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            }
+                            else {
+                                HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            }
+                            break;
+                        default:
+                            Debug.Log("card not dropped in card drop zone");
+                            handPositioner.ReturnCardToHand(card);
+                            gameObjectCard.GetComponentInParent<slippy>().enabled = true;
+                            gameObjectCard.GetComponent<HoverScale>().Drop();
+                            break;
+                    }
+                }
+
+                // index of where this card is in handlist
+                if (playCount > 0) {
+                    break;
+                }
             }
-            //Debug.Log($"Adding {tag} to cardDropLocations");
-            cardDropLocations.Add(tag, dropZone.gameObject);
-
-            //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
-        // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
 
+        if (playCount > 0) {
+            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue || phase == GamePhase.DiscardBlue || phase == GamePhase.DiscardRed) {
+                // we're not discarding a facility or sharing what we're discarding with the opponent
+                DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
+            }
+            else {
+                // remove the discarded card
+                if (!HandCards.Remove(playKey)) {
+                    Debug.Log("didn't find a key to remove! " + playKey);
+                }
+            }
+        }
 
+        return playCount;
     }
+    #endregion
+
+    #region Dropping
+    //This function is called when a card is dropped from that card's slippy component (happens one time at drop)
     public Card HandleCardDrop(Card card) {
         if (hoveredDropLocation == null) {
             Debug.Log("No drop location found");
@@ -636,22 +824,108 @@ public class CardPlayer : MonoBehaviour {
         }
         return null;
     }
-    private void ReturnCardToDeck(Card card) {
-        handPositioner.cards.Remove(card);
-        DeckIDs.Add(card.data.cardID);//add it back to the deck
-        HandCards.Remove(card.UniqueID);
-        Destroy(card.gameObject);
+    //Called when a card is dropped onto the discard drop area
+    private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+        switch (phase) {
+            case GamePhase.DrawBlue:
+            case GamePhase.DrawRed:
+            case GamePhase.DiscardBlue:
+            case GamePhase.DiscardRed:
+                // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
+                card.SetCardState(CardState.CardNeedsToBeDiscarded);
+                playCount = 1;
+                break;
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
+                //discarding here will be done by a card forcing the player to discard a number of cards
+                if (ReadyState == PlayerReadyState.DiscardCards) {
+                    card.SetCardState(CardState.CardNeedsToBeDiscarded);
+                    playCount = 1;
+                    //flag discard as done
+                    AmountToDiscard--;
+                    if (AmountToDiscard <= 0) {//check if we discard enough cards
+                        GameManager.instance.DisablePlayerDiscard(this);
+                    }
+                }
+                break;
+        }
     }
-    public void ReturnHandToDeckAndDraw(int amount) {
-        HandCards.Values.ToList().ForEach(card => {
-            ReturnCardToDeck(card.GetComponent<Card>());
-        });
-        //for (int i = 0; i < amount; i++) {
-        //    DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
-        //}
-        DrawNumberOfCards(amount, updateNetwork: true);
-    }
+    //Called when a Facility/Effect target card is dropped in the play area
+    private void HandleFacilityDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
 
+        Facility facility = FacilityPlayedOn();
+        Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
+        switch (phase) {
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
+                // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
+                card.SetCardState(CardState.CardInPlay);
+                ActiveCards.Add(card.UniqueID, card.gameObject);
+                // NOTE: TO DO - need to add the correct update for the card played since some of them
+                // need different info
+                mUpdatesThisPhase.Enqueue(new Update {
+                    Type = CardMessageType.CardUpdate,
+                    UniqueID = card.UniqueID,
+                    CardID = card.data.cardID,
+                    FacilityType = facility.facilityType //added facility type to update
+                });
+                GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
+
+                // card.Play(this, opponentPlayer, facility);
+                playCount = 1;
+                playKey = card.UniqueID;
+
+
+                // Start the animation
+
+                StartCoroutine(card.AnimateCardToPosition(facility.transform.position, .6f, () => card.Play(this, opponentPlayer, facility)));
+
+                break;
+
+            //break;
+            default:
+                // we're not in the right phase, so
+                // reset the dropped state
+                //card.state = CardState.CardDrawn;
+                ResetCardToInHand(card);
+                break;
+        }
+    }
+    //Called when a non-Facility/Effect target card is dropped in the play area
+    private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+        Debug.Log($"Handling non facility card - {card.front.title}");
+        switch (phase) {
+            case GamePhase.ActionBlue:
+            case GamePhase.ActionRed:
+                card.SetCardState(CardState.CardInPlay);
+                ActiveCards.Add(card.UniqueID, card.gameObject);
+                // NOTE TO DO: need to add proper data and message type for the card here
+                mUpdatesThisPhase.Enqueue(new Update {
+                    Type = CardMessageType.CardUpdate,
+                    UniqueID = card.UniqueID,
+                    CardID = card.data.cardID
+                });
+                //GameManager.instance.SendUpdatesToOpponent(phase, this); //dont update opponent yet we need to add more info to the update (maybe)
+
+                //card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
+                playCount = 1;
+                playKey = card.UniqueID;
+                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer)));
+
+                break;
+
+            //break;
+            default:
+                // we're not in the right phase, so
+                // reset the dropped state
+                //card.state = CardState.CardDrawn;
+                ResetCardToInHand(card);
+                break;
+        }
+    }
+    #endregion
+
+    #region Card Play Validation
     private bool ValidateCardPlay(Card card) {
         string response = "";
         bool canPlay = false;
@@ -740,29 +1014,11 @@ public class CardPlayer : MonoBehaviour {
         //}
         return ("You do not need to discard cards currently", false);
     }
-    public bool IsPlayerTurn() {
-        //replace with call to game manager?
-        //some code to validate turn order red goes before blue
-        return true;
-    }
+    #endregion
 
+    #endregion
 
-    public void ResetMeepleCost() {
-        mMeeplesSpent = 0;
-    }
-
-    public GameObject GetActiveCardObject(CardIDInfo cardIdInfo) {
-        GameObject cardObject = null;
-        if (ActiveCards.ContainsKey(cardIdInfo.UniqueID)) {
-            cardObject = ActiveCards[cardIdInfo.UniqueID];
-        }
-        else if (HandCards.ContainsKey(cardIdInfo.UniqueID)) {
-            Debug.Log("hand cards contained the card with unique id " + cardIdInfo.UniqueID);
-        }
-
-        return cardObject;
-    }
-
+    #region Discarding
     public void DiscardAllInactiveCards(DiscardFromWhere where, bool addUpdate, int uniqueFacilityID) {
         List<int> inactives = new List<int>(10);
         Dictionary<int, GameObject> discardFromArea = where switch {
@@ -813,388 +1069,10 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
-
-    public int GetMeeplesSpent() {
-        return mMeeplesSpent;
-    }
-    public int AddMeeplesSpent(int meeples) {
-        mMeeplesSpent += meeples;
-        return mMeeplesSpent;
-    }
-
-    public string GetCardNameFromID(int cardID) {
-        if (cards.TryGetValue(cardID, out Card card)) {
-            return card.data.name;
-        }
-        return "Card not found";
-    }
-    public int GetTotalMeeples() {
-        return playerSector.GetTotalMeeples();
-    }
-    public int GetMaxMeeples() {
-        return playerSector.GetMaxMeeples();
-    }
-
-    private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
-        switch (phase) {
-            case GamePhase.DrawBlue:
-            case GamePhase.DrawRed:
-            case GamePhase.DiscardBlue:
-            case GamePhase.DiscardRed:
-                // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
-                card.SetCardState(CardState.CardNeedsToBeDiscarded);
-                playCount = 1;
-                break;
-            case GamePhase.ActionBlue:
-            case GamePhase.ActionRed:
-                //discarding here will be done by a card forcing the player to discard a number of cards
-                if (ReadyState == PlayerReadyState.DiscardCards) {
-                    card.SetCardState(CardState.CardNeedsToBeDiscarded);
-                    playCount = 1;
-                    //flag discard as done
-                    AmountToDiscard--;
-                    if (AmountToDiscard <= 0) {//check if we discard enough cards
-                        GameManager.instance.DisablePlayerDiscard(this);
-                    }
-                }
-                break;
-        }
-    }
-
-    private void HandleFacilityDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
-
-        Facility facility = FacilityPlayedOn();
-        Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
-        switch (phase) {
-            case GamePhase.ActionBlue:
-            case GamePhase.ActionRed:
-                // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
-                card.SetCardState(CardState.CardInPlay);
-                ActiveCards.Add(card.UniqueID, card.gameObject);
-                // NOTE: TO DO - need to add the correct update for the card played since some of them
-                // need different info
-                mUpdatesThisPhase.Enqueue(new Update {
-                    Type = CardMessageType.CardUpdate,
-                    UniqueID = card.UniqueID,
-                    CardID = card.data.cardID,
-                    FacilityType = facility.facilityType //added facility type to update
-                });
-                GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
-
-                // card.Play(this, opponentPlayer, facility);
-                playCount = 1;
-                playKey = card.UniqueID;
-
-
-                // Start the animation
-
-                StartCoroutine(card.AnimateCardToPosition(facility.transform.position, .6f, () => card.Play(this, opponentPlayer, facility)));
-
-                break;
-
-            //break;
-            default:
-                // we're not in the right phase, so
-                // reset the dropped state
-                //card.state = CardState.CardDrawn;
-                ResetCardToInHand(card);
-                break;
-        }
-    }
-    private Facility FacilityPlayedOn() {
-        Facility facility = null;
-        if (cardDroppedOnObject != null) {
-            facility = cardDroppedOnObject.GetComponentInParent<Facility>();
-        }
-        return facility;
-    }
-    private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
-        Debug.Log($"Handling non facility card - {card.front.title}");
-        switch (phase) {
-            case GamePhase.ActionBlue:
-            case GamePhase.ActionRed:
-                card.SetCardState(CardState.CardInPlay);
-                ActiveCards.Add(card.UniqueID, card.gameObject);
-                // NOTE TO DO: need to add proper data and message type for the card here
-                mUpdatesThisPhase.Enqueue(new Update {
-                    Type = CardMessageType.CardUpdate,
-                    UniqueID = card.UniqueID,
-                    CardID = card.data.cardID
-                });
-                //GameManager.instance.SendUpdatesToOpponent(phase, this); //dont update opponent yet we need to add more info to the update (maybe)
-
-                //card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
-                playCount = 1;
-                playKey = card.UniqueID;
-                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer)));
-
-                break;
-
-            //break;
-            default:
-                // we're not in the right phase, so
-                // reset the dropped state
-                //card.state = CardState.CardDrawn;
-                ResetCardToInHand(card);
-                break;
-        }
-    }
-
-    public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
-        int playCount = 0;
-        int playKey = 0;
-
-        if (HandCards.Count != 0) {
-            //Debug.Log(phase);
-            foreach (GameObject gameObjectCard in HandCards.Values) {
-                Card card = gameObjectCard.GetComponent<Card>();
-                if (card.State == CardState.CardDrawnDropped) {
-
-                    // card has been dropped somewhere - where?
-                    // Vector2 cardPosition = card.getDroppedPosition();
-
-                    if (cardDroppedOnObject == null) {
-                        Debug.Log("card not dropped in card drop zone");
-                        handPositioner.ReturnCardToHand(card);
-                        gameObjectCard.GetComponentInParent<slippy>().enabled = true;
-                        gameObjectCard.GetComponent<HoverScale>().Drop();
-                        return playCount;
-                        // Debug.LogError("Card was dropped on null object?");
-                    }
-                    Debug.Log("Valid card play made somewhere!");
-                    //check where the card was dropped based on the tag
-                    switch (cardDroppedOnObject.tag) {
-                        case CardDropZoneTag.DISCARD:
-                            HandleDiscardDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
-                            break;
-                        case CardDropZoneTag.FACILITY:
-                            if (card.target == CardTarget.Facility || card.target == CardTarget.Effect) {
-                                HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
-                            }
-                            else {
-                                HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
-                            }
-                            break;
-                        default:
-                            Debug.Log("card not dropped in card drop zone");
-                            handPositioner.ReturnCardToHand(card);
-                            gameObjectCard.GetComponentInParent<slippy>().enabled = true;
-                            gameObjectCard.GetComponent<HoverScale>().Drop();
-                            break;
-                    }
-                }
-
-                // index of where this card is in handlist
-                if (playCount > 0) {
-                    break;
-                }
-            }
-        }
-
-        if (playCount > 0) {
-            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue || phase == GamePhase.DiscardBlue || phase == GamePhase.DiscardRed) {
-                // we're not discarding a facility or sharing what we're discarding with the opponent
-                DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
-            }
-            else {
-                // remove the discarded card
-                if (!HandCards.Remove(playKey)) {
-                    Debug.Log("didn't find a key to remove! " + playKey);
-                }
-            }
-        }
-
-        return playCount;
-    }
-    //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
-    public void ResetCardToInHand(Card card) {
-        card.SetCardState(CardState.CardDrawn);
-        handPositioner.ReturnCardToHand(card);
-    }
-    public void ForcePlayerReturnCardsToDeck(int amount, Action onCardsReturned) {
-
-        if (amount > 0) {
-            AmountToReturnToDeck = amount;
-            OnCardsReturnedToDeck = onCardsReturned;
-            ReadyState = PlayerReadyState.ReturnCardsToDeck;
-            GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} cards to the deck\nby dragging them to the play area", this);
-        }
-    }
-    public bool DuplicateCardPlayed(Card facilityCard, Card cardToPlay) {
-        bool duplicateCardFound = false;
-
-        foreach (CardIDInfo cardInfo in facilityCard.AttackingCards) {
-            if (cardInfo.CardID == cardToPlay.data.cardID) {
-                duplicateCardFound = true;
-                break;
-            }
-        }
-
-        return duplicateCardFound;
-    }
-
-    public void ChangeScaleAndPosition(Vector2 scale, GameObject objToScale) {
-        Transform parent = objToScale.transform.parent;
-        slippy parentSlippy = objToScale.GetComponentInParent<slippy>();
-        slippy areaSlippy = objToScale.GetComponent<slippy>();
-
-        if (parent != null && parentSlippy != null) {
-            objToScale.transform.SetParent(null, true);
-
-            parentSlippy.originalScale = scale;
-            parentSlippy.originalPosition = new Vector3();
-            parentSlippy.ResetScale();
-
-            if (areaSlippy != null) {
-                areaSlippy.originalScale = scale;
-                areaSlippy.originalPosition = new Vector3();
-                areaSlippy.ResetScale();
-            }
-
-            objToScale.transform.SetPositionAndRotation(new Vector3(), objToScale.transform.rotation);
-        }
-        else if (parent != null) {
-            objToScale.transform.SetParent(null, true);
-
-            if (areaSlippy != null) {
-                areaSlippy.originalScale = scale;
-                areaSlippy.originalPosition = new Vector3();
-                areaSlippy.ResetScale();
-            }
-
-            objToScale.transform.localScale = scale;
-            objToScale.transform.SetPositionAndRotation(new Vector3(), objToScale.transform.rotation);
-        }
-        else {
-            if (areaSlippy != null) {
-                areaSlippy.originalScale = scale;
-                areaSlippy.originalPosition = new Vector3();
-                areaSlippy.ResetScale();
-            }
-
-            // if there's no parent then our scale is THE scale
-            objToScale.transform.localScale = new Vector3(scale.x, scale.y, 1.0f);
-            objToScale.transform.SetPositionAndRotation(new Vector3(), objToScale.transform.rotation);
-
-
-        }
-    }
-    #region Stack Cards (old)
-    public void StackCards(GameObject stationObject, GameObject addedObject, GameObject dropZone, GamePhase phase) {
-        Card stationCard = stationObject.GetComponent<Card>();
-
-        // unhighlight the outline if it's turned on
-        //stationCard.OutlineImage.SetActive(false);
-        GameObject tempCanvas;
-
-        if (stationCard.HasCanvas) {
-            // at least one card is already played on this one!    
-            tempCanvas = stationCard.CanvasHolder;
-
-            ChangeScaleAndPosition(new Vector2(1.0f, 1.0f), addedObject);
-            addedObject.transform.SetParent(tempCanvas.transform, false);
-
-            // set local offset for actual stacking
-            stationCard.stackNumber += 1;
-            /*if (phase == GamePhase.Defense)
-            {
-                // added cards go at the back
-                addedObject.transform.SetAsFirstSibling();
-            }
-            else if (phase == GamePhase.Vulnerability)
-            {
-                // added cards go at the front if they're vulnerabilities
-                addedObject.transform.SetAsLastSibling();
-            }
-            else if (phase == GamePhase.Mitigate)
-            {
-                // added cards go at the front if they're vulnerabilities
-                addedObject.transform.SetAsLastSibling();
-            }*/
-            addedObject.transform.SetAsLastSibling();
-
-            addedObject.GetComponent<slippy>().enabled = false;
-            addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
-            addedObject.GetComponent<HoverScale>().SlippyOff = true;
-
-        }
-        else {
-            // add a canvas component and change around the parents
-            tempCanvas = Instantiate(cardStackingCanvas);
-            // set defaults for canvas
-            Transform parent = tempCanvas.transform.parent;
-            if (parent != null) {
-                tempCanvas.transform.SetParent(null, false);
-            }
-            tempCanvas.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-            tempCanvas.transform.localScale = new Vector3(ORIGINAL_SCALE, ORIGINAL_SCALE, 1.0f);
-
-            // turn slippy off - needs to be here???
-            if (addedObject.GetComponentInParent<slippy>() != null) {
-                addedObject.GetComponentInParent<slippy>().enabled = false;
-            }
-            if (stationObject.GetComponentInParent<slippy>() != null) {
-                stationObject.GetComponentInParent<slippy>().enabled = false;
-            }
-
-            // now reset scale on all the cards under the canvas!
-            // this is only necessary since they likely already have their own scale and we
-            // want the canvas to now scale them
-            ChangeScaleAndPosition(new Vector2(1.0f, 1.0f), stationObject);
-            ChangeScaleAndPosition(new Vector2(1.0f, 1.0f), addedObject);
-
-            // now add them to canvas
-            addedObject.transform.SetParent(tempCanvas.transform, false);
-            addedObject.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-            stationObject.transform.SetParent(tempCanvas.transform, false);
-            /*
-            if (phase == GamePhase.Defense)
-            {
-                // added cards go at the back
-                addedObject.transform.SetAsFirstSibling();
-            }
-            else if (phase == GamePhase.Vulnerability)
-            {
-                // added cards go at the front if they're vulnerabilities
-                addedObject.transform.SetAsLastSibling();
-            } else if (phase == GamePhase.Mitigate)
-            {
-                // added cards go at the front if they're vulnerabilities
-                addedObject.transform.SetAsLastSibling();
-            }*/
-
-            addedObject.transform.SetAsLastSibling();
-            // make sure the station knows if has a canvas with children
-            stationCard.HasCanvas = true;
-            stationCard.CanvasHolder = tempCanvas;
-            stationCard.stackNumber += 1;
-
-            // reset some hoverscale info
-            addedObject.GetComponent<HoverScale>().previousScale = Vector2.one;
-            addedObject.GetComponent<HoverScale>().SlippyOff = true;
-            stationObject.GetComponent<HoverScale>().SlippyOff = true;
-            stationObject.GetComponent<HoverScale>().previousScale = Vector2.one;
-
-            // add the canvas to the played card holder
-            tempCanvas.transform.SetParent(dropZone.transform, false);
-            tempCanvas.SetActive(true);
-
-            addedObject.GetComponent<slippy>().enabled = false;
-        }
-
-    }
     #endregion
-    //returns any dropped cards to the hand
-    public void ClearDropState() {
-        if (HandCards.Count != 0) {
-            foreach (GameObject cardGameObject in HandCards.Values) {
-                Card card = cardGameObject.GetComponent<Card>();
-                if (card.State == CardState.CardDrawnDropped) {
-                    card.SetCardState(CardState.CardDrawn);
-                }
-            }
-        }
-    }
+
+
+    #region Network Updates
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
     public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
@@ -1218,6 +1096,7 @@ public class CardPlayer : MonoBehaviour {
 
         }
     }
+    //Actually process the card action, used to create the update queue and is called when the update is ready to be resolved
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         IsAnimating = true;
         if (update.Type == CardMessageType.CardUpdate) {
@@ -1237,6 +1116,7 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityType}");
         }
     }
+    //handles when the shared logic of opponent card plays
     private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null) {
         if (card != null) {
             GameObject cardGameObject = ActiveCards[card.UniqueID];
@@ -1259,7 +1139,7 @@ public class CardPlayer : MonoBehaviour {
             }));
         }
     }
-
+    //handles when the opponent plays a non facility/effect card
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
             deckToDrawFrom: ref DeckIDs, dropZone: null,
@@ -1267,7 +1147,7 @@ public class CardPlayer : MonoBehaviour {
 
         HandleOpponentCardPlay(card, null, opponent);
     }
-
+    //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
         if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
@@ -1279,29 +1159,8 @@ public class CardPlayer : MonoBehaviour {
             HandleOpponentCardPlay(card, facilityGo, opponent, facility);
         }
     }
-    //called when the card animation is complete to start the next animation
-    private void OnAnimationComplete() {
-        IsAnimating = false;
 
-        // Check if there are more cards in the queue
-        if (opponentCardPlays.Count > 0) {
-            var nextCardPlay = opponentCardPlays.Dequeue();
-            ProcessCardPlay(nextCardPlay.Item1, nextCardPlay.Item2, nextCardPlay.Item3);
-        }
-    }
-
-    void CalculateScore() {
-        mFinalScore = 42;
-    }
-
-    public int GetScore() {
-        CalculateScore();
-        return mFinalScore;
-    }
-
-    public bool HasUpdates() {
-        return (mUpdatesThisPhase.Count != 0);
-    }
+    #region Network Helpers
 
     // an update message consists of:
     // a. phase it happened in
@@ -1341,6 +1200,11 @@ public class CardPlayer : MonoBehaviour {
         return CardMessageType.None;
     }
 
+    #endregion
+
+    #endregion
+
+    #region Reset
     // Reset the variables in this class to allow for a new
     // game to happen.
     public void ResetForNewGame() {
@@ -1394,6 +1258,9 @@ public class CardPlayer : MonoBehaviour {
         mFinalScore = 0;
         mUpdatesThisPhase.Clear();
     }
+    #endregion
+
+    #region Debug logging
     void TryLogFacilityInfo() {
         if (this != GameManager.instance.actualPlayer) return;
         var hitFacility = cardDropLocations.Values.ToList().Find(x => x.GetComponent<Collider2D>().OverlapPoint(Mouse.current.position.ReadValue()));
@@ -1435,4 +1302,6 @@ public class CardPlayer : MonoBehaviour {
         s += $"Active Facilities: {ActiveFacilities.Count}";
         Debug.Log(s);
     }
+    #endregion
+
 }

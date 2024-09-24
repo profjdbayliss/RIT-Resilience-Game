@@ -713,8 +713,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     actualPlayer.discardDropZone.SetActive(false);
                     MIsDiscardAllowed = false;
 
-                    // clear any remaining drops since we're ending the phase now
-                    actualPlayer.ClearDropState();
+                    // clear any remaining drops since we're ending the phase now (dont think this is needed anymore)
+                    //actualPlayer.ClearDropState();
 
                    // Debug.Log("ending draw and discard game phase!");
 
