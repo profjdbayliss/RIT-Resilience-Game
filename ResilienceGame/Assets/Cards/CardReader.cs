@@ -11,6 +11,8 @@ public class CardReader : MonoBehaviour {
     // deck name to use for the deck
     public string DeckName;
 
+    
+
     // filename - directory path is assumed to be Application.streamingAssetsPath
     // extension is assumed to be csv
     public string cardFileName;
@@ -243,6 +245,7 @@ public class CardReader : MonoBehaviour {
                         // 6: set up the card title
                         // WORK: do we really need to set both of these?
                         tempCardFront.title = tempCardObj.name = individualCSVObjects[6];
+
                         tempCard.data.name = individualCSVObjects[6];
 
                         // Set up the card color. Could be done using csv

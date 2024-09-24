@@ -21,6 +21,7 @@ public enum CardMessageType
     DiscardCard,
     MeepleShare,
     EndGame,
+    DrawCard,
     None
 }
 

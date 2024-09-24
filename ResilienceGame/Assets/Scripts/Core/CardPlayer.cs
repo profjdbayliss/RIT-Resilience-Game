@@ -302,6 +302,7 @@ public class CardPlayer : MonoBehaviour {
         tempCard.data = actualCard.data;
         tempCard.ActionList = new List<ICardAction>(actualCard.ActionList); // Copy action list
         tempCard.target = actualCard.target; // Copy the target type
+
         if (uniqueId != -1) {
             tempCard.UniqueID = uniqueId;
             Debug.Log("setting unique id for facility " + uniqueId);
@@ -795,6 +796,12 @@ public class CardPlayer : MonoBehaviour {
         return mMeeplesSpent;
     }
 
+    public string GetCardNameFromID(int cardID) {
+        if (cards.TryGetValue(cardID, out Card card)) {
+            return card.data.name;
+        }
+        return "Card not found";
+    }
     public int GetTotalMeeples() {
         return playerSector.GetTotalMeeples();
     }
@@ -1395,17 +1402,33 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public void LogPlayerInfo() {
-        string s = $"Player info for: " + playerName + "\n";
+        string s = $"Player info for: {playerName}\n";
+
+        // Handle Hand Cards
         s += $"Hand size: {HandCards.Count}\n";
-        foreach (Card card in HandCards.Values.Select(x => x.GetComponent<Card>())) {
-            s += "\t" + card.front.title + "\n";
+        var handCardGroups = HandCards.Values
+            .Select(x => x.GetComponent<Card>().front.title)
+            .GroupBy(x => x)
+            .Select(g => new { Title = g.Key, Count = g.Count() })
+            .OrderBy(x => x.Title);
+
+        foreach (var cardGroup in handCardGroups) {
+            s += $"\t{cardGroup.Title}{(cardGroup.Count > 1 ? $" x{cardGroup.Count}" : "")}\n";
         }
+
+        // Handle Deck Cards
         s += $"Deck Size: {DeckIDs.Count}\n";
-        foreach (int cardId in DeckIDs) {
-            s += "\t" + cardId + "\n";
+        var deckCardGroups = DeckIDs
+            .Select(cardId => GetCardNameFromID(cardId))
+            .GroupBy(x => x)
+            .Select(g => new { Title = g.Key, Count = g.Count() })
+            .OrderBy(x => x.Title);
+
+        foreach (var cardGroup in deckCardGroups) {
+            s += $"\t{cardGroup.Title}{(cardGroup.Count > 1 ? $" x{cardGroup.Count}" : "")}\n";
         }
+
         s += $"Active Facilities: {ActiveFacilities.Count}";
         Debug.Log(s);
-
     }
 }
