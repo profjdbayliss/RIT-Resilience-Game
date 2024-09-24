@@ -25,20 +25,22 @@ public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
         List<Card> drawnCards = new List<Card>();
-        // TODO: Get data from card reader to loop
-        for (int i = 0; i < card.data.drawAmount; i++) {
-            Card cardDrawn = player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
-            if (card.data.removeAmount > 0) {
-                cardDrawn.ToggleOutline(true);
-                drawnCards.Add(cardDrawn);
+        if (player == GameManager.instance.actualPlayer) {
+
+            for (int i = 0; i < card.data.drawAmount; i++) {
+                Card cardDrawn = player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
+                if (card.data.removeAmount > 0) {
+                    cardDrawn.ToggleOutline(true);
+                    drawnCards.Add(cardDrawn);
+                }
+
             }
-            
+            if (card.data.removeAmount > 0) {
+                GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
+                GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
+            }
+            base.Played(player, opponent, facilityActedUpon, cardActedUpon, card); 
         }
-        if (card.data.removeAmount > 0) {
-            GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
-            GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
-        }
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " canceled.");
@@ -48,13 +50,15 @@ public class DrawAndDiscardCards : ICardAction {
 public class ShuffleAndDrawCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
-
-        player.ForcePlayerReturnCardsToDeck(card.data.removeAmount, () => {
-            for (int i = 0; i < card.data.drawAmount; i++) {
-                player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
-            }
-        });
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        if (player == GameManager.instance.actualPlayer) {
+            player.ForcePlayerReturnCardsToDeck(card.data.removeAmount, () => {
+                for (int i = 0; i < card.data.drawAmount; i++) {
+                    player.DrawCard(true, 0, -1, ref player.DeckIDs, player.handDropZone, true, ref player.HandCards);
+                }
+            });
+            base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        }
+        
     }
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " canceled.");
@@ -63,8 +67,10 @@ public class ShuffleAndDrawCards : ICardAction {
 public class ReturnHandToDeckAndDraw : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
-        player.ReturnHandToDeckAndDraw(card.data.drawAmount);
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        if (player == GameManager.instance.actualPlayer) {
+            player.ReturnHandToDeckAndDraw(card.data.drawAmount);
+            base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        }
     }
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " canceled.");
