@@ -67,6 +67,12 @@ public enum DiscardFromWhere {
 
 
 public class CardPlayer : MonoBehaviour {
+    public enum PlayerReadyState {
+        ReadyToPlay,
+        ReturnCardsToDeck,
+        DiscardCards,
+        SelectCardsForCostChange
+    }
     // Establish necessary fields
     public string playerName;
     public GameManager manager;
@@ -99,8 +105,8 @@ public class CardPlayer : MonoBehaviour {
     //private Dictionary<string, Collider2D> cardDropColliders = new Dictionary<string, Collider2D>();
     public Queue<(Update, GamePhase, CardPlayer)> opponentCardPlays = new Queue<(Update, GamePhase, CardPlayer)>();
     public bool IsAnimating { get; set; } = false;
-
-    public bool ForceDiscard { get; set; } = false;
+    public PlayerReadyState ReadyState { get; set; } = PlayerReadyState.ReadyToPlay;
+  //  public bool ForceDiscard { get; set; } = false;
     public int AmountToDiscard { get; set; } = 0;
 
     public int AmountToReturnToDeck { get; private set; } = 0;
@@ -169,14 +175,14 @@ public class CardPlayer : MonoBehaviour {
         return HandCards.Count > MAX_HAND_SIZE_AFTER_ACTION;
     }
     public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
-        ForceDiscard = true;
+        ReadyState = PlayerReadyState.DiscardCards;
         AmountToDiscard = amount;
         discardDropZone.SetActive(true);
         CardsAllowedToBeDiscard = cardsAllowedToBeDiscard;
         Debug.Log($"Enabling {playerName}'s discard temporarily");
     }
     public void StopDiscard() {
-        ForceDiscard = false;
+        ReadyState = PlayerReadyState.ReadyToPlay;
         CardsAllowedToBeDiscard?.ForEach(card => card.ToggleOutline(false));
         CardsAllowedToBeDiscard = null;
         discardDropZone.SetActive(false);
@@ -550,7 +556,7 @@ public class CardPlayer : MonoBehaviour {
             }
             if (ValidateCardPlay(card)) {
                 //check if the game is waiting for the player to return cards to the deck by playing them
-                if (AmountToReturnToDeck > 0) {
+                if (ReadyState == PlayerReadyState.ReturnCardsToDeck) {
                     Debug.Log("Returning card to deck");
                     ReturnCardToDeck(card);
                     AmountToReturnToDeck--;
@@ -560,11 +566,13 @@ public class CardPlayer : MonoBehaviour {
                     else {
                         OnCardsReturnedToDeck?.Invoke(); //Resolve the action after cards have been returned to deck
                         GameManager.instance.mAlertPanel.ResolveAlert(); //remove alert message
+                        ReadyState = PlayerReadyState.ReadyToPlay; //reset player state
                     }
 
                 }
-                else {
-                    Debug.Log("Card is valid to play, dropping?");
+                //check for a card play or card discard
+                else if (ReadyState == PlayerReadyState.ReadyToPlay || ReadyState == PlayerReadyState.DiscardCards) {
+                    Debug.Log("Card is valid to play and player is ready");
                     //set var to hold where the card was dropped
                     cardDroppedOnObject = hoveredDropLocation;
                     //set card state to played
@@ -574,6 +582,9 @@ public class CardPlayer : MonoBehaviour {
                     //set the parent to where it was played
                     card.transform.transform.SetParent(hoveredDropLocation.transform);
                     return card;
+                }
+                else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
+
                 }
 
             }
@@ -640,12 +651,12 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
-        if (ForceDiscard && GameManager.instance.MIsDiscardAllowed) {
+        if (ReadyState == PlayerReadyState.DiscardCards && GameManager.instance.MIsDiscardAllowed) {
             if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
                 if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
                     return ("Discard any card allowed", true);
                 if (CardsAllowedToBeDiscard.Contains(card)) //only highlighted cards can be discarded
-                    return ("Discarded valid card", true);
+                    return ("Allowing discard of valid card", true);
                 return ("Must discard one of the highlighted cards", false); //highlighted cards must be discarded
             }
             return ("Must discard cards first", false); //didn't drop on the discard drop zone
@@ -790,7 +801,7 @@ public class CardPlayer : MonoBehaviour {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
                 //discarding here will be done by a card forcing the player to discard a number of cards
-                if (ForceDiscard) {
+                if (ReadyState == PlayerReadyState.DiscardCards) {
                     card.SetCardState(CardState.CardNeedsToBeDiscarded);
                     playCount = 1;
                     //flag discard as done
@@ -958,6 +969,7 @@ public class CardPlayer : MonoBehaviour {
         if (amount > 0) {
             AmountToReturnToDeck = amount;
             OnCardsReturnedToDeck = onCardsReturned;
+            ReadyState = PlayerReadyState.ReturnCardsToDeck;
             GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} cards to the deck\nby dragging them to the play area", this);
         }
     }
