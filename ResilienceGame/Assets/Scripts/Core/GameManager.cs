@@ -40,8 +40,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [Header("Decks and Cards")]
     public CardReader redDeckReader;
     public CardReader blueDeckReader;
+    public CardReader positiveWhiteDeckReader;
+    public CardReader negativeWhiteDeckReader;
     public List<Card> redCards;
     public List<Card> blueCards;
+    public List<Card> positiveWhiteCards;
+    public List<Card> negativeWhiteCards;
     public GameObject playerDeckList;
     private TMPro.TMP_Dropdown playerDeckChoice;
 
@@ -530,7 +534,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
             GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => GamePhase.DiscardRed,
-            GamePhase.DiscardRed => GamePhase.DrawBlue,
+            GamePhase.DiscardRed => (turnTotal % 3 == 0) ? GamePhase.DrawBlue : GamePhase.PlayWhite,
+            GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
             GamePhase.BonusBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
@@ -642,6 +647,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
                             DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
                         }
                     }
+                }
+                break;
+            case GamePhase.PlayWhite:
+                if(turnTotal % 9 == 0)
+                {
+                    //positive white
+                }
+                else
+                {
+                    //negative white
                 }
                 break;
             case GamePhase.End:
