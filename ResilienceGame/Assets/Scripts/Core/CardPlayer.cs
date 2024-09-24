@@ -247,10 +247,10 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //These are for testing purposes to add/remove cards from the hand
-    public virtual void DrawSpecificCard(int id, bool updateNetwork = false) {
+    public virtual void DrawSpecificCard(int id, GameObject handParent, bool updateNetwork = false) {
         Debug.Log($"{playerName} is trying to draw {GetCardNameFromID(id)} with id {id}");
         if (DeckIDs.Count > 0) {
-            DrawCard(false, id, -1, ref DeckIDs, handDropZone, true, ref HandCards, updateNetwork);
+            DrawCard(false, id, -1, ref DeckIDs, handParent, true, ref HandCards, updateNetwork);
         }
     }
     public virtual void ForceDrawCard() {
@@ -427,10 +427,12 @@ public class CardPlayer : MonoBehaviour {
                 UniqueID = tempCard.UniqueID,
                 CardID = tempCard.data.cardID,
                 Type = CardMessageType.DrawCard
-            }; 
+            };
             mUpdatesThisPhase.Enqueue(update);
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
+
+        // GameManager.instance.UpdateDeckSizeText(); //update UI
 
 
 
@@ -1193,11 +1195,11 @@ public class CardPlayer : MonoBehaviour {
     }
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
-    public void AddUpdate(Update update, GamePhase phase, CardPlayer opponent) {
+    public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
         switch (update.Type) {
             case CardMessageType.DrawCard:
                 Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
-                opponent.DrawSpecificCard(update.CardID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
+                opponent.DrawSpecificCard(update.CardID, opponentDropZone, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
                 break;
             default: //card update for now, maybe discard?
                 Debug.Log($"Player {playerName} is adding card update: {update.Type}, FacilityType: {update.FacilityType}");
@@ -1211,10 +1213,8 @@ public class CardPlayer : MonoBehaviour {
                 // If no animation is in progress, handle the card play immediately
                 ProcessCardPlay(update, phase, opponent);
                 break;
-            
-        }
 
-        
+        }
     }
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         IsAnimating = true;

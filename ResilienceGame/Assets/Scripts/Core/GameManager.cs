@@ -799,7 +799,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
-        actualPlayer.AddUpdate(update, phase, opponentPlayer);
+        actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
 
     }
     #endregion

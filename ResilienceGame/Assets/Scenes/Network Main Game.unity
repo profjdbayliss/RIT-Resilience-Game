@@ -19011,8 +19011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd5c3baf7b087e747970001e8607c4a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  opponentDeckText: {fileID: 0}
-  playerDeckText: {fileID: 0}
+  opponentDeckText: {fileID: 309195530}
+  playerDeckText: {fileID: 432820158}
 --- !u!1 &1493997354
 GameObject:
   m_ObjectHideFlags: 0
