@@ -10,5 +10,6 @@ public enum GamePhase
     ActionBlue,
     DiscardRed,
     DiscardBlue,
+    PlayWhite,
     End
 };
