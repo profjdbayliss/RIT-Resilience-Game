@@ -56,6 +56,7 @@ public struct Update {
     public int Amount;
     public FacilityType FacilityType;
     public FacilityEffectType EffectTarget;
+    public string DiscardedOrReturnedCardUIDs;
 };
 
 public enum DiscardFromWhere {
@@ -559,6 +560,17 @@ public class CardPlayer : MonoBehaviour {
                 if (ReadyState == PlayerReadyState.ReturnCardsToDeck) {
                     Debug.Log("Returning card to deck");
                     ReturnCardToDeck(card);
+                    //update the card update with the card that was returned
+                    if (mUpdatesThisPhase.TryPeek(out Update update)) {
+                        if (update.Type == CardMessageType.CardUpdate) {
+                            if (update.DiscardedOrReturnedCardUIDs == null || update.DiscardedOrReturnedCardUIDs == "") {
+                                update.DiscardedOrReturnedCardUIDs = card.UniqueID.ToString();
+                            }
+                            else {
+                                update.DiscardedOrReturnedCardUIDs += ";" + card.UniqueID;
+                            }
+                        }
+                    }
                     AmountToReturnToDeck--;
                     if (AmountToReturnToDeck > 0) {
                         GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} more cards to the deck", this); //update alert message
@@ -567,6 +579,8 @@ public class CardPlayer : MonoBehaviour {
                         OnCardsReturnedToDeck?.Invoke(); //Resolve the action after cards have been returned to deck
                         GameManager.instance.mAlertPanel.ResolveAlert(); //remove alert message
                         ReadyState = PlayerReadyState.ReadyToPlay; //reset player state
+                        //update opponent now that the update has all the info it needs
+                        GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
                     }
 
                 }
@@ -874,7 +888,7 @@ public class CardPlayer : MonoBehaviour {
                     UniqueID = card.UniqueID,
                     CardID = card.data.cardID
                 });
-                GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
+                //GameManager.instance.SendUpdatesToOpponent(phase, this); //dont update opponent yet we need to add more info to the update (maybe)
 
                 //card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
                 playCount = 1;
@@ -1183,6 +1197,38 @@ public class CardPlayer : MonoBehaviour {
     }
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
 
+
+            Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
+                deckToDrawFrom: ref DeckIDs, dropZone: null,
+                allowSlippy: false, activeDeck: ref ActiveCards);
+
+            if (card != null) {
+                GameObject cardGameObject = ActiveCards[card.UniqueID];
+                RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
+
+                // Set the card's parent to nothing, in order to position it in world space
+                cardRect.SetParent(null, true);
+
+                Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); //top middle just off the screen
+
+                cardRect.anchoredPosition = topMiddle;
+                card.transform.localRotation = Quaternion.Euler(0, 0, 180); //flip upside down as if played by opponent
+
+                // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
+
+                cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); //set parent to game canvas and keep world position
+                cardGameObject.SetActive(true);
+                
+                // Start the card animation
+                StartCoroutine(card.MoveAndRotateToCenter(cardRect, null, () => {
+                    card.SetCardState(CardState.CardInPlay);
+                    card.Play(opponent, this);    // play when animation completes
+
+                    // After the current animation is done, check if there's another card queued
+                    OnAnimationComplete();
+                }));
+            }
+        
     }
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
@@ -1208,13 +1254,13 @@ public class CardPlayer : MonoBehaviour {
 
                 // cardRect.SetParent(facilityGo.transform, true); //set parent to facility and keep world position
 
-                cardRect.SetParent(facilityGo.GetComponentInParent<Canvas>().transform, true); //set parent to game canvas and keep world position
+                cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); //set parent to game canvas and keep world position
                 cardGameObject.SetActive(true);
 
                 // Start the card animation
                 StartCoroutine(card.MoveAndRotateToCenter(cardRect, facilityGo, () => {
                     card.SetCardState(CardState.CardInPlay);
-                    card.Play(this, opponent, facility);    // play when animation completes
+                    card.Play(opponent, this, facility);    // play when animation completes
 
                     // After the current animation is done, check if there's another card queued
                     OnAnimationComplete();
