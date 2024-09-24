@@ -27022,7 +27022,7 @@ MonoBehaviour:
   cam: {fileID: 1515608158}
   titlee: {fileID: 631575999}
   mAlertPanel: {fileID: 228889691}
-  deckSizeTracker: {fileID: 0}
+  deckSizeTracker: {fileID: 1488800424}
   endGameCanvas: {fileID: 1756113746}
   endGameText: {fileID: 894850864}
   yarnSpinner: {fileID: 2753718019496694862}
