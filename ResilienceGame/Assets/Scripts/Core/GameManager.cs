@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Networking
     [Header("Networking")]
     private RGNetworkPlayerList mRGNetworkPlayerList;
-    private bool isServer = true;
+    public bool IsServer = true;
     private MessageQueue mMessageQueue = new MessageQueue();
     // Observers
     private List<IRGObserver> mObservers = new List<IRGObserver>(20);
@@ -165,7 +165,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             mPlayerDeckType.text = "" + playerType;
 
             // tell everybody else of this player's type
-            if (!isServer) {
+            if (!IsServer) {
                 Message msg;
                 List<int> tmpList = new List<int>(1);
                 tmpList.Add((int)playerType);
@@ -186,7 +186,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         gameCanvas.SetActive(true);
         // send out the starting message with all player info
         // and start the next phase
-        if (isServer) {
+        if (IsServer) {
             Message msg = RGNetworkPlayerList.instance.CreateStartGameMessage();
             AddMessage(msg);
         }
@@ -378,7 +378,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     void Update() {
         if (DEBUG_ENABLED) {
             if (Keyboard.current.f1Key.wasPressedThisFrame) {
-                Debug.Log($"{(isServer ? "**[SERVER]**" : "**[CLIENT]**")}");
+                Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
                 actualPlayer.LogPlayerInfo();
                 opponentPlayer.LogPlayerInfo();
             }
@@ -403,7 +403,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // means network init is done
                 // and we're joined
                 RegisterObserver(mRGNetworkPlayerList);
-                isServer = mRGNetworkPlayerList.isServer;
+                IsServer = mRGNetworkPlayerList.isServer;
                 CardPlayer player = GameObject.FindObjectOfType<CardPlayer>();
                 if (player != null) {
                     // player is initialized and ready to go
@@ -811,7 +811,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         OnRoundEnd?.Invoke(); //inform listeners that the round ended
         turnTotal++;
         mTurnText.text = "Turn: " + GetTurn();
-        if (isServer) {
+        if (IsServer) {
             Debug.Log("server adding increment turn message");
             AddMessage(new Message(CardMessageType.IncrementTurn));
         }

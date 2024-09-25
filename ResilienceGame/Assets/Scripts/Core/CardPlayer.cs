@@ -338,7 +338,7 @@ public class CardPlayer : MonoBehaviour {
         return (mUpdatesThisPhase.Count != 0);
     }
 
-    
+
     #endregion
 
     #region Card Drawing Functions
@@ -373,10 +373,10 @@ public class CardPlayer : MonoBehaviour {
     }
     //Draws a specific card from the deck and adds it to the handParent by calling the CardDraw function
     //Currently used to add a card to opponents hand when receiving a draw message from the network
-    public virtual void DrawSpecificCard(int id, GameObject handParent, bool updateNetwork = false) {
-        Debug.Log($"{playerName} is trying to draw {GetCardNameFromID(id)} with id {id}");
+    public virtual void DrawSpecificCard(int id, GameObject handParent, int uid = -1, bool updateNetwork = false) {
+        Debug.Log($"[{(GameManager.instance.IsServer ? "SERVER" : "CLIENT")}]'s player {playerName} is trying to draw {GetCardNameFromID(id)} with uid {uid}");
         if (DeckIDs.Count > 0) {
-            DrawCard(false, id, -1, ref DeckIDs, handParent, true, ref HandCards, updateNetwork);
+            DrawCard(false, id, uid, ref DeckIDs, handParent, true, ref HandCards, updateNetwork);
         }
     }
     //Creates a card and adds it to the activeDeck from the deckToDrawFrom
@@ -403,7 +403,7 @@ public class CardPlayer : MonoBehaviour {
             }
             indexForCard = deckToDrawFrom.FindIndex(x => x == cardId);
             if (indexForCard == -1) {
-                Debug.Log("didn't find a card of this type to draw : " + cardId + " to card deck with number " + deckToDrawFrom.Count);
+                Debug.Log("didn't find a card of this type to draw : " + cardId + $" in {(deckToDrawFrom == DeckIDs ? $"{DeckName} deck" : $"deck with size {deckToDrawFrom.Count}")}");
                 return null;
             }
         }
@@ -571,7 +571,7 @@ public class CardPlayer : MonoBehaviour {
         card.transform.localPosition = new Vector3();
     }
     #endregion
-    
+
     #region Update Functions
     // Update is called once per frame
     void Update() {
@@ -1071,7 +1071,6 @@ public class CardPlayer : MonoBehaviour {
     }
     #endregion
 
-
     #region Network Updates
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
@@ -1079,25 +1078,23 @@ public class CardPlayer : MonoBehaviour {
         switch (update.Type) {
             case CardMessageType.DrawCard:
                 Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
-                opponent.DrawSpecificCard(update.CardID, opponentDropZone, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
+                opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
                 break;
             default: //card update for now, maybe discard?
-                Debug.Log($"Player {playerName} is adding card update: {update.Type}, FacilityType: {update.FacilityType}");
 
                 if (IsAnimating) {
                     Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
                     opponentCardPlays.Enqueue((update, phase, opponent));
                     return;
                 }
-
                 // If no animation is in progress, handle the card play immediately
                 ProcessCardPlay(update, phase, opponent);
                 break;
-
         }
     }
     //Actually process the card action, used to create the update queue and is called when the update is ready to be resolved
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
+        Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type}");
         IsAnimating = true;
         if (update.Type == CardMessageType.CardUpdate) {
             //handle facility card play
@@ -1118,45 +1115,82 @@ public class CardPlayer : MonoBehaviour {
     }
     //handles when the shared logic of opponent card plays
     private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null) {
+        Debug.Log($"Handling {opponent.playerName}'s card play of {card.data.name}");
         if (card != null) {
-            GameObject cardGameObject = ActiveCards[card.UniqueID];
-            RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
+            
+            Debug.Log($"Active cards length ({ActiveCards.Count}):");
+            foreach (var kvp in ActiveCards) {
+                Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+            }
+            if (opponent.HandCards.TryGetValue(card.UniqueID, out GameObject cardGameObject)) {
+                RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
 
-            // Set the card's parent to nothing, in order to position it in world space
-            cardRect.SetParent(null, true);
-            Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); // top middle just off the screen
-            cardRect.anchoredPosition = topMiddle;
-            card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
-            cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); // set parent to game canvas and keep world position
-            cardGameObject.SetActive(true);
-
-            // Start the card animation
-            StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
-                card.SetCardState(CardState.CardInPlay);
-                card.Play(opponent, this, facility);
-                // After the current animation is done, check if there's another card queued
-                OnAnimationComplete();
-            }));
+                // Set the card's parent to nothing, in order to position it in world space
+                cardRect.SetParent(null, true);
+                Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); // top middle just off the screen
+                cardRect.anchoredPosition = topMiddle;
+                card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
+                cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); // set parent to game canvas and keep world position
+                cardGameObject.SetActive(true);
+                Debug.Log($"Added card to screen, starting animation");
+                // Start the card animation
+                StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
+                    card.SetCardState(CardState.CardInPlay);
+                    card.Play(player: opponent, opponent: this, facilityActedUpon: facility);
+                    // After the current animation is done, check if there's another card queued
+                    OnAnimationComplete();
+                }));
+            }
+            else {
+                Debug.Log($"Card with uid {card.UniqueID} was not found in {opponent.playerName}'s Hand which has size {opponent.HandCards.Count}");
+            }
+            
+            
         }
     }
     //handles when the opponent plays a non facility/effect card
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
-        Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
-            deckToDrawFrom: ref DeckIDs, dropZone: null,
-            allowSlippy: false, activeDeck: ref ActiveCards);
+        Debug.Log($"Handling {opponent.playerName}'s non facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
+        Debug.Log($"{playerName} is playing the card from {opponent.playerName}'s hand which has {opponent.HandCards.Count} cards with uids:");
+        string s = "";
+        if (opponent.HandCards.Count > 0) {
+            foreach (int id in opponent.HandCards.Keys) {
+                s += id + ", ";
+            }
+        }
+        Debug.Log(s.Length > 2 ? "No cards in opponent hand" : s[..-2]);
+        //Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
+        //    deckToDrawFrom: ref opponent.DeckIDs, dropZone: null,
+        //    allowSlippy: false, activeDeck: ref ActiveCards);
 
+        Card card = opponent.HandCards.Count > 0 ? opponent.HandCards[update.UniqueID].GetComponent<Card>() : null; //card should be in the hand
         HandleOpponentCardPlay(card, null, opponent);
     }
     //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
+        Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
+        Debug.Log($"{playerName} is playing the card from {opponent.playerName}'s hand which has {opponent.HandCards.Count} cards");
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
         if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
-            Debug.Log($"Creating card played on facility: {facility.facilityName}");
-            Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
-                deckToDrawFrom: ref DeckIDs, dropZone: facilityGo,
-                allowSlippy: false, activeDeck: ref ActiveCards);
-
-            HandleOpponentCardPlay(card, facilityGo, opponent, facility);
+            Debug.Log($"{playerName} is creating card played on facility: {facility.facilityName}");
+            string s = "";
+            if (opponent.HandCards.Count > 0) {
+                foreach (int id in opponent.HandCards.Keys) {
+                    s += id + ", ";
+                }
+            }
+            Debug.Log("Opponent Info:");
+            opponent.LogPlayerInfo();
+            if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
+                Card tempCard = cardObject.GetComponent<Card>();
+                Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
+                HandleOpponentCardPlay(tempCard, facilityGo, opponent, facility);
+            }
+            else {
+                Debug.LogError($"{playerName} was looking for ");
+            }
+            
+            
         }
     }
 
@@ -1277,14 +1311,9 @@ public class CardPlayer : MonoBehaviour {
 
         // Handle Hand Cards
         s += $"Hand size: {HandCards.Count}\n";
-        var handCardGroups = HandCards.Values
-            .Select(x => x.GetComponent<Card>().front.title)
-            .GroupBy(x => x)
-            .Select(g => new { Title = g.Key, Count = g.Count() })
-            .OrderBy(x => x.Title);
-
-        foreach (var cardGroup in handCardGroups) {
-            s += $"\t{cardGroup.Title}{(cardGroup.Count > 1 ? $" x{cardGroup.Count}" : "")}\n";
+        foreach (var kvp in HandCards) {
+            var card = kvp.Value.GetComponent<Card>();
+            s += "\t[" + kvp.Key + "] - " + card.data.name + $" with uid: {card.UniqueID}\n";
         }
 
         // Handle Deck Cards
@@ -1303,5 +1332,4 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log(s);
     }
     #endregion
-
 }

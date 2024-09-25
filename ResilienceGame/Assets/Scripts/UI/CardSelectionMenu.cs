@@ -51,7 +51,7 @@ public class CardSelectionMenu : MonoBehaviour {
 
     // Function to handle the card being drawn when the button is pressed
     private void OnCardButtonPressed(Card selectedCard) {
-        GameManager.instance.actualPlayer.DrawSpecificCard(selectedCard.data.cardID, GameManager.instance.actualPlayer.handDropZone, true);
+        GameManager.instance.actualPlayer.DrawSpecificCard(selectedCard.data.cardID, GameManager.instance.actualPlayer.handDropZone, uid: -1, updateNetwork: true);
         DisableMenu();
     }
 
