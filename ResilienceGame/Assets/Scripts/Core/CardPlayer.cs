@@ -1117,11 +1117,6 @@ public class CardPlayer : MonoBehaviour {
     private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null) {
         Debug.Log($"Handling {opponent.playerName}'s card play of {card.data.name}");
         if (card != null) {
-            
-            Debug.Log($"Active cards length ({ActiveCards.Count}):");
-            foreach (var kvp in ActiveCards) {
-                Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
-            }
             if (opponent.HandCards.TryGetValue(card.UniqueID, out GameObject cardGameObject)) {
                 RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
 
@@ -1132,7 +1127,7 @@ public class CardPlayer : MonoBehaviour {
                 card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
                 cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); // set parent to game canvas and keep world position
                 cardGameObject.SetActive(true);
-                Debug.Log($"Added card to screen, starting animation");
+                //Debug.Log($"Added card to screen, starting animation");
                 // Start the card animation
                 StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
                     card.SetCardState(CardState.CardInPlay);
@@ -1150,44 +1145,33 @@ public class CardPlayer : MonoBehaviour {
     }
     //handles when the opponent plays a non facility/effect card
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
-        Debug.Log($"Handling {opponent.playerName}'s non facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
-        Debug.Log($"{playerName} is playing the card from {opponent.playerName}'s hand which has {opponent.HandCards.Count} cards with uids:");
-        string s = "";
-        if (opponent.HandCards.Count > 0) {
-            foreach (int id in opponent.HandCards.Keys) {
-                s += id + ", ";
-            }
-        }
-        Debug.Log(s.Length > 2 ? "No cards in opponent hand" : s[..-2]);
         //Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
         //    deckToDrawFrom: ref opponent.DeckIDs, dropZone: null,
         //    allowSlippy: false, activeDeck: ref ActiveCards);
+        if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
+            Card tempCard = cardObject.GetComponent<Card>();
+            Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
+            HandleOpponentCardPlay(tempCard, null, opponent);
+        }
+        else {
+            Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
+        }
 
-        Card card = opponent.HandCards.Count > 0 ? opponent.HandCards[update.UniqueID].GetComponent<Card>() : null; //card should be in the hand
-        HandleOpponentCardPlay(card, null, opponent);
+        
     }
     //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
-        Debug.Log($"{playerName} is playing the card from {opponent.playerName}'s hand which has {opponent.HandCards.Count} cards");
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
         if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
             Debug.Log($"{playerName} is creating card played on facility: {facility.facilityName}");
-            string s = "";
-            if (opponent.HandCards.Count > 0) {
-                foreach (int id in opponent.HandCards.Keys) {
-                    s += id + ", ";
-                }
-            }
-            Debug.Log("Opponent Info:");
-            opponent.LogPlayerInfo();
             if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
                 Card tempCard = cardObject.GetComponent<Card>();
                 Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
                 HandleOpponentCardPlay(tempCard, facilityGo, opponent, facility);
             }
             else {
-                Debug.LogError($"{playerName} was looking for ");
+                Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
             }
             
             
