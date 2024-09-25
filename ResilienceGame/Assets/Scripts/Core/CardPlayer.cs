@@ -544,7 +544,7 @@ public class CardPlayer : MonoBehaviour {
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
 
-        GameManager.instance.UpdateDeckSizeText(); //update UI
+        GameManager.instance.UpdateUISizeTrackers(); //update UI
 
 
 
@@ -735,6 +735,7 @@ public class CardPlayer : MonoBehaviour {
 
                 // index of where this card is in handlist
                 if (playCount > 0) {
+                    GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                     break;
                 }
             }
@@ -749,6 +750,9 @@ public class CardPlayer : MonoBehaviour {
                 // remove the discarded card
                 if (!HandCards.Remove(playKey)) {
                     Debug.Log("didn't find a key to remove! " + playKey);
+                }
+                else {
+                    GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                 }
             }
         }
@@ -1068,6 +1072,7 @@ public class CardPlayer : MonoBehaviour {
                 Debug.Log("card not removed where it supposedly was from: " + key);
             }
         }
+        GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
     }
     #endregion
 
@@ -1103,6 +1108,7 @@ public class CardPlayer : MonoBehaviour {
             }
             //handle non facility card
             else if (update.FacilityType == FacilityType.None) {
+
                 HandleFreeOpponentPlay(update, phase, opponent);
             }
             else {
@@ -1131,7 +1137,9 @@ public class CardPlayer : MonoBehaviour {
                 // Start the card animation
                 StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
                     card.SetCardState(CardState.CardInPlay);
+                    opponent.HandCards.Remove(card.UniqueID); //remove the card from the opponent's hand
                     card.Play(player: opponent, opponent: this, facilityActedUpon: facility);
+                    GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                     // After the current animation is done, check if there's another card queued
                     OnAnimationComplete();
                 }));

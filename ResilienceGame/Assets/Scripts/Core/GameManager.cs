@@ -420,10 +420,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
-    public void UpdateDeckSizeText() {
+    public void UpdateUISizeTrackers() {
         //TODO: Add check for all red players
-        deckSizeTracker.UpdatePlayerDeckSize(actualPlayer.DeckIDs.Count);
-        deckSizeTracker.UpdateOpponentDeckSize(opponentPlayer.DeckIDs.Count);
+        deckSizeTracker.UpdateAllTrackerTexts(
+            playerDeckSize: actualPlayer.DeckIDs.Count, 
+            playerHandSize: actualPlayer.HandCards.Count, 
+            opponentDeckSize: opponentPlayer.DeckIDs.Count, 
+            opponentHandSize: opponentPlayer.HandCards.Count);
     }
     // WORK: there is no menu?????
     public void BackToMenu() {
@@ -785,7 +788,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
         while (player.HasUpdates()) {
-            Debug.Log("Checking for updates to send to opponent");
+           // Debug.Log("Checking for updates to send to opponent");
             Message msg;
             List<int> tmpList = new List<int>(4);
             CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
