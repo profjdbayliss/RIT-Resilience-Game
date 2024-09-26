@@ -692,6 +692,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 else
                 {
                     //negative white
+                    Debug.Log("Playing negative white card on turn " + turnTotal);
+                    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
+                    negativeWhiteCards[randCard].Play(null, null);
+                    negativeWhiteCards.RemoveAt(randCard);
                 }
                 break;
             case GamePhase.End:
