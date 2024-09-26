@@ -210,6 +210,15 @@ public class CardReader : MonoBehaviour {
                                 case "NWShuffleFromDiscard":
                                     tempCard.ActionList.Add(new NWShuffleFromDiscard());
                                     break;
+                                case "NWChangePhysPointsDice":
+                                    tempCard.ActionList.Add(new NWChangePhysPointsDice());
+                                    break;
+                                case "NWChangeFinPointsDice":
+                                    tempCard.ActionList.Add(new NWChangeFinPointsDice());
+                                    break;
+                                case "NWChangeMeepleAmtDice":
+                                    tempCard.ActionList.Add(new NWChangeMeepleAmtDice());
+                                    break;
                                 default:
                                     tempCard.data.cardType = CardType.None;
                                     break;
