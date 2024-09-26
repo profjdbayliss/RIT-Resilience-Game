@@ -228,6 +228,72 @@ public class ReduceCardCost : ICardAction {
     }
 }
 
+/// <summary>
+/// NW stands for nation wide as this will affect all the sectors. This method intends to
+/// give each sector a give number of meeples of each type
+/// </summary>
+public class NWMeepleChangeEach : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
+/// <summary>
+/// NW stands for nation wide as this will affect all the sectors. This method intends to
+/// give each sector their choice of a give number of meeples of any given type.
+/// </summary>
+public class NWMeepleChangeChoice : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
+/// <summary>
+/// Nation-wide increase overtime amount
+/// </summary>
+public class NWIncOvertimeAmount : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
+/// <summary>
+/// Nation-wide shuffle cards from discard
+/// </summary>
+public class NWShuffleFromDiscard : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
 
 
 

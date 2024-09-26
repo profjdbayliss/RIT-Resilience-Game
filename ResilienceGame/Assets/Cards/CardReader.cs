@@ -198,7 +198,18 @@ public class CardReader : MonoBehaviour {
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
                                     break;
-
+                                case "NWMeepleChangeEach":
+                                    tempCard.ActionList.Add(new NWMeepleChangeEach());
+                                    break;
+                                case "NWMeepleChangeChoice":
+                                    tempCard.ActionList.Add(new NWMeepleChangeChoice());
+                                    break;
+                                case "NWIncOvertimeAmount":
+                                    tempCard.ActionList.Add(new NWIncOvertimeAmount());
+                                    break;
+                                case "NWShuffleFromDiscard":
+                                    tempCard.ActionList.Add(new NWShuffleFromDiscard());
+                                    break;
                                 default:
                                     tempCard.data.cardType = CardType.None;
                                     break;
