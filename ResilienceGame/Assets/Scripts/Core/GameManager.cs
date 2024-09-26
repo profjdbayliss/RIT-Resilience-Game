@@ -684,6 +684,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 if(turnTotal % 9 == 0)
                 {
                     //positive white
+                    Debug.Log("Playing positive white card on turn " + turnTotal);
+                    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
+                    positiveWhiteCards[randCard].Play(null, null);
+                    positiveWhiteCards.RemoveAt(randCard);
                 }
                 else
                 {
