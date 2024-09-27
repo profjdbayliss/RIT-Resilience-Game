@@ -489,6 +489,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (actualPlayer == player) {
             MIsDiscardAllowed = true;
             player.StopDiscard();
+            UpdateUISizeTrackers();
         }
     }
     public bool CanHighlight() {

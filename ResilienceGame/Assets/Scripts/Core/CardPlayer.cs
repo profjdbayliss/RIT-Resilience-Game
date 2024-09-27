@@ -423,7 +423,7 @@ public class CardPlayer : MonoBehaviour {
 
         if (uniqueId != -1) {
             tempCard.UniqueID = uniqueId;
-            Debug.Log("setting unique id for facility " + uniqueId);
+            //Debug.Log("setting unique id for card " + uniqueId);
         }
         else {
             // since there are multiples of each card type potentially
@@ -742,7 +742,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         if (playCount > 0) {
-            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue || phase == GamePhase.DiscardBlue || phase == GamePhase.DiscardRed) {
+            if (phase == GamePhase.DrawRed || phase == GamePhase.DrawBlue || phase == GamePhase.DiscardBlue || phase == GamePhase.DiscardRed || AmountToDiscard > 0) {
                 // we're not discarding a facility or sharing what we're discarding with the opponent
                 DiscardAllInactiveCards(DiscardFromWhere.Hand, false, -1);
             }
@@ -752,6 +752,7 @@ public class CardPlayer : MonoBehaviour {
                     Debug.Log("didn't find a key to remove! " + playKey);
                 }
                 else {
+                    Debug.Log("removed key " + playKey + " and updating tracker UI");
                     GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                 }
             }
@@ -830,28 +831,42 @@ public class CardPlayer : MonoBehaviour {
     }
     //Called when a card is dropped onto the discard drop area
     private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+        bool discard = false;
         switch (phase) {
             case GamePhase.DrawBlue:
             case GamePhase.DrawRed:
             case GamePhase.DiscardBlue:
             case GamePhase.DiscardRed:
                 // Debug.Log("card dropped in discard zone or needs to be discarded" + card.UniqueID);
+                playKey = card.UniqueID;
                 card.SetCardState(CardState.CardNeedsToBeDiscarded);
                 playCount = 1;
+                discard = true;
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
                 //discarding here will be done by a card forcing the player to discard a number of cards
                 if (ReadyState == PlayerReadyState.DiscardCards) {
                     card.SetCardState(CardState.CardNeedsToBeDiscarded);
+                    playKey = card.UniqueID;
                     playCount = 1;
                     //flag discard as done
                     AmountToDiscard--;
                     if (AmountToDiscard <= 0) {//check if we discard enough cards
                         GameManager.instance.DisablePlayerDiscard(this);
                     }
+                    discard = true;
                 }
                 break;
+        }
+        if (discard) {
+            Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
+            mUpdatesThisPhase.Enqueue(new Update {
+                Type = CardMessageType.DiscardCard,
+                UniqueID = card.UniqueID,
+                CardID = card.data.cardID
+            });
+            GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this); //immediately update opponent of card discard
         }
     }
     //Called when a Facility/Effect target card is dropped in the play area
@@ -909,9 +924,6 @@ public class CardPlayer : MonoBehaviour {
                     UniqueID = card.UniqueID,
                     CardID = card.data.cardID
                 });
-                //GameManager.instance.SendUpdatesToOpponent(phase, this); //dont update opponent yet we need to add more info to the update (maybe)
-
-                //card.Play(this, opponentPlayer, null, card); //TODO: idk if this is right, it passes itself as the "card to be acted on" should this just be null?
                 playCount = 1;
                 playKey = card.UniqueID;
                 StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer)));
@@ -1023,6 +1035,22 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Discarding
+    //attempts to discard the card with the given UID
+    public bool TryDiscardFromHandByUID(int uid) {
+        if (HandCards.TryGetValue(uid, out GameObject cardGameObject)) {
+            if (cardGameObject.TryGetComponent(out Card card)) {
+                card.SetCardState(CardState.CardNeedsToBeDiscarded);
+                Discards.Add(uid, cardGameObject);
+                cardGameObject.transform.SetParent(discardDropZone.transform, false);
+                cardGameObject.transform.localPosition = new Vector3();
+                cardGameObject.SetActive(false);
+                HandCards.Remove(uid);
+                GameManager.instance.UpdateUISizeTrackers();
+                return true;
+            }
+        }
+        return false;
+    }
     public void DiscardAllInactiveCards(DiscardFromWhere where, bool addUpdate, int uniqueFacilityID) {
         List<int> inactives = new List<int>(10);
         Dictionary<int, GameObject> discardFromArea = where switch {
@@ -1057,12 +1085,13 @@ public class CardPlayer : MonoBehaviour {
                 activeCardObject.SetActive(false);
                 card.cardZone = discardDropZone;
                 if (addUpdate) {
-                    Debug.Log("adding update for opponent to get");
+                    Debug.Log($"adding discard update from {playerName} to {GameManager.instance.opponentPlayer.playerName}");
                     mUpdatesThisPhase.Enqueue(new Update {
                         Type = CardMessageType.DiscardCard,
                         UniqueID = uniqueFacilityID,
                         CardID = card.data.cardID
                     });
+                    GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this); //immediately update opponent of card discard
                 }
             }
         }
@@ -1115,12 +1144,20 @@ public class CardPlayer : MonoBehaviour {
                 Debug.LogError($"Failed to find facility of type: {update.FacilityType}");
             }
         }
+        else if (update.Type == CardMessageType.DiscardCard) {
+            if (opponent.TryDiscardFromHandByUID(update.UniqueID)) {
+                Debug.Log($"Successfully removed card with uid {update.UniqueID} from {opponent.playerName}'s hand");
+            }
+            else {
+                Debug.LogError($"Did not find card with uid {update.UniqueID} in {opponent.playerName}'s hand!!");
+            }
+        }
         else {
             Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityType}");
         }
     }
     //handles when the shared logic of opponent card plays
-    private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null) {
+    private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null, bool callPlay = true) {
         Debug.Log($"Handling {opponent.playerName}'s card play of {card.data.name}");
         if (card != null) {
             if (opponent.HandCards.TryGetValue(card.UniqueID, out GameObject cardGameObject)) {
@@ -1138,7 +1175,8 @@ public class CardPlayer : MonoBehaviour {
                 StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
                     card.SetCardState(CardState.CardInPlay);
                     opponent.HandCards.Remove(card.UniqueID); //remove the card from the opponent's hand
-                    card.Play(player: opponent, opponent: this, facilityActedUpon: facility);
+                    if (callPlay)
+                        card.Play(player: opponent, opponent: this, facilityActedUpon: facility);
                     GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                     // After the current animation is done, check if there's another card queued
                     OnAnimationComplete();
@@ -1147,8 +1185,8 @@ public class CardPlayer : MonoBehaviour {
             else {
                 Debug.Log($"Card with uid {card.UniqueID} was not found in {opponent.playerName}'s Hand which has size {opponent.HandCards.Count}");
             }
-            
-            
+
+
         }
     }
     //handles when the opponent plays a non facility/effect card
@@ -1159,13 +1197,13 @@ public class CardPlayer : MonoBehaviour {
         if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
             Card tempCard = cardObject.GetComponent<Card>();
             Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
-            HandleOpponentCardPlay(tempCard, null, opponent);
+            HandleOpponentCardPlay(tempCard, null, opponent, callPlay: false);//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
         }
         else {
             Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
         }
 
-        
+
     }
     //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
@@ -1181,8 +1219,8 @@ public class CardPlayer : MonoBehaviour {
             else {
                 Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
             }
-            
-            
+
+
         }
     }
 

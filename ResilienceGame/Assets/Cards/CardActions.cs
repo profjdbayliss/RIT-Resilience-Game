@@ -78,10 +78,8 @@ public class AddEffect : ICardAction {
     }
 }
 
-//TODO: These are the same, should be combined, difference is handled in the FacilityEffectManager
 public class NegateEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-       // var effectType = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
 
         // Get all active effects on the facility
         var activeEffects = facilityActedUpon.effectManager.GetEffects();
