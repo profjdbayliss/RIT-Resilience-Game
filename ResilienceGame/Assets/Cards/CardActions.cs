@@ -69,7 +69,7 @@ public class ReturnHandToDeckAndDraw : ICardAction {
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         FacilityTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red;
-        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectIds, true, playedTeam);
+        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectString, true, playedTeam);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

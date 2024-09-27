@@ -8,10 +8,8 @@ using UnityEngine.UI;
 
 
 
-public class Facility : MonoBehaviour
-{
-    public enum FacilityType
-    {
+public class Facility : MonoBehaviour {
+    public enum FacilityType {
         None,
         Production,
         Transmission,
@@ -34,7 +32,7 @@ public class Facility : MonoBehaviour
     public Image[][] pointImages; // [0] for Physical, [1] for Financial, [2] for Network
     private const int MAX_POINTS = 3;
     [SerializeField] private TextMeshProUGUI facilityNameText;
-    public Image effectIcon;
+
     public FacilityEffectManager effectManager;
     // public FacilityEffect effect;
     //   public bool effectNegated;
@@ -45,8 +43,7 @@ public class Facility : MonoBehaviour
 
 
     // Start is called before the first frame update
-    public void Initialize()
-    {
+    public void Initialize() {
         effectManager = GetComponent<FacilityEffectManager>();
         facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
@@ -75,7 +72,7 @@ public class Facility : MonoBehaviour
                 pointImages[i][j * 2 + 1] = pointTransform.Find("FilledPoint").GetComponent<Image>();
             }
         }
-        
+
     }
     public void UpdatePointsUI() {
         UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
@@ -101,81 +98,64 @@ public class Facility : MonoBehaviour
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
     }
-    public void ChangeFacilityPoints(string target, int value) {
-        target = target.ToLower().Trim();
+    public void ChangeFacilityPoints(FacilityPointTarget target, int value) {
         Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
-        switch (target) {
-            case "physical":
-                physicalPoints += value;
-                physicalPoints = Mathf.Clamp(physicalPoints, 0, maxPhysicalPoints);
-                break;
-            case "financial":
-                finacialPoints += value;
-                finacialPoints = Mathf.Clamp(finacialPoints, 0, maxFinacialPoints);
-                break;
-            case "network":
-                networkPoints += value;
-                networkPoints = Mathf.Clamp(networkPoints, 0, maxNetworkPoints);
-                break;
-        }
-        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
-        // Update isDown based on points
-        isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
 
+        void UpdatePoints(ref int points, int maxPoints) {
+            points = Mathf.Clamp(points + value, 0, maxPoints);
+        }
+
+        if (target.HasFlag(FacilityPointTarget.Physical) || target == FacilityPointTarget.All)
+            UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+
+        if (target.HasFlag(FacilityPointTarget.Financial) || target == FacilityPointTarget.All)
+            UpdatePoints(ref finacialPoints, maxFinacialPoints);
+
+        if (target.HasFlag(FacilityPointTarget.Network) || target == FacilityPointTarget.All)
+            UpdatePoints(ref networkPoints, maxNetworkPoints);
+
+        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
+
+        isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
         UpdateUI();
     }
 
-    public bool HasEffect(int id) {
-        return effectManager.HasEffect(id);
+    public bool HasEffectOfType(FacilityEffectType type) {
+        return effectManager.HasEffectOfType(type);
     }
 
-    public void SetFacilityPoints(int physical, int finacial, int network)
-    {
+    public void SetFacilityPoints(int physical, int finacial, int network) {
         maxPhysicalPoints = physicalPoints = physical;
         maxFinacialPoints = finacialPoints = finacial;
         maxNetworkPoints = networkPoints = network;
 
         UpdateUI();
     }
-    public void ToggleEffectImageAlpha() {
-        Color color = effectIcon.color;
-        var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
-        effectIcon.color = newColor;
-    }
+
     public void NegateEffect(FacilityEffect effectToNegate) {
         effectManager.NegateEffect(effectToNegate);
     }
-    
+
     public void AddRemoveEffectsByIdString(string idString, bool isAdding, FacilityTeam team) {
-        var effectIds = idString.Split(';').Select(int.Parse).ToList();
-        foreach (var id in effectIds) {
-            FacilityEffect effect = FacilityEffect.CreateEffectFromID(id);
+
+        //var effectIds = idString.Split(';').Select(int.Parse).ToList();
+        //TODO: change effect csv storage
+        var effects = FacilityEffect.CreateEffectsFromID(idString);
+        effects.ForEach(effect => {
             effect.CreatedByTeam = team;
             effectManager.AddRemoveEffect(effect, isAdding);
-        }
-    }
-    public void UpdateEffectUI(FacilityEffect effect) {
-        // Update UI based on effect type
-        switch (effect.EffectType) {
-            case FacilityEffectType.Backdoor:
-                effectIcon.sprite = Sector.EffectSprites[0];
-                break;
-            case FacilityEffectType.Fortify:
-                effectIcon.sprite = Sector.EffectSprites[1];
-                break;
-                // Add more cases for other effect types
-        }
-        ToggleEffectImageAlpha();
+        });
+
+
     }
 
-    private void UpdateUI()
-    {
+
+    private void UpdateUI() {
         //pointsUI[0].text = physicalPoints.ToString();
         //pointsUI[1].text = finacialPoints.ToString();
         //pointsUI[2].text = networkPoints.ToString();
         UpdatePointsUI();
-        if (isDown)
-        {
+        if (isDown) {
             // TODO: Change UI to show that the facility is down
         }
     }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System;
 using UnityEngine.UI;
+using System.Linq;
 
 public class CardReader : MonoBehaviour {
     // TODO: Currently used in two objects, one for each of Jessica's decks
@@ -11,7 +12,7 @@ public class CardReader : MonoBehaviour {
     // deck name to use for the deck
     public string DeckName;
 
-    
+
 
     // filename - directory path is assumed to be Application.streamingAssetsPath
     // extension is assumed to be csv
@@ -127,7 +128,7 @@ public class CardReader : MonoBehaviour {
                     }
 
                     // TODO: If needed set teamID here
-                   // Debug.Log(DeckName);
+                    // Debug.Log(DeckName);
 
                     // 1:if there's one or more cards to be inserted into the deck
                     int numberOfCards = int.Parse(individualCSVObjects[1].Trim());
@@ -169,7 +170,7 @@ public class CardReader : MonoBehaviour {
                                     break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.data.effectIds = individualCSVObjects[19];
+                                    tempCard.data.effectString = individualCSVObjects[19];
                                     tempCard.ActionList.Add(new AddEffect());
                                     break;
                                 case "NegateEffect":
@@ -179,7 +180,7 @@ public class CardReader : MonoBehaviour {
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
-                                    tempCard.data.effectIds = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
+                                    tempCard.data.effectString = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
                                     tempCard.ActionList.Add(new RemoveEffect());
                                     break;
                                 case "SpreadEffect":
@@ -335,13 +336,18 @@ public class CardReader : MonoBehaviour {
 
                         // 19:  Effect
                         //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19].Trim());
-                        tempCard.data.effectIds = individualCSVObjects[19].Trim();
+                        string s = "";
+                        for (int j = 0; j < individualCSVObjects.Length; j++) {
+                            s += $"{j}: {individualCSVObjects[j]}\n";
+                        }
+                        Debug.Log(s);
+                        tempCard.data.effectString = individualCSVObjects[19].Trim();
 
                         // 20:  Number of Effects TODO: this line is wrong in csv if its actually used anywhere
                         tempCard.data.effectCount = int.Parse(individualCSVObjects[20].Trim());
 
                         // 21:  Prereq Effect
-                        tempCard.data.preReqEffectId = int.Parse(individualCSVObjects[21].Trim());
+                        tempCard.data.preReqEffectType = Enum.Parse<FacilityEffectType>(individualCSVObjects[21].Trim());
 
                         // 22:  Duration
                         tempCard.data.duration = int.Parse(individualCSVObjects[22].Trim());

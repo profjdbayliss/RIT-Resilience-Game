@@ -994,9 +994,9 @@ public class CardPlayer : MonoBehaviour {
         }
         else {
             //check prereq effects on cards
-            if (card.data.preReqEffectId != 0) {
+            if (card.data.preReqEffectType != FacilityEffectType.None) {
                 Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
-                if (!facility.HasEffect(card.data.preReqEffectId)) {
+                if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
                     return ("Facility effect does not match card prereq effect", false);
                 }
             }

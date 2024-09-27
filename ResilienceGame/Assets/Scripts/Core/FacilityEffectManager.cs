@@ -2,17 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// This class belongs to a facility and manages the effects that are applied to it
 /// </summary>
-public class FacilityEffectManager : MonoBehaviour{
-    private List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> activeEffects
-    = new List<(FacilityEffect, FacilityEffectUIElement)>();
+public class FacilityEffectManager : MonoBehaviour {
+    private readonly List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> activeEffects = new List<(FacilityEffect, FacilityEffectUIElement)>();
     private Facility facility;
     private bool hasNegatedEffectThisRound = false;
     [SerializeField] private Transform effectParent;
     [SerializeField] private GameObject effectPrefab;
+    [SerializeField] private Image effectIcon;
 
 
     private void Start() {
@@ -35,6 +36,7 @@ public class FacilityEffectManager : MonoBehaviour{
         else {
             RemoveEffect(effect);
         }
+
     }
     /// <summary>
     /// Adds an effect to the facility
@@ -46,45 +48,85 @@ public class FacilityEffectManager : MonoBehaviour{
             return;
         }
 
-        var (Effect, UIElement) = activeEffects.FirstOrDefault(e =>
-               e.Effect.CreatedEffectID == effect.CreatedEffectID &&
-               e.Effect.EffectType == effect.EffectType &&
-               e.Effect.Target == effect.Target);
+        activeEffects.Add((effect, null));//add the effect to list
+        UpdateEffectUI(effect);
+        ApplyEffect(effect);
+    }
+    public void UpdateSpecialIcon(FacilityEffect effect, bool add = true) {
+        if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
+            if (add) {
+                effectIcon.sprite = Sector.EffectSprites[(int)effect.EffectType];
+            }
+            ToggleEffectImageAlpha();
+        }
+    }
+    public void UpdateEffectUI(FacilityEffect effect, bool add = true) {
+        if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
+            UpdateSpecialIcon(effect, add);
+            return;
+        }
 
-        if (Effect != null) {
-            Effect.AddStack();
-            UIElement.UpdateText(Effect.Stack);
+        int indexToUpdate = activeEffects.FindIndex(e => e.Effect.UniqueID == effect.UniqueID);
+
+        if (add) {
+            if (indexToUpdate != -1) {
+                // Effect exists, update or create its UI element
+                var (existingEffect, existingUI) = activeEffects[indexToUpdate];
+                if (existingUI == null) {
+                    // Create new UI element
+                    var newEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
+                    newEffectUI.SetEffectType(effect.Target);
+                    newEffectUI.UpdateText(effect.Magnitude + "");
+                    activeEffects[indexToUpdate] = (existingEffect, newEffectUI);
+                }
+                else {
+                    // Update existing UI element
+                    existingUI.SetEffectType(effect.Target);
+                    existingUI.UpdateText(effect.Magnitude + "");
+                }
+            }
+            else {
+                Debug.LogError("Shouldn't ever happen - probably some effect UID error");
+            }
         }
         else {
-            var effectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
-            effectUI.SetEffectType(effect.Target);
-            effectUI.UpdateText(effect.Stack);
-            activeEffects.Add((effect, effectUI));
+            // Remove the effect element
+            if (indexToUpdate != -1) {
+                var (_, uiElement) = activeEffects[indexToUpdate];
+                activeEffects.RemoveAt(indexToUpdate);
+                if (uiElement != null) {
+                    Destroy(uiElement.gameObject);
+                }
+            }
         }
-
-        ApplyEffect(effect);
+    }
+    public void ToggleEffectImageAlpha() {
+        Color color = effectIcon.color;
+        var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
+        effectIcon.color = newColor;
     }
     /// <summary>
     /// Removes an effect from the facility
     /// </summary>
     /// <param name="effect">The effect to remove</param>
-    private void RemoveEffect(FacilityEffect effect) {
-        if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {
-            hasNegatedEffectThisRound = true;
+    private void RemoveEffect(FacilityEffect effect, bool bypassFortified = false) {
+        if (!bypassFortified) {
+            if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {
+                hasNegatedEffectThisRound = true;
+                return;
+            }
+        }
+        int indexToRemove = activeEffects.FindIndex(e => e.Effect.UniqueID == effect.UniqueID);
+        if (indexToRemove == -1) {
+            Debug.LogError("Trying to remove an effect that doesn't exist [Probably UID issue]");
             return;
         }
+        var (effectToRemove, uiElement) = activeEffects[indexToRemove];
 
-        var existingTuple = activeEffects.FirstOrDefault(e => e.Effect.CreatedEffectID == effect.CreatedEffectID);
-        if (existingTuple.Effect != null) {
-            if (existingTuple.Effect.Stack > 1) {
-                existingTuple.Effect.RemoveStack();
-                existingTuple.UIElement.UpdateText(existingTuple.Effect.Stack);
-            }
-            else {
-                Destroy(existingTuple.UIElement.gameObject);
-                activeEffects.Remove(existingTuple);
-            }
-            UnapplyEffect(existingTuple.Effect);
+        if (effectToRemove != null) {
+            Destroy(uiElement.gameObject);
+            activeEffects.RemoveAt(indexToRemove);
+            UnapplyEffect(effectToRemove);
         }
     }
     /// <summary>
@@ -92,18 +134,7 @@ public class FacilityEffectManager : MonoBehaviour{
     /// </summary>
     /// <param name="effect">The effect to remove from the facility</param>
     public void ForceRemoveEffect(FacilityEffect effect) {
-        var existingTuple = activeEffects.FirstOrDefault(e => e.Effect.CreatedEffectID == effect.CreatedEffectID);
-        if (existingTuple.Effect != null) {
-            if (existingTuple.Effect.Stack > 1) {
-                existingTuple.Effect.RemoveStack();
-                existingTuple.UIElement.UpdateText(existingTuple.Effect.Stack);
-            }
-            else {
-                Destroy(existingTuple.UIElement.gameObject);
-                activeEffects.Remove(existingTuple);
-            }
-            UnapplyEffect(existingTuple.Effect);
-        }
+        RemoveEffect(effect, true);
     }
 
     /// <summary>
@@ -111,14 +142,13 @@ public class FacilityEffectManager : MonoBehaviour{
     /// </summary>
     /// <param name="effect">The facility effect object that holds the facility effect type</param>
     private void ApplyEffect(FacilityEffect effect) {
+        Debug.Log($"Applying effect {effect.EffectType} to {facility.facilityName}");
         switch (effect.EffectType) {
-            case FacilityEffectType.Backdoor:
-            case FacilityEffectType.Fortify:
-                facility.UpdateEffectUI(effect);    //TODO: eventually all effects should have a ui element
-                break;
             case FacilityEffectType.ModifyPoints:
             case FacilityEffectType.ModifyPointsPerTurn:
                 ChangeFacilityPoints(effect);
+                break;
+            default:
                 break;
         }
     }
@@ -129,13 +159,11 @@ public class FacilityEffectManager : MonoBehaviour{
     /// <param name="effect">The facility effect object that holds the facility effect type</param>
     private void UnapplyEffect(FacilityEffect effect) {
         switch (effect.EffectType) {
-            case FacilityEffectType.Backdoor:
-            case FacilityEffectType.Fortify:    //TODO: eventually all effects should have a ui element
-                facility.UpdateEffectUI(null); // Clear the effect UI
-                break;
             case FacilityEffectType.ModifyPoints:
             case FacilityEffectType.ModifyPointsPerTurn:
-                ChangeFacilityPoints(effect, true);
+                ChangeFacilityPoints(effect, isRemoving: true);
+                break;
+            default:
                 break;
         }
     }
@@ -145,8 +173,8 @@ public class FacilityEffectManager : MonoBehaviour{
     public void OnRoundEnded() {
         foreach (var (effect, uiElement) in activeEffects.ToList()) {
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
-                var newEffect = FacilityEffect.CreateEffectFromID(effect.CreatedEffectID - 6);
-                AddEffect(newEffect);
+                var effects = FacilityEffect.CreateEffectsFromID(effect.CreatedEffectID);
+                effects.ForEach(_effect => AddEffect(_effect));
             }
 
             if (effect.Duration > 0) {
@@ -159,8 +187,8 @@ public class FacilityEffectManager : MonoBehaviour{
         hasNegatedEffectThisRound = false;
     }
 
-    public bool HasEffect(int id) {
-        return activeEffects.Any(e => e.Effect.CreatedEffectID == id);
+    public bool HasEffectOfType(FacilityEffectType type) {
+        return activeEffects.Any(effect => effect.Effect.EffectType == type);
     }
 
     public void RemoveAllEffects() {
@@ -189,8 +217,10 @@ public class FacilityEffectManager : MonoBehaviour{
 
     #region Effect Functions
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
+        Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? -1 : 1);
-        facility.ChangeFacilityPoints(effect.Target.ToString(), value);
+
+        facility.ChangeFacilityPoints(effect.Target, value);
     }
     public void NegateEffect(FacilityEffect effect) {
         if (facility.IsFortified && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {

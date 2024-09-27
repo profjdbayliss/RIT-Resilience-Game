@@ -63,10 +63,10 @@ public class CardInfoDisplay : MonoBehaviour {
         sb.AppendLine("Card Data:");
         sb.AppendLine($"Card Type: {card.data.cardType}");
         sb.AppendLine($"Effects: ");
-        foreach (var s in card.data.effectIds.Split(';')) {
+        foreach (var s in card.data.effectString.Split(';')) {
             sb.AppendLine($"- {s}");
         }
-        sb.AppendLine($"PreReq Effect: {FacilityEffect.GetEffectInfoFromId(card.data.preReqEffectId)}");
+        sb.AppendLine($"PreReq Effect: {card.data.preReqEffectType}");
         sb.AppendLine($"Effect Count: {card.data.effectCount}");
         sb.AppendLine($"Duration: {card.data.duration}");
         sb.AppendLine($"Has Doom Effect: {card.data.hasDoomEffect}");

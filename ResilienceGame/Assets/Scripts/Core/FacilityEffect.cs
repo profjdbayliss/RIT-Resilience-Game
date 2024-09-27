@@ -1,12 +1,16 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
-public enum FacilityEffectTarget {
-    Physical,
-    Network,
-    Financial,
-    None
+[Flags]
+public enum FacilityPointTarget {
+    None = 0,
+    Physical = 1 << 0,
+    Financial = 1 << 1,
+    Network = 1 << 2,
+    All = Physical | Financial | Network
 }
 
 public enum FacilityEffectType {
@@ -24,44 +28,50 @@ public enum FacilityTeam {
 }
 
 public class FacilityEffect {
+    private const int BACKDOOR_FORT_DURATION = 3;
     public FacilityEffectType EffectType { get; private set; }
-    public FacilityEffectTarget Target { get; private set; }
+    public FacilityPointTarget Target { get; private set; }
 
     public FacilityTeam CreatedByTeam { get; set; } = FacilityTeam.None;
     public int Magnitude { get; private set; } // Integer magnitude instead of enum
     public int Duration { get; set; }  // -1 for infinite
-    public int Stack { get; private set; } = 1;
+                                       // public int Stack { get; private set; } = 1;
     public bool IsNegated { get; set; } = false;
 
-    public static int UniqueID { get; private set; }
+    private static int _uniqueID = 0;
+    public int UniqueID { get; private set; }
 
-    public int CreatedEffectID { get; private set; }
+    public string CreatedEffectID { get; private set; }
 
     public List<FacilityEffect> CreatedEffects { get; private set; }
 
-    public FacilityEffect(FacilityEffectType effectType, FacilityEffectTarget target, int createdEffectID, int magnitude, int duration = -1, int uniqueID = 0) {
+    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1, int uniqueID = -1) {
         EffectType = effectType;
         Target = target;
         Magnitude = magnitude;
         Duration = duration;
         CreatedEffects = new List<FacilityEffect>();
-        UniqueID = ++uniqueID;
+        if (uniqueID == -1) {
+            UniqueID = _uniqueID++;
+        }
+        else {
+            if (uniqueID < _uniqueID) {
+                UniqueID = _uniqueID++;
+                Debug.LogError($"Unique Facility Effect id is less than uniqueID which will cause duplicate unique ID values");
+            }
+            else {
+                _uniqueID = uniqueID;
+                UniqueID = uniqueID;
+            }
+        }
         CreatedEffectID = createdEffectID;
     }
 
-    public void AddStack() {
-        Stack++;
-    }
 
-    public void RemoveStack() {
-        if (Stack > 1) {
-            Stack--;
-        }
-    }
 
     public override string ToString() {
         string effectInfo = $"Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
-                            $"Stack: {Stack}, Negated: {IsNegated}";
+                            $"Negated: {IsNegated}";
 
         if (CreatedEffects.Count > 0) {
             effectInfo += "\n  Created Effects: ";
@@ -75,94 +85,55 @@ public class FacilityEffect {
 
     #region Facility Effect Creation
 
-    public static FacilityEffect CreateEffectFromID(int id) {
-        FacilityEffectType effectType = FacilityEffectType.None;
-        FacilityEffectTarget target = FacilityEffectTarget.None;
-        int duration = -1;
-        int amount = 0;
+    public static List<FacilityEffect> CreateEffectsFromID(string effectString) {
+        List<FacilityEffect> effects = new List<FacilityEffect>();
+        string[] effectParts = effectString.Split(';');
+        string effectTypeString = effectParts[0];
+        string targetInfoString = effectParts[1];
+        int magnitude = int.Parse(effectParts[2]);
 
-        (effectType, target, amount) = id switch {
-            0 => (FacilityEffectType.None, FacilityEffectTarget.None, 0),
-            1 => (FacilityEffectType.Backdoor, FacilityEffectTarget.None, 0),
-            2 => (FacilityEffectType.Fortify, FacilityEffectTarget.None, 0),
-            // ModifyPoints - Amount +1
-            3 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 1),
-            4 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 1),
-            5 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 1),
-            // ModifyPoints - Amount +2
-            6 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 2),
-            7 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 2),
-            8 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 2),
-            // ModifyPoints - Amount -1
-            9 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -1),
-            10 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -1),
-            11 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -1),
-            // ModifyPoints - Amount -2
-            12 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -2),
-            13 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -2),
-            14 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -2),
-            // ModifyPointsPerTurn - Amount -1
-            15 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -1),
-            16 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -1),
-            17 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -1),
-            // ModifyPointsPerTurn - Amount -2
-            18 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -2),
-            19 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -2),
-            20 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -2),
-            21 => (FacilityEffectType.Negate, FacilityEffectTarget.None, 0),
-            _ => (FacilityEffectType.None, FacilityEffectTarget.None, 0)
-        };
-        if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
-            duration = 3;
+        var effectTypes = effectTypeString.Split('&');
+        foreach (var effect in effectTypes) {
+            FacilityEffectType effectType = ParseEffectType(effect);
+            if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
+                effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", magnitude, BACKDOOR_FORT_DURATION));
+            }
+            else {
+                string effectCreatedByEffect = effectType == FacilityEffectType.ModifyPointsPerTurn
+                    ? $"modp;{targetInfoString};{magnitude}"
+                    : "";
+
+                FacilityPointTarget target = ParseTarget(targetInfoString);
+                effects.Add(new FacilityEffect(effectType, target, effectCreatedByEffect, magnitude));
+            }
         }
-        Debug.Log($"Creating effect: {effectType}, {target}, {amount}, {duration}");
-        return new FacilityEffect(effectType, target, id, amount, duration);
+        return effects;
     }
 
-    public static string GetEffectInfoFromId(int id) {
-        FacilityEffectType effectType = FacilityEffectType.None;
-        FacilityEffectTarget target = FacilityEffectTarget.None;
-        int magnitude = 0;
-
-        /* parses an int ID from the csv into a proper facility effect
-         * 
-         * 3 to 8 are for ModifyPoints with targets Physical, Network, and Financial, and magnitudes +1 and +2.
-         * 9 to 14 are for ModifyPoints with the same targets, and magnitudes -1 and -2.
-         * 15 to 20 are for ModifyPointsPerTurn with the same targets and magnitudes -1 and -2.
-         */
-        (effectType, target, magnitude) = id switch {
-            0 => (FacilityEffectType.None, FacilityEffectTarget.None, 0),
-            1 => (FacilityEffectType.Backdoor, FacilityEffectTarget.None, 0),
-            2 => (FacilityEffectType.Fortify, FacilityEffectTarget.None, 0),
-            3 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 1),
-            4 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 1),
-            5 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 1),
-            6 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, 2),
-            7 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, 2),
-            8 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, 2),
-            9 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -1),
-            10 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -1),
-            11 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -1),
-            12 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Physical, -2),
-            13 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Network, -2),
-            14 => (FacilityEffectType.ModifyPoints, FacilityEffectTarget.Financial, -2),
-            15 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -1),
-            16 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -1),
-            17 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -1),
-            18 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Physical, -2),
-            19 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Network, -2),
-            20 => (FacilityEffectType.ModifyPointsPerTurn, FacilityEffectTarget.Financial, -2),
-            21 => (FacilityEffectType.Negate, FacilityEffectTarget.None, 0),
-            _ => (FacilityEffectType.None, FacilityEffectTarget.None, 0)
+    public static FacilityEffectType ParseEffectType(string typeString) {
+        return typeString.ToLower() switch {
+            "modp" => FacilityEffectType.ModifyPoints,
+            "modppt" => FacilityEffectType.ModifyPointsPerTurn,
+            "fortify" => FacilityEffectType.Fortify,
+            "backdoor" => FacilityEffectType.Backdoor,
+            "remove" => FacilityEffectType.Negate,
+            _ => FacilityEffectType.None
         };
-
-        string effectInfo = $"Effect: {effectType}, Target: {target}";
-        if (magnitude != 0) {
-            effectInfo += $", Magnitude: {magnitude}";
-        }
-        return effectInfo;
     }
 
+    public static FacilityPointTarget ParseTarget(string targetString) {
+        FacilityPointTarget target = FacilityPointTarget.None;
+        foreach (string t in targetString.Split('&')) {
+            target |= t.ToLower() switch {
+                "phys" => FacilityPointTarget.Physical,
+                "net" => FacilityPointTarget.Network,
+                "fin" => FacilityPointTarget.Financial,
+                "all" => FacilityPointTarget.All,
+                _ => FacilityPointTarget.None
+            };
+        }
+        return target;
+    }
 
     #endregion
 }
