@@ -47,7 +47,7 @@ public class Facility : MonoBehaviour
     // Start is called before the first frame update
     public void Initialize()
     {
-        effectManager = new FacilityEffectManager(this);
+        effectManager = GetComponent<FacilityEffectManager>();
         facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
         // pointsUI = new TextMeshProUGUI[3];

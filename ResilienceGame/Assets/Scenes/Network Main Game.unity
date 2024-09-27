@@ -4309,7 +4309,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &268107327
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4328,8 +4328,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -398, y: -28.9}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchoredPosition: {x: -420, y: -19.5}
+  m_SizeDelta: {x: 0, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &268107328
 MonoBehaviour:
@@ -5274,6 +5274,7 @@ GameObject:
   - component: {fileID: 325979395}
   - component: {fileID: 325979394}
   - component: {fileID: 325979396}
+  - component: {fileID: 325979397}
   m_Layer: 6
   m_Name: TransmissionFacility
   m_TagString: FacilityDropLocation
@@ -5323,6 +5324,7 @@ MonoBehaviour:
   - {fileID: 988311466}
   facilityNameText: {fileID: 310921094}
   effectIcon: {fileID: 1162327640}
+  effectManager: {fileID: 0}
   isDown: 0
 --- !u!114 &325979394
 MonoBehaviour:
@@ -5373,6 +5375,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &325979397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325979391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7287f0ba321793a428b042640d6937d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &327071780
@@ -8543,6 +8557,7 @@ GameObject:
   - component: {fileID: 510286173}
   - component: {fileID: 510286172}
   - component: {fileID: 510286174}
+  - component: {fileID: 510286175}
   m_Layer: 6
   m_Name: DistributionFacility
   m_TagString: FacilityDropLocation
@@ -8592,6 +8607,7 @@ MonoBehaviour:
   - {fileID: 606468166}
   facilityNameText: {fileID: 96068603}
   effectIcon: {fileID: 67481886}
+  effectManager: {fileID: 0}
   isDown: 0
 --- !u!114 &510286172
 MonoBehaviour:
@@ -8642,6 +8658,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &510286175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510286169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7287f0ba321793a428b042640d6937d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &520008979
@@ -15857,10 +15885,10 @@ RectTransform:
   m_Father: {fileID: 268107327}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 37.5, y: -37.5}
+  m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1089916465
 MonoBehaviour:
@@ -16786,6 +16814,7 @@ GameObject:
   - component: {fileID: 1173674372}
   - component: {fileID: 1173674371}
   - component: {fileID: 1173674373}
+  - component: {fileID: 1173674374}
   m_Layer: 6
   m_Name: ProductionFacility
   m_TagString: FacilityDropLocation
@@ -16835,6 +16864,7 @@ MonoBehaviour:
   - {fileID: 470503063}
   facilityNameText: {fileID: 426345553}
   effectIcon: {fileID: 1672299466}
+  effectManager: {fileID: 0}
   isDown: 0
 --- !u!61 &1173674371
 BoxCollider2D:
@@ -16885,6 +16915,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59913c53fb54f5849af55b2f72f8463e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1173674374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173674368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7287f0ba321793a428b042640d6937d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1175584532

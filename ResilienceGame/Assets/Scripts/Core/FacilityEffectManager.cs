@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity;
+using UnityEngine;
 
 /// <summary>
 /// This class belongs to a facility and manages the effects that are applied to it
 /// </summary>
-public class FacilityEffectManager {
+public class FacilityEffectManager : MonoBehaviour{
     private List<FacilityEffect> activeEffects = new List<FacilityEffect>();
     private Facility facility;
     private bool hasNegatedEffectThisRound = false;
 
-    public FacilityEffectManager(Facility facility) {
-        this.facility = facility;
+    private void Start() {
+        facility = GetComponent<Facility>();
     }
+
 
     public List<FacilityEffect> GetEffects() {
         return activeEffects;
