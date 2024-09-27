@@ -7,9 +7,13 @@ using UnityEngine;
 /// This class belongs to a facility and manages the effects that are applied to it
 /// </summary>
 public class FacilityEffectManager : MonoBehaviour{
-    private List<FacilityEffect> activeEffects = new List<FacilityEffect>();
+    private List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> activeEffects
+    = new List<(FacilityEffect, FacilityEffectUIElement)>();
     private Facility facility;
     private bool hasNegatedEffectThisRound = false;
+    [SerializeField] private Transform effectParent;
+    [SerializeField] private GameObject effectPrefab;
+
 
     private void Start() {
         facility = GetComponent<Facility>();
@@ -17,7 +21,7 @@ public class FacilityEffectManager : MonoBehaviour{
 
 
     public List<FacilityEffect> GetEffects() {
-        return activeEffects;
+        return activeEffects.Select(effect => effect.Effect).ToList();
     }
     /// <summary>
     /// Handles adding or removing an effect from the facility
@@ -37,25 +41,27 @@ public class FacilityEffectManager : MonoBehaviour{
     /// </summary>
     /// <param name="effect">The effect to add</param>
     private void AddEffect(FacilityEffect effect) {
-        // If the facility is fortified and the effect is created by the red team, negate the effect once per round
         if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
             return;
         }
-        // Check if the effect already exists
-        var existingEffect = activeEffects.FirstOrDefault(e =>
-               e.CreatedEffectID == effect.CreatedEffectID &&
-               e.EffectType == effect.EffectType &&
-               e.Target == effect.Target);
 
-        // If the effect already exists, add a stack to it
-        if (existingEffect != null) {
-            existingEffect.AddStack();
+        var (Effect, UIElement) = activeEffects.FirstOrDefault(e =>
+               e.Effect.CreatedEffectID == effect.CreatedEffectID &&
+               e.Effect.EffectType == effect.EffectType &&
+               e.Effect.Target == effect.Target);
+
+        if (Effect != null) {
+            Effect.AddStack();
+            UIElement.UpdateText(Effect.Stack);
         }
         else {
-            activeEffects.Add(effect);
+            var effectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
+            effectUI.SetEffectType(effect.Target);
+            effectUI.UpdateText(effect.Stack);
+            activeEffects.Add((effect, effectUI));
         }
-        // Apply the effect to the facility
+
         ApplyEffect(effect);
     }
     /// <summary>
@@ -63,39 +69,43 @@ public class FacilityEffectManager : MonoBehaviour{
     /// </summary>
     /// <param name="effect">The effect to remove</param>
     private void RemoveEffect(FacilityEffect effect) {
-        // If the facility is fortified and the effect is created by the red team, negate the effect once per round
         if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
             return;
         }
 
-        var existingEffect = activeEffects.FirstOrDefault(e => e.CreatedEffectID == effect.CreatedEffectID);
-        if (existingEffect != null) {
-            if (existingEffect.Stack > 1) {
-                existingEffect.RemoveStack();
+        var existingTuple = activeEffects.FirstOrDefault(e => e.Effect.CreatedEffectID == effect.CreatedEffectID);
+        if (existingTuple.Effect != null) {
+            if (existingTuple.Effect.Stack > 1) {
+                existingTuple.Effect.RemoveStack();
+                existingTuple.UIElement.UpdateText(existingTuple.Effect.Stack);
             }
             else {
-                activeEffects.Remove(existingEffect);
+                Destroy(existingTuple.UIElement.gameObject);
+                activeEffects.Remove(existingTuple);
             }
-            UnapplyEffect(existingEffect);
+            UnapplyEffect(existingTuple.Effect);
         }
     }
     /// <summary>
-    /// Forces a removal of an effect from the facility, meant to be called be Effect cards that remove effects from facility (assuming this bypasses fortification otherwise it seems kinda pointless)
+    /// Forces a removal of an effect from the facility, meant to be called by Effect cards that remove effects from facility (assuming this bypasses fortification otherwise it seems kinda pointless)
     /// </summary>
     /// <param name="effect">The effect to remove from the facility</param>
     public void ForceRemoveEffect(FacilityEffect effect) {
-        var existingEffect = activeEffects.FirstOrDefault(e => e.CreatedEffectID == effect.CreatedEffectID);
-        if (existingEffect != null) {
-            if (existingEffect.Stack > 1) {
-                existingEffect.RemoveStack();
+        var existingTuple = activeEffects.FirstOrDefault(e => e.Effect.CreatedEffectID == effect.CreatedEffectID);
+        if (existingTuple.Effect != null) {
+            if (existingTuple.Effect.Stack > 1) {
+                existingTuple.Effect.RemoveStack();
+                existingTuple.UIElement.UpdateText(existingTuple.Effect.Stack);
             }
             else {
-                activeEffects.Remove(existingEffect);
+                Destroy(existingTuple.UIElement.gameObject);
+                activeEffects.Remove(existingTuple);
             }
-            UnapplyEffect(existingEffect);
+            UnapplyEffect(existingTuple.Effect);
         }
     }
+
     /// <summary>
     /// Applies the effect to the facility based on the facility effect type
     /// </summary>
@@ -133,9 +143,7 @@ public class FacilityEffectManager : MonoBehaviour{
     /// Called when the round is ended by the game manager
     /// </summary>
     public void OnRoundEnded() {
-        // Loop through all active effects
-        foreach (var effect in activeEffects.ToList()) {
-            //If the effect is a modify points per turn effect, create its 
+        foreach (var (effect, uiElement) in activeEffects.ToList()) {
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
                 var newEffect = FacilityEffect.CreateEffectFromID(effect.CreatedEffectID - 6);
                 AddEffect(newEffect);
@@ -150,13 +158,21 @@ public class FacilityEffectManager : MonoBehaviour{
         }
         hasNegatedEffectThisRound = false;
     }
-    
+
     public bool HasEffect(int id) {
-        return activeEffects.Find(e => e.CreatedEffectID == id) != null;
+        return activeEffects.Any(e => e.Effect.CreatedEffectID == id);
     }
 
     public void RemoveAllEffects() {
+        foreach (var (_, uiElement) in activeEffects) {
+            Destroy(uiElement.gameObject);
+        }
         activeEffects.Clear();
+    }
+    public void ToggleAllEffectOutlines(bool enable) {
+        foreach (var (_, uiElement) in activeEffects) {
+            uiElement.ToggleOutline(enable);
+        }
     }
 
     #region Effect Switches
