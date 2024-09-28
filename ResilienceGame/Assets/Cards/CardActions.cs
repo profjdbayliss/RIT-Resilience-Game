@@ -234,6 +234,27 @@ public class NWMeepleChangeEach : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        //at the moment this method doesnt actually handle multiple sectors because
+        //we dont know how to implement multiple sectors yet. that being said this doesnt 
+        //use stuff like facilityactedupon and relies directly upon the game manager singleton
+        foreach(string meepleType in card.data.meepleType)
+        {
+            switch(meepleType)
+            {
+                case "Blue":
+                    GameManager.instance.actualPlayer.playerSector.blueMeeples += card.data.meepleAmount;
+                    break;
+                case "Black":
+                    GameManager.instance.actualPlayer.playerSector.blackMeeples += card.data.meepleAmount;
+                    break;
+                case "Purple":
+                    GameManager.instance.actualPlayer.playerSector.purpleMeeples += card.data.meepleAmount;
+                    break;
+                default:
+                    Debug.Log("meeple type isnt black blue or purple for some reason");
+                    break;
+            }
+        }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -267,6 +288,10 @@ public class NWIncOvertimeAmount : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        //at the moment this method doesnt actually handle multiple sectors because
+        //we dont know how to implement multiple sectors yet. that being said this doesnt 
+        //use stuff like facilityactedupon and relies directly upon the game manager singleton
+        GameManager.instance.actualPlayer.playerSector.overTimeCharges++;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
