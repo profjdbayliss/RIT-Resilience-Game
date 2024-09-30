@@ -303,12 +303,40 @@ public class NWIncOvertimeAmount : ICardAction
 
 /// <summary>
 /// Nation-wide shuffle cards from discard
+/// TODO: Currently only adds for the one blue team but without using the parameters and
+/// instead using the GaneManager static class, need to figure out how to use for multiple
+/// blue players
 /// </summary>
 public class NWShuffleFromDiscard : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        //nowhere in the csv does it indicate the number of cards that should be 
+        //shuffled from discard except the description
+        GameObject[] cardsShuffledFromDiscard = new GameObject[5];
+        CardPlayer playerInstance;
+        if (GameManager.instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.instance.actualPlayer;
+        else playerInstance = GameManager.instance.opponentPlayer;
+        if (playerInstance.Discards.Count == 0)
+        {
+            Debug.LogWarning("The discard pile is empty");
+            return;
+        }
+
+        for (int i = 0; i < cardsShuffledFromDiscard.Length; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, playerInstance.Discards.Count);
+            cardsShuffledFromDiscard[i] = playerInstance.Discards.ElementAt(randomIndex).Value;
+            int key = playerInstance.Discards.ElementAt(randomIndex).Key;
+            playerInstance.Discards.Remove(key);
+            while (playerInstance.HandCards.ContainsKey(key))
+            {
+                key++;
+            }
+            playerInstance.HandCards.Add(key, cardsShuffledFromDiscard[i]);
+        }
+            base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
