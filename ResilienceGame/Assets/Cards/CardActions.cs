@@ -234,21 +234,25 @@ public class NWMeepleChangeEach : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        CardPlayer playerInstance;
+        if (GameManager.instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.instance.actualPlayer;
+        else playerInstance = GameManager.instance.opponentPlayer;
         //at the moment this method doesnt actually handle multiple sectors because
         //we dont know how to implement multiple sectors yet. that being said this doesnt 
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
-        foreach(string meepleType in card.data.meepleType)
+        foreach (string meepleType in card.data.meepleType)
         {
             switch(meepleType)
             {
                 case "Blue":
-                    GameManager.instance.actualPlayer.playerSector.blueMeeples += card.data.meepleAmount;
+                    playerInstance.playerSector.blueMeeples += card.data.meepleAmount;
                     break;
                 case "Black":
-                    GameManager.instance.actualPlayer.playerSector.blackMeeples += card.data.meepleAmount;
+                    playerInstance.playerSector.blackMeeples += card.data.meepleAmount;
                     break;
                 case "Purple":
-                    GameManager.instance.actualPlayer.playerSector.purpleMeeples += card.data.meepleAmount;
+                    playerInstance.playerSector.purpleMeeples += card.data.meepleAmount;
                     break;
                 default:
                     Debug.Log("meeple type isnt black blue or purple for some reason");
@@ -288,10 +292,14 @@ public class NWIncOvertimeAmount : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        CardPlayer playerInstance;
+        if (GameManager.instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.instance.actualPlayer;
+        else playerInstance = GameManager.instance.opponentPlayer;
         //at the moment this method doesnt actually handle multiple sectors because
         //we dont know how to implement multiple sectors yet. that being said this doesnt 
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
-        GameManager.instance.actualPlayer.playerSector.overTimeCharges++;
+        playerInstance.playerSector.overTimeCharges++;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -352,6 +360,23 @@ public class NWChangePhysPointsDice : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        CardPlayer playerInstance;
+        if (GameManager.instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.instance.actualPlayer;
+        else playerInstance = GameManager.instance.opponentPlayer;
+        int diceRoll = UnityEngine.Random.Range(1, 6);
+        if ( diceRoll < card.data.minDiceRoll)
+        {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+            foreach(Facility facility in playerInstance.playerSector.facilities)
+            {
+                facility.ChangeFacilityPoints(FacilityPointTarget.Physical, card.data.facilityAmount);
+            }
+        }
+        else
+        {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+        }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -368,9 +393,25 @@ public class NWChangeFinPointsDice : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        CardPlayer playerInstance;
+        if (GameManager.instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.instance.actualPlayer;
+        else playerInstance = GameManager.instance.opponentPlayer;
+        int diceRoll = UnityEngine.Random.Range(1, 6);
+        if (diceRoll < card.data.minDiceRoll)
+        {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+            foreach (Facility facility in playerInstance.playerSector.facilities)
+            {
+                facility.ChangeFacilityPoints(FacilityPointTarget.Financial, card.data.facilityAmount);
+            }
+        }
+        else
+        {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+        }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
-
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
@@ -384,6 +425,15 @@ public class NWChangeMeepleAmtDice : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        int diceRoll = UnityEngine.Random.Range(1, 6);
+        if (diceRoll < card.data.minDiceRoll)
+        {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+        }
+        else
+        {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+        }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
