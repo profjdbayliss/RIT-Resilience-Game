@@ -36,6 +36,7 @@ public struct CardData
     public int effectCount;
     public int duration;
     public bool hasDoomEffect;
+    public int minDiceRoll;
     public string[] meepleType;
     public float meepleAmount;
     public PlayerSector[] onlyPlayedOn;

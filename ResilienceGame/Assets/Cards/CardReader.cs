@@ -356,6 +356,7 @@ public class CardReader : MonoBehaviour {
                         tempCard.data.hasDoomEffect = bool.Parse(individualCSVObjects[23].Trim());
 
                         // 24:  Dice roll minimum [I thought dice rolls were done away with?]
+                        tempCard.data.minDiceRoll = int.Parse(individualCSVObjects[24].Trim());
 
                         // 25:  Flavor Text
                         // Replace csv semi-colons with appropiate commas
