@@ -75,11 +75,13 @@ public class CardPlayer : MonoBehaviour {
     public Sector playerSector;
     public string DeckName = "";
 
+    [Header("Game References")]
+    public GameManager manager;
 
     [Header("Card Collections")]
-    //public static Dictionary<int, Card> cards = new Dictionary<int, Card>();
+    public static Dictionary<int, Card> cards = new Dictionary<int, Card>();
     public List<int> FacilityIDs = new List<int>(10);
-    //public List<int> DeckIDs = new List<int>(52);
+    public List<int> DeckIDs = new List<int>(52);
     public Dictionary<int, GameObject> HandCards = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> Discards = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> ActiveCards = new Dictionary<int, GameObject>();
@@ -128,7 +130,7 @@ public class CardPlayer : MonoBehaviour {
     private int mFinalScore = 0;
 
     // Private fields
-   // private static int sUniqueIDCount = 0;
+    private static int sUniqueIDCount = 0;
     private Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
     // Enum definition
@@ -172,20 +174,21 @@ public class CardPlayer : MonoBehaviour {
         //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
 
     }
-    //public void InitializeCards() {
-    //    DeckIDs.Clear();
-    //    Debug.Log("card count is: " + cards.Count);
-    //    foreach (Card card in cards.Values) {
-    //        if (card != null && card.DeckName.Equals(DeckName)) {
-    //            //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
-    //            for (int j = 0; j < card.data.numberInDeck; j++) {
-    //                DeckIDs.Add(card.data.cardID);
-    //            }
+    public void InitializeCards() {
+        DeckIDs.Clear();
+        manager = GameObject.FindObjectOfType<GameManager>();
+        Debug.Log("card count is: " + cards.Count);
+        foreach (Card card in cards.Values) {
+            if (card != null && card.DeckName.Equals(DeckName)) {
+                //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
+                for (int j = 0; j < card.data.numberInDeck; j++) {
+                    DeckIDs.Add(card.data.cardID);
+                }
 
-    //        }
-    //    }
+            }
+        }
 
-    //}
+    }
     //add the facilities to the player's active facilities
     public void RegisterFacilities() {
         registeredFacilities = true;
@@ -195,11 +198,11 @@ public class CardPlayer : MonoBehaviour {
             FacilityIDs.Add((int)facility.facilityType);
         }
     }
-    //public static void AddCards(List<Card> cardList) {
-    //    foreach (Card card in cardList) {
-    //        cards.Add(card.data.cardID, card);
-    //    }
-    //}
+    public static void AddCards(List<Card> cardList) {
+        foreach (Card card in cardList) {
+            cards.Add(card.data.cardID, card);
+        }
+    }
     void InitDropLocations() {
 
         var dropZones = FindObjectsOfType<CardDropLocation>();
@@ -241,14 +244,9 @@ public class CardPlayer : MonoBehaviour {
     private void ReturnCardToDeck(Card card) {
         //TODO: Might need to inform the opponent that a card was returned to the deck
         handPositioner.cards.Remove(card);
-        //DeckIDs.Add(card.data.cardID);//add it back to the deck
-        if (GameManager.instance.TryAddCardToDeck(deckName: DeckName, card: card)) {
-            HandCards.Remove(card.UniqueID);
-            Destroy(card.gameObject);
-        }
-        else {
-            Debug.LogError("Unable to return the card to the deck");
-        }
+        DeckIDs.Add(card.data.cardID);//add it back to the deck
+        HandCards.Remove(card.UniqueID);
+        Destroy(card.gameObject);
     }
     //Called by a card action to return the entire hand to the deck and draw a new hand
     public void ReturnHandToDeckAndDraw(int amount) {
@@ -299,7 +297,12 @@ public class CardPlayer : MonoBehaviour {
         mMeeplesSpent += meeples;
         return mMeeplesSpent;
     }
-    
+    public string GetCardNameFromID(int cardID) {
+        if (cards.TryGetValue(cardID, out Card card)) {
+            return card.data.name;
+        }
+        return "Card not found";
+    }
     public int GetTotalMeeples() {
         return playerSector.GetTotalMeeples();
     }
@@ -350,15 +353,16 @@ public class CardPlayer : MonoBehaviour {
     public virtual void DrawNumberOfCards(int num, List<Card> cardsDrawn = null, bool highlight = false, bool updateNetwork = false) {
 
         Card cardDrawn = null;
-        if (GameManager.instance.HasCardsLeft(DeckName)) {
+        if (DeckIDs.Count > 0) {
             for (int i = 0; i < num; i++) {
                 cardDrawn = DrawCard(
                     random: true,
-                    uid: -1,
-                    sharedCardID: 0,
+                    cardId: 0,
+                    uniqueId: -1,
+                    deckToDrawFrom: ref DeckIDs,
                     dropZone: handDropZone,
                     allowSlippy: true,
-                    activeHand: ref HandCards,
+                    activeDeck: ref HandCards,
                     sendUpdate: updateNetwork);
                 if (highlight) {
                     cardDrawn.ToggleOutline(true);
@@ -369,60 +373,42 @@ public class CardPlayer : MonoBehaviour {
     }
     //Draws a specific card from the deck and adds it to the handParent by calling the CardDraw function
     //Currently used to add a card to opponents hand when receiving a draw message from the network
-    public virtual void DrawCardByUID(int sharedCardID, GameObject handParent, int uid = -1, bool updateNetwork = false) {
-        Debug.Log($"[{(GameManager.instance.IsServer ? "SERVER" : "CLIENT")}]'s player {playerName} is trying to draw {GameManager.instance.GetCardNameFromID(sharedCardID)} with uid {uid}");
-        if (GameManager.instance.HasCardsLeft(DeckName)) {
-            DrawCard(false, sharedCardID, uid, handParent, true, ref HandCards, updateNetwork);
+    public virtual void DrawSpecificCard(int id, GameObject handParent, int uid = -1, bool updateNetwork = false) {
+        Debug.Log($"[{(GameManager.instance.IsServer ? "SERVER" : "CLIENT")}]'s player {playerName} is trying to draw {GetCardNameFromID(id)} with uid {uid}");
+        if (DeckIDs.Count > 0) {
+            DrawCard(false, id, uid, ref DeckIDs, handParent, true, ref HandCards, updateNetwork);
         }
     }
     //Creates a card and adds it to the activeDeck from the deckToDrawFrom
-    protected virtual Card DrawCard(bool random, int sharedCardID, int uid, GameObject dropZone, bool allowSlippy, ref Dictionary<int, GameObject> activeHand, bool sendUpdate = false) {
+    protected virtual Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
+        GameObject dropZone, bool allowSlippy,
+        ref Dictionary<int, GameObject> activeDeck, bool sendUpdate = false) {
         int rng = -1;
         Card actualCard;
         int indexForCard = -1;
 
         if (random) {
-            //rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
-            //if (GameManager.instance.AllCardsByUID.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
-            //    //  Debug.Log("found proper card!");
-            //}
-            indexForCard = rng;
-            actualCard = GameManager.instance.DrawRandomCardFromDeckByName(DeckName);
-            if (!actualCard) {
-                Debug.LogError("Missing draw card in deck");
-                return null;
+            rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
+            if (cards.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
+                //  Debug.Log("found proper card!");
             }
+            indexForCard = rng;
         }
         else {
-            //find card by UID
-            if (uid != -1) {
-                actualCard = GameManager.instance.DrawCardbyUIDByName(uid, DeckName);
+            if (!cards.TryGetValue(cardId, out actualCard)) {
+                Debug.Log("Error: handed the card deck a card id that isn't in the deck! " + cardId);
+                rng = 0;
+                return null;
+
             }
-            else {
-                //find card by sharedCardID
-                actualCard = GameManager.instance.DrawCardByIDByName(sharedCardID, DeckName);
-                
-            }
-            if (!actualCard) {
-                Debug.LogError("Missing draw card in deck");
+            indexForCard = deckToDrawFrom.FindIndex(x => x == cardId);
+            if (indexForCard == -1) {
+                Debug.Log("didn't find a card of this type to draw : " + cardId + $" in {(deckToDrawFrom == DeckIDs ? $"{DeckName} deck" : $"deck with size {deckToDrawFrom.Count}")}");
                 return null;
             }
-            indexForCard = actualCard.UniqueID;
-
-            //if (!GameManager.instance.AllCardsByUID.TryGetValue(cardId, out actualCard)) {
-            //    Debug.Log("Error: handed the card deck a card id that isn't in the deck! " + cardId);
-            //    rng = 0;
-            //    return null;
-
-            //}
-            //indexForCard = deckToDrawFrom.FindIndex(x => x == cardId);
-            //if (indexForCard == -1) {
-            //    Debug.Log("didn't find a card of this type to draw : " + cardId + $" in {(deckToDrawFrom == DeckIDs ? $"{DeckName} deck" : $"deck with size {deckToDrawFrom.Count}")}");
-            //    return null;
-            //}
         }
 
-        if (!GameManager.instance.HasCardsLeft(DeckName)) // Check to ensure the deck is actually built before trying to draw a card
+        if (deckToDrawFrom.Count <= 0) // Check to ensure the deck is actually built before trying to draw a card
         {
             Debug.Log("no cards drawn.");
             return null;
@@ -434,8 +420,17 @@ public class CardPlayer : MonoBehaviour {
         tempCard.data = actualCard.data;
         tempCard.ActionList = new List<ICardAction>(actualCard.ActionList); // Copy action list
         tempCard.target = actualCard.target; // Copy the target type
-        tempCard.UniqueID = actualCard.UniqueID;//copy UID
 
+        if (uniqueId != -1) {
+            tempCard.UniqueID = uniqueId;
+            //Debug.Log("setting unique id for card " + uniqueId);
+        }
+        else {
+            // since there are multiples of each card type potentially
+            // in a deck they need a unique id outside of the card's id
+            tempCard.UniqueID = sUniqueIDCount;
+            sUniqueIDCount++;
+        }
 
         // set the info on the card front
         CardFront front = actualCard.GetComponent<CardFront>();
@@ -526,9 +521,9 @@ public class CardPlayer : MonoBehaviour {
         tempCardObj.SetActive(true);
 
 
-        if (!activeHand.TryAdd(tempCard.UniqueID, tempCardObj)) {
-            Debug.Log("number of cards in draw active deck are: " + activeHand.Count);
-            foreach (GameObject gameObject in activeHand.Values) {
+        if (!activeDeck.TryAdd(tempCard.UniqueID, tempCardObj)) {
+            Debug.Log("number of cards in draw active deck are: " + activeDeck.Count);
+            foreach (GameObject gameObject in activeDeck.Values) {
                 Card card = gameObject.GetComponent<Card>();
                 //   Debug.Log("active deck value: " + card.UniqueID);
             }
@@ -536,11 +531,10 @@ public class CardPlayer : MonoBehaviour {
 
 
         // remove this card so we don't draw it again
-        //deckToDrawFrom.RemoveAt(indexForCard);
+        deckToDrawFrom.RemoveAt(indexForCard);
 
         //send the update to the opponent about which card was drawn
         if (sendUpdate) {
-            //TODO: update
             Update update = new Update() {
                 UniqueID = tempCard.UniqueID,
                 CardID = tempCard.data.cardID,
@@ -552,14 +546,31 @@ public class CardPlayer : MonoBehaviour {
 
         GameManager.instance.UpdateUISizeTrackers(); //update UI
 
-        //remove the card from the scene, its removed from the deck in the game manager
-        Destroy(actualCard.gameObject);
+
+
 
         return tempCard;
     }
 
     #endregion
 
+    #region Debug
+    //These are for testing purposes to add/remove cards from the hand
+    public virtual void ForceDrawCard() {
+        if (DeckIDs.Count > 0) {
+            DrawCard(true, 0, -1, ref DeckIDs, handDropZone, true, ref HandCards);
+        }
+    }
+    public virtual void ForceDiscardRandomCard() {
+        var num = UnityEngine.Random.Range(0, HandCards.Count);
+        var card = HandCards[num];
+        HandCards.Remove(num);
+        Discards.Add(num, card);
+        card.GetComponent<Card>().SetCardState(CardState.CardNeedsToBeDiscarded);
+        card.transform.SetParent(discardDropZone.transform, false);
+        card.transform.localPosition = new Vector3();
+    }
+    #endregion
 
     #region Update Functions
     // Update is called once per frame
@@ -598,7 +609,7 @@ public class CardPlayer : MonoBehaviour {
             }
             else {
                 Debug.Log("Showing card selection menu");
-                var cardsList = new List<Card>(GameManager.instance.AllCardsByUID.Values);
+                var cardsList = new List<Card>(cards.Values);
                 cardMenu.EnableMenu(cardsList);
             }
         }
@@ -1100,8 +1111,8 @@ public class CardPlayer : MonoBehaviour {
     public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
         switch (update.Type) {
             case CardMessageType.DrawCard:
-                Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GameManager.instance.GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
-                opponent.DrawCardByUID(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
+                Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
+                opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
                 break;
             default: //card update for now, maybe discard?
 
@@ -1196,7 +1207,7 @@ public class CardPlayer : MonoBehaviour {
     }
     //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
-        Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GameManager.instance.GetCardNameFromID(update.CardID)}'");
+        Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
         if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
             Debug.Log($"{playerName} is creating card played on facility: {facility.facilityName}");
@@ -1299,7 +1310,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         FacilityIDs.Clear();
-        //DeckIDs.Clear();
+        DeckIDs.Clear();
         HandCards.Clear();
         Discards.Clear();
         ActiveCards.Clear();
@@ -1336,9 +1347,9 @@ public class CardPlayer : MonoBehaviour {
         }
 
         // Handle Deck Cards
-        s += $"Deck Size: {GameManager.instance.GetDeckSizeByName(DeckName)}\n";
-        var deckCardGroups = GameManager.instance.GetUniqueCardsByDeckName(DeckName)
-            .Select(card => GameManager.instance.GetCardNameFromID(card.data.cardID))
+        s += $"Deck Size: {DeckIDs.Count}\n";
+        var deckCardGroups = DeckIDs
+            .Select(cardId => GetCardNameFromID(cardId))
             .GroupBy(x => x)
             .Select(g => new { Title = g.Key, Count = g.Count() })
             .OrderBy(x => x.Title);

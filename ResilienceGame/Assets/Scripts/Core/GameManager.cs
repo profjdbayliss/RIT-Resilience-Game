@@ -6,7 +6,6 @@ using Yarn.Unity;
 using UnityEngine.InputSystem;
 using System.IO;
 using System;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 public class GameManager : MonoBehaviour, IRGObservable {
 
@@ -43,18 +42,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public CardReader blueDeckReader;
     public CardReader positiveWhiteDeckReader;
     public CardReader negativeWhiteDeckReader;
-    // public List<Card> redCards;
-    //  public List<Card> blueCards;
-    // public List<Card> positiveWhiteCards;
-    //  public List<Card> negativeWhiteCards;
-    public Dictionary<int, Card> AllCardsByUID;
-    public Dictionary<int, Card> RedCardsByUID;
-    public Dictionary<int, Card> BlueCardsByUID;
-    public Dictionary<int, Card> PositiveWhiteCardsByUID;
-    public Dictionary<int, Card> NegativeWhiteCardsByUID;
+    public List<Card> redCards;
+    public List<Card> blueCards;
+    public List<Card> positiveWhiteCards;
+    public List<Card> negativeWhiteCards;
     public GameObject playerDeckList;
     private TMPro.TMP_Dropdown playerDeckChoice;
-    static int cardIDTracker = 0;
 
     // Game Rules
     [Header("Game Rules")]
@@ -246,7 +239,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 opponentPlayer.playerTeam = PlayerTeam.Blue;
                 opponentPlayer.DeckName = "blue";
             }
-            //opponentPlayer.InitializeCards();
+            opponentPlayer.InitializeCards();
         }
         //Moved this from player setup so that it updates the opponents game canvas as well
         //is this correct?
@@ -273,14 +266,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         instance = this;
     }
 
-    void InitCardDictionaries() {
-        Debug.Log("creating cards");
+    // Start is called before the first frame update
+    void Start() {
+        mStartGameRun = false;
+        Debug.Log("start run on GameManager");
         if (!hasStartedAlready) {
-            AllCardsByUID = new Dictionary<int, Card>();
-            RedCardsByUID = new Dictionary<int, Card>();
-            BlueCardsByUID = new Dictionary<int, Card>();
-            PositiveWhiteCardsByUID = new Dictionary<int, Card>();
-            NegativeWhiteCardsByUID = new Dictionary<int, Card>();
             startScreen.SetActive(true);
 
             //TODO: Read based on number of players/selection
@@ -289,16 +279,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             CardReader reader = blueDeckReader.GetComponent<CardReader>();
             if (reader != null) {
                 // TODO: Set with csv
-                var blueCards = reader.CSVRead(mCreateWaterAtlas); // TODO: Remove var, single atlas
-                blueCards.ForEach(card => {
-                    for (int x = 0; x < card.data.numberInDeck; x++) {
-                        int uid = cardIDTracker++;
-                        card.UniqueID = uid;
-                        BlueCardsByUID.Add(uid, card);
-                        AllCardsByUID.Add(uid, card);
-                    }
-
-                });
+                blueCards = reader.CSVRead(mCreateWaterAtlas); // TODO: Remove var, single atlas
+                CardPlayer.AddCards(blueCards);
                 //waterPlayer.playerTeam = PlayerTeam.Blue;
                 //waterPlayer.DeckName = "blue";
                 //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
@@ -312,15 +294,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // read energy deck
             reader = redDeckReader.GetComponent<CardReader>();
             if (reader != null) {
-                var redCards = reader.CSVRead(mCreateEnergyAtlas);
-                redCards.ForEach(card => {
-                    for (int x = 0; x < card.data.numberInDeck; x++) {
-                        int uid = cardIDTracker++;
-                        card.UniqueID = uid;
-                        RedCardsByUID.Add(uid, card);
-                        AllCardsByUID.Add(uid, card);
-                    }
-                });
+                redCards = reader.CSVRead(mCreateEnergyAtlas);
+                CardPlayer.AddCards(redCards);
                 //energyPlayer.playerTeam = PlayerTeam.Red;
                 //energyPlayer.DeckName = "red";
                 //   Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
@@ -331,34 +306,24 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
 
             reader = positiveWhiteDeckReader.GetComponent<CardReader>();
-            if (reader != null) {
-                var positiveWhiteCards = reader.CSVRead(mCreatePosWhiteAtlas);
-                positiveWhiteCards.ForEach(card => {
-                    for (int x = 0; x < card.data.numberInDeck; x++) {
-                        int uid = cardIDTracker++;
-                        card.UniqueID = uid;
-                        PositiveWhiteCardsByUID.Add(uid, card);
-                        AllCardsByUID.Add(uid, card);
-                    }
-                });
+            if(reader != null)
+            {
+                positiveWhiteCards = reader.CSVRead(mCreatePosWhiteAtlas);
+                CardPlayer.AddCards(positiveWhiteCards);
             }
-            else {
+            else
+            {
                 Debug.Log("Positive white deck reader is null.");
             }
 
             reader = negativeWhiteDeckReader.GetComponent<CardReader>();
-            if (reader != null) {
-                var negativeWhiteCards = reader.CSVRead(mCreateNegWhiteAtlas);
-                negativeWhiteCards.ForEach(card => {
-                    for (int x = 0; x < card.data.numberInDeck; x++) {
-                        int uid = cardIDTracker++;
-                        card.UniqueID = uid;
-                        NegativeWhiteCardsByUID.Add(uid, card);
-                        AllCardsByUID.Add(uid, card);
-                    }
-                });
+            if(reader != null)
+            {
+                negativeWhiteCards = reader.CSVRead(mCreateNegWhiteAtlas); 
+                CardPlayer.AddCards(negativeWhiteCards);
             }
-            else {
+            else
+            {
                 Debug.Log("Negative white deck reader is null.");
             }
 
@@ -367,25 +332,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
             background = yarnSpinner.transform.GetChild(0).GetChild(0).gameObject;
             //Debug.Log(background);
             hasStartedAlready = true;
-            Debug.Log("----------------------Cards have been created----------------------");
-            foreach (var kvp in AllCardsByUID) {
-                Debug.Log($"UID {kvp.Key}: Card: {kvp.Value.data.cardID} - {kvp.Value.data.name}");
-            }
-            Debug.Log($"Blue Card Count: {BlueCardsByUID.Count}");
-            Debug.Log($"Red Card Count: {RedCardsByUID.Count}");
-            Debug.Log($"Positive White Card Count: {PositiveWhiteCardsByUID.Count}");
-            Debug.Log($"Negative White Card Count: {NegativeWhiteCardsByUID.Count}");
-
         }
         else {
             Debug.Log("start is being run multiple times!");
         }
-    }
-    // Start is called before the first frame update
-    void Start() {
-        mStartGameRun = false;
-        Debug.Log("start run on GameManager");
-        //InitCardDictionaries();
 
     }
 
@@ -415,7 +365,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         // Initialize the deck info and set various
         // player zones active
-        //actualPlayer.InitializeCards();
+        actualPlayer.InitializeCards();
         actualPlayer.discardDropZone.SetActive(true);
         actualPlayer.handDropZone.SetActive(true);
 
@@ -432,20 +382,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 actualPlayer.LogPlayerInfo();
                 opponentPlayer.LogPlayerInfo();
             }
-            if (Keyboard.current.f2Key.wasPressedThisFrame) {
-                Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
-                Debug.Log($"-------------------AllCards-----------------------");
-                string s = "";
-                foreach (var kvp in AllCardsByUID) {
-                    s += $"UID {kvp.Key}: Card: {kvp.Value.data.cardID} - {kvp.Value.data.name}\n";
-                }
-                Debug.Log(s);
-                Debug.Log($"Blue Cards Count: {BlueCardsByUID.Count}");
-                Debug.Log($"Red Cards Count: {RedCardsByUID.Count}");
-                Debug.Log($"Positive White Cards Count: {PositiveWhiteCardsByUID.Count}");
-                Debug.Log($"Negative White Cards Count: {NegativeWhiteCardsByUID.Count}");
-            }
-
+            
 
         }
         if (isInit) {
@@ -472,7 +409,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     // player is initialized and ready to go
                     // this follows the network init and also
                     // takes a while to happen
-                    InitCardDictionaries();
                     isInit = true;
                 }
             }
@@ -487,9 +423,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void UpdateUISizeTrackers() {
         //TODO: Add check for all red players
         deckSizeTracker.UpdateAllTrackerTexts(
-            playerDeckSize: GetDeckSizeByName(actualPlayer.DeckName),
-            playerHandSize: actualPlayer.HandCards.Count,
-            opponentDeckSize: GetDeckSizeByName(opponentPlayer.DeckName),
+            playerDeckSize: actualPlayer.DeckIDs.Count, 
+            playerHandSize: actualPlayer.HandCards.Count, 
+            opponentDeckSize: opponentPlayer.DeckIDs.Count, 
             opponentHandSize: opponentPlayer.HandCards.Count);
     }
     // WORK: there is no menu?????
@@ -635,7 +571,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
             GamePhase.BonusBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
-            GamePhase.DiscardBlue => (HasCardsLeft(actualPlayer.DeckName) || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
+            GamePhase.DiscardBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
             _ => GamePhase.End
         };
     }
@@ -732,7 +668,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                     if (MIsDiscardAllowed) {
                         MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
-
+                        
                         if (!actualPlayer.NeedsToDiscard()) {
                             Debug.Log("Ending discard phase after finishing discarding");
                             MIsDiscardAllowed = false;
@@ -746,7 +682,22 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.PlayWhite:
-                HandleWhitePhase();
+                if(turnTotal % 9 == 0)
+                {
+                    //positive white
+                    Debug.Log("Playing positive white card on turn " + turnTotal);
+                    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
+                    positiveWhiteCards[randCard].Play(null, null);
+                    positiveWhiteCards.RemoveAt(randCard);
+                }
+                else
+                {
+                    //negative white
+                    Debug.Log("Playing negative white card on turn " + turnTotal);
+                    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
+                    negativeWhiteCards[randCard].Play(null, null);
+                    negativeWhiteCards.RemoveAt(randCard);
+                }
                 break;
             case GamePhase.End:
                 // end of game phase
@@ -759,37 +710,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             default:
                 break;
         }
-    }
-    public void HandleWhitePhase() {
-        int cardIndex = -1;
-        if (turnTotal % 9 == 0) {
-            // Positive white
-            Debug.Log("Playing positive white card on turn " + turnTotal);
-
-            // Get a random key from the PositiveWhiteCardsByUID dictionary
-            var positiveKeys = new List<int>(PositiveWhiteCardsByUID.Keys);
-            cardIndex = positiveKeys[UnityEngine.Random.Range(0, positiveKeys.Count)];
-
-            // Remove the card with the selected key
-            PositiveWhiteCardsByUID.Remove(cardIndex);
-        }
-        else {
-            // Negative white
-            Debug.Log("Playing negative white card on turn " + turnTotal);
-
-            // Get a random key from the NegativeWhiteCardsByUID dictionary
-            var negativeKeys = new List<int>(NegativeWhiteCardsByUID.Keys);
-            cardIndex = negativeKeys[UnityEngine.Random.Range(0, negativeKeys.Count)];
-
-            // Remove the card with the selected key
-            NegativeWhiteCardsByUID.Remove(cardIndex);
-        }
-
-        // Play the card
-        var cardToPlay = AllCardsByUID[cardIndex];
-        cardToPlay.Play(player: null, opponent: null);
-
-        // TODO: Send message to opponent
     }
     // Ends the phase.
     public void EndPhase() {
@@ -808,7 +728,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     // clear any remaining drops since we're ending the phase now (dont think this is needed anymore)
                     //actualPlayer.ClearDropState();
 
-                    // Debug.Log("ending draw and discard game phase!");
+                   // Debug.Log("ending draw and discard game phase!");
 
                     // send a message with number of discards of the player
                     Message msg;
@@ -877,7 +797,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
         while (player.HasUpdates()) {
-            // Debug.Log("Checking for updates to send to opponent");
+           // Debug.Log("Checking for updates to send to opponent");
             Message msg;
             List<int> tmpList = new List<int>(4);
             CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
@@ -986,137 +906,5 @@ public class GameManager : MonoBehaviour, IRGObservable {
         RGNetworkPlayerList.instance.ResetAllPlayersToNotReady();
         RGNetworkPlayerList.instance.SetPlayerType(actualPlayer.playerTeam);
     }
-    #endregion
-
-    #region Card Control
-    public bool HasCardsLeft(string deckName) {
-        return deckName switch {
-            "red" => RedCardsByUID.Count > 0,
-            "blue" => BlueCardsByUID.Count > 0,
-            "positive white" => PositiveWhiteCardsByUID.Count > 0,
-            "negative white" => NegativeWhiteCardsByUID.Count > 0,
-            _ => false
-        };
-    }
-    public bool TryAddCardToDeck(string deckName, Card card) {
-        return deckName.ToLower() switch {
-            "red" => TryAddCardToDeck(ref RedCardsByUID, card),
-            "blue" => TryAddCardToDeck(ref BlueCardsByUID, card),
-            "positive white" => TryAddCardToDeck(ref PositiveWhiteCardsByUID, card),
-            "negative white" => TryAddCardToDeck(ref NegativeWhiteCardsByUID, card),
-            _ => false
-        };
-    }
-    private bool TryAddCardToDeck(ref Dictionary<int, Card> deck, Card card) {
-        if (deck.ContainsKey(card.UniqueID)) {
-            Debug.Log("Card already in deck.");
-            return false;
-        }
-        deck.Add(card.UniqueID, card);
-        return true;
-    }
-    public string GetCardNameFromID(int cardID) {
-        foreach (var card in AllCardsByUID.Values) {
-            if (card.data.cardID == cardID) {
-                return card.data.name;
-            }
-        }
-        return "Card not found";
-    }
-    public Card DrawRandomCardFromDeckByName(string deckName) {
-        return deckName.ToLower() switch {
-            "red" => DrawRandomCardFromDeck(ref RedCardsByUID),
-            "blue" => DrawRandomCardFromDeck(ref BlueCardsByUID),
-            "white" => turnTotal % 9 == 0 ? DrawRandomCardFromDeck(ref PositiveWhiteCardsByUID) : DrawRandomCardFromDeck(ref NegativeWhiteCardsByUID),
-            _ => null
-        };
-    }
-    // Get a random card from a specific deck by unique ID
-    private Card DrawRandomCardFromDeck(ref Dictionary<int, Card> deck) {
-        if (deck.Count == 0) {
-            Debug.Log("Deck is empty.");
-            return null;
-        }
-
-        int rng = UnityEngine.Random.Range(0, deck.Count);
-        int randomKey = new List<int>(deck.Keys)[rng];
-        return DrawCardByUID(randomKey, ref deck);
-    }
-    public Card DrawCardByIDByName(int cardId, string deckName) {
-        return deckName.ToLower() switch {
-            "red" => DrawCardByID(cardId, ref RedCardsByUID),
-            "blue" => DrawCardByID(cardId, ref BlueCardsByUID),
-            "white" => turnTotal % 9 == 0 ? DrawCardByID(cardId, ref PositiveWhiteCardsByUID) : DrawCardByID(cardId, ref NegativeWhiteCardsByUID),
-            _ => null
-        };
-    }
-
-    // Get a specific card by cardID from the appropriate deck
-    private Card DrawCardByID(int cardId, ref Dictionary<int, Card> deck) {
-        foreach (var cardEntry in deck.Values) {
-            if (cardEntry.data.cardID == cardId) {
-                return cardEntry;
-            }
-        }
-        Debug.Log("Card ID not found in deck.");
-        return null;
-    }
-    public Card DrawCardbyUIDByName(int uniqueId, string deckName) {
-        return deckName.ToLower() switch {
-            "red" => DrawCardByUID(uniqueId, ref RedCardsByUID),
-            "blue" => DrawCardByUID(uniqueId, ref BlueCardsByUID),
-            "white" => turnTotal % 9 == 0 ? DrawCardByUID(uniqueId, ref PositiveWhiteCardsByUID) : DrawCardByUID(uniqueId, ref NegativeWhiteCardsByUID),
-            _ => null
-        };
-    }
-    // Remove a card from the deck by its unique ID
-    private Card DrawCardByUID(int uniqueId, ref Dictionary<int, Card> deck) {
-        if (!deck.TryGetValue(uniqueId, out Card cardToDraw)) {
-            Debug.Log($"Card with UID {uniqueId} not found.");
-            return null;
-        }
-
-        deck.Remove(uniqueId);
-        return cardToDraw;
-    }
-    public int GetDeckSizeByName(string deckName) {
-        return deckName.ToLower() switch {
-            "red" => RedCardsByUID.Count,
-            "blue" => BlueCardsByUID.Count,
-            "positive white" => PositiveWhiteCardsByUID.Count,
-            "negative white" => NegativeWhiteCardsByUID.Count,
-            _ => 0
-        };
-    }
-    public List<Card> GetDeckCopyByName(string deckName) {
-        return deckName switch {
-            "red" => new List<Card>(RedCardsByUID.Values),
-            "blue" => new List<Card>(BlueCardsByUID.Values),
-            "positive white" => new List<Card>(PositiveWhiteCardsByUID.Values),
-            "negative white" => new List<Card>(NegativeWhiteCardsByUID.Values),
-            _ => new List<Card>()
-        };
-    }
-    public List<Card> GetUniqueCardsByDeckName(string deckName) {
-        var deck = deckName switch {
-            "red" => new List<Card>(RedCardsByUID.Values),
-            "blue" => new List<Card>(BlueCardsByUID.Values),
-            "positive white" => new List<Card>(PositiveWhiteCardsByUID.Values),
-            "negative white" => new List<Card>(NegativeWhiteCardsByUID.Values),
-            _ => new List<Card>()
-        };
-
-        HashSet<int> seenCardIDs = new HashSet<int>();
-        List<Card> uniqueCards = new List<Card>();
-
-        foreach (var card in deck) {
-            if (seenCardIDs.Add(card.data.cardID)) {
-                uniqueCards.Add(card);
-            }
-        }
-
-        return uniqueCards;
-    }
-
     #endregion
 }

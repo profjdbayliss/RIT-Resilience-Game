@@ -336,11 +336,11 @@ public class CardReader : MonoBehaviour {
 
                         // 19:  Effect
                         //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19].Trim());
-                        //string s = "";
-                        //for (int j = 0; j < individualCSVObjects.Length; j++) {
-                        //    s += $"{j}: {individualCSVObjects[j]}\n";
-                        //}
-                        //Debug.Log(s);
+                        string s = "";
+                        for (int j = 0; j < individualCSVObjects.Length; j++) {
+                            s += $"{j}: {individualCSVObjects[j]}\n";
+                        }
+                        Debug.Log(s);
                         tempCard.data.effectString = individualCSVObjects[19].Trim();
 
                         // 20:  Number of Effects TODO: this line is wrong in csv if its actually used anywhere
