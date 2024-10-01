@@ -130,7 +130,7 @@ public class CardPlayer : MonoBehaviour {
     private int mFinalScore = 0;
 
     // Private fields
-    private static int sUniqueIDCount = 0;
+    //private static int sUniqueIDCount = 0;
     private Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
     // Enum definition
@@ -423,13 +423,13 @@ public class CardPlayer : MonoBehaviour {
 
         if (uniqueId != -1) {
             tempCard.UniqueID = uniqueId;
+            GameManager.instance.UniqueCardIdCount++;
             //Debug.Log("setting unique id for card " + uniqueId);
         }
         else {
             // since there are multiples of each card type potentially
             // in a deck they need a unique id outside of the card's id
-            tempCard.UniqueID = sUniqueIDCount;
-            sUniqueIDCount++;
+            tempCard.UniqueID = GameManager.instance.UniqueCardIdCount++;
         }
 
         // set the info on the card front

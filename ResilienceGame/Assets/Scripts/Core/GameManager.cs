@@ -113,6 +113,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool mCreateNegWhiteAtlas = false;
     private int turnTotal = 0;
 
+    public int UniqueCardIdCount = 0;
+
     #endregion
 
     #region Initialization
