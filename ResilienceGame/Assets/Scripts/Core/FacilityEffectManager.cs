@@ -223,7 +223,11 @@ public class FacilityEffectManager : MonoBehaviour {
             _ => false
         };
     }
-
+    public bool HasEffectsByOpponentTeam(PlayerTeam opponentTeam) {
+        Debug.Log($"Checking if facility {facility.facilityName} has effects by {opponentTeam}");
+        activeEffects.ForEach(effect => Debug.Log($"{effect.Effect.EffectType} created by {effect.Effect.CreatedByTeam}"));
+        return activeEffects.Any(effect => effect.Effect.CreatedByTeam == opponentTeam);
+    }
     public bool HasEffectOfType(FacilityEffectType type) {
         return activeEffects.Any(effect => effect.Effect.EffectType == type);
     }
@@ -236,9 +240,10 @@ public class FacilityEffectManager : MonoBehaviour {
         }
         activeEffects.Clear();
     }
-    public void ToggleAllEffectOutlines(bool enable) {
-        foreach (var (_, uiElement) in activeEffects) {
-            uiElement.ToggleOutline(enable);
+    public void ToggleAllEffectOutlines(bool enable, PlayerTeam opponentTeam) {
+        foreach (var (effect, uiElement) in activeEffects) {
+            if (effect.CreatedByTeam == opponentTeam)
+                uiElement.ToggleOutline(enable);
         }
     }
 

@@ -136,6 +136,9 @@ public class Facility : MonoBehaviour {
         isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
         UpdateUI();
     }
+    public bool HasRemovableEffects(PlayerTeam opponentTeam) {
+        return effectManager.HasEffectsByOpponentTeam(opponentTeam);
+    }
 
     public bool HasEffectOfType(FacilityEffectType type) {
         return effectManager.HasEffectOfType(type);
@@ -159,10 +162,11 @@ public class Facility : MonoBehaviour {
             effect.CreatedByTeam = team;
             effectManager.AddRemoveEffect(effect, isAdding);
         });
-
-
     }
 
+    public void ToggleEffectOutlines(bool enable, PlayerTeam opponentTeam) {
+        effectManager.ToggleAllEffectOutlines(enable, opponentTeam);
+    }
 
     private void UpdateUI() {
         //pointsUI[0].text = physicalPoints.ToString();

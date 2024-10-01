@@ -107,14 +107,19 @@ public class NegateEffect : ICardAction {
 public class RemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         var effectList = facilityActedUpon.effectManager.GetEffects();
-        var effectType = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
+        //var effectCreatedBy = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
 
-        // TODO: Implement user selection for effect removal
+        //// TODO: Implement user selection for effect removal
+        //if (effectList.Count > 0) {
+        //    var randomEffect = effectList[UnityEngine.Random.Range(0, effectList.Count)];
+        //    facilityActedUpon.AddRemoveEffectsByIdString(idString: randomEffect.CreatedEffectID.ToString(),
+        //                                                 isAdding: false, 
+        //                                                 team: player.playerTeam);
+        //}
         if (effectList.Count > 0) {
-            var randomEffect = effectList[UnityEngine.Random.Range(0, effectList.Count)];
-            facilityActedUpon.AddRemoveEffectsByIdString(idString: randomEffect.CreatedEffectID.ToString(),
-                                                         isAdding: false, 
-                                                         team: player.playerTeam);
+            facilityActedUpon.ToggleEffectOutlines(true, player.GetOpponentTeam());
+            //TODO: works but needs to implement a way to select the effect to remove
+            //outline is tiny, need to increase the size of all the effects or something
         }
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);

@@ -271,6 +271,12 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Helpers
+    public PlayerTeam GetOpponentTeam() {
+        return playerTeam switch { 
+            PlayerTeam.Red => PlayerTeam.Blue, 
+            PlayerTeam.Blue => PlayerTeam.Red, 
+            _ => PlayerTeam.Any };
+    }
     public void InformSectorOfNewTurn() {
         if (playerSector != null)
             playerSector.InformFacilitiesOfNewTurn();
@@ -658,18 +664,48 @@ public class CardPlayer : MonoBehaviour {
                 hoveredFacilityCollider = hoveredColliders.First();
             }
 
+            bool highlight = false;
+
             // Process the hovered facility collider
             if (hoveredFacilityCollider != null) {
                 var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
+                Debug.Log(cardDraggedTarget);
                 // Check if the card being dragged is a facility card
                 if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
                     if (GameManager.instance.CanHighlight()) {
-                        // Activate the hover effect
-                        if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                            //    Debug.Log("Hovering");
-                            hoverActivateObject.ActivateHover();
-                            currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
+                        //effect card hover
+                        if (cardDraggedTarget == CardTarget.Effect) {
+                            if (hoveredFacilityCollider.TryGetComponent(out Facility facility)) {
+                                Debug.Log($"Hovering facility {facility.facilityName} while holding effect card");
+                                if (facility.HasRemovableEffects(GetOpponentTeam())) {
+
+                                    highlight = true;
+
+                                    //if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                                    //    //    Debug.Log("Hovering");
+                                    //    hoverActivateObject.ActivateHover();
+                                    //    currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
+                                    //}
+                                }
+                            }
                         }
+                        //facility card hover
+                        else {
+                            highlight = true;
+                            //// Activate the hover effect
+                            //if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                            //    //    Debug.Log("Hovering");
+                            //    hoverActivateObject.ActivateHover();
+                            //    currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
+                            //}
+                        }
+                    }
+                }
+                if (highlight) {
+                    if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                        //    Debug.Log("Hovering");
+                        hoverActivateObject.ActivateHover();
+                        currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
                     }
                 }
                 hoveredDropLocation = hoveredFacilityCollider.gameObject;
