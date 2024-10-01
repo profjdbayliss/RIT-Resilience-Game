@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +15,10 @@ public class FacilityEffectManager : MonoBehaviour {
     [SerializeField] private Transform effectParent;
     [SerializeField] private GameObject effectPrefab;
     [SerializeField] private Image effectIcon;
-
-
+    [SerializeField] private GameObject counterBackground;
+    [SerializeField] private TextMeshProUGUI counterText;
+    private int counter = 0;
+    private int specialEffectIndex = -1;
     private void Start() {
         facility = GetComponent<Facility>();
     }
@@ -43,21 +46,37 @@ public class FacilityEffectManager : MonoBehaviour {
     /// </summary>
     /// <param name="effect">The effect to add</param>
     private void AddEffect(FacilityEffect effect) {
-        if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {
+        if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
             return;
         }
 
         activeEffects.Add((effect, null));//add the effect to list
-        UpdateEffectUI(effect);
+        //UpdateEffectUI(effect);
         ApplyEffect(effect);
     }
     public void UpdateSpecialIcon(FacilityEffect effect, bool add = true) {
         if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
             if (add) {
+                Debug.Log($"Adding special effect icon to facility");
                 effectIcon.sprite = Sector.EffectSprites[(int)effect.EffectType];
+                counterBackground.SetActive(true);
+                counter = effect.Duration;
+                counterText.text = effect.Duration.ToString();
+                specialEffectIndex = activeEffects.Count - 1;
+            }
+            else {
+                counterBackground.SetActive(false);
             }
             ToggleEffectImageAlpha();
+        }
+    }
+    public void DecrementCounter() {
+        counter--;
+        counterText.text = counter.ToString();
+        if (counter == 0) {
+            counter = -1;
+            counterBackground.SetActive(false);
         }
     }
     public void UpdateEffectUI(FacilityEffect effect, bool add = true) {
@@ -104,6 +123,7 @@ public class FacilityEffectManager : MonoBehaviour {
         Color color = effectIcon.color;
         var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
         effectIcon.color = newColor;
+        Debug.Log($"Toggling effect icon alpha to {newColor.a}");
     }
     /// <summary>
     /// Removes an effect from the facility
@@ -111,7 +131,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The effect to remove</param>
     private void RemoveEffect(FacilityEffect effect, bool bypassFortified = false) {
         if (!bypassFortified) {
-            if (facility.IsFortified && effect.CreatedByTeam == FacilityTeam.Red && !hasNegatedEffectThisRound) {
+            if (facility.IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
                 hasNegatedEffectThisRound = true;
                 return;
             }
@@ -151,6 +171,7 @@ public class FacilityEffectManager : MonoBehaviour {
             default:
                 break;
         }
+        UpdateEffectUI(effect, true);
     }
 
     /// <summary>
@@ -170,27 +191,47 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <summary>
     /// Called when the round is ended by the game manager
     /// </summary>
-    public void OnRoundEnded() {
+    public void UpdateForNextActionPhase() {
+        Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
+        //update all effects
         foreach (var (effect, uiElement) in activeEffects.ToList()) {
+            //only update effects that are created by the team whos turn it is
+            //this will be called twice once in action red and once in action blue
+            //we need to update the correct effects on both clients each phase
+            if (!IsEffectCreatorsTurn(effect)) return;
+
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
                 var effects = FacilityEffect.CreateEffectsFromID(effect.CreatedEffectID);
                 effects.ForEach(_effect => AddEffect(_effect));
             }
 
             if (effect.Duration > 0) {
+                Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
                 effect.Duration--;
+                DecrementCounter();
                 if (effect.Duration == 0) {
-                    RemoveEffect(effect);
+                    ForceRemoveEffect(effect);
                 }
             }
         }
         hasNegatedEffectThisRound = false;
     }
+    
+    private bool IsEffectCreatorsTurn(FacilityEffect effect) {
+        Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
+        return effect.CreatedByTeam switch {
+            PlayerTeam.Red => GameManager.instance.MGamePhase == GamePhase.ActionRed,
+            PlayerTeam.Blue => GameManager.instance.MGamePhase == GamePhase.ActionBlue,
+            _ => false
+        };
+    }
 
     public bool HasEffectOfType(FacilityEffectType type) {
         return activeEffects.Any(effect => effect.Effect.EffectType == type);
     }
-
+    public bool IsFortified() {
+        return activeEffects.Any(effect => effect.Effect.EffectType == FacilityEffectType.Fortify);
+    }
     public void RemoveAllEffects() {
         foreach (var (_, uiElement) in activeEffects) {
             Destroy(uiElement.gameObject);
@@ -203,7 +244,7 @@ public class FacilityEffectManager : MonoBehaviour {
         }
     }
 
-    #region Effect Switches
+    #region Effect Functions
 
     private void ApplyNegationChangeToFacility(FacilityEffect effect, bool negate) {
         if (negate) {
@@ -213,9 +254,8 @@ public class FacilityEffectManager : MonoBehaviour {
             ChangeFacilityPoints(effect); // Reapply effect
         }
     }
-    #endregion
 
-    #region Effect Functions
+    
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
         Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? -1 : 1);
@@ -223,7 +263,7 @@ public class FacilityEffectManager : MonoBehaviour {
         facility.ChangeFacilityPoints(effect.Target, value);
     }
     public void NegateEffect(FacilityEffect effect) {
-        if (facility.IsFortified && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {
+        if (IsFortified() && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
             return;
         }

@@ -21,18 +21,14 @@ public enum FacilityEffectType {
     Negate,
     None
 }
-public enum FacilityTeam {
-    Blue,
-    Red,
-    None
-}
+
 
 public class FacilityEffect {
     private const int BACKDOOR_FORT_DURATION = 3;
     public FacilityEffectType EffectType { get; private set; }
     public FacilityPointTarget Target { get; private set; }
 
-    public FacilityTeam CreatedByTeam { get; set; } = FacilityTeam.None;
+    public PlayerTeam CreatedByTeam { get; set; } = PlayerTeam.None;
     public int Magnitude { get; private set; } // Integer magnitude instead of enum
     public int Duration { get; set; }  // -1 for infinite
                                        // public int Stack { get; private set; } = 1;
@@ -66,7 +62,6 @@ public class FacilityEffect {
         }
         CreatedEffectID = createdEffectID;
     }
-
 
 
     public override string ToString() {

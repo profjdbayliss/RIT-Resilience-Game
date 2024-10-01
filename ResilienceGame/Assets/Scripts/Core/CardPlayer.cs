@@ -19,7 +19,8 @@ public enum PlayerTeam {
     Red,
     Blue,
     White,
-    Any
+    Any,
+    None
 };
 
 public enum PlayerSector {
@@ -270,17 +271,14 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Helpers
-    //returns any dropped cards to the hand
-    //public void ClearDropState() {
-    //    if (HandCards.Count != 0) {
-    //        foreach (GameObject cardGameObject in HandCards.Values) {
-    //            Card card = cardGameObject.GetComponent<Card>();
-    //            if (card.State == CardState.CardDrawnDropped) {
-    //                card.SetCardState(CardState.CardDrawn);
-    //            }
-    //        }
-    //    }
-    //}
+    public void InformSectorOfNewTurn() {
+        if (playerSector != null)
+            playerSector.InformFacilitiesOfNewTurn();
+        else {
+            Debug.Log($"{playerName}'s sector is null");
+        }
+    }
+
     //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
     public void ResetCardToInHand(Card card) {
         card.SetCardState(CardState.CardDrawn);
@@ -596,6 +594,20 @@ public class CardPlayer : MonoBehaviour {
             }
             if (Mouse.current.rightButton.wasReleasedThisFrame) {
                 TryLogFacilityInfo();
+            }
+            if (Keyboard.current.f3Key.wasPressedThisFrame) {
+                if (GameManager.instance.actualPlayer == this) {
+                    if (playerSector != null) {
+                        Debug.Log($"Facility info for player {playerName}");
+                        foreach (Facility facility in playerSector.facilities) {
+                            facility.LogFacilityDebug();
+                        }
+                    }
+                    else {
+                        Debug.Log($"Player {playerName} does not have an assigned sector");
+                    }
+                }
+               
             }
         }
     }

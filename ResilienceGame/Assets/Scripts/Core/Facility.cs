@@ -38,7 +38,7 @@ public class Facility : MonoBehaviour {
     //   public bool effectNegated;
 
     public bool isDown;
-    public bool IsFortified { get; set; } = false;
+   // public bool IsFortified { get; set; } = false;
     public bool IsBackdoored { get; set; } = false;
 
 
@@ -57,6 +57,12 @@ public class Facility : MonoBehaviour {
         //}
         SetupPointImages();
         UpdateUI();
+    }
+    public void UpdateForNextActionPhase() {
+        effectManager.UpdateForNextActionPhase();
+    }
+    public bool IsFortified() {
+        return effectManager.IsFortified();
     }
     private void SetupPointImages() {
         pointImages = new Image[3][];
@@ -146,11 +152,8 @@ public class Facility : MonoBehaviour {
     public void NegateEffect(FacilityEffect effectToNegate) {
         effectManager.NegateEffect(effectToNegate);
     }
-
-    public void AddRemoveEffectsByIdString(string idString, bool isAdding, FacilityTeam team) {
-
-        //var effectIds = idString.Split(';').Select(int.Parse).ToList();
-        //TODO: change effect csv storage
+    //adds or remove effect by the string in the csv file 
+    public void AddRemoveEffectsByIdString(string idString, bool isAdding, PlayerTeam team) {
         var effects = FacilityEffect.CreateEffectsFromID(idString);
         effects.ForEach(effect => {
             effect.CreatedByTeam = team;

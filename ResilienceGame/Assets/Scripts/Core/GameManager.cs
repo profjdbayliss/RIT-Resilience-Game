@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Static Members
     public static GameManager instance;
     private static bool hasStartedAlready = false;
-    public static event Action OnRoundEnd;
+  //  public static event Action OnRoundEnd;
 
     // Debug
     public bool DEBUG_ENABLED = true;
@@ -650,6 +650,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 else if (phaseJustChanged) {
                     mIsActionAllowed = true;
+                    actualPlayer.InformSectorOfNewTurn();
+                    //opponentPlayer.InformSectorOfNewTurn();
                 }
 
                 break;
@@ -686,22 +688,22 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.PlayWhite:
-                if(turnTotal % 9 == 0)
-                {
-                    //positive white
-                    Debug.Log("Playing positive white card on turn " + turnTotal);
-                    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
-                    positiveWhiteCards[randCard].Play(null, null);
-                    positiveWhiteCards.RemoveAt(randCard);
-                }
-                else
-                {
-                    //negative white
-                    Debug.Log("Playing negative white card on turn " + turnTotal);
-                    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
-                    negativeWhiteCards[randCard].Play(null, null);
-                    negativeWhiteCards.RemoveAt(randCard);
-                }
+                //if(turnTotal % 9 == 0)
+                //{
+                //    //positive white
+                //    Debug.Log("Playing positive white card on turn " + turnTotal);
+                //    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
+                //    positiveWhiteCards[randCard].Play(null, null);
+                //    positiveWhiteCards.RemoveAt(randCard);
+                //}
+                //else
+                //{
+                //    //negative white
+                //    Debug.Log("Playing negative white card on turn " + turnTotal);
+                //    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
+                //    negativeWhiteCards[randCard].Play(null, null);
+                //    negativeWhiteCards.RemoveAt(randCard);
+                //}
                 break;
             case GamePhase.End:
                 // end of game phase
@@ -824,7 +826,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Increments a turn. Note that turns consist of multiple phases.
     public void IncrementTurn() {
-        OnRoundEnd?.Invoke(); //inform listeners that the round ended
+       // OnRoundEnd?.Invoke(); //inform listeners that the round ended
         turnTotal++;
         mTurnText.text = "Turn: " + GetTurn();
         if (IsServer) {
