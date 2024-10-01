@@ -18,7 +18,6 @@ public class FacilityEffectManager : MonoBehaviour {
     [SerializeField] private GameObject counterBackground;
     [SerializeField] private TextMeshProUGUI counterText;
     private int counter = 0;
-    private int specialEffectIndex = -1;
     private void Start() {
         facility = GetComponent<Facility>();
     }
@@ -58,12 +57,11 @@ public class FacilityEffectManager : MonoBehaviour {
     public void UpdateSpecialIcon(FacilityEffect effect, bool add = true) {
         if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
             if (add) {
-                Debug.Log($"Adding special effect icon to facility");
+                //Debug.Log($"Adding special effect icon to facility");
                 effectIcon.sprite = Sector.EffectSprites[(int)effect.EffectType];
                 counterBackground.SetActive(true);
                 counter = effect.Duration;
                 counterText.text = effect.Duration.ToString();
-                specialEffectIndex = activeEffects.Count - 1;
             }
             else {
                 counterBackground.SetActive(false);
@@ -192,7 +190,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Called when the round is ended by the game manager
     /// </summary>
     public void UpdateForNextActionPhase() {
-        Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
+       // Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
         //update all effects
         foreach (var (effect, uiElement) in activeEffects.ToList()) {
             //only update effects that are created by the team whos turn it is
@@ -206,7 +204,7 @@ public class FacilityEffectManager : MonoBehaviour {
             }
 
             if (effect.Duration > 0) {
-                Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
+               // Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
                 effect.Duration--;
                 DecrementCounter();
                 if (effect.Duration == 0) {
@@ -218,7 +216,7 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
-        Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
+        //Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
         return effect.CreatedByTeam switch {
             PlayerTeam.Red => GameManager.instance.MGamePhase == GamePhase.ActionRed,
             PlayerTeam.Blue => GameManager.instance.MGamePhase == GamePhase.ActionBlue,
@@ -257,7 +255,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
     
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
-        Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
+       // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? -1 : 1);
 
         facility.ChangeFacilityPoints(effect.Target, value);
