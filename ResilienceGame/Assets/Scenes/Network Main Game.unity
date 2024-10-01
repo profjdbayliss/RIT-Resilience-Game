@@ -4430,7 +4430,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 127, y: -23.00008}
+  m_AnchoredPosition: {x: 127, y: -23.000082}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &276171662
@@ -27816,6 +27816,7 @@ MonoBehaviour:
   mCreateWaterAtlas: 0
   mCreatePosWhiteAtlas: 0
   mCreateNegWhiteAtlas: 0
+  UniqueCardIdCount: 0
 --- !u!4 &2133546054
 Transform:
   m_ObjectHideFlags: 0

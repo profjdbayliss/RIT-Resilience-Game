@@ -67,13 +67,24 @@ public class Facility : MonoBehaviour {
             Transform pointsParent = transform.Find("Points").Find(pointTypes[i]);
 
             for (int j = 0; j < MAX_POINTS; j++) {
-                Transform pointTransform = pointsParent.Find($"Point{j + 1}");
+                Transform pointTransform;
+
+                // Reverse the order for NetworkPoints (index 2)
+                if (i == 2) {
+                    // Reverse order for NetworkPoints
+                    pointTransform = pointsParent.Find($"Point{MAX_POINTS - j}");
+                }
+                else {
+                    // Normal order for PhysicalPoints and FinancialPoints
+                    pointTransform = pointsParent.Find($"Point{j + 1}");
+                }
+
                 pointImages[i][j * 2] = pointTransform.Find("EmptyPoint").GetComponent<Image>();
                 pointImages[i][j * 2 + 1] = pointTransform.Find("FilledPoint").GetComponent<Image>();
             }
         }
-
     }
+
     public void UpdatePointsUI() {
         UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
         UpdatePointTypeUI(1, finacialPoints, maxFinacialPoints);

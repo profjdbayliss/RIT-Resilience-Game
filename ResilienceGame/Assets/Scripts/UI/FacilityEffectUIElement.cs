@@ -18,8 +18,10 @@ public class FacilityEffectUIElement : MonoBehaviour
     [SerializeField] TextMeshProUGUI effectText;
     [SerializeField] Material outlineMat;
     [SerializeField] Sprite[] effectSprites;
+    private string effectToolTip;
 
-    public void SetEffectType(FacilityPointTarget effectTarget) {
+    public void SetEffectType(FacilityPointTarget effectTarget, int magnitude) {
+        effectToolTip = "";
         if (effectTarget == FacilityPointTarget.All) {
             effectImage.sprite = effectSprites[ALL];
             return;
@@ -35,35 +37,25 @@ public class FacilityEffectUIElement : MonoBehaviour
         if (effectTarget.HasFlag(FacilityPointTarget.Financial)) combinedIndex |= 2;
         if (effectTarget.HasFlag(FacilityPointTarget.Network)) combinedIndex |= 4;
 
-        switch (combinedIndex) {
-            case 1: // Physical only
-                effectImage.sprite = effectSprites[PHYSICAL];
-                break;
-            case 2: // Financial only
-                effectImage.sprite = effectSprites[FINANCIAL];
-                break;
-            case 4: // Network only
-                effectImage.sprite = effectSprites[NETWORK];
-                break;
-            case 3: // Physical and Financial
-                effectImage.sprite = effectSprites[PHYSICAL_FINANCIAL];
-                break;
-            case 5: // Physical and Network
-                effectImage.sprite = effectSprites[PHYSICAL_NETWORK];
-                break;
-            case 6: // Financial and Network
-                effectImage.sprite = effectSprites[FINANCIAL_NETWORK];
-                break;
-            default:
-                effectImage.sprite = effectSprites[ALL];
-                break;
-        }
+        string typeString = "";
+
+        (typeString, effectImage.sprite) = combinedIndex switch {
+            1 => ("physical", effectSprites[PHYSICAL]),
+            2 => ("financial", effectSprites[FINANCIAL]),
+            4 => ("network", effectSprites[NETWORK]),
+            3 => ("physical and financial", effectSprites[PHYSICAL_FINANCIAL]),
+            5 => ("physical and network", effectSprites[PHYSICAL_NETWORK]),
+            6 => ("financial and network", effectSprites[FINANCIAL_NETWORK]),
+            _ => ("all", effectSprites[ALL]),
+        };
+        UpdateText(magnitude);
+        effectToolTip = $"{(magnitude > 0 ? "Restores": "Reduces")} {typeString} points by {magnitude}";
     }
     public void ToggleOutline(bool enable) {
         effectImage.material = enable ? outlineMat : null;
     }
-    public void UpdateText(string amt) {
-        effectText.text = amt;
+    public void UpdateText(int amt) {
+        effectText.text = amt > 0 ? $"+{amt}":$"{amt}";
     }
 
 

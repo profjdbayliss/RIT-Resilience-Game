@@ -1072,25 +1072,25 @@ public class CardPlayer : MonoBehaviour {
                 Discards.Add(card.UniqueID, activeCardObject);
                 inactives.Add(card.UniqueID);
                 card.SetCardState(CardState.CardDiscarded);
-            //    var slippy = activeCardObject.GetComponent<slippy>();
-            //    // change parent and rescale
-            //    //   activeCardObject.GetComponentInParent<HoverScale>().previousScale = Vector2.zero;
-            //    //    activeCardObject.GetComponentInParent<HoverScale>().ResetScale();
-            //    activeCardObject.GetComponentInParent<slippy>().enabled = false;
-            //    activeCardObject.GetComponentInParent<slippy>().ResetScale();
-            ////    activeCardObject.GetComponent<HoverScale>().enabled = false;
-            //    activeCardObject.GetComponent<slippy>().ResetScale();
-            //    activeCardObject.GetComponent<slippy>().enabled = false;
+                //    var slippy = activeCardObject.GetComponent<slippy>();
+                //    // change parent and rescale
+                //    //   activeCardObject.GetComponentInParent<HoverScale>().previousScale = Vector2.zero;
+                //    //    activeCardObject.GetComponentInParent<HoverScale>().ResetScale();
+                //    activeCardObject.GetComponentInParent<slippy>().enabled = false;
+                //    activeCardObject.GetComponentInParent<slippy>().ResetScale();
+                ////    activeCardObject.GetComponent<HoverScale>().enabled = false;
+                //    activeCardObject.GetComponent<slippy>().ResetScale();
+                //    activeCardObject.GetComponent<slippy>().enabled = false;
                 activeCardObject.transform.SetParent(discardDropZone.transform, false);
                 activeCardObject.transform.localPosition = new Vector3();
                 activeCardObject.transform.localScale = new Vector3(1, 1, 1);
 
                 // for the future might want to stack cards in the discard zone
-               // Debug.Log("setting card to discard zone: " + card.UniqueID + " with name " + card.front.title);
+                // Debug.Log("setting card to discard zone: " + card.UniqueID + " with name " + card.front.title);
                 activeCardObject.SetActive(false);
                 card.cardZone = discardDropZone;
                 if (addUpdate) {
-                   // Debug.Log($"adding discard update from {playerName} to {GameManager.instance.opponentPlayer.playerName}");
+                    // Debug.Log($"adding discard update from {playerName} to {GameManager.instance.opponentPlayer.playerName}");
                     mUpdatesThisPhase.Enqueue(new Update {
                         Type = CardMessageType.DiscardCard,
                         UniqueID = uniqueFacilityID,
@@ -1101,9 +1101,9 @@ public class CardPlayer : MonoBehaviour {
             }
         }
         foreach (int key in inactives) {
-          //  Debug.Log("key being discarded is " + key);
+            //  Debug.Log("key being discarded is " + key);
             if (!discardFromArea.Remove(key)) {
-               // Debug.Log("card not removed where it supposedly was from: " + key);
+                // Debug.Log("card not removed where it supposedly was from: " + key);
             }
         }
         GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
@@ -1122,7 +1122,7 @@ public class CardPlayer : MonoBehaviour {
             default: //card update for now, maybe discard?
 
                 if (IsAnimating) {
-                   // Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
+                    // Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
                     opponentCardPlays.Enqueue((update, phase, opponent));
                     return;
                 }
@@ -1134,7 +1134,7 @@ public class CardPlayer : MonoBehaviour {
     //Actually process the card action, used to create the update queue and is called when the update is ready to be resolved
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type}");
-        
+
         if (update.Type == CardMessageType.CardUpdate) {
             IsAnimating = true;
             //handle facility card play

@@ -75,14 +75,14 @@ public class FacilityEffectManager : MonoBehaviour {
                 if (existingUI == null) {
                     // Create new UI element
                     var newEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
-                    newEffectUI.SetEffectType(effect.Target);
-                    newEffectUI.UpdateText(effect.Magnitude + "");
+                    newEffectUI.SetEffectType(effect.Target, effect.Magnitude);
+                   
                     activeEffects[indexToUpdate] = (existingEffect, newEffectUI);
                 }
                 else {
                     // Update existing UI element
-                    existingUI.SetEffectType(effect.Target);
-                    existingUI.UpdateText(effect.Magnitude + "");
+                    existingUI.SetEffectType(effect.Target, effect.Magnitude);
+                    
                 }
             }
             else {
