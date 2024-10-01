@@ -606,11 +606,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                     MIsDiscardAllowed = true;
                     // draw cards if necessary
-                    if (IsActualPlayersTurn())
+                    if (IsActualPlayersTurn()) {
                         actualPlayer.DrawCardsToFillHand();
-                    // set the discard area to work if necessary
-                    actualPlayer.discardDropZone.SetActive(true);
-                    MNumberDiscarded = 0;
+                        // set the discard area to work if necessary
+                        actualPlayer.discardDropZone.SetActive(true);
+                        MNumberDiscarded = 0;
+                    }
                     DisplayGameStatus("[TEAM COLOR] has drawn " + actualPlayer.HandCards.Count + " cards each.");
                 }
                 else {
@@ -661,6 +662,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                     //reset player discard amounts
                     MIsDiscardAllowed = true;
+                    Debug.Log($"setting discard drop active");
                     actualPlayer.discardDropZone.SetActive(true);
                     MNumberDiscarded = 0;
                     DisplayGameStatus(mPlayerName.text + " has " + actualPlayer.HandCards.Count + " cards in hand.");

@@ -87,7 +87,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         if (State == CardState.CardInPlay) {
             if (isAnimating) {
                 if (Mouse.current.leftButton.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame) {
-                    skipCurrentAnimation = true;
+                    //skipCurrentAnimation = true;
                 }
             }
         }
