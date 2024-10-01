@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class FacilityEffectUIElement : MonoBehaviour
-{
+public class FacilityEffectUIElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     private const int PHYSICAL = 0;
     private const int FINANCIAL = 1;
     private const int NETWORK = 2;
@@ -49,13 +50,21 @@ public class FacilityEffectUIElement : MonoBehaviour
             _ => ("all", effectSprites[ALL]),
         };
         UpdateText(magnitude);
-        effectToolTip = $"{(magnitude > 0 ? "Restores": "Reduces")} {typeString} points by {magnitude}";
+        effectToolTip = $"{(magnitude > 0 ? "Restores": "Reduces")} {typeString} points by {Mathf.Abs(magnitude)}";
     }
     public void ToggleOutline(bool enable) {
         effectImage.material = enable ? outlineMat : null;
     }
     public void UpdateText(int amt) {
         effectText.text = amt > 0 ? $"+{amt}":$"{amt}";
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        Vector3 tooltipPosition = Mouse.current.position.ReadValue();
+        Tooltip.ShowTooltip(effectToolTip, tooltipPosition);
+    }
+    public void OnPointerExit(PointerEventData eventData) {
+        Tooltip.HideTooltip();
     }
 
 

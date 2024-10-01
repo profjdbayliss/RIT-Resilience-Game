@@ -147,6 +147,7 @@ GameObject:
   - component: {fileID: 173455971292745242}
   - component: {fileID: 173455971292745241}
   - component: {fileID: 1333627881014802872}
+  - component: {fileID: 6520023377673292750}
   m_Layer: 6
   m_Name: EffectUIImage
   m_TagString: Untagged
@@ -173,7 +174,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 75, y: 75}
+  m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &173455971292745242
 CanvasRenderer:
@@ -236,3 +237,32 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 081dc3398eb818644ad5579220b86df0, type: 3}
   - {fileID: 21300000, guid: 0f34d70c942ab494eb52ca14f0db4130, type: 3}
   - {fileID: 21300000, guid: 5a2d96f87fa009942a139a137761d1ae, type: 3}
+--- !u!114 &6520023377673292750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 173455971292745223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 173455971292745223}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2

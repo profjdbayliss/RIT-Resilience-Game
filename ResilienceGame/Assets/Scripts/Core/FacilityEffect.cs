@@ -89,6 +89,12 @@ public class FacilityEffect {
         List<FacilityEffect> effects = new List<FacilityEffect>();
         string[] effectParts = effectString.Split(';');
         string effectTypeString = effectParts[0];
+        if (effectParts.Length < 2) {
+            FacilityEffectType effectType = ParseEffectType(effectParts[0]);
+            effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", 0, 3));
+            return effects;
+
+        }
         string targetInfoString = effectParts[1];
         int magnitude = int.Parse(effectParts[2]);
 
