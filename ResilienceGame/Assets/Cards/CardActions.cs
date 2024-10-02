@@ -117,7 +117,7 @@ public class RemoveEffect : ICardAction {
         //                                                 team: player.playerTeam);
         //}
         if (effectList.Count > 0) {
-            facilityActedUpon.ToggleEffectOutlines(true, player.GetOpponentTeam());
+            //facilityActedUpon.ToggleEffectOutlines(true, player.GetOpponentTeam());
             //TODO: works but needs to implement a way to select the effect to remove
             //outline is tiny, need to increase the size of all the effects or something
         }

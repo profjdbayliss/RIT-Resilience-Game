@@ -33,8 +33,9 @@ public class Sector : MonoBehaviour {
     public string spriteSheetName = "sectorIconAtlas.png";
     public Texture2D iconAtlasTexture;
 
-    private const string BACKDOOR_ICON_PATH = "images/Backdoor.png";
-    private const string FORTIFY_ICON_PATH = "images/Fortified.png";
+    //private const string BACKDOOR_ICON_PATH = "images/Backdoor.png";
+    //private const string FORTIFY_ICON_PATH = "images/Fortified.png";
+    private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
 
 
@@ -140,21 +141,33 @@ public class Sector : MonoBehaviour {
         return sprites;
     }
     private void InitEffectSprites() {
-        EffectSprites = new Sprite[2];
-
-        // Load Backdoor icon
-        string backdoorFilePath = Path.Combine(Application.streamingAssetsPath, BACKDOOR_ICON_PATH);
-        Texture2D backdoorTexture = LoadTextureFromFile(backdoorFilePath);
-        if (backdoorTexture != null) {
-            EffectSprites[0] = Sprite.Create(backdoorTexture, new Rect(0, 0, backdoorTexture.width, backdoorTexture.height), new Vector2(0.5f, 0.5f));
+        
+        string effectAtlasPath = Path.Combine(Application.streamingAssetsPath, EFFECT_ICON_PATH);
+        Texture2D effectAtlasTexture = LoadTextureFromFile(effectAtlasPath);
+        if (effectAtlasTexture != null) {
+            EffectSprites = SliceSpriteSheet(
+                texture: effectAtlasTexture, 
+                spriteWidth: 50, 
+                spriteHeight: 50, 
+                columns: 3, 
+                rows: 3);
         }
-
-        // Load Fortified icon
-        string fortifyFilePath = Path.Combine(Application.streamingAssetsPath, FORTIFY_ICON_PATH);
-        Texture2D fortifyTexture = LoadTextureFromFile(fortifyFilePath);
-        if (fortifyTexture != null) {
-            EffectSprites[1] = Sprite.Create(fortifyTexture, new Rect(0, 0, fortifyTexture.width, fortifyTexture.height), new Vector2(0.5f, 0.5f));
+        else {
+            Debug.LogError("Failed to load effect icon atlas");
         }
+        //// Load Backdoor icon
+        //string backdoorFilePath = Path.Combine(Application.streamingAssetsPath, BACKDOOR_ICON_PATH);
+        //Texture2D backdoorTexture = LoadTextureFromFile(backdoorFilePath);
+        //if (backdoorTexture != null) {
+        //    EffectSprites[0] = Sprite.Create(backdoorTexture, new Rect(0, 0, backdoorTexture.width, backdoorTexture.height), new Vector2(0.5f, 0.5f));
+        //}
+
+        //// Load Fortified icon
+        //string fortifyFilePath = Path.Combine(Application.streamingAssetsPath, FORTIFY_ICON_PATH);
+        //Texture2D fortifyTexture = LoadTextureFromFile(fortifyFilePath);
+        //if (fortifyTexture != null) {
+        //    EffectSprites[1] = Sprite.Create(fortifyTexture, new Rect(0, 0, fortifyTexture.width, fortifyTexture.height), new Vector2(0.5f, 0.5f));
+        //}
     }
 
     // Helper function to load Texture2D from file

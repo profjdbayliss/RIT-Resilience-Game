@@ -28,6 +28,7 @@ public class FacilityEffect {
     public FacilityEffectType EffectType { get; private set; }
     public FacilityPointTarget Target { get; private set; }
 
+
     public PlayerTeam CreatedByTeam { get; set; } = PlayerTeam.None;
     public int Magnitude { get; private set; } // Integer magnitude instead of enum
     public int Duration { get; set; }  // -1 for infinite
@@ -40,8 +41,9 @@ public class FacilityEffect {
     public string CreatedEffectID { get; private set; }
 
     public List<FacilityEffect> CreatedEffects { get; private set; }
+    public Sprite EffectIcon;
 
-    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1, int uniqueID = -1) {
+    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1, int uniqueID = -1, Sprite effectIcon = null) {
         EffectType = effectType;
         Target = target;
         Magnitude = magnitude;
@@ -61,6 +63,7 @@ public class FacilityEffect {
             }
         }
         CreatedEffectID = createdEffectID;
+        EffectIcon = effectIcon;
     }
 
 

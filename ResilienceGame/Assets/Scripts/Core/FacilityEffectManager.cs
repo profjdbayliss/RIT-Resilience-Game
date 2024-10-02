@@ -17,9 +17,62 @@ public class FacilityEffectManager : MonoBehaviour {
     [SerializeField] private Image effectIcon;
     [SerializeField] private GameObject counterBackground;
     [SerializeField] private TextMeshProUGUI counterText;
+
+    private const int PHYSICAL_INDEX = 8;
+    private const int FINANCIAL_INDEX = 5;
+    private const int NETWORK_INDEX = 7;
+    private const int FINANCIAL_NETWORK_INDEX = 1;
+    private const int PHYSICAL_FINANCIAL_INDEX = 2;
+    private const int PHYSICAL_NETWORK_INDEX = 3;
+    private const int ALL_INDEX = 4;
+    private const int BACKDOOR_INDEX = 6;
+    private const int FORTIFY_INDEX = 0;
+
+    public static Sprite[] EffectSprites { get; private set; }
     private int counter = 0;
     private void Start() {
         facility = GetComponent<Facility>();
+    }
+    public void Initialize() {
+        EffectSprites = Sector.EffectSprites;
+    }
+
+
+    public Sprite GetEffectSprite(FacilityEffect effect) {
+        if (effect.EffectType == FacilityEffectType.Backdoor) {
+            return EffectSprites[BACKDOOR_INDEX];
+        }
+        if (effect.EffectType == FacilityEffectType.Fortify) {
+            return EffectSprites[FORTIFY_INDEX];
+        }
+        return GetEffectSprite(effect.Target);
+    }
+    public static Sprite GetEffectSprite(FacilityPointTarget effectTarget) {
+        // Default to "all" if all points are affected
+        if (effectTarget == FacilityPointTarget.All) {
+            return EffectSprites[ALL_INDEX];
+        }
+
+        // Return null if no effect is applied
+        if (effectTarget == FacilityPointTarget.None) {
+            return null;
+        }
+
+        int combinedIndex = 0;
+        if (effectTarget.HasFlag(FacilityPointTarget.Physical)) combinedIndex |= 1;
+        if (effectTarget.HasFlag(FacilityPointTarget.Financial)) combinedIndex |= 2;
+        if (effectTarget.HasFlag(FacilityPointTarget.Network)) combinedIndex |= 4;
+
+        // Determine the sprite based on the combined index
+        return combinedIndex switch {
+            1 => EffectSprites[PHYSICAL_INDEX],               // Physical
+            2 => EffectSprites[FINANCIAL_INDEX],              // Financial
+            4 => EffectSprites[NETWORK_INDEX],                // Network
+            3 => EffectSprites[PHYSICAL_FINANCIAL_INDEX],     // Physical and Financial
+            5 => EffectSprites[PHYSICAL_NETWORK_INDEX],       // Physical and Network
+            6 => EffectSprites[FINANCIAL_NETWORK_INDEX],      // Financial and Network
+            _ => EffectSprites[ALL_INDEX],                    // Default to "all"
+        };
     }
 
 

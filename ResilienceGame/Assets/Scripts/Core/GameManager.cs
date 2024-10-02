@@ -465,7 +465,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1) {
         if (player == actualPlayer) {
-            mAlertPanel.ShowAlert(message, duration);
+            mAlertPanel.ShowTextAlert(message, duration);
         }
     }
     // WORK: rewrite for this card game
@@ -719,7 +719,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     // Ends the phase.
     public void EndPhase() {
-        mAlertPanel.ResolveAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
+        mAlertPanel.ResolveTextAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
         switch (MGamePhase) {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:

@@ -238,7 +238,7 @@ public class CardPlayer : MonoBehaviour {
         CardsAllowedToBeDiscard?.ForEach(card => card.ToggleOutline(false));    //turn off the outline on the cards that were allowed to be discarded
         CardsAllowedToBeDiscard = null;             //dispose of the list
         discardDropZone.SetActive(false);           //disable the discard drop zone
-        GameManager.instance.mAlertPanel.ResolveAlert();    //hide alert panel
+        GameManager.instance.mAlertPanel.ResolveTextAlert();    //hide alert panel
         Debug.Log($"Disabling {playerName}'s discard");
     }
     //returns the card from the hand to the deck
@@ -847,7 +847,7 @@ public class CardPlayer : MonoBehaviour {
                     }
                     else {
                         OnCardsReturnedToDeck?.Invoke(); //Resolve the action after cards have been returned to deck
-                        GameManager.instance.mAlertPanel.ResolveAlert(); //remove alert message
+                        GameManager.instance.mAlertPanel.ResolveTextAlert(); //remove alert message
                         ReadyState = PlayerReadyState.ReadyToPlay; //reset player state
                         //update opponent now that the update has all the info it needs
                         GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
