@@ -427,6 +427,9 @@ public class NWChangeFinPointsDice : ICardAction
 
 /// <summary>
 /// Changes meeple amounts across all sectors if they fail a dice roll
+/// TODO: Loaned meeples not yet a mechanic, those should be excluded from this halving.
+/// Also todo: its reduced by half for two turns but we haven't quite implemented the turn
+/// stuff yet to my knowledge
 /// </summary>
 public class NWChangeMeepleAmtDice : ICardAction
 {
@@ -435,7 +438,53 @@ public class NWChangeMeepleAmtDice : ICardAction
         int diceRoll = UnityEngine.Random.Range(1, 6);
         if (diceRoll < card.data.minDiceRoll)
         {
+            CardPlayer playerInstance;
+            if (GameManager.instance.playerType == PlayerTeam.Blue)
+                playerInstance = GameManager.instance.actualPlayer;
+            else playerInstance = GameManager.instance.opponentPlayer;
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+            if(card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
+            {
+                foreach (string meepleType in card.data.meepleType)
+                {
+                    switch (meepleType)
+                    {
+                        case "Blue":
+                            playerInstance.playerSector.blueMeeples *= card.data.meepleAmount;
+                            break;
+                        case "Black":
+                            playerInstance.playerSector.blackMeeples *= card.data.meepleAmount;
+                            break;
+                        case "Purple":
+                            playerInstance.playerSector.purpleMeeples *= card.data.meepleAmount;
+                            break;
+                        default:
+                            Debug.Log("meeple type isnt black blue or purple for some reason");
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (string meepleType in card.data.meepleType)
+                {
+                    switch (meepleType)
+                    {
+                        case "Blue":
+                            playerInstance.playerSector.blueMeeples += card.data.meepleAmount;
+                            break;
+                        case "Black":
+                            playerInstance.playerSector.blackMeeples += card.data.meepleAmount;
+                            break;
+                        case "Purple":
+                            playerInstance.playerSector.purpleMeeples += card.data.meepleAmount;
+                            break;
+                        default:
+                            Debug.Log("meeple type isnt black blue or purple for some reason");
+                            break;
+                    }
+                }
+            }
         }
         else
         {
