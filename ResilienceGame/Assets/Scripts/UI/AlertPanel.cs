@@ -32,14 +32,15 @@ public class AlertPanel : MonoBehaviour {
         yield return new WaitForSeconds(time);
         ResolveTextAlert();
     }
-    public void ShowEffectList(List<FacilityEffect> effects) {
-        foreach (var effect in effects) {
+    public void ShowEffectList(List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> effectList) {
+        foreach (var (_, uiElement) in effectList) {
             var effectListItem = Instantiate(effectListItemPrefab, effectListPanel);
             var listItemText = effectListItem.GetComponentInChildren<TextMeshProUGUI>();
             var listItemIcon = effectListItem.GetComponentInChildren<Image>();
 
+            (listItemText.text, listItemIcon.sprite) = (uiElement.EffectToolTip, uiElement.EffectImage.sprite);
 
-
+            effectListPanel.gameObject.SetActive(true);
         }
     }
 

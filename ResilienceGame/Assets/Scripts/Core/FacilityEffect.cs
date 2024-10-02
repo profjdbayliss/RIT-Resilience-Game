@@ -41,9 +41,9 @@ public class FacilityEffect {
     public string CreatedEffectID { get; private set; }
 
     public List<FacilityEffect> CreatedEffects { get; private set; }
-    public Sprite EffectIcon;
 
-    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1, int uniqueID = -1, Sprite effectIcon = null) {
+
+    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1, int uniqueID = -1) {
         EffectType = effectType;
         Target = target;
         Magnitude = magnitude;
@@ -63,7 +63,6 @@ public class FacilityEffect {
             }
         }
         CreatedEffectID = createdEffectID;
-        EffectIcon = effectIcon;
     }
 
 

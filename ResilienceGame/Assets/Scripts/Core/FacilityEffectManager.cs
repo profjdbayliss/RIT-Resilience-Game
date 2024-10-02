@@ -18,6 +18,7 @@ public class FacilityEffectManager : MonoBehaviour {
     [SerializeField] private GameObject counterBackground;
     [SerializeField] private TextMeshProUGUI counterText;
 
+    //indicies from the sprite sheet
     private const int PHYSICAL_INDEX = 8;
     private const int FINANCIAL_INDEX = 5;
     private const int NETWORK_INDEX = 7;
@@ -28,34 +29,31 @@ public class FacilityEffectManager : MonoBehaviour {
     private const int BACKDOOR_INDEX = 6;
     private const int FORTIFY_INDEX = 0;
 
-    public static Sprite[] EffectSprites { get; private set; }
+    public static Sprite[] EffectSprites { get => Sector.EffectSprites; }
     private int counter = 0;
     private void Start() {
         facility = GetComponent<Facility>();
     }
-    public void Initialize() {
-        EffectSprites = Sector.EffectSprites;
-    }
 
 
-    public Sprite GetEffectSprite(FacilityEffect effect) {
+    public (string, Sprite) GetEffectSprite(FacilityEffect effect) {
         if (effect.EffectType == FacilityEffectType.Backdoor) {
-            return EffectSprites[BACKDOOR_INDEX];
+            return ("backdoor", EffectSprites[BACKDOOR_INDEX]);
         }
         if (effect.EffectType == FacilityEffectType.Fortify) {
-            return EffectSprites[FORTIFY_INDEX];
+            return ("fortify", EffectSprites[FORTIFY_INDEX]);
         }
-        return GetEffectSprite(effect.Target);
+        return GetEffectSpriteByPointTarget(effect.Target);
     }
-    public static Sprite GetEffectSprite(FacilityPointTarget effectTarget) {
+    private static (string, Sprite) GetEffectSpriteByPointTarget(FacilityPointTarget effectTarget) {
         // Default to "all" if all points are affected
         if (effectTarget == FacilityPointTarget.All) {
-            return EffectSprites[ALL_INDEX];
+            return ("all", EffectSprites[ALL_INDEX]);
         }
 
         // Return null if no effect is applied
         if (effectTarget == FacilityPointTarget.None) {
-            return null;
+            return ("", null);
         }
 
         int combinedIndex = 0;
@@ -63,21 +61,25 @@ public class FacilityEffectManager : MonoBehaviour {
         if (effectTarget.HasFlag(FacilityPointTarget.Financial)) combinedIndex |= 2;
         if (effectTarget.HasFlag(FacilityPointTarget.Network)) combinedIndex |= 4;
 
-        // Determine the sprite based on the combined index
         return combinedIndex switch {
-            1 => EffectSprites[PHYSICAL_INDEX],               // Physical
-            2 => EffectSprites[FINANCIAL_INDEX],              // Financial
-            4 => EffectSprites[NETWORK_INDEX],                // Network
-            3 => EffectSprites[PHYSICAL_FINANCIAL_INDEX],     // Physical and Financial
-            5 => EffectSprites[PHYSICAL_NETWORK_INDEX],       // Physical and Network
-            6 => EffectSprites[FINANCIAL_NETWORK_INDEX],      // Financial and Network
-            _ => EffectSprites[ALL_INDEX],                    // Default to "all"
+            1 => ("physical", EffectSprites[PHYSICAL_INDEX]),               // Physical
+            2 => ("financial", EffectSprites[FINANCIAL_INDEX]),              // Financial
+            4 => ("network", EffectSprites[NETWORK_INDEX]),                // Network
+            3 => ("physical and financial", EffectSprites[PHYSICAL_FINANCIAL_INDEX]),     // Physical and Financial
+            5 => ("physical and network", EffectSprites[PHYSICAL_NETWORK_INDEX]),       // Physical and Network
+            6 => ("financial and network", EffectSprites[FINANCIAL_NETWORK_INDEX]),      // Financial and Network
+            _ => ("all", EffectSprites[ALL_INDEX]),                    // Default to "all"
         };
+
     }
+
 
 
     public List<FacilityEffect> GetEffects() {
         return activeEffects.Select(effect => effect.Effect).ToList();
+    }
+    public List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> GetEffectsCreatedByTeam(PlayerTeam team) {
+        return activeEffects.Where(effect => effect.Effect.CreatedByTeam == team).ToList();
     }
     /// <summary>
     /// Handles adding or removing an effect from the facility
@@ -145,14 +147,14 @@ public class FacilityEffectManager : MonoBehaviour {
                 if (existingUI == null) {
                     // Create new UI element
                     var newEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
-                    newEffectUI.SetEffectType(effect.Target, effect.Magnitude);
-                   
+                    newEffectUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
+
                     activeEffects[indexToUpdate] = (existingEffect, newEffectUI);
                 }
                 else {
                     // Update existing UI element
-                    existingUI.SetEffectType(effect.Target, effect.Magnitude);
-                    
+                    existingUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
+
                 }
             }
             else {
@@ -243,7 +245,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Called when the round is ended by the game manager
     /// </summary>
     public void UpdateForNextActionPhase() {
-       // Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
+        // Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
         //update all effects
         foreach (var (effect, uiElement) in activeEffects.ToList()) {
             //only update effects that are created by the team whos turn it is
@@ -257,7 +259,7 @@ public class FacilityEffectManager : MonoBehaviour {
             }
 
             if (effect.Duration > 0) {
-               // Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
+                // Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
                 effect.Duration--;
                 DecrementCounter();
                 if (effect.Duration == 0) {
@@ -267,7 +269,7 @@ public class FacilityEffectManager : MonoBehaviour {
         }
         hasNegatedEffectThisRound = false;
     }
-    
+
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
         //Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
         return effect.CreatedByTeam switch {
@@ -311,9 +313,9 @@ public class FacilityEffectManager : MonoBehaviour {
         }
     }
 
-    
+
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
-       // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
+        // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? -1 : 1);
 
         facility.ChangeFacilityPoints(effect.Target, value);
