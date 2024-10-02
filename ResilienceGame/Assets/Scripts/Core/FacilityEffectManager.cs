@@ -315,9 +315,13 @@ public class FacilityEffectManager : MonoBehaviour {
         };
     }
     public bool HasEffectsByOpponentTeam(PlayerTeam opponentTeam) {
-        Debug.Log($"Checking if facility {facility.facilityName} has effects by {opponentTeam}");
-        activeEffects.ForEach(effect => Debug.Log($"{effect.EffectType} created by {effect.CreatedByTeam}"));
-        return activeEffects.Any(effect => effect.CreatedByTeam == opponentTeam);
+        //Debug.Log($"Checking if facility {facility.facilityName} has effects by {opponentTeam}");
+        //activeEffects.ForEach(effect => Debug.Log($"{effect.EffectType} created by {effect.CreatedByTeam}"));
+        //return activeEffects.Any(effect => effect.CreatedByTeam == opponentTeam);
+        //replace by only check backdoor/fortify
+        //return true if opponents are red and have backdoor on facility
+        //return true if opponents are blue and have fortify on facility
+        return opponentTeam == PlayerTeam.Red ? HasEffectOfType(FacilityEffectType.Backdoor) : HasEffectOfType(FacilityEffectType.Fortify);
     }
     public bool HasEffectOfType(FacilityEffectType type) {
         return activeEffects.Any(effect => effect.EffectType == type);
