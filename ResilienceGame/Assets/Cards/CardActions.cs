@@ -106,20 +106,18 @@ public class NegateEffect : ICardAction {
 
 public class RemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        var effectList = facilityActedUpon.effectManager.GetEffects();
-        //var effectCreatedBy = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
-
-        //// TODO: Implement user selection for effect removal
-        //if (effectList.Count > 0) {
-        //    var randomEffect = effectList[UnityEngine.Random.Range(0, effectList.Count)];
-        //    facilityActedUpon.AddRemoveEffectsByIdString(idString: randomEffect.CreatedEffectID.ToString(),
-        //                                                 isAdding: false, 
-        //                                                 team: player.playerTeam);
-        //}
-        if (effectList.Count > 0) {
-            //facilityActedUpon.ToggleEffectOutlines(true, player.GetOpponentTeam());
-            //TODO: works but needs to implement a way to select the effect to remove
-            //outline is tiny, need to increase the size of all the effects or something
+        var effectToRemove = facilityActedUpon.effectManager.GetRemovableEffectByFromOpponentTeam(opponent.playerTeam);
+        if (effectToRemove != null) {
+            if (facilityActedUpon.TryRemoveEffect(effectToRemove)) {
+                Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facilityActedUpon.facilityName}");
+            }
+            else {
+                Debug.LogError($"Found effect to remove but then got a false value when trying to remove it");
+            }
+            
+        }
+        else {
+            Debug.Log($"No removable effects to remove on {facilityActedUpon.facilityName}");
         }
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);

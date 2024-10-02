@@ -101,6 +101,15 @@ public class FacilityEffectManager : MonoBehaviour {
         return result;
 
     }
+    public bool TryRemoveEffect(FacilityEffect effect) {
+        if (activeEffects.Contains(effect)) {
+            ForceRemoveEffect(effect);
+            return true;
+        }
+        return false;
+
+
+    }
     public void RemoveEffectByUID(int uid) {
         var result = FindEffectByUID(uid);
         if (result != null && result.EffectType != FacilityEffectType.None) {
@@ -110,7 +119,9 @@ public class FacilityEffectManager : MonoBehaviour {
             Debug.LogError($"Did not find effect on {facility.facilityName} with uid {uid} to remove!");
         }
     }
-
+    public FacilityEffect GetRemovableEffectByFromOpponentTeam(PlayerTeam opponentTeam) {
+        return activeEffects.Find(effect => effect.CreatedByTeam == opponentTeam && (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify));
+    }
     public List<FacilityEffect> GetEffectsCreatedByTeam(PlayerTeam team) {
         return activeEffects.Where(effect => effect.CreatedByTeam == team).ToList();
     }
@@ -273,6 +284,10 @@ public class FacilityEffectManager : MonoBehaviour {
             case FacilityEffectType.ModifyPoints:
             case FacilityEffectType.ModifyPointsPerTurn:
                 ChangeFacilityPoints(effect, isRemoving: true);
+                break;
+            case FacilityEffectType.Backdoor:
+            case FacilityEffectType.Fortify:
+                UpdateSpecialIcon(effect, false);
                 break;
             default:
                 break;

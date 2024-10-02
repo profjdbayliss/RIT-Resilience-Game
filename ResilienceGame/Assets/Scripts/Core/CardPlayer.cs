@@ -574,6 +574,7 @@ public class CardPlayer : MonoBehaviour {
 "modp;fin&net;-1",
      */
     void HandleDebugEffectCreation() {
+
         if (playerSector == null || playerSector.facilities == null || playerSector.facilities.Length == 0) {
             return;
         }
@@ -634,7 +635,7 @@ public class CardPlayer : MonoBehaviour {
             UpdateHoveredDropLocation();
         }
         if (GameManager.instance.DEBUG_ENABLED) {
-            HandleDebugEffectCreation();
+            //HandleDebugEffectCreation();
             if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
                 HandleMenuToggle();
             }
