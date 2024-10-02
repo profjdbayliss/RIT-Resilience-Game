@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using TMPro;
@@ -115,21 +116,41 @@ public class Facility : MonoBehaviour {
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
     }
-    public void ChangeFacilityPoints(FacilityPointTarget target, int value) {
+    public void ChangeFacilityPoints(FacilityEffectTarget target, int value) {
         Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
 
         void UpdatePoints(ref int points, int maxPoints) {
             points = Mathf.Clamp(points + value, 0, maxPoints);
         }
+        switch (target) { 
+            case FacilityEffectTarget.Physical:
+                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                break;
+            case FacilityEffectTarget.Financial:
+                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                break;
+            case FacilityEffectTarget.Network:
+                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                break;
+            case FacilityEffectTarget.NetworkPhysical:
+                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                break;
+            case FacilityEffectTarget.FinancialPhysical:
+                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                break;
+            case FacilityEffectTarget.FinancialNetwork:
+                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                break;
+            case FacilityEffectTarget.All:
+                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                break;
 
-        if (target.HasFlag(FacilityPointTarget.Physical) || target == FacilityPointTarget.All)
-            UpdatePoints(ref physicalPoints, maxPhysicalPoints);
-
-        if (target.HasFlag(FacilityPointTarget.Financial) || target == FacilityPointTarget.All)
-            UpdatePoints(ref finacialPoints, maxFinacialPoints);
-
-        if (target.HasFlag(FacilityPointTarget.Network) || target == FacilityPointTarget.All)
-            UpdatePoints(ref networkPoints, maxNetworkPoints);
+        }
 
         Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
 
@@ -199,9 +220,12 @@ public class Facility : MonoBehaviour {
         Debug.Log(facilityInfo.ToString());
     }
 
-#if UNITY_EDITOR
+
     public void DebugAddNewEffect() {
         effectManager.DebugAddEffect();
     }
-#endif
+    public void DebugAddSpecificEffect(string effect) {
+        effectManager.DebugAddEffect(effect);
+    }
+
 }

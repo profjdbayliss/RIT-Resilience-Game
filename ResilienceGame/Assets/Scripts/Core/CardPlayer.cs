@@ -556,6 +556,55 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Debug
+    /*
+     * "modp;net;1",
+"modp;phys;1",
+"modp;fin;1",
+"modp;all;1",
+"modp;fin&net;1",
+"modp;phys&net;1",
+"fortify",
+"backdoor",
+"modp;net;-1",
+"modp;phys;-1",
+"modp;fin;-1",
+"modp;all;-1",
+"modp;phys&net;-1",
+"modp;phys&fin;-1",
+"modp;fin&net;-1",
+     */
+    //void HandleDebugEffectCreation() {
+    //    if (playerSector == null || playerSector.facilities == null || playerSector.facilities.Length == 0) {
+    //        return;
+    //    }
+    //    if (Keyboard.current.digit1Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;net;1");
+    //    }
+    //    else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;phys;1");
+    //    }
+    //    else if (Keyboard.current.digit3Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;fin;1");
+    //    }
+    //    else if (Keyboard.current.digit4Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;fin&phys;1");
+    //    }
+    //    else if (Keyboard.current.digit5Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;fin&net;1");
+    //    }
+    //    else if (Keyboard.current.digit6Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;phys&net;1");
+    //    }
+    //    else if (Keyboard.current.digit7Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;all;1");
+    //    }
+    //    else if (Keyboard.current.digit8Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("fortify");
+    //    }
+    //    else if (Keyboard.current.digit9Key.wasPressedThisFrame) {
+    //        playerSector.facilities[0].DebugAddSpecificEffect("backdoor");
+    //    }
+    //}
     //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawCard() {
         if (DeckIDs.Count > 0) {
@@ -590,6 +639,7 @@ public class CardPlayer : MonoBehaviour {
             UpdateHoveredDropLocation();
         }
         if (GameManager.instance.DEBUG_ENABLED) {
+            //HandleDebugEffectCreation();
             if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
                 HandleMenuToggle();
             }
@@ -913,7 +963,7 @@ public class CardPlayer : MonoBehaviour {
             EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
             card.gameObject.SetActive(false);
             GameManager.instance.UpdateUISizeTrackers();
-           
+
         }
     }
     //Called when a Facility/Effect target card is dropped in the play area
@@ -1144,7 +1194,7 @@ public class CardPlayer : MonoBehaviour {
     private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1) {
         EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, facilityType, facilityEffectUID, true);
     }
-    
+
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
     public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
@@ -1394,11 +1444,10 @@ public class CardPlayer : MonoBehaviour {
 
     void TryAddRandomFacilityEffect() {
         if (this != GameManager.instance.actualPlayer) return;
-#if UNITY_EDITOR
         if (TryGetFacilityUnderMouse(out Facility facility)) {
-            facility.DebugAddNewEffect();
+            //facility.DebugAddNewEffect();
+            GameManager.instance.DisplayFacilityEffectChoiceMenu(facility, this);
         }
-#endif
     }
     bool TryGetFacilityUnderMouse(out Facility facility) {
         var hitFacility = cardDropLocations.Values.ToList().Find(x => x.GetComponent<Collider2D>().OverlapPoint(Mouse.current.position.ReadValue()));

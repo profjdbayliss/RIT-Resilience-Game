@@ -5,13 +5,17 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
-[Flags]
-public enum FacilityPointTarget {
-    None = 0,
-    Physical = 1 << 0,
-    Financial = 1 << 1,
-    Network = 1 << 2,
-    All = Physical | Financial | Network
+public enum FacilityEffectTarget {
+    Fortify,
+    Network,
+    Physical,
+    NetworkPhysical,
+    All,
+    Financial,
+    Backdoor,
+    FinancialNetwork,
+    FinancialPhysical,
+    None
 }
 
 public enum FacilityEffectType {
@@ -27,7 +31,7 @@ public enum FacilityEffectType {
 public class FacilityEffect {
     private const int BACKDOOR_FORT_DURATION = 3;
     public FacilityEffectType EffectType { get; private set; }
-    public FacilityPointTarget Target { get; private set; }
+    public FacilityEffectTarget Target { get; private set; }
 
 
     public PlayerTeam CreatedByTeam { get; set; } = PlayerTeam.None;
@@ -44,7 +48,7 @@ public class FacilityEffect {
     public List<FacilityEffect> CreatedEffects { get; private set; }
 
 
-    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1) {
+    public FacilityEffect(FacilityEffectType effectType, FacilityEffectTarget target, string createdEffectID, int magnitude, int duration = -1) {
         EffectType = effectType;
         Target = target;
         Magnitude = magnitude;
@@ -84,7 +88,7 @@ public class FacilityEffect {
         //if there is only 1 piece of info, its backdoor or fortify so we can just add that effect
         if (effectParts.Length < 2) {
             FacilityEffectType effectType = ParseEffectType(effectParts[0]);
-            effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", 0, 3));
+            effects.Add(new FacilityEffect(effectType, FacilityEffectTarget.None, "", 0, 3));
             //set the team created field
             if (effectType == FacilityEffectType.Backdoor)
                 effects[^1].CreatedByTeam = PlayerTeam.Red;
@@ -103,7 +107,7 @@ public class FacilityEffect {
             FacilityEffectType effectType = ParseEffectType(effect);
             //if effect is backdoor or fortify, dont worry about target
             if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
-                effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", magnitude, BACKDOOR_FORT_DURATION));
+                effects.Add(new FacilityEffect(effectType, FacilityEffectTarget.None, "", magnitude, BACKDOOR_FORT_DURATION));
                 effects[^1].EffectIdString = effect.ToString().ToLower(); //only backdoor or fortify
             }
             else {
@@ -112,7 +116,7 @@ public class FacilityEffect {
                     ? $"modp;{targetInfoString};{magnitude}"
                     : "";
 
-                FacilityPointTarget target = ParseTarget(targetInfoString);
+                FacilityEffectTarget target = ParseTarget(targetInfoString);
                 effects.Add(new FacilityEffect(effectType, target, effectCreatedByEffect, magnitude));
                 effects[^1].EffectIdString = $"{effect};{targetInfoString};{magnitude}";
             }
@@ -155,38 +159,44 @@ public class FacilityEffect {
             _ => ""
         };
     }
-    public static string GetTargetString(FacilityPointTarget target) {
+    public static string GetTargetString(FacilityEffectTarget target) {
 
-        int combinedIndex = 0;
-        if (target.HasFlag(FacilityPointTarget.Physical)) combinedIndex |= 1;
-        if (target.HasFlag(FacilityPointTarget.Financial)) combinedIndex |= 2;
-        if (target.HasFlag(FacilityPointTarget.Network)) combinedIndex |= 4;
-
-        return combinedIndex switch {
-            1 => "phys",               // Physical
-            2 => "fin",              // Financial
-            4 => "net",                // Network
-            3 => "phys&fin",     // Physical and Financial
-            5 => "phys&net",       // Physical and Network
-            6 => "fin&net",      // Financial and Network
-            _ => "all",                    // Default to "all"
+        return target switch {
+            FacilityEffectTarget.Physical => "phys",
+            FacilityEffectTarget.Financial => "fin",
+            FacilityEffectTarget.Network => "net",
+            FacilityEffectTarget.All => "all",
+            FacilityEffectTarget.FinancialPhysical => "fin&phys",
+            FacilityEffectTarget.FinancialNetwork => "fin&net",
+            FacilityEffectTarget.NetworkPhysical => "net&phys",
+            _ => "",
         };
-
-
     }
 
-    public static FacilityPointTarget ParseTarget(string targetString) {
-        FacilityPointTarget target = FacilityPointTarget.None;
-        foreach (string t in targetString.Split('&')) {
-            target |= t.ToLower() switch {
-                "phys" => FacilityPointTarget.Physical,
-                "net" => FacilityPointTarget.Network,
-                "fin" => FacilityPointTarget.Financial,
-                "all" => FacilityPointTarget.All,
-                _ => FacilityPointTarget.None
-            };
+    public static FacilityEffectTarget ParseTarget(string targetString) {
+        if (targetString.Contains("all")) {
+            return FacilityEffectTarget.All;
         }
-        return target;
+        bool isPhysical = targetString.Contains("phys");
+        bool isFinancial = targetString.Contains("fin");
+        bool isNetwork = targetString.Contains("net");
+        
+        if (isPhysical && isFinancial && isNetwork)
+            return FacilityEffectTarget.All;
+        else if (isPhysical && isFinancial)
+            return FacilityEffectTarget.FinancialPhysical;
+        else if (isPhysical && isNetwork)
+            return FacilityEffectTarget.NetworkPhysical;
+        else if (isFinancial && isNetwork)
+            return FacilityEffectTarget.FinancialNetwork;
+        else if (isPhysical)
+            return FacilityEffectTarget.Physical;
+        else if (isFinancial)
+            return FacilityEffectTarget.Financial;
+        else if (isNetwork)
+            return FacilityEffectTarget.Network;
+
+        return FacilityEffectTarget.None;
     }
 
     #endregion

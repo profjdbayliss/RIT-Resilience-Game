@@ -18,18 +18,6 @@ public class FacilityEffectManager : MonoBehaviour {
     [SerializeField] private GameObject counterBackground;
     [SerializeField] private TextMeshProUGUI counterText;
 
-    //indicies from the sprite sheet
-    private const int PHYSICAL_INDEX = 8;
-    private const int FINANCIAL_INDEX = 5;
-    private const int NETWORK_INDEX = 7;
-    private const int FINANCIAL_NETWORK_INDEX = 1;
-    private const int PHYSICAL_FINANCIAL_INDEX = 2;
-    private const int PHYSICAL_NETWORK_INDEX = 3;
-    private const int ALL_INDEX = 4;
-    private const int BACKDOOR_INDEX = 6;
-    private const int FORTIFY_INDEX = 0;
-
-
 
     public static Sprite[] EffectSprites { get => Sector.EffectSprites; }
     private int counter = 0;
@@ -40,43 +28,40 @@ public class FacilityEffectManager : MonoBehaviour {
 
     public (string, Sprite) GetEffectSprite(FacilityEffect effect) {
         if (effect.EffectType == FacilityEffectType.Backdoor) {
-            return ("backdoor", EffectSprites[BACKDOOR_INDEX]);
+            return ("backdoor", EffectSprites[(int)FacilityEffectTarget.Backdoor]);
         }
         if (effect.EffectType == FacilityEffectType.Fortify) {
-            return ("fortify", EffectSprites[FORTIFY_INDEX]);
+            return ("fortify", EffectSprites[(int)FacilityEffectTarget.Fortify]);
         }
         return GetEffectSpriteByPointTarget(effect.Target);
     }
-    private static (string, Sprite) GetEffectSpriteByPointTarget(FacilityPointTarget effectTarget) {
-        // Default to "all" if all points are affected
-        if (effectTarget == FacilityPointTarget.All) {
-            return ("all", EffectSprites[ALL_INDEX]);
-        }
+    private static (string, Sprite) GetEffectSpriteByPointTarget(FacilityEffectTarget effectTarget) {
+        int index = (int)effectTarget;
+        string type = effectTarget switch {
+            FacilityEffectTarget.Physical => "physical",
+            FacilityEffectTarget.Financial => "financial",
+            FacilityEffectTarget.Network => "network",
+            FacilityEffectTarget.FinancialNetwork => "financial and network",
+            FacilityEffectTarget.FinancialPhysical => "financial and physical",
+            FacilityEffectTarget.NetworkPhysical => "network and physical",
+            FacilityEffectTarget.All => "all",
+            _ => ""
+        };
 
-        // Return null if no effect is applied
-        if (effectTarget == FacilityPointTarget.None) {
+        if (index == -1 || effectTarget == FacilityEffectTarget.None) {
+            Debug.LogError($"invalid index {index}");
             return ("", null);
         }
 
-        int combinedIndex = 0;
-        if (effectTarget.HasFlag(FacilityPointTarget.Physical)) combinedIndex |= 1;
-        if (effectTarget.HasFlag(FacilityPointTarget.Financial)) combinedIndex |= 2;
-        if (effectTarget.HasFlag(FacilityPointTarget.Network)) combinedIndex |= 4;
 
-        return combinedIndex switch {
-            1 => ("physical", EffectSprites[PHYSICAL_INDEX]),               // Physical
-            2 => ("financial", EffectSprites[FINANCIAL_INDEX]),              // Financial
-            4 => ("network", EffectSprites[NETWORK_INDEX]),                // Network
-            3 => ("physical and financial", EffectSprites[PHYSICAL_FINANCIAL_INDEX]),     // Physical and Financial
-            5 => ("physical and network", EffectSprites[PHYSICAL_NETWORK_INDEX]),       // Physical and Network
-            6 => ("financial and network", EffectSprites[FINANCIAL_NETWORK_INDEX]),      // Financial and Network
-            _ => ("all", EffectSprites[ALL_INDEX]),                    // Default to "all"
-        };
+        Debug.Log("Creating icon for effect type: " + effectTarget.ToString() + " with index: " + index);
 
+        return (type, EffectSprites[index]);
     }
 
-#if UNITY_EDITOR
-    public void DebugAddEffect() {
+
+
+    public void DebugAddEffect(string effectId = "") {
         var allEffects = new List<string>() {
             "modp;net;1",
             "modp;phys;1",
@@ -94,9 +79,16 @@ public class FacilityEffectManager : MonoBehaviour {
             "modp;phys&fin;-1",
             "modp;fin&net;-1",
         };
-        AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
+        //foreach (Sprite sprite in EffectSprites) {
+        //    AddRemoveEffect(FacilityEffect.CreateEffectsFromID($"modp;net;1")[0], true);
+        //}
+
+        Debug.Log($"DEBUG: Adding facility effect with id: {effectId}");
+        if (effectId == "")
+            AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
+        else
+            AddRemoveEffect(FacilityEffect.CreateEffectsFromID(effectId)[0], true);
     }
-#endif
     public List<FacilityEffect> GetEffects() {
         return activeEffects.Select(effect => effect.Effect).ToList();
     }

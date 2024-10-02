@@ -377,7 +377,7 @@ public class NWChangePhysPointsDice : ICardAction
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
             foreach(Facility facility in playerInstance.playerSector.facilities)
             {
-                facility.ChangeFacilityPoints(FacilityPointTarget.Physical, card.data.facilityAmount);
+                facility.ChangeFacilityPoints(FacilityEffectTarget.Physical, card.data.facilityAmount);
             }
         }
         else
@@ -410,7 +410,7 @@ public class NWChangeFinPointsDice : ICardAction
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
             foreach (Facility facility in playerInstance.playerSector.facilities)
             {
-                facility.ChangeFacilityPoints(FacilityPointTarget.Financial, card.data.facilityAmount);
+                facility.ChangeFacilityPoints(FacilityEffectTarget.Financial, card.data.facilityAmount);
             }
         }
         else

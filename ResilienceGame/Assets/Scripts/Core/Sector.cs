@@ -58,6 +58,7 @@ public class Sector : MonoBehaviour {
         { PlayerSector.Transport, 14 }
     };
 
+
     public void InformFacilitiesOfNewTurn() {
         foreach (Facility facility in facilities) {
             facility.UpdateForNextActionPhase();

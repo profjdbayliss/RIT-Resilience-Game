@@ -1,11 +1,11 @@
 using UnityEngine;
 using TMPro;
 
-public class Tooltip : MonoBehaviour {
+public class ToolTip : MonoBehaviour {
     [SerializeField] private GameObject tooltipBox;
     [SerializeField] private TextMeshProUGUI tooltipText;
 
-    private static Tooltip Instance;
+    private static ToolTip Instance;
 
     private void Awake() {
         Instance = this;
@@ -19,6 +19,7 @@ public class Tooltip : MonoBehaviour {
     }
 
     public static void HideTooltip() {
+
         Instance.tooltipBox.SetActive(false);
     }
 }

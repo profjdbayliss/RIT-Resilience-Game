@@ -30,10 +30,10 @@ public class FacilityEffectUIElement : MonoBehaviour, IPointerEnterHandler, IPoi
 
     public void OnPointerEnter(PointerEventData eventData) {
         Vector3 tooltipPosition = Mouse.current.position.ReadValue();
-        Tooltip.ShowTooltip(EffectToolTip, tooltipPosition);
+        ToolTip.ShowTooltip(EffectToolTip, tooltipPosition);
     }
     public void OnPointerExit(PointerEventData eventData) {
-        Tooltip.HideTooltip();
+        ToolTip.HideTooltip();
     }
 
 
