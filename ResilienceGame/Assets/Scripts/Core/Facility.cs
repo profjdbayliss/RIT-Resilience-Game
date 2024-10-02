@@ -173,9 +173,6 @@ public class Facility : MonoBehaviour {
         UpdateUI();
     }
 
-    public void NegateEffect(FacilityEffect effectToNegate) {
-        effectManager.NegateEffect(effectToNegate);
-    }
     //adds or remove effect by the string in the csv file 
     public void AddRemoveEffectsByIdString(string idString, bool isAdding, PlayerTeam team) {
         var effects = FacilityEffect.CreateEffectsFromID(idString);
@@ -183,10 +180,6 @@ public class Facility : MonoBehaviour {
             effect.CreatedByTeam = team;
             effectManager.AddRemoveEffect(effect, isAdding);
         });
-    }
-
-    public void ToggleEffectOutlines(bool enable, PlayerTeam opponentTeam) {
-        effectManager.ToggleAllEffectOutlines(enable, opponentTeam);
     }
 
     private void UpdateUI() {

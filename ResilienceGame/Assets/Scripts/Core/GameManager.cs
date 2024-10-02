@@ -474,16 +474,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
     public void DisplayFacilityEffectChoiceMenu(Facility facility, CardPlayer player) {
-        if (!facility) return;
-        FacilityEffectManager effectManager = facility.effectManager;
-        if (!effectManager) return;
-        var opponentEffects = effectManager.GetEffectsCreatedByTeam(player.GetOpponentTeam());
-        if (opponentEffects.Count == 0) {
-            var opponentEffects2 = effectManager.GetEffectsCreatedByTeam(player.playerTeam);
-            Debug.LogWarning($"No {player.GetOpponentTeam()} effects found on facility. Were you trying to get {player.playerTeam} effects with count {opponentEffects2.Count}?");
-            return;
-        }
-        mAlertPanel.ShowEffectList(opponentEffects);
+        //if (!facility) return;
+        //FacilityEffectManager effectManager = facility.effectManager;
+        //if (!effectManager) return;
+        //var opponentEffects = effectManager.GetEffectsCreatedByTeam(player.GetOpponentTeam());
+        //if (opponentEffects.Count == 0) {
+        //    var opponentEffects2 = effectManager.GetEffectsCreatedByTeam(player.playerTeam);
+        //    Debug.LogWarning($"No {player.GetOpponentTeam()} effects found on facility. Were you trying to get {player.playerTeam} effects with count {opponentEffects2.Count}?");
+        //    return;
+        //}
+        //mAlertPanel.ShowEffectList(opponentEffects);
 
     }
     // WORK: rewrite for this card game

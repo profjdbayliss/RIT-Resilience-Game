@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// This class belongs to a facility and manages the effects that are applied to it
 /// </summary>
 public class FacilityEffectManager : MonoBehaviour {
-    private readonly List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> activeEffects = new List<(FacilityEffect, FacilityEffectUIElement)>();
+    private readonly List<FacilityEffect> activeEffects = new List<FacilityEffect>();
     private Facility facility;
     private bool hasNegatedEffectThisRound = false;
     [SerializeField] private Transform effectParent;
@@ -90,19 +90,16 @@ public class FacilityEffectManager : MonoBehaviour {
             AddRemoveEffect(FacilityEffect.CreateEffectsFromID(effectId)[0], true);
     }
     public List<FacilityEffect> GetEffects() {
-        return activeEffects.Select(effect => effect.Effect).ToList();
+        return activeEffects;
     }
     public FacilityEffect FindEffectByUID(int uid) {
-        var result = activeEffects.Find(e => e.Effect.UniqueID == uid);
+        var result = activeEffects.Find(e => e.UniqueID == uid);
 
-        // Check if the result is the default tuple (i.e., not found)
-        if (!result.Equals(default((FacilityEffect, FacilityEffectUIElement)))) {
-            return result.Effect;
+        if (result == null) {
+            Debug.LogError($"Did not find effect on {facility.facilityName} with uid {uid}");
         }
-        else {
-            Debug.LogWarning($"Attempt to find Facility Effect by uid {uid} failed");
-            return null;
-        }
+        return result;
+
     }
     public void RemoveEffectByUID(int uid) {
         var result = FindEffectByUID(uid);
@@ -114,8 +111,8 @@ public class FacilityEffectManager : MonoBehaviour {
         }
     }
 
-    public List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> GetEffectsCreatedByTeam(PlayerTeam team) {
-        return activeEffects.Where(effect => effect.Effect.CreatedByTeam == team).ToList();
+    public List<FacilityEffect> GetEffectsCreatedByTeam(PlayerTeam team) {
+        return activeEffects.Where(effect => effect.CreatedByTeam == team).ToList();
     }
     /// <summary>
     /// Handles adding or removing an effect from the facility
@@ -141,7 +138,7 @@ public class FacilityEffectManager : MonoBehaviour {
             return;
         }
 
-        activeEffects.Add((effect, null));//add the effect to list
+        activeEffects.Add(effect);//add the effect to list
         //UpdateEffectUI(effect);
         ApplyEffect(effect);
     }
@@ -168,46 +165,46 @@ public class FacilityEffectManager : MonoBehaviour {
             counterBackground.SetActive(false);
         }
     }
-    public void UpdateEffectUI(FacilityEffect effect, bool add = true) {
-        if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
-            UpdateSpecialIcon(effect, add);
-            return;
-        }
+    //public void UpdateEffectUI(FacilityEffect effect, bool add = true) {
+    //    if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
+    //        UpdateSpecialIcon(effect, add);
+    //        return;
+    //    }
 
-        int indexToUpdate = activeEffects.FindIndex(e => e.Effect.UniqueID == effect.UniqueID);
+    //    int indexToUpdate = activeEffects.FindIndex(e => e.UniqueID == effect.UniqueID);
 
-        if (add) {
-            if (indexToUpdate != -1) {
-                // Effect exists, update or create its UI element
-                var (existingEffect, existingUI) = activeEffects[indexToUpdate];
-                if (existingUI == null) {
-                    // Create new UI element
-                    var newEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
-                    newEffectUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
+    //    if (add) {
+    //        if (indexToUpdate != -1) {
+    //            // Effect exists, update or create its UI element
+    //            var (existingEffect, existingUI) = activeEffects[indexToUpdate];
+    //            if (existingUI == null) {
+    //                // Create new UI element
+    //                var newEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
+    //                newEffectUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
 
-                    activeEffects[indexToUpdate] = (existingEffect, newEffectUI);
-                }
-                else {
-                    // Update existing UI element
-                    existingUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
+    //                activeEffects[indexToUpdate] = (existingEffect, newEffectUI);
+    //            }
+    //            else {
+    //                // Update existing UI element
+    //                existingUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
 
-                }
-            }
-            else {
-                Debug.LogError("Shouldn't ever happen - probably some effect UID error");
-            }
-        }
-        else {
-            // Remove the effect element
-            if (indexToUpdate != -1) {
-                var (_, uiElement) = activeEffects[indexToUpdate];
-                activeEffects.RemoveAt(indexToUpdate);
-                if (uiElement != null) {
-                    Destroy(uiElement.gameObject);
-                }
-            }
-        }
-    }
+    //            }
+    //        }
+    //        else {
+    //            Debug.LogError("Shouldn't ever happen - probably some effect UID error");
+    //        }
+    //    }
+    //    else {
+    //        // Remove the effect element
+    //        if (indexToUpdate != -1) {
+    //            var (_, uiElement) = activeEffects[indexToUpdate];
+    //            activeEffects.RemoveAt(indexToUpdate);
+    //            if (uiElement != null) {
+    //                Destroy(uiElement.gameObject);
+    //            }
+    //        }
+    //    }
+    //}
     public void ToggleEffectImageAlpha() {
         Color color = effectIcon.color;
         var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
@@ -225,15 +222,14 @@ public class FacilityEffectManager : MonoBehaviour {
                 return;
             }
         }
-        int indexToRemove = activeEffects.FindIndex(e => e.Effect.UniqueID == effect.UniqueID);
+        int indexToRemove = activeEffects.FindIndex(e => e.UniqueID == effect.UniqueID);
         if (indexToRemove == -1) {
             Debug.LogError("Trying to remove an effect that doesn't exist [Probably UID issue]");
             return;
         }
-        var (effectToRemove, uiElement) = activeEffects[indexToRemove];
+        var effectToRemove = activeEffects[indexToRemove];
 
         if (effectToRemove != null) {
-            Destroy(uiElement.gameObject);
             activeEffects.RemoveAt(indexToRemove);
             UnapplyEffect(effectToRemove);
         }
@@ -257,10 +253,14 @@ public class FacilityEffectManager : MonoBehaviour {
             case FacilityEffectType.ModifyPointsPerTurn:
                 ChangeFacilityPoints(effect);
                 break;
+            case FacilityEffectType.Backdoor:
+            case FacilityEffectType.Fortify:
+                UpdateSpecialIcon(effect);
+                break;
             default:
                 break;
         }
-        UpdateEffectUI(effect, true);
+
     }
 
     /// <summary>
@@ -283,7 +283,7 @@ public class FacilityEffectManager : MonoBehaviour {
     public void UpdateForNextActionPhase() {
         // Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
         //update all effects
-        foreach (var (effect, uiElement) in activeEffects.ToList()) {
+        foreach (var effect in activeEffects) {
             //only update effects that are created by the team whos turn it is
             //this will be called twice once in action red and once in action blue
             //we need to update the correct effects on both clients each phase
@@ -316,38 +316,31 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     public bool HasEffectsByOpponentTeam(PlayerTeam opponentTeam) {
         Debug.Log($"Checking if facility {facility.facilityName} has effects by {opponentTeam}");
-        activeEffects.ForEach(effect => Debug.Log($"{effect.Effect.EffectType} created by {effect.Effect.CreatedByTeam}"));
-        return activeEffects.Any(effect => effect.Effect.CreatedByTeam == opponentTeam);
+        activeEffects.ForEach(effect => Debug.Log($"{effect.EffectType} created by {effect.CreatedByTeam}"));
+        return activeEffects.Any(effect => effect.CreatedByTeam == opponentTeam);
     }
     public bool HasEffectOfType(FacilityEffectType type) {
-        return activeEffects.Any(effect => effect.Effect.EffectType == type);
+        return activeEffects.Any(effect => effect.EffectType == type);
     }
     public bool IsFortified() {
-        return activeEffects.Any(effect => effect.Effect.EffectType == FacilityEffectType.Fortify);
+        return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.Fortify);
     }
     public void RemoveAllEffects() {
-        foreach (var (_, uiElement) in activeEffects) {
-            Destroy(uiElement.gameObject);
-        }
+
         activeEffects.Clear();
     }
-    public void ToggleAllEffectOutlines(bool enable, PlayerTeam opponentTeam) {
-        foreach (var (effect, uiElement) in activeEffects) {
-            if (effect.CreatedByTeam == opponentTeam)
-                uiElement.ToggleOutline(enable);
-        }
-    }
+   
 
     #region Effect Functions
 
-    private void ApplyNegationChangeToFacility(FacilityEffect effect, bool negate) {
-        if (negate) {
-            ChangeFacilityPoints(effect, true); // Reverse effect
-        }
-        else {
-            ChangeFacilityPoints(effect); // Reapply effect
-        }
-    }
+    //private void ApplyNegationChangeToFacility(FacilityEffect effect, bool negate) {
+    //    if (negate) {
+    //        ChangeFacilityPoints(effect, true); // Reverse effect
+    //    }
+    //    else {
+    //        ChangeFacilityPoints(effect); // Reapply effect
+    //    }
+    //}
 
 
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
@@ -356,17 +349,17 @@ public class FacilityEffectManager : MonoBehaviour {
 
         facility.ChangeFacilityPoints(effect.Target, value);
     }
-    public void NegateEffect(FacilityEffect effect) {
-        if (IsFortified() && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {
-            hasNegatedEffectThisRound = true;
-            return;
-        }
+    //public void NegateEffect(FacilityEffect effect) {
+    //    if (IsFortified() && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {
+    //        hasNegatedEffectThisRound = true;
+    //        return;
+    //    }
 
-        if (!effect.IsNegated) {
-            effect.IsNegated = true;
-            ApplyNegationChangeToFacility(effect, true); // Apply negation (reverse effect)
-        }
-    }
+    //    if (!effect.IsNegated) {
+    //        effect.IsNegated = true;
+    //        ApplyNegationChangeToFacility(effect, true); // Apply negation (reverse effect)
+    //    }
+    //}
 
     #endregion
 }

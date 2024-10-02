@@ -573,38 +573,33 @@ public class CardPlayer : MonoBehaviour {
 "modp;phys&fin;-1",
 "modp;fin&net;-1",
      */
-    //void HandleDebugEffectCreation() {
-    //    if (playerSector == null || playerSector.facilities == null || playerSector.facilities.Length == 0) {
-    //        return;
-    //    }
-    //    if (Keyboard.current.digit1Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;net;1");
-    //    }
-    //    else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;phys;1");
-    //    }
-    //    else if (Keyboard.current.digit3Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;fin;1");
-    //    }
-    //    else if (Keyboard.current.digit4Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;fin&phys;1");
-    //    }
-    //    else if (Keyboard.current.digit5Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;fin&net;1");
-    //    }
-    //    else if (Keyboard.current.digit6Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;phys&net;1");
-    //    }
-    //    else if (Keyboard.current.digit7Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("modp;all;1");
-    //    }
-    //    else if (Keyboard.current.digit8Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("fortify");
-    //    }
-    //    else if (Keyboard.current.digit9Key.wasPressedThisFrame) {
-    //        playerSector.facilities[0].DebugAddSpecificEffect("backdoor");
-    //    }
-    //}
+    void HandleDebugEffectCreation() {
+        if (playerSector == null || playerSector.facilities == null || playerSector.facilities.Length == 0) {
+            return;
+        }
+
+        if (Keyboard.current.digit1Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1":"1")}");
+        }
+        else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+        }
+        else if (Keyboard.current.digit3Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;fin;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+        }
+        else if (Keyboard.current.digit4Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+        }
+        else if (Keyboard.current.digit5Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+        }
+        else if (Keyboard.current.digit6Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;phys&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+        }
+        else if (Keyboard.current.digit7Key.wasPressedThisFrame) {
+            playerSector.facilities[0].DebugAddSpecificEffect($"modp;all;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+        }
+    }
     //These are for testing purposes to add/remove cards from the hand
     public virtual void ForceDrawCard() {
         if (DeckIDs.Count > 0) {
@@ -639,7 +634,7 @@ public class CardPlayer : MonoBehaviour {
             UpdateHoveredDropLocation();
         }
         if (GameManager.instance.DEBUG_ENABLED) {
-            //HandleDebugEffectCreation();
+            HandleDebugEffectCreation();
             if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
                 HandleMenuToggle();
             }
@@ -647,7 +642,7 @@ public class CardPlayer : MonoBehaviour {
                 TryLogFacilityInfo();
             }
             else if (Mouse.current.middleButton.wasReleasedThisFrame) {
-                TryAddRandomFacilityEffect();
+                TryShowEffectSelectionMenu();
             }
             if (Keyboard.current.f3Key.wasPressedThisFrame) {
                 if (GameManager.instance.actualPlayer == this) {
@@ -1067,6 +1062,7 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
+        //handle player having to discard cards during action phase
         if (ReadyState == PlayerReadyState.DiscardCards && GameManager.instance.MIsDiscardAllowed) {
             if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
                 if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
@@ -1080,7 +1076,7 @@ public class CardPlayer : MonoBehaviour {
         else {
             //check prereq effects on cards
             if (card.data.preReqEffectType != FacilityEffectType.None) {
-                Facility facility = cardDroppedOnObject.GetComponentInParent<Facility>();
+                Facility facility = hoveredDropLocation.GetComponent<Facility>();
                 if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
                     return ("Facility effect does not match card prereq effect", false);
                 }
@@ -1442,11 +1438,11 @@ public class CardPlayer : MonoBehaviour {
         }
     }
 
-    void TryAddRandomFacilityEffect() {
+    void TryShowEffectSelectionMenu() {
         if (this != GameManager.instance.actualPlayer) return;
         if (TryGetFacilityUnderMouse(out Facility facility)) {
             //facility.DebugAddNewEffect();
-            GameManager.instance.DisplayFacilityEffectChoiceMenu(facility, this);
+           // GameManager.instance.DisplayFacilityEffectChoiceMenu(facility, this);
         }
     }
     bool TryGetFacilityUnderMouse(out Facility facility) {

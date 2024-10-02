@@ -80,23 +80,23 @@ public class AddEffect : ICardAction {
 
 public class NegateEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        //doesnt exist anymore?
+        //// Get all active effects on the facility
+        //var activeEffects = facilityActedUpon.effectManager.GetEffects();
 
-        // Get all active effects on the facility
-        var activeEffects = facilityActedUpon.effectManager.GetEffects();
+        //// If there are any active effects, negate a random one
+        //if (activeEffects.Count > 0) {
+        //    int randomIndex = UnityEngine.Random.Range(0, activeEffects.Count);
+        //    var effectToNegate = activeEffects[randomIndex];
+        //    facilityActedUpon.effectManager.NegateEffect(effectToNegate);
 
-        // If there are any active effects, negate a random one
-        if (activeEffects.Count > 0) {
-            int randomIndex = UnityEngine.Random.Range(0, activeEffects.Count);
-            var effectToNegate = activeEffects[randomIndex];
-            facilityActedUpon.effectManager.NegateEffect(effectToNegate);
+        //    Debug.Log($"Negated random effect: {effectToNegate.EffectType} on {facilityActedUpon.facilityName}");
+        //}
+        //else {
+        //    Debug.Log($"No active effects to negate on {facilityActedUpon.facilityName}");
+        //}
 
-            Debug.Log($"Negated random effect: {effectToNegate.EffectType} on {facilityActedUpon.facilityName}");
-        }
-        else {
-            Debug.Log($"No active effects to negate on {facilityActedUpon.facilityName}");
-        }
-
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+        //base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {

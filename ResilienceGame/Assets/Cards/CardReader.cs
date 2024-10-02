@@ -174,8 +174,9 @@ public class CardReader : MonoBehaviour {
                                     tempCard.ActionList.Add(new AddEffect());
                                     break;
                                 case "NegateEffect":
+                                    Debug.LogWarning("Negate Effect action is deprecated and will not function");
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new NegateEffect());
+                                   // tempCard.ActionList.Add(new NegateEffect());
                                     break;
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());

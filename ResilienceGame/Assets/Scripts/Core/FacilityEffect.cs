@@ -32,7 +32,7 @@ public class FacilityEffect {
     private const int BACKDOOR_FORT_DURATION = 3;
     public FacilityEffectType EffectType { get; private set; }
     public FacilityEffectTarget Target { get; private set; }
-
+    public bool IsRestoreEffect => EffectType == FacilityEffectType.ModifyPoints && Magnitude > 0;
 
     public PlayerTeam CreatedByTeam { get; set; } = PlayerTeam.None;
     public int Magnitude { get; private set; } // Integer magnitude instead of enum
@@ -47,7 +47,7 @@ public class FacilityEffect {
     public string EffectIdString { get; private set; } //holds a string used to create this effect
     public List<FacilityEffect> CreatedEffects { get; private set; }
 
-
+    
     public FacilityEffect(FacilityEffectType effectType, FacilityEffectTarget target, string createdEffectID, int magnitude, int duration = -1) {
         EffectType = effectType;
         Target = target;
@@ -57,9 +57,6 @@ public class FacilityEffect {
         UniqueID = GameManager.instance.UniqueFacilityEffectIdCount++;
         EffectCreatedOnRoundEndIdString = createdEffectID;
     }
-
-
-
     public override string ToString() {
         string effectInfo = $"UID: {UniqueID}, Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
                             $"Negated: {IsNegated}";
