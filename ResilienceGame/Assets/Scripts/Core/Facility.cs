@@ -198,4 +198,10 @@ public class Facility : MonoBehaviour {
 
         Debug.Log(facilityInfo.ToString());
     }
+
+#if UNITY_EDITOR
+    public void DebugAddNewEffect() {
+        effectManager.DebugAddEffect();
+    }
+#endif
 }

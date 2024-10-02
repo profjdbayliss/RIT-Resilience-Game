@@ -29,6 +29,8 @@ public class FacilityEffectManager : MonoBehaviour {
     private const int BACKDOOR_INDEX = 6;
     private const int FORTIFY_INDEX = 0;
 
+
+
     public static Sprite[] EffectSprites { get => Sector.EffectSprites; }
     private int counter = 0;
     private void Start() {
@@ -73,8 +75,28 @@ public class FacilityEffectManager : MonoBehaviour {
 
     }
 
-
-
+#if UNITY_EDITOR
+    public void DebugAddEffect() {
+        var allEffects = new List<string>() {
+            "modp;net;1",
+            "modp;phys;1",
+            "modp;fin;1",
+            "modp;all;1",
+            "modp;fin&net;1",
+            "modp;phys&net;1",
+            "fortify",
+            "backdoor",
+            "modp;net;-1",
+            "modp;phys;-1",
+            "modp;fin;-1",
+            "modp;all;-1",
+            "modp;phys&net;-1",
+            "modp;phys&fin;-1",
+            "modp;fin&net;-1",
+        };
+        AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
+    }
+#endif
     public List<FacilityEffect> GetEffects() {
         return activeEffects.Select(effect => effect.Effect).ToList();
     }

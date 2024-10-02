@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
@@ -82,13 +83,25 @@ public class FacilityEffect {
 
     #region Facility Effect Creation
 
+    //creates a list of facility effects from a string in the csv file
+    //format currently supports multiple effects, but only 1 effect with a target
+    //this works with current card design, but may need to be updated if we add more effect types
+    //ie. cards can 'fortify' and '+1 physical' but you can't 'fortify' and 'backdoor' in the same card
+    //csv format is "effectType&effectType2;target1&target2;magnitude" where effectType2 and target2 are optional
     public static List<FacilityEffect> CreateEffectsFromID(string effectString) {
         List<FacilityEffect> effects = new List<FacilityEffect>();
         string[] effectParts = effectString.Split(';');
         string effectTypeString = effectParts[0];
+        //if there is only 1 piece of info, its backdoor or fortify so we can just add that effect
         if (effectParts.Length < 2) {
             FacilityEffectType effectType = ParseEffectType(effectParts[0]);
             effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", 0, 3));
+            //set the team created field
+            if (effectType == FacilityEffectType.Backdoor)
+                effects[^1].CreatedByTeam = PlayerTeam.Red;
+            else if (effectType == FacilityEffectType.Fortify)
+                effects[^1].CreatedByTeam = PlayerTeam.Blue;
+
             return effects;
 
         }
@@ -96,18 +109,30 @@ public class FacilityEffect {
         int magnitude = int.Parse(effectParts[2]);
 
         var effectTypes = effectTypeString.Split('&');
+        //create an effect for each effect type
         foreach (var effect in effectTypes) {
             FacilityEffectType effectType = ParseEffectType(effect);
+            //if effect is backdoor or fortify, dont worry about target
             if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
                 effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", magnitude, BACKDOOR_FORT_DURATION));
             }
             else {
+                //create a string to represent the effect that this effect will create (if its a Modify Points Per Turn type)
                 string effectCreatedByEffect = effectType == FacilityEffectType.ModifyPointsPerTurn
                     ? $"modp;{targetInfoString};{magnitude}"
                     : "";
 
                 FacilityPointTarget target = ParseTarget(targetInfoString);
                 effects.Add(new FacilityEffect(effectType, target, effectCreatedByEffect, magnitude));
+            }
+            if (effectType != FacilityEffectType.None) {
+                //initially set a created by team
+                if (magnitude < 0) {
+                    effects[^1].CreatedByTeam = PlayerTeam.Red;
+                }
+                else {
+                    effects[^1].CreatedByTeam = PlayerTeam.Blue;
+                }
             }
         }
         return effects;

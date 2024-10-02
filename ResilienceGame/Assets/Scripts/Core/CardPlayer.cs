@@ -601,6 +601,9 @@ public class CardPlayer : MonoBehaviour {
             if (Mouse.current.rightButton.wasReleasedThisFrame) {
                 TryLogFacilityInfo();
             }
+            else if (Mouse.current.middleButton.wasReleasedThisFrame) {
+                TryAddRandomFacilityEffect();
+            }
             if (Keyboard.current.f3Key.wasPressedThisFrame) {
                 if (GameManager.instance.actualPlayer == this) {
                     if (playerSector != null) {
@@ -1378,16 +1381,30 @@ public class CardPlayer : MonoBehaviour {
     }
     #endregion
 
-    #region Debug logging
+    #region Debug
     void TryLogFacilityInfo() {
         if (this != GameManager.instance.actualPlayer) return;
+        if (TryGetFacilityUnderMouse(out Facility facility)) {
+            facility.LogFacilityDebug();
+        }
+    }
+
+    void TryAddRandomFacilityEffect() {
+        if (this != GameManager.instance.actualPlayer) return;
+#if UNITY_EDITOR
+        if (TryGetFacilityUnderMouse(out Facility facility)) {
+            facility.DebugAddNewEffect();
+        }
+#endif
+    }
+    bool TryGetFacilityUnderMouse(out Facility facility) {
         var hitFacility = cardDropLocations.Values.ToList().Find(x => x.GetComponent<Collider2D>().OverlapPoint(Mouse.current.position.ReadValue()));
         if (hitFacility) {
-            var faciltiy = hitFacility.GetComponentInParent<Facility>();
-            if (faciltiy) {
-                faciltiy.LogFacilityDebug();
-            }
+            facility = hitFacility.GetComponentInParent<Facility>();
+            return facility != null;
         }
+        facility = null;
+        return false;
     }
 
     public void LogPlayerInfo() {
