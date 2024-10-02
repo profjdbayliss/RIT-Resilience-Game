@@ -225,6 +225,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7dd96a8314ddca4aa05eab2b0672038, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectImage: {fileID: 173455971292745241}
+  EffectImage: {fileID: 173455971292745241}
   effectText: {fileID: 173455971257193851}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}

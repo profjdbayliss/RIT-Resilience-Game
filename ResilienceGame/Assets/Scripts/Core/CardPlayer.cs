@@ -56,7 +56,7 @@ public struct Update {
     public int UniqueID;
     public int Amount;
     public FacilityType FacilityType;
-    public FacilityEffectType EffectTarget;
+    //public FacilityEffectType EffectTarget;
     public string DiscardedOrReturnedCardUIDs;
 };
 
@@ -1293,7 +1293,7 @@ public class CardPlayer : MonoBehaviour {
             playsForMessage.Add((int)phase);
             Update update = mUpdatesThisPhase.Dequeue();
             //public CardMessageType Type;int CardID;int UniqueID;int Amount;FacilityType FacilityType;FacilityEffectType Effect;
-            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|facility type:{update.FacilityType}|effect target:{update.EffectTarget}");
+            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|facility type:{update.FacilityType}");
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
             playsForMessage.Add((int)update.FacilityType);
@@ -1304,7 +1304,7 @@ public class CardPlayer : MonoBehaviour {
             }
             else if (update.Type == CardMessageType.RemoveEffect) {
                 playsForMessage.Add((int)update.FacilityType);
-                playsForMessage.Add((int)update.EffectTarget);
+                //playsForMessage.Add((int)update.EffectTarget);
             }
             else if (update.Type == CardMessageType.RestorePoints) {
                 playsForMessage.Add(update.Amount);

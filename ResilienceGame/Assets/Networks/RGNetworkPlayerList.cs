@@ -554,11 +554,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int effect = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         Update update = new Update {
-                            Type = CardMessageType.ReduceCost,
+                            Type = CardMessageType.RemoveEffect,
                             UniqueID = uniqueId,
                             CardID = cardId,
                             FacilityType = (FacilityType)facilityType,
-                            EffectTarget = (FacilityEffectType)effect,
+                            //EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
@@ -774,11 +774,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int effect = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         Update update = new Update {
-                            Type = CardMessageType.ReduceCost,
+                            Type = CardMessageType.RemoveEffect,
                             UniqueID = uniqueId,
                             CardID = cardId,
                             FacilityType = (FacilityType)facilityType,
-                            EffectTarget = (FacilityEffectType)effect,
+                            //EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
