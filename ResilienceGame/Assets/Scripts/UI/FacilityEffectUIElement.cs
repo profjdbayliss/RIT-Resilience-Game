@@ -7,7 +7,15 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class FacilityEffectUIElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-    
+    private const int PHYSICAL = 0;
+    private const int FINANCIAL = 1;
+    private const int NETWORK = 2;
+    private const int FINANCIAL_NETWORK = 3;
+    private const int PHYSICAL_FINANCIAL = 4;
+    private const int PHYSICAL_NETWORK = 5;
+    private const int ALL = 6;
+    private const int BACKDOOR = 0;
+    private const int FORTIFY = 1;
 
     [SerializeField] Image effectImage;
     [SerializeField] TextMeshProUGUI effectText;
