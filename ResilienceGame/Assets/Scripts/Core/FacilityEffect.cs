@@ -36,39 +36,28 @@ public class FacilityEffect {
                                        // public int Stack { get; private set; } = 1;
     public bool IsNegated { get; set; } = false;
 
-    private static int _uniqueID = 0;
+    //private static int _uniqueID = 0;
     public int UniqueID { get; private set; }
 
-    public string CreatedEffectID { get; private set; }
-
+    public string EffectCreatedOnRoundEndIdString { get; private set; } //holds a string used to create the effect that this effect will create
+    public string EffectIdString { get; private set; } //holds a string used to create this effect
     public List<FacilityEffect> CreatedEffects { get; private set; }
 
 
-    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1, int uniqueID = -1) {
+    public FacilityEffect(FacilityEffectType effectType, FacilityPointTarget target, string createdEffectID, int magnitude, int duration = -1) {
         EffectType = effectType;
         Target = target;
         Magnitude = magnitude;
         Duration = duration;
         CreatedEffects = new List<FacilityEffect>();
-        if (uniqueID == -1) {
-            UniqueID = _uniqueID++;
-        }
-        else {
-            if (uniqueID < _uniqueID) {
-                UniqueID = _uniqueID++;
-                Debug.LogError($"Unique Facility Effect id is less than uniqueID which will cause duplicate unique ID values");
-            }
-            else {
-                _uniqueID = uniqueID;
-                UniqueID = uniqueID;
-            }
-        }
-        CreatedEffectID = createdEffectID;
+        UniqueID = GameManager.instance.UniqueFacilityEffectIdCount++;
+        EffectCreatedOnRoundEndIdString = createdEffectID;
     }
 
 
+
     public override string ToString() {
-        string effectInfo = $"Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
+        string effectInfo = $"UID: {UniqueID}, Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
                             $"Negated: {IsNegated}";
 
         if (CreatedEffects.Count > 0) {
@@ -101,7 +90,7 @@ public class FacilityEffect {
                 effects[^1].CreatedByTeam = PlayerTeam.Red;
             else if (effectType == FacilityEffectType.Fortify)
                 effects[^1].CreatedByTeam = PlayerTeam.Blue;
-
+            effects[^1].EffectIdString = effectString;
             return effects;
 
         }
@@ -115,6 +104,7 @@ public class FacilityEffect {
             //if effect is backdoor or fortify, dont worry about target
             if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.Fortify) {
                 effects.Add(new FacilityEffect(effectType, FacilityPointTarget.None, "", magnitude, BACKDOOR_FORT_DURATION));
+                effects[^1].EffectIdString = effect.ToString().ToLower(); //only backdoor or fortify
             }
             else {
                 //create a string to represent the effect that this effect will create (if its a Modify Points Per Turn type)
@@ -124,6 +114,7 @@ public class FacilityEffect {
 
                 FacilityPointTarget target = ParseTarget(targetInfoString);
                 effects.Add(new FacilityEffect(effectType, target, effectCreatedByEffect, magnitude));
+                effects[^1].EffectIdString = $"{effect};{targetInfoString};{magnitude}";
             }
             if (effectType != FacilityEffectType.None) {
                 //initially set a created by team
@@ -133,11 +124,17 @@ public class FacilityEffect {
                 else {
                     effects[^1].CreatedByTeam = PlayerTeam.Blue;
                 }
+
             }
         }
         return effects;
     }
-
+    public string ToIdString() {
+        if (EffectType == FacilityEffectType.Backdoor || EffectType == FacilityEffectType.Fortify) {
+            return EffectType.ToString().ToLower();
+        }
+        return $"{EffectType.ToString().ToLower()}&{Target.ToString().ToLower()}&{Magnitude}";
+    }
     public static FacilityEffectType ParseEffectType(string typeString) {
         return typeString.ToLower() switch {
             "modp" => FacilityEffectType.ModifyPoints,
@@ -147,6 +144,35 @@ public class FacilityEffect {
             "remove" => FacilityEffectType.Negate,
             _ => FacilityEffectType.None
         };
+    }
+    public static string GetEffectTypeString(FacilityEffectType type) {
+        return type switch {
+            FacilityEffectType.ModifyPoints => "modp",
+            FacilityEffectType.ModifyPointsPerTurn => "modppt",
+            FacilityEffectType.Fortify => "fortify",
+            FacilityEffectType.Backdoor => "backdoor",
+            FacilityEffectType.Negate => "remove",
+            _ => ""
+        };
+    }
+    public static string GetTargetString(FacilityPointTarget target) {
+
+        int combinedIndex = 0;
+        if (target.HasFlag(FacilityPointTarget.Physical)) combinedIndex |= 1;
+        if (target.HasFlag(FacilityPointTarget.Financial)) combinedIndex |= 2;
+        if (target.HasFlag(FacilityPointTarget.Network)) combinedIndex |= 4;
+
+        return combinedIndex switch {
+            1 => "phys",               // Physical
+            2 => "fin",              // Financial
+            4 => "net",                // Network
+            3 => "phys&fin",     // Physical and Financial
+            5 => "phys&net",       // Physical and Network
+            6 => "fin&net",      // Financial and Network
+            _ => "all",                    // Default to "all"
+        };
+
+
     }
 
     public static FacilityPointTarget ParseTarget(string targetString) {

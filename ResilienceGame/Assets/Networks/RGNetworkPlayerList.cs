@@ -227,7 +227,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.ShareDiscardNumber:
             case CardMessageType.CardUpdate:
             case CardMessageType.ReduceCost:
-            case CardMessageType.RestorePoints:
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
             case CardMessageType.DrawCard:
@@ -495,52 +494,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
-                case CardMessageType.ReduceCost: {
-                        int element = 0;
-                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int uniqueId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int cardId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int amount = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        Update update = new Update {
-                            Type = CardMessageType.ReduceCost,
-                            UniqueID = uniqueId,
-                            CardID = cardId,
-                            Amount = amount,
-                        };
-                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
-
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
-                    }
-                    break;
-                case CardMessageType.RestorePoints: {
-                        int element = 0;
-                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int uniqueId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int cardId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-
-                        int amount = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int facilityType = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-
-                        Update update = new Update {
-                            Type = CardMessageType.RestorePoints,
-                            UniqueID = uniqueId,
-                            CardID = cardId,
-                            Amount = amount,
-                            FacilityType = (FacilityType)facilityType,
-                        };
-                        //Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
-                    }
-                    break;
+               
                 case CardMessageType.RemoveEffect: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -737,30 +691,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
-                case CardMessageType.RestorePoints: {
-                        int element = 0;
-                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int uniqueId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int cardId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-
-                        int amount = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-                        int facilityType = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
-
-                        Update update = new Update {
-                            Type = CardMessageType.RestorePoints,
-                            UniqueID = uniqueId,
-                            CardID = cardId,
-                            Amount = amount,
-                            FacilityType = (FacilityType)facilityType,
-                        };
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
-                    }
-                    break;
                 case CardMessageType.RemoveEffect: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -778,6 +708,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                             FacilityType = (FacilityType)facilityType,
+
                             //EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);

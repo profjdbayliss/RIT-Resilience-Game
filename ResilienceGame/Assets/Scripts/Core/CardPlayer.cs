@@ -57,6 +57,7 @@ public struct Update {
     public int Amount;
     public FacilityType FacilityType;
     //public FacilityEffectType EffectTarget;
+    public int EffectUID;
     public string DiscardedOrReturnedCardUIDs;
 };
 
@@ -672,7 +673,7 @@ public class CardPlayer : MonoBehaviour {
             // Process the hovered facility collider
             if (hoveredFacilityCollider != null) {
                 var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
-                Debug.Log(cardDraggedTarget);
+               // Debug.Log(cardDraggedTarget);
                 // Check if the card being dragged is a facility card
                 if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
                     if (GameManager.instance.CanHighlight()) {
@@ -1165,13 +1166,21 @@ public class CardPlayer : MonoBehaviour {
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
     public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
+        /*
+            CardUpdate,
+            RemoveEffect,
+            DiscardCard,
+            MeepleShare,
+            DrawCard
+         */
         switch (update.Type) {
             case CardMessageType.DrawCard:
                 Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
                 opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
                 break;
-            default: //card update for now, maybe discard?
-
+            case CardMessageType.CardUpdate:
+            case CardMessageType.DiscardCard:
+            case CardMessageType.ReduceCost:
                 if (IsAnimating) {
                     // Debug.Log($"Queueing card update due to ongoing animation: {update.Type}, Facility: {update.FacilityType}");
                     opponentCardPlays.Enqueue((update, phase, opponent));
@@ -1180,6 +1189,20 @@ public class CardPlayer : MonoBehaviour {
                 // If no animation is in progress, handle the card play immediately
                 ProcessCardPlay(update, phase, opponent);
                 break;
+            case CardMessageType.RemoveEffect:
+                Debug.Log($"{playerName} received remove effect from {opponent.playerName}");
+                HandleRemoveEffectUpdate(update, opponent);
+                break;
+        }
+    }
+    void HandleRemoveEffectUpdate(Update update, CardPlayer opponent) {
+        if (update.FacilityType != FacilityType.None) {
+            if (ActiveFacilities.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
+                if (facilityGo.TryGetComponent(out Facility facility)) {
+                    //Debug.Log($"Removing effect with id string {update.EffectIdString} from {facility.facilityName
+                    
+                }
+            }
         }
     }
     //Actually process the card action, used to create the update queue and is called when the update is ready to be resolved
@@ -1276,8 +1299,6 @@ public class CardPlayer : MonoBehaviour {
             else {
                 Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
             }
-
-
         }
     }
 
@@ -1306,10 +1327,10 @@ public class CardPlayer : MonoBehaviour {
                 playsForMessage.Add((int)update.FacilityType);
                 //playsForMessage.Add((int)update.EffectTarget);
             }
-            else if (update.Type == CardMessageType.RestorePoints) {
-                playsForMessage.Add(update.Amount);
-                playsForMessage.Add((int)update.FacilityType);
-            }
+            //else if (update.Type == CardMessageType.RestorePoints) {
+            //    playsForMessage.Add(update.Amount);
+            //    playsForMessage.Add((int)update.FacilityType);
+            //}
             else if (update.Type == CardMessageType.MeepleShare) {
                 // unique id is the player to share with
                 // card id is actually the meeple color

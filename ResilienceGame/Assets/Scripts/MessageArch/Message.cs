@@ -16,7 +16,6 @@ public enum CardMessageType
     ShareDiscardNumber,
     CardUpdate,
     ReduceCost,
-    RestorePoints,
     RemoveEffect,
     DiscardCard,
     MeepleShare,

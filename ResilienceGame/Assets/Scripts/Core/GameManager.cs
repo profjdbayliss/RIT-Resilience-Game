@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool mIsActionAllowed = false;
     private bool isDoomClockActive = false;
 
+
     // UI Elements
     [Header("UI Elements")]
     public GameObject gameCanvas;
@@ -114,6 +115,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private int turnTotal = 0;
 
     public int UniqueCardIdCount = 0;
+
+    public int UniqueFacilityEffectIdCount { get; set; }
+
 
     #endregion
 

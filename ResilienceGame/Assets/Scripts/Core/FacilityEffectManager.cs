@@ -100,6 +100,28 @@ public class FacilityEffectManager : MonoBehaviour {
     public List<FacilityEffect> GetEffects() {
         return activeEffects.Select(effect => effect.Effect).ToList();
     }
+    public FacilityEffect FindEffectByUID(int uid) {
+        var result = activeEffects.Find(e => e.Effect.UniqueID == uid);
+
+        // Check if the result is the default tuple (i.e., not found)
+        if (!result.Equals(default((FacilityEffect, FacilityEffectUIElement)))) {
+            return result.Effect;
+        }
+        else {
+            Debug.LogWarning($"Attempt to find Facility Effect by uid {uid} failed");
+            return null;
+        }
+    }
+    public void RemoveEffectByUID(int uid) {
+        var result = FindEffectByUID(uid);
+        if (result != null && result.EffectType != FacilityEffectType.None) {
+            ForceRemoveEffect(result); //remove the effect bypassing any possible negation
+        }
+        else {
+            Debug.LogError($"Did not find effect on {facility.facilityName} with uid {uid} to remove!");
+        }
+    }
+
     public List<(FacilityEffect Effect, FacilityEffectUIElement UIElement)> GetEffectsCreatedByTeam(PlayerTeam team) {
         return activeEffects.Where(effect => effect.Effect.CreatedByTeam == team).ToList();
     }
@@ -135,7 +157,7 @@ public class FacilityEffectManager : MonoBehaviour {
         if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
             if (add) {
                 //Debug.Log($"Adding special effect icon to facility");
-                effectIcon.sprite = Sector.EffectSprites[(int)effect.EffectType];
+                effectIcon.sprite = GetEffectSprite(effect).Item2;
                 counterBackground.SetActive(true);
                 counter = effect.Duration;
                 counterText.text = effect.Duration.ToString();
@@ -276,7 +298,7 @@ public class FacilityEffectManager : MonoBehaviour {
             if (!IsEffectCreatorsTurn(effect)) return;
 
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
-                var effects = FacilityEffect.CreateEffectsFromID(effect.CreatedEffectID);
+                var effects = FacilityEffect.CreateEffectsFromID(effect.EffectCreatedOnRoundEndIdString);
                 effects.ForEach(_effect => AddEffect(_effect));
             }
 
