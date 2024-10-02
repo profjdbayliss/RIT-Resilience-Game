@@ -711,6 +711,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
+
                 case CardMessageType.RemoveEffect: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);

@@ -56,9 +56,7 @@ public struct Update {
     public int UniqueID;
     public int Amount;
     public FacilityType FacilityType;
-    //public FacilityEffectType EffectTarget;
-    public int EffectUID;
-    public string DiscardedOrReturnedCardUIDs;
+    public int FacilityEffectUID;
 };
 
 public enum DiscardFromWhere {
@@ -273,10 +271,11 @@ public class CardPlayer : MonoBehaviour {
 
     #region Helpers
     public PlayerTeam GetOpponentTeam() {
-        return playerTeam switch { 
-            PlayerTeam.Red => PlayerTeam.Blue, 
-            PlayerTeam.Blue => PlayerTeam.Red, 
-            _ => PlayerTeam.Any };
+        return playerTeam switch {
+            PlayerTeam.Red => PlayerTeam.Blue,
+            PlayerTeam.Blue => PlayerTeam.Red,
+            _ => PlayerTeam.Any
+        };
     }
     public void InformSectorOfNewTurn() {
         if (playerSector != null)
@@ -542,12 +541,7 @@ public class CardPlayer : MonoBehaviour {
 
         //send the update to the opponent about which card was drawn
         if (sendUpdate) {
-            Update update = new Update() {
-                UniqueID = tempCard.UniqueID,
-                CardID = tempCard.data.cardID,
-                Type = CardMessageType.DrawCard
-            };
-            mUpdatesThisPhase.Enqueue(update);
+            EnqueueCardMessageUpdate(CardMessageType.DrawCard, tempCard.data.cardID, tempCard.UniqueID);
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
 
@@ -617,7 +611,7 @@ public class CardPlayer : MonoBehaviour {
                         Debug.Log($"Player {playerName} does not have an assigned sector");
                     }
                 }
-               
+
             }
         }
     }
@@ -673,7 +667,7 @@ public class CardPlayer : MonoBehaviour {
             // Process the hovered facility collider
             if (hoveredFacilityCollider != null) {
                 var cardDraggedTarget = handPositioner.CardsBeingDragged.First().target;
-               // Debug.Log(cardDraggedTarget);
+                // Debug.Log(cardDraggedTarget);
                 // Check if the card being dragged is a facility card
                 if (cardDraggedTarget == CardTarget.Facility || cardDraggedTarget == CardTarget.Effect) {
                     if (GameManager.instance.CanHighlight()) {
@@ -835,16 +829,16 @@ public class CardPlayer : MonoBehaviour {
                     ReturnCardToDeck(card);
                     //TODO: this is not correct??
                     //update the card update with the card that was returned
-                    if (mUpdatesThisPhase.TryPeek(out Update update)) {
-                        if (update.Type == CardMessageType.CardUpdate) {
-                            if (update.DiscardedOrReturnedCardUIDs == null || update.DiscardedOrReturnedCardUIDs == "") {
-                                update.DiscardedOrReturnedCardUIDs = card.UniqueID.ToString();
-                            }
-                            else {
-                                update.DiscardedOrReturnedCardUIDs += ";" + card.UniqueID;
-                            }
-                        }
-                    }
+                    //if (mUpdatesThisPhase.TryPeek(out Update update)) {
+                    //    if (update.Type == CardMessageType.CardUpdate) {
+                    //        if (update.DiscardedOrReturnedCardUIDs == null || update.DiscardedOrReturnedCardUIDs == "") {
+                    //            update.DiscardedOrReturnedCardUIDs = card.UniqueID.ToString();
+                    //        }
+                    //        else {
+                    //            update.DiscardedOrReturnedCardUIDs += ";" + card.UniqueID;
+                    //        }
+                    //    }
+                    //}
                     AmountToReturnToDeck--;
                     if (AmountToReturnToDeck > 0) {
                         GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} more cards to the deck", this); //update alert message
@@ -916,14 +910,10 @@ public class CardPlayer : MonoBehaviour {
         }
         if (discard) {
             Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
-            mUpdatesThisPhase.Enqueue(new Update {
-                Type = CardMessageType.DiscardCard,
-                UniqueID = card.UniqueID,
-                CardID = card.data.cardID
-            });
+            EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
             card.gameObject.SetActive(false);
             GameManager.instance.UpdateUISizeTrackers();
-            GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this); //immediately update opponent of card discard
+           
         }
     }
     //Called when a Facility/Effect target card is dropped in the play area
@@ -939,13 +929,14 @@ public class CardPlayer : MonoBehaviour {
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 // NOTE: TO DO - need to add the correct update for the card played since some of them
                 // need different info
-                mUpdatesThisPhase.Enqueue(new Update {
-                    Type = CardMessageType.CardUpdate,
-                    UniqueID = card.UniqueID,
-                    CardID = card.data.cardID,
-                    FacilityType = facility.facilityType //added facility type to update
-                });
-                GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
+                //mUpdatesThisPhase.Enqueue(new Update {
+                //    Type = CardMessageType.CardUpdate,
+                //    UniqueID = card.UniqueID,
+                //    CardID = card.data.cardID,
+                //    FacilityType = facility.facilityType //added facility type to update
+                //});
+                //GameManager.instance.SendUpdatesToOpponent(phase, this); //immediately update opponent
+                EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID, facilityType: facility.facilityType); //send the update to the opponent
 
                 // card.Play(this, opponentPlayer, facility);
                 playCount = 1;
@@ -975,12 +966,14 @@ public class CardPlayer : MonoBehaviour {
             case GamePhase.ActionRed:
                 card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
+
                 // NOTE TO DO: need to add proper data and message type for the card here
-                mUpdatesThisPhase.Enqueue(new Update {
-                    Type = CardMessageType.CardUpdate,
-                    UniqueID = card.UniqueID,
-                    CardID = card.data.cardID
-                });
+                //mUpdatesThisPhase.Enqueue(new Update {
+                //    Type = CardMessageType.CardUpdate,
+                //    UniqueID = card.UniqueID,
+                //    CardID = card.data.cardID
+                //});
+                EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID);
                 playCount = 1;
                 playKey = card.UniqueID;
                 StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer)));
@@ -1143,12 +1136,13 @@ public class CardPlayer : MonoBehaviour {
                 card.cardZone = discardDropZone;
                 if (addUpdate) {
                     // Debug.Log($"adding discard update from {playerName} to {GameManager.instance.opponentPlayer.playerName}");
-                    mUpdatesThisPhase.Enqueue(new Update {
-                        Type = CardMessageType.DiscardCard,
-                        UniqueID = uniqueFacilityID,
-                        CardID = card.data.cardID
-                    });
-                    GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this); //immediately update opponent of card discard
+                    EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
+                    //mUpdatesThisPhase.Enqueue(new Update {
+                    //    Type = CardMessageType.DiscardCard,
+                    //    UniqueID = uniqueFacilityID,
+                    //    CardID = card.data.cardID
+                    //});
+                    //GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this); //immediately update opponent of card discard
                 }
             }
         }
@@ -1163,6 +1157,32 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Network Updates
+
+    /*
+     *  public CardMessageType Type;
+    public int CardID;
+    public int UniqueID;
+    public int Amount;
+    public FacilityType FacilityType;
+    public int FacilityEffectUID;
+     */
+    private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1, bool sendUpdateImmediately = false) {
+        mUpdatesThisPhase.Enqueue(new Update {
+            Type = cardMessageType,
+            UniqueID = UniqueID,
+            CardID = CardID,
+            Amount = Amount,
+            FacilityType = facilityType,
+            FacilityEffectUID = facilityEffectUID
+        });
+        if (sendUpdateImmediately) {
+            GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
+        }
+    }
+    private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1) {
+        EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, facilityType, facilityEffectUID, true);
+    }
+    
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
     public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
@@ -1200,7 +1220,7 @@ public class CardPlayer : MonoBehaviour {
             if (ActiveFacilities.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
                 if (facilityGo.TryGetComponent(out Facility facility)) {
                     //Debug.Log($"Removing effect with id string {update.EffectIdString} from {facility.facilityName
-                    
+
                 }
             }
         }
