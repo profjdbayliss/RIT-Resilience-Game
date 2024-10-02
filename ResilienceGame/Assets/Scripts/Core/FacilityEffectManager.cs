@@ -165,6 +165,7 @@ public class FacilityEffectManager : MonoBehaviour {
             counterBackground.SetActive(false);
         }
     }
+    //add back ui element here
     //public void UpdateEffectUI(FacilityEffect effect, bool add = true) {
     //    if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
     //        UpdateSpecialIcon(effect, add);
@@ -349,7 +350,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
         // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
-        int value = effect.Magnitude * (isRemoving ? -1 : 1);
+        int value = effect.Magnitude * (isRemoving ? 0 : 1); //dont give points back when removing effects
 
         facility.ChangeFacilityPoints(effect.Target, value);
     }
