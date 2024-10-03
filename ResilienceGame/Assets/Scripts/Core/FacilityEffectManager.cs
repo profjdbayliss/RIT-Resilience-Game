@@ -266,7 +266,13 @@ public class FacilityEffectManager : MonoBehaviour {
                 ChangeFacilityPoints(effect);
                 break;
             case FacilityEffectType.Backdoor:
+                UpdateSpecialIcon(effect);
+                break;
             case FacilityEffectType.Fortify:
+                if (IsBackdoored()) {
+                    ToggleEffectImageAlpha();
+                    RemoveNegativeEffects(); 
+                }
                 UpdateSpecialIcon(effect);
                 break;
             default:
@@ -345,8 +351,17 @@ public class FacilityEffectManager : MonoBehaviour {
     public bool IsFortified() {
         return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.Fortify);
     }
-    public void RemoveAllEffects() {
-
+    public bool IsBackdoored() {
+        return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.Backdoor);
+    }
+    void RemoveNegativeEffects() {
+        //remove backdoor or points per turn effects
+        activeEffects.RemoveAll(effect => effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor);
+    }
+    private void RemoveAllEffects() {
+        if (IsBackdoored()) {
+            ToggleEffectImageAlpha();
+        }
         activeEffects.Clear();
     }
    
