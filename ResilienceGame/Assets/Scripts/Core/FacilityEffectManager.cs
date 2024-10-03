@@ -271,7 +271,7 @@ public class FacilityEffectManager : MonoBehaviour {
             case FacilityEffectType.Fortify:
                 if (IsBackdoored()) {
                     ToggleEffectImageAlpha();
-                    RemoveNegativeEffects(); 
+                    RemoveNegativeEffects();
                 }
                 UpdateSpecialIcon(effect);
                 break;
@@ -364,7 +364,7 @@ public class FacilityEffectManager : MonoBehaviour {
         }
         activeEffects.Clear();
     }
-   
+
 
     #region Effect Functions
 

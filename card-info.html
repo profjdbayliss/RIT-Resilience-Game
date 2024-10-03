@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #ffffff;
             margin: 0;
             padding: 20px;
         }
@@ -27,6 +27,7 @@
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
         }
         .card-info {
             font-size: 14px;
@@ -50,6 +51,22 @@
             border-radius: 5px;
             font-weight: bold;
         }
+        .description-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .flavour-text {
+            margin-top: 8px;
+            font-size: 12px;
+            font-style: italic;
+            color: #666;
+        }
+
         .doom-card {
             background-color: #ffcccc;
             padding: 5px;
@@ -77,36 +94,29 @@
 
     <script>
         const csv_path = 'ResilienceGame\\Assets\\StreamingAssets\\SectorDownCards.csv';
+        const img_path = 'ResilienceGame\\Assets\\StreamingAssets\\';
         function parseCSV(csv) {
             const lines = csv.split('\n');
             const headers = lines[0].split(',');
             return lines.slice(1).map(line => {
                 const values = line.split(',');
                 return headers.reduce((obj, header, index) => {
-                    obj[header] = values[index] || ''; // Use empty string if value is undefined
+                    obj[header.trim()] = (values[index] || '').trim(); // Trim both the header and the value
                     return obj;
                 }, {});
             });
         }
 
+
         function createCardElement(card) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.style.backgroundColor = getTeamColor(card.Team);
 
-            const methods = (card.Method || '').split(';');
-            const methodHtml = methods.length > 1
-                ? `<strong>Methods:</strong>
-                   <ul class="method-list">
-                     ${methods.map(method => `<li class="method-item">${method.trim()}</li>`).join('')}
-                   </ul>`
-                : `<strong>Method:</strong> ${card.Method || 'N/A'}`;
+            const imgPath = card.imgLocation === "" ? "https://placehold.co/300" : img_path + card.imgLocation;
 
             cardElement.innerHTML = `
-                <div class="card-title">${card.Title || 'Untitled'}</div>
-                <div class="card-info">${methodHtml}</div>
-                <div class="card-info"><strong>Target:</strong> ${card.Target || 'N/A'}</div>
-                <div class="card-info"><strong>Sectors:</strong> ${card.SectorsAffected || 'N/A'}</div>
+                <div class="card-title" style="background-color: ${getTeamColor(card.Team)};">${card.Title || 'Untitled'}</div>
+                <div class="card-img"><img src="${imgPath}" alt="Card Image" style="width: 100%;"></div>
                 <div class="card-cost">
                     ${parseInt(card.BlueCost) > 0 ? `<span class="cost-item" style="background-color: #add8e6;">Blue: ${card.BlueCost}</span>` : ''}
                     ${parseInt(card.BlackCost) > 0 ? `<span class="cost-item" style="background-color: #d3d3d3;">Black: ${card.BlackCost}</span>` : ''}
@@ -114,15 +124,15 @@
                 </div>
                 ${parseInt(card.CardsDrawn) > 0 ? `<div class="card-info"><strong>Cards Drawn:</strong> ${card.CardsDrawn}</div>` : ''}
                 ${parseInt(card.CardsRemoved) > 0 ? `<div class="card-info"><strong>Cards Removed:</strong> ${card.CardsRemoved}</div>` : ''}
-                ${parseInt(card.FacilityPoint) > 0 ? `<div class="card-info"><strong>Facility Points:</strong> ${card.FacilityPoint}</div>` : ''}
-                ${parseInt(card.Duration) > 0 ? `<div class="card-info"><strong>Duration:</strong> ${card.Duration}</div>` : ''}
                 ${card.DoomEffect === 'TRUE' ? '<div class="doom-card">DOOM CARD</div>' : ''}
-                <div class="card-info"><strong>Description:</strong> ${card.Description || 'No description available.'}</div>
-                <div class="card-info"><strong>Flavour Text:</strong> ${card.FlavourText || 'No flavour text available.'}</div>
+                <div class="description-box">${card.Description || 'No description available.'}</div>
+                <div class="flavour-text">${card.FlavourText || ''}</div>
             `;
 
             return cardElement;
         }
+
+
 
         function getTeamColor(team) {
             switch ((team || '').toLowerCase()) {
