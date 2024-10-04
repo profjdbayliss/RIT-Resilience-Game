@@ -3,6 +3,7 @@ using System.Linq;
 using TMPro;
 using Unity;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -365,6 +366,23 @@ public class FacilityEffectManager : MonoBehaviour {
         activeEffects.Clear();
     }
 
+    public void DisplayEffectImageTooltip() {
+        FacilityEffect activeIconEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify);
+        if (activeIconEffect == null) return;
+        string tooltip = activeIconEffect.EffectType switch {
+            FacilityEffectType.Fortify => $"Fortified - blocks the first red effect played on this facility each turn\n{activeIconEffect.Duration} turns remaining",
+            FacilityEffectType.Backdoor => $"Backdoored - allows certain red cards to be played on this facility\n{activeIconEffect.Duration} turns remaining",
+            _ => ""
+        };
+        if (tooltip != "") {
+            ToolTip.Instance.ShowTooltip(tooltip, Mouse.current.position.ReadValue());
+        }
+
+
+    }
+    public void HideEffectImageTooltip() {
+        ToolTip.HideTooltip();
+    }
 
     #region Effect Functions
 

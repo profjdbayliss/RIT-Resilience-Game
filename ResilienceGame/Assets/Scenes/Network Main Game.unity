@@ -1169,6 +1169,7 @@ GameObject:
   - component: {fileID: 92073678}
   - component: {fileID: 92073677}
   - component: {fileID: 92073676}
+  - component: {fileID: 92073679}
   m_Layer: 6
   m_Name: Distribution Facility Box
   m_TagString: FacilityDropLocation
@@ -1265,6 +1266,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 92073674}
   m_CullTransparentMesh: 1
+--- !u!114 &92073679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92073674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 92073677}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &92478569
 GameObject:
   m_ObjectHideFlags: 0
@@ -5699,7 +5744,8 @@ MonoBehaviour:
   - {fileID: 830756715}
   - {fileID: 988311466}
   facilityNameText: {fileID: 310921094}
-  effectManager: {fileID: 0}
+  facilitySelectionButton: {fileID: 520008984}
+  effectManager: {fileID: 325979397}
   isDown: 0
 --- !u!114 &325979394
 MonoBehaviour:
@@ -9121,7 +9167,8 @@ MonoBehaviour:
   - {fileID: 2116300310}
   - {fileID: 606468166}
   facilityNameText: {fileID: 96068603}
-  effectManager: {fileID: 0}
+  facilitySelectionButton: {fileID: 92073679}
+  effectManager: {fileID: 510286175}
   isDown: 0
 --- !u!114 &510286172
 MonoBehaviour:
@@ -9203,6 +9250,7 @@ GameObject:
   - component: {fileID: 520008983}
   - component: {fileID: 520008982}
   - component: {fileID: 520008981}
+  - component: {fileID: 520008984}
   m_Layer: 6
   m_Name: Transmission Facility Box
   m_TagString: FacilityDropLocation
@@ -9299,6 +9347,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 520008979}
   m_CullTransparentMesh: 1
+--- !u!114 &520008984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520008979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 520008982}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &522352602
 GameObject:
   m_ObjectHideFlags: 0
@@ -11279,7 +11371,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerName: 
   playerTeam: 3
-  playerSector: {fileID: 0}
   DeckName: 
   manager: {fileID: 2133546051}
   FacilityIDs: 
@@ -14660,6 +14751,7 @@ GameObject:
   - component: {fileID: 908258020}
   - component: {fileID: 908258022}
   - component: {fileID: 908258021}
+  - component: {fileID: 908258023}
   m_Layer: 5
   m_Name: EffectImage
   m_TagString: Untagged
@@ -14725,6 +14817,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 908258019}
   m_CullTransparentMesh: 1
+--- !u!114 &908258023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908258019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 510286175}
+          m_TargetAssemblyTypeName: FacilityEffectManager, Assembly-CSharp
+          m_MethodName: DisplayEffectImageTooltip
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 510286175}
+          m_TargetAssemblyTypeName: FacilityEffectManager, Assembly-CSharp
+          m_MethodName: HideEffectImageTooltip
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &910449740
 GameObject:
   m_ObjectHideFlags: 0
@@ -15180,6 +15317,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tooltipBox: {fileID: 1181670011}
   tooltipText: {fileID: 1035010516}
+  tooltipRect: {fileID: 1181670012}
 --- !u!1 &950315397
 GameObject:
   m_ObjectHideFlags: 0
@@ -16442,8 +16580,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -17641,7 +17779,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerName: 
   playerTeam: 3
-  playerSector: {fileID: 0}
   DeckName: 
   manager: {fileID: 2133546051}
   FacilityIDs: 
@@ -18124,7 +18261,8 @@ MonoBehaviour:
   - {fileID: 173618669}
   - {fileID: 470503063}
   facilityNameText: {fileID: 426345553}
-  effectManager: {fileID: 0}
+  facilitySelectionButton: {fileID: 1599086105}
+  effectManager: {fileID: 1173674374}
   isDown: 0
 --- !u!61 &1173674371
 BoxCollider2D:
@@ -18205,6 +18343,7 @@ GameObject:
   - component: {fileID: 1174120408}
   - component: {fileID: 1174120410}
   - component: {fileID: 1174120409}
+  - component: {fileID: 1174120411}
   m_Layer: 5
   m_Name: EffectImage
   m_TagString: Untagged
@@ -18270,6 +18409,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174120407}
   m_CullTransparentMesh: 1
+--- !u!114 &1174120411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174120407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 325979397}
+          m_TargetAssemblyTypeName: FacilityEffectManager, Assembly-CSharp
+          m_MethodName: DisplayEffectImageTooltip
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 325979397}
+          m_TargetAssemblyTypeName: FacilityEffectManager, Assembly-CSharp
+          m_MethodName: HideEffectImageTooltip
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1175584532
 GameObject:
   m_ObjectHideFlags: 0
@@ -18346,9 +18530,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -246.09497, y: -30.109985}
-  m_SizeDelta: {x: 492.19, y: 60.22}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -30.109985}
+  m_SizeDelta: {x: 825, y: 60.22}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1181670013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23350,6 +23534,7 @@ GameObject:
   - component: {fileID: 1599086103}
   - component: {fileID: 1599086102}
   - component: {fileID: 1599086101}
+  - component: {fileID: 1599086105}
   m_Layer: 6
   m_Name: Production Facility Box
   m_TagString: FacilityDropLocation
@@ -23459,6 +23644,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1599086097}
   m_CullTransparentMesh: 1
+--- !u!114 &1599086105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599086097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1599086103}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1608748578
 GameObject:
   m_ObjectHideFlags: 0
@@ -24024,6 +24253,7 @@ GameObject:
   - component: {fileID: 1672299465}
   - component: {fileID: 1672299467}
   - component: {fileID: 1672299466}
+  - component: {fileID: 1672299468}
   m_Layer: 5
   m_Name: EffectImage
   m_TagString: Untagged
@@ -24089,6 +24319,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1672299464}
   m_CullTransparentMesh: 1
+--- !u!114 &1672299468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672299464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1173674374}
+          m_TargetAssemblyTypeName: FacilityEffectManager, Assembly-CSharp
+          m_MethodName: DisplayEffectImageTooltip
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1173674374}
+          m_TargetAssemblyTypeName: FacilityEffectManager, Assembly-CSharp
+          m_MethodName: HideEffectImageTooltip
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1689205843
 GameObject:
   m_ObjectHideFlags: 0
@@ -24778,7 +25053,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &1730128616
 GameObject:
   m_ObjectHideFlags: 0
@@ -27164,6 +27439,7 @@ MonoBehaviour:
   meeplesAmountText: []
   csvFileName: Sectors.csv
   outputAtlasName: sectorAtlas
+  owner: {fileID: 0}
   sectorCanvas: {fileID: 0}
   icon: {fileID: 879134672}
   spriteSheetName: sectorIconAtlas.png
@@ -27178,6 +27454,7 @@ MonoBehaviour:
   - {fileID: 1478987593}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   meeplesSpent: 0
+  numMeeplesRequired: 0
 --- !u!1 &1877610056
 GameObject:
   m_ObjectHideFlags: 0

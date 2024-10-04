@@ -33,7 +33,7 @@ public class Facility : MonoBehaviour {
     public Image[][] pointImages; // [0] for Physical, [1] for Financial, [2] for Network
     private const int MAX_POINTS = 3;
     [SerializeField] private TextMeshProUGUI facilityNameText;
-
+    [SerializeField] private Button facilitySelectionButton;
     public FacilityEffectManager effectManager;
     // public FacilityEffect effect;
     //   public bool effectNegated;

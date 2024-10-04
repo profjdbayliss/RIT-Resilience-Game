@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class CardInfoDisplay : MonoBehaviour {
 
     public TextMeshProUGUI cardInfo;
-    private bool displayCardInfo = true;
+    private bool displayCardInfo = false;
     public GameObject cardInfoPanel;
     public Toggle cardInfoToggle;
     private bool panelActive = false;
