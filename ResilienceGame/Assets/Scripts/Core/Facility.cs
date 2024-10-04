@@ -38,6 +38,7 @@ public class Facility : MonoBehaviour {
     public FacilityEffectManager effectManager;
     private HoverActivateObject hoverEffect;
     [SerializeField] private Material outlineMat;
+
     // public FacilityEffect effect;
     //   public bool effectNegated;
 
@@ -161,8 +162,8 @@ public class Facility : MonoBehaviour {
         isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
         UpdateUI();
     }
-    public bool HasRemovableEffects(PlayerTeam opponentTeam) {
-        return effectManager.HasEffectsByOpponentTeam(opponentTeam);
+    public bool HasRemovableEffects(PlayerTeam opponentTeam, bool removePointsPerTurn = true) {
+        return effectManager.GetRemoveableEffects(opponentTeam, removePointsPerTurn).Any();
     }
 
     public bool HasEffectOfType(FacilityEffectType type) {

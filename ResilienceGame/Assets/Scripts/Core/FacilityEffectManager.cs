@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -86,7 +87,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
         Debug.Log($"DEBUG: Adding facility effect with id: {effectId}");
         if (effectId == "")
-            AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
+            AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[UnityEngine.Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
         else
             AddRemoveEffect(FacilityEffect.CreateEffectsFromID(effectId)[0], true);
     }
@@ -120,8 +121,11 @@ public class FacilityEffectManager : MonoBehaviour {
             Debug.LogError($"Did not find effect on {facility.facilityName} with uid {uid} to remove!");
         }
     }
-    public FacilityEffect GetRemovableEffectByFromOpponentTeam(PlayerTeam opponentTeam) {
-        return activeEffects.Find(effect => effect.CreatedByTeam == opponentTeam && (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify));
+    //returns a list of effects that can be removed,
+    //these are effects marked with the correct type that are created by the opponent team
+    public List<FacilityEffect> GetRemoveableEffects(PlayerTeam playerTeam, bool removePointsPerTurnEffects = false) {
+        var opponentTeam = playerTeam == PlayerTeam.Red ? PlayerTeam.Blue : PlayerTeam.Red;
+        return GetEffectsCreatedByTeam(opponentTeam).Where(effect => effect.IsRemoveable).ToList();
     }
     public List<FacilityEffect> GetEffectsCreatedByTeam(PlayerTeam team) {
         return activeEffects.Where(effect => effect.CreatedByTeam == team).ToList();
@@ -338,13 +342,8 @@ public class FacilityEffectManager : MonoBehaviour {
         };
     }
     public bool HasEffectsByOpponentTeam(PlayerTeam opponentTeam) {
-        //Debug.Log($"Checking if facility {facility.facilityName} has effects by {opponentTeam}");
-        //activeEffects.ForEach(effect => Debug.Log($"{effect.EffectType} created by {effect.CreatedByTeam}"));
-        //return activeEffects.Any(effect => effect.CreatedByTeam == opponentTeam);
-        //replace by only check backdoor/fortify
-        //return true if opponents are red and have backdoor on facility
-        //return true if opponents are blue and have fortify on facility
-        return opponentTeam == PlayerTeam.Red ? HasEffectOfType(FacilityEffectType.Backdoor) : HasEffectOfType(FacilityEffectType.Fortify);
+        //return true if there are any effects created by the opponent team
+        return activeEffects.Any(effect => effect.CreatedByTeam == opponentTeam);
     }
     public bool HasEffectOfType(FacilityEffectType type) {
         return activeEffects.Any(effect => effect.EffectType == type);

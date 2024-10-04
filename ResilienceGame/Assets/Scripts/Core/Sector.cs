@@ -30,7 +30,7 @@ public class Sector : MonoBehaviour {
     private string fileLocation;
     // output atlas filename
     public string outputAtlasName;
-    public CardPlayer owner;
+    public CardPlayer Owner;
 
     [SerializeField] private GameObject sectorCanvas;
     public RawImage icon;
@@ -189,6 +189,9 @@ public class Sector : MonoBehaviour {
         iconAtlasTexture.LoadImage(fileData);
     }
 
+    public bool HasRemovableEffectsOnFacilities(PlayerTeam playerTeam) {
+        return facilities.Any(facility => facility.HasRemovableEffects(playerTeam));
+    }
     Sprite[] SliceSpriteSheet(Texture2D texture, int spriteWidth, int spriteHeight, int columns, int rows) {
         Sprite[] sprites = new Sprite[columns * rows];
 
@@ -288,7 +291,7 @@ public class Sector : MonoBehaviour {
     }
     public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
         this.numMeeplesRequired = numMeeplesRequired;
-        GameManager.instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", owner, onAlertFinish: onFinish);
+        GameManager.instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", Owner, onAlertFinish: onFinish);
         EnableMeepleButtons();
 
     }
@@ -336,7 +339,7 @@ public class Sector : MonoBehaviour {
                     DisableMeepleButtons();
                 }
                 else {
-                    GameManager.instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", owner);
+                    GameManager.instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", Owner);
 
                 }
             }

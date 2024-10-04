@@ -227,11 +227,11 @@ public class CardPlayer : MonoBehaviour {
 
     #region Card Action Functions
 
-    public void ForcePlayerSelectFacilities(int num, Action<List<Facility>> onFacilitySelect) {
-        if (num <= 0) return;
+    public void ForcePlayerSelectFacilities(int numFacilitiesToSelect, Action<List<Facility>> onFacilitySelect) {
+        if (numFacilitiesToSelect <= 0) return;
         ReadyState = PlayerReadyState.SelectFacilties;
-        Debug.Log($"Forcing {playerName} to select {num} facilities before continuing");
-        PlayerSector.EnableFacilitySelection(num);
+        Debug.Log($"Forcing {playerName} to select {numFacilitiesToSelect} facilities before continuing");
+        PlayerSector.EnableFacilitySelection(numFacilitiesToSelect);
         OnFacilitiesSelected = onFacilitySelect;
     }
     public void ResolveFacilitySelection() {
@@ -622,6 +622,49 @@ public class CardPlayer : MonoBehaviour {
 "modp;phys&fin;-1",
 "modp;fin&net;-1",
      */
+    void HandleDebugInput() {
+        //force add backdoor or fortify to hovered facility
+        if (GameManager.instance.actualPlayer == this) {
+            if (Keyboard.current.digit9Key.wasPressedThisFrame) {
+                if (TryGetFacilityUnderMouse(out Facility facility)) {
+                    facility.AddRemoveEffectsByIdString("backdoor", true, PlayerTeam.Red);
+                }
+
+            }
+            else if (Keyboard.current.digit0Key.wasPressedThisFrame) {
+                if (TryGetFacilityUnderMouse(out Facility facility)) {
+                    facility.AddRemoveEffectsByIdString("fortify", true, PlayerTeam.Blue);
+                }
+            }
+
+        }
+        //HandleDebugEffectCreation();
+        if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
+            HandleMenuToggle();
+        }
+        //print info about clicked facility
+        if (Mouse.current.rightButton.wasReleasedThisFrame) {
+            TryLogFacilityInfo();
+        }
+        //show effect selection menu
+        else if (Mouse.current.middleButton.wasReleasedThisFrame) {
+            //TryShowEffectSelectionMenu(); //not neede
+        }
+        //log all of the facilities in the sector
+        if (Keyboard.current.f3Key.wasPressedThisFrame) {
+            if (GameManager.instance.actualPlayer == this) {
+                if (PlayerSector != null) {
+                    Debug.Log($"Facility info for player {playerName}");
+                    foreach (Facility facility in PlayerSector.facilities) {
+                        facility.LogFacilityDebug();
+                    }
+                }
+                else {
+                    Debug.Log($"Player {playerName} does not have an assigned sector");
+                }
+            }
+        }
+    }
     public void HandleMenuToggle() {
         if (this != GameManager.instance.actualPlayer) {
             return;
@@ -646,7 +689,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         if (Keyboard.current.digit1Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1":"1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
         else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
             PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
@@ -704,47 +747,18 @@ public class CardPlayer : MonoBehaviour {
         //wait and check for the proper amount of facilities selected
         if (ReadyState == PlayerReadyState.SelectFacilties) {
             if (PlayerSector.HasSelectedFacilities()) {
-                
+
                 ResolveFacilitySelection();
             }
         }
 
 
         if (GameManager.instance.DEBUG_ENABLED) {
-            if (Keyboard.current.digit0Key.wasPressedThisFrame) {
-                if (GameManager.instance.actualPlayer == this)
-                    ForcePlayerSelectFacilities(2, (selectedFacilities) => {
-                        selectedFacilities.ForEach(facility => {
-                            facility.AddRemoveEffectsByIdString("fortify", true, playerTeam);
-                        });
-                    });
-            }
-            //HandleDebugEffectCreation();
-            if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
-                HandleMenuToggle();
-            }
-            if (Mouse.current.rightButton.wasReleasedThisFrame) {
-                TryLogFacilityInfo();
-            }
-            else if (Mouse.current.middleButton.wasReleasedThisFrame) {
-                TryShowEffectSelectionMenu();
-            }
-            if (Keyboard.current.f3Key.wasPressedThisFrame) {
-                if (GameManager.instance.actualPlayer == this) {
-                    if (PlayerSector != null) {
-                        Debug.Log($"Facility info for player {playerName}");
-                        foreach (Facility facility in PlayerSector.facilities) {
-                            facility.LogFacilityDebug();
-                        }
-                    }
-                    else {
-                        Debug.Log($"Player {playerName} does not have an assigned sector");
-                    }
-                }
-            }
+            HandleDebugInput();
         }
     }
     
+
     //updates the hoverDropLocation class field to hold the object the card is hovering over
     void UpdateHoveredDropLocation() {
         GameObject currentHoveredFacility = null; // Reset at the beginning of each update
@@ -1059,6 +1073,7 @@ public class CardPlayer : MonoBehaviour {
     //Called when a non-Facility/Effect target card is dropped in the play area
     private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
         Debug.Log($"Handling non facility card - {card.front.title}");
+        Facility facility = FacilityPlayedOn(); //still need this for sector cards
         switch (phase) {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
@@ -1068,7 +1083,7 @@ public class CardPlayer : MonoBehaviour {
                 EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID);
                 playCount = 1;
                 playKey = card.UniqueID;
-                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer)));
+                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer, facility)));
 
                 break;
 
@@ -1128,6 +1143,7 @@ public class CardPlayer : MonoBehaviour {
             return ($"Player must select facilities before playing cards", false);
         }
         //handle player having to discard cards during action phase
+        //quitting out of the function early with true here is fine since these cards arent actually getting played/meeples spent
         else if (ReadyState == PlayerReadyState.DiscardCards && GameManager.instance.MIsDiscardAllowed) {
             if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
                 if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
@@ -1139,11 +1155,19 @@ public class CardPlayer : MonoBehaviour {
             return ("Must discard cards first", false); //didn't drop on the discard drop zone
         }
         else {
-            //check prereq effects on cards
+            //check prereq effects on cards for effect cards played on single facilities
             if (card.data.preReqEffectType != FacilityEffectType.None) {
                 Facility facility = hoveredDropLocation.GetComponent<Facility>();
                 if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
                     return ("Facility effect does not match card prereq effect", false);
+                }
+            }
+            //check for 'Remove' effect for sector cards
+            if (card.data.effectString == "Remove") {
+                Facility facility = hoveredDropLocation.GetComponent<Facility>();
+                Sector sector = facility.sectorItsAPartOf;
+                if (!sector.HasRemovableEffectsOnFacilities(playerTeam)) {
+                    return ("Sector does not have removable effects", false);
                 }
             }
             if (!PlayerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
@@ -1507,7 +1531,7 @@ public class CardPlayer : MonoBehaviour {
         if (this != GameManager.instance.actualPlayer) return;
         if (TryGetFacilityUnderMouse(out Facility facility)) {
             //facility.DebugAddNewEffect();
-           // GameManager.instance.DisplayFacilityEffectChoiceMenu(facility, this);
+            // GameManager.instance.DisplayFacilityEffectChoiceMenu(facility, this);
         }
     }
     bool TryGetFacilityUnderMouse(out Facility facility) {
