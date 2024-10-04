@@ -6,6 +6,7 @@ using System.IO;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using System.Security.Principal;
 
 public class Sector : MonoBehaviour {
     public PlayerSector sectorName; // TODO: Move playersector here
@@ -18,6 +19,7 @@ public class Sector : MonoBehaviour {
     public float purpleMeeples;
 
     public const int STARTING_MEEPLES = 2;
+    private readonly float[] maxMeeples = { 2, 2, 2 };
 
     public TextMeshProUGUI[] meeplesAmountText;
 
@@ -74,7 +76,7 @@ public class Sector : MonoBehaviour {
         return false;
     }
     public List<Facility> GetSelectedFacilities() {
-        if (selectedFacilities == null)
+        if (selectedFacilities != null)
             return selectedFacilities.ToList();
         return null;
     }
@@ -86,25 +88,29 @@ public class Sector : MonoBehaviour {
         selectedFacilities = new HashSet<Facility>();
         //special case to select all facilities
         if (numRequired == 3) {
-            foreach (Facility facility in selectedFacilities) {
+            foreach (Facility facility in facilities) {
                 if (facility != null) {
                     selectedFacilities.Add(facility);
                 }
             }
             return;
         }
-        foreach (Facility facility in selectedFacilities) {
+        foreach (Facility facility in facilities) {
             if (facility != null) {
                 facility.EnableFacilitySelection();
             }
         }
+        numFacilitiesRequired = numRequired;
+        Debug.Log("Enabled facility selection");
     }
     public void DisableFacilitySelection() {
-        foreach (Facility facility in selectedFacilities) {
+        foreach (Facility facility in facilities) {
             if (facility != null) {
                 facility.DisableFacilitySelection();
             }
         }
+        selectedFacilities = null;
+        Debug.Log("Disabled facility selection");
     }
     public void AddFacilityToSelection(Facility facility) {
         if (selectedFacilities == null)
@@ -161,7 +167,7 @@ public class Sector : MonoBehaviour {
         return (int)(blueMeeples + blackMeeples + purpleMeeples);
     }
     public int GetMaxMeeples() {
-        return STARTING_MEEPLES * 3;
+        return (int)Mathf.Floor(maxMeeples.Aggregate((a, b) => a + b));
     }
     void UpdateFacilityDependencyIcons() {
         string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
@@ -339,7 +345,9 @@ public class Sector : MonoBehaviour {
     }
     public void ResetMeepleCount() {
         meeplesSpent = 0;
-        blueMeeples = blackMeeples = purpleMeeples = STARTING_MEEPLES;
+        blackMeeples = maxMeeples[0];
+        blueMeeples = maxMeeples[1];
+        purpleMeeples = maxMeeples[2];
         UpdateMeepleAmountUI();
     }
     private void CSVRead() {
@@ -420,5 +428,23 @@ public class Sector : MonoBehaviour {
             int.Parse(values[11]),
             int.Parse(values[12])
         );
+    }
+
+    public void AddSubtractMeepleAmount(int index, float numMeeples) {
+        if (index < 0 || index >= 3) return;
+        maxMeeples[index] += numMeeples;
+        if (maxMeeples[index] < 0) maxMeeples[index] = 0;
+
+        if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
+        if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
+        if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
+        UpdateMeepleAmountUI();
+    }
+    public void MultiplyMeepleAmount(int index, float multiplier) {
+        if (index < 0 || index >= 3) return;
+        var reduceAmt = (int)Mathf.Floor(maxMeeples[index] * multiplier);   //don't reduce by a half value...why were meeples floats ever
+        if (reduceAmt > 0) {
+            AddSubtractMeepleAmount(index, reduceAmt);
+        }
     }
 }

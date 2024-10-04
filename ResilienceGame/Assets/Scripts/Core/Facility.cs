@@ -34,7 +34,10 @@ public class Facility : MonoBehaviour {
     private const int MAX_POINTS = 3;
     [SerializeField] private TextMeshProUGUI facilityNameText;
     [SerializeField] private Button facilitySelectionButton;
+    [SerializeField] private Image facilityBoxImage;
     public FacilityEffectManager effectManager;
+    private HoverActivateObject hoverEffect;
+    [SerializeField] private Material outlineMat;
     // public FacilityEffect effect;
     //   public bool effectNegated;
 
@@ -45,6 +48,7 @@ public class Facility : MonoBehaviour {
 
     // Start is called before the first frame update
     public void Initialize() {
+        hoverEffect = GetComponent<HoverActivateObject>();
         effectManager = GetComponent<FacilityEffectManager>();
         facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
@@ -223,14 +227,18 @@ public class Facility : MonoBehaviour {
         effectManager.DebugAddEffect(effect);
     }
     public void EnableFacilitySelection() {
+        facilityBoxImage.material = outlineMat;
         facilitySelectionButton.interactable = true;
     }
     public void DisableFacilitySelection() {
+        facilityBoxImage.material = null;
         facilitySelectionButton.interactable = false;
+        hoverEffect.DeactivateHover();
     }
     //called by the button
     public void AddFacilityToSectorSelection() {
         sectorItsAPartOf.AddFacilityToSelection(this);
+        hoverEffect.ActivateHover();
     }
 
 }

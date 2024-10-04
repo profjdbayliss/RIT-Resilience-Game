@@ -72,7 +72,7 @@ public class CardPlayer : MonoBehaviour {
     [Header("Player Information")]
     public string playerName;
     public PlayerTeam playerTeam = PlayerTeam.Any;
-    public Sector PlayerSector { get; set; }
+    public Sector PlayerSector { get; private set; }
     public string DeckName = "";
 
     [Header("Game References")]
@@ -118,6 +118,7 @@ public class CardPlayer : MonoBehaviour {
     public int AmountToReturnToDeck { get; private set; } = 0;
     public List<Card> CardsAllowedToBeDiscard;
     public Action OnCardsReturnedToDeck { get; set; }
+    public Action<List<Facility>> OnFacilitiesSelected { get; set; }
 
     [Header("Facilities")]
     private int facilityCount = 0;
@@ -138,6 +139,7 @@ public class CardPlayer : MonoBehaviour {
         ReadyToPlay,
         ReturnCardsToDeck,
         DiscardCards,
+        SelectFacilties,
         SelectMeeplesWithUI,
         SelectCardsForCostChange
     }
@@ -225,6 +227,24 @@ public class CardPlayer : MonoBehaviour {
 
     #region Card Action Functions
 
+    public void ForcePlayerSelectFacilities(int num, Action<List<Facility>> onFacilitySelect) {
+        if (num <= 0) return;
+        ReadyState = PlayerReadyState.SelectFacilties;
+        Debug.Log($"Forcing {playerName} to select {num} facilities before continuing");
+        PlayerSector.EnableFacilitySelection(num);
+        OnFacilitiesSelected = onFacilitySelect;
+    }
+    public void ResolveFacilitySelection() {
+        ReadyState = PlayerReadyState.ReadyToPlay;
+        //todo: add what happens after facilities selected
+        var facilities = PlayerSector.GetSelectedFacilities(); //also doesn't work if we move sectors to the blue players 
+        if (facilities == null) {
+            Debug.LogError("selected facility list is null");
+            return;
+        }
+        PlayerSector.DisableFacilitySelection();
+        OnFacilitiesSelected?.Invoke(facilities);
+    }
     public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded) {
         ChooseMeeples(amountOfMeeplesNeeded);
         //TODO: move to an update loop checking ReadyState
@@ -233,7 +253,7 @@ public class CardPlayer : MonoBehaviour {
     }
     private void ChooseMeeples(int amountOfMeeplesNeeded) {
         ReadyState = PlayerReadyState.SelectMeeplesWithUI;
-        PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => ReadyState = PlayerReadyState.SelectCardsForCostChange);
+        PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => ReadyState = PlayerReadyState.SelectCardsForCostChange);//example
     }
     private void SelectCardsInHand() {
 
@@ -288,6 +308,17 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Helpers
+    public void ResetMeepleCount() {
+        if (PlayerSector != null)
+            PlayerSector.ResetMeepleCount();
+    }
+    //TODO: update for more than 2 players
+    public Sector GetActiveSector() {
+        return PlayerSector == null ? GameManager.instance.opponentPlayer.PlayerSector : PlayerSector;
+    }
+    public void AssignSector(Sector sector) {
+        PlayerSector = sector;
+    }
     public PlayerTeam GetOpponentTeam() {
         return playerTeam switch {
             PlayerTeam.Red => PlayerTeam.Blue,
@@ -591,6 +622,23 @@ public class CardPlayer : MonoBehaviour {
 "modp;phys&fin;-1",
 "modp;fin&net;-1",
      */
+    public void HandleMenuToggle() {
+        if (this != GameManager.instance.actualPlayer) {
+            return;
+        }
+        var cardMenu = FindObjectOfType<CardSelectionMenu>();
+        if (cardMenu != null) {
+            if (cardMenu.IsMenuActive) {
+                Debug.Log("Hiding card selection menu");
+                cardMenu.DisableMenu();
+            }
+            else {
+                Debug.Log("Showing card selection menu");
+                var cardsList = new List<Card>(cards.Values);
+                cardMenu.EnableMenu(cardsList);
+            }
+        }
+    }
     void HandleDebugEffectCreation() {
 
         if (PlayerSector == null || PlayerSector.facilities == null || PlayerSector.facilities.Length == 0) {
@@ -652,7 +700,25 @@ public class CardPlayer : MonoBehaviour {
         if (IsDraggingCard) {
             UpdateHoveredDropLocation();
         }
+
+        //wait and check for the proper amount of facilities selected
+        if (ReadyState == PlayerReadyState.SelectFacilties) {
+            if (PlayerSector.HasSelectedFacilities()) {
+                
+                ResolveFacilitySelection();
+            }
+        }
+
+
         if (GameManager.instance.DEBUG_ENABLED) {
+            if (Keyboard.current.digit0Key.wasPressedThisFrame) {
+                if (GameManager.instance.actualPlayer == this)
+                    ForcePlayerSelectFacilities(2, (selectedFacilities) => {
+                        selectedFacilities.ForEach(facility => {
+                            facility.AddRemoveEffectsByIdString("fortify", true, playerTeam);
+                        });
+                    });
+            }
             //HandleDebugEffectCreation();
             if (Keyboard.current.backquoteKey.wasPressedThisFrame) {
                 HandleMenuToggle();
@@ -675,34 +741,17 @@ public class CardPlayer : MonoBehaviour {
                         Debug.Log($"Player {playerName} does not have an assigned sector");
                     }
                 }
-
             }
         }
     }
-    public void HandleMenuToggle() {
-        if (this != GameManager.instance.actualPlayer) {
-            return;
-        }
-        var cardMenu = FindObjectOfType<CardSelectionMenu>();
-        if (cardMenu != null) {
-            if (cardMenu.IsMenuActive) {
-                Debug.Log("Hiding card selection menu");
-                cardMenu.DisableMenu();
-            }
-            else {
-                Debug.Log("Showing card selection menu");
-                var cardsList = new List<Card>(cards.Values);
-                cardMenu.EnableMenu(cardsList);
-            }
-        }
-    }
+    
     //updates the hoverDropLocation class field to hold the object the card is hovering over
     void UpdateHoveredDropLocation() {
         GameObject currentHoveredFacility = null; // Reset at the beginning of each update
         bool isOverAnyDropLocation = false;
 
-        //don't highlight anything if we are just discard or returning cards
-        if (ReadyState == PlayerReadyState.DiscardCards || ReadyState == PlayerReadyState.ReturnCardsToDeck) {
+        //only highlight when the player is ready to play cards
+        if (ReadyState != PlayerReadyState.ReadyToPlay) {
             return;
         }
 
@@ -1075,8 +1124,11 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.instance.IsActualPlayersTurn())
             return ($"It is not {playerTeam}'s turn", false);
+        if (ReadyState == PlayerReadyState.SelectFacilties) {
+            return ($"Player must select facilities before playing cards", false);
+        }
         //handle player having to discard cards during action phase
-        if (ReadyState == PlayerReadyState.DiscardCards && GameManager.instance.MIsDiscardAllowed) {
+        else if (ReadyState == PlayerReadyState.DiscardCards && GameManager.instance.MIsDiscardAllowed) {
             if (hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
                 if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
                     return ("Discard any card allowed", true);

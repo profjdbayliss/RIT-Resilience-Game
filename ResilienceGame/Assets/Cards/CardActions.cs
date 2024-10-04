@@ -147,16 +147,17 @@ public class SpreadEffect : ICardAction {
 }
 
 public class ChangeMeepleAmount : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        facilityActedUpon.sectorItsAPartOf.blackMeeples += card.data.meepleAmount;
-        facilityActedUpon.sectorItsAPartOf.blueMeeples += card.data.meepleAmount;
-        facilityActedUpon.sectorItsAPartOf.purpleMeeples += card.data.meepleAmount;
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //deprecated?
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    facilityActedUpon.sectorItsAPartOf.blackMeeples += card.data.meepleAmount;
+    //    facilityActedUpon.sectorItsAPartOf.blueMeeples += card.data.meepleAmount;
+    //    facilityActedUpon.sectorItsAPartOf.purpleMeeples += card.data.meepleAmount;
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log("card " + card.front.title + " canceled.");
-    }
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    Debug.Log("card " + card.front.title + " canceled.");
+    //}
 }
 
 public class IncreaseOvertimeAmount : ICardAction {
@@ -248,21 +249,15 @@ public class NWMeepleChangeEach : ICardAction
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
         foreach (string meepleType in card.data.meepleType)
         {
-            switch(meepleType)
-            {
-                case "Blue":
-                    playerInstance.PlayerSector.blueMeeples += card.data.meepleAmount;
-                    break;
-                case "Black":
-                    playerInstance.PlayerSector.blackMeeples += card.data.meepleAmount;
-                    break;
-                case "Purple":
-                    playerInstance.PlayerSector.purpleMeeples += card.data.meepleAmount;
-                    break;
-                default:
-                    Debug.Log("meeple type isnt black blue or purple for some reason");
-                    break;
-            }
+            playerInstance.PlayerSector.AddSubtractMeepleAmount(
+                meepleType switch {
+                    "Blue" => 0,
+                    "Black" => 1,
+                    "Purple" => 2,
+                    _ => -1
+                }, 
+            card.data.meepleAmount);
+            
         }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
@@ -443,44 +438,29 @@ public class NWChangeMeepleAmtDice : ICardAction
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
             if(card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
             {
-                foreach (string meepleType in card.data.meepleType)
-                {
-                    switch (meepleType)
-                    {
-                        case "Blue":
-                            playerInstance.PlayerSector.blueMeeples *= card.data.meepleAmount;
-                            break;
-                        case "Black":
-                            playerInstance.PlayerSector.blackMeeples *= card.data.meepleAmount;
-                            break;
-                        case "Purple":
-                            playerInstance.PlayerSector.purpleMeeples *= card.data.meepleAmount;
-                            break;
-                        default:
-                            Debug.Log("meeple type isnt black blue or purple for some reason");
-                            break;
-                    }
+                foreach (string meepleType in card.data.meepleType) {
+                    playerInstance.PlayerSector.MultiplyMeepleAmount(
+                        meepleType switch {
+                            "Blue" => 0,
+                            "Black" => 1,
+                            "Purple" => 2,
+                            _ => -1
+                        },
+                        card.data.meepleAmount);
                 }
             }
             else
             {
                 foreach (string meepleType in card.data.meepleType)
                 {
-                    switch (meepleType)
-                    {
-                        case "Blue":
-                            playerInstance.PlayerSector.blueMeeples += card.data.meepleAmount;
-                            break;
-                        case "Black":
-                            playerInstance.PlayerSector.blackMeeples += card.data.meepleAmount;
-                            break;
-                        case "Purple":
-                            playerInstance.PlayerSector.purpleMeeples += card.data.meepleAmount;
-                            break;
-                        default:
-                            Debug.Log("meeple type isnt black blue or purple for some reason");
-                            break;
-                    }
+                    playerInstance.PlayerSector.AddSubtractMeepleAmount(
+                        meepleType switch {
+                            "Blue" => 0,
+                            "Black" => 1,
+                            "Purple" => 2,
+                            _ => -1
+                        },
+                        card.data.meepleAmount);
                 }
             }
         }

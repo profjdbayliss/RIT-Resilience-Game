@@ -251,10 +251,18 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //is this correct?
 
         // TODO: Set randomly
+        
         Sector sector = gameCanvas.GetComponentInChildren<Sector>();
-        actualPlayer.PlayerSector = sector;
-        sector.owner = actualPlayer; //this should actually belong to the blue player not just whoever is 'actual player'
-        actualPlayer.PlayerSector.Initialize(PlayerSector.Water);
+        //assign the owner of the sector as the blue player
+        sector.owner = actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer;
+        //give the sector to both players
+        //id imagine eventually red player will have a sector, but it will change depending on which game board(sector) they are currently looking at
+        actualPlayer.AssignSector(sector);
+        opponentPlayer.AssignSector(sector);
+        sector.Initialize(PlayerSector.Water);
+        //actualPlayer.PlayerSector = sector;
+        //sector.owner = actualPlayer; //this should actually belong to the blue player not just whoever is 'actual player'
+        //actualPlayer.PlayerSector.Initialize(PlayerSector.Water);
         //if (actualPlayer.playerTeam == PlayerTeam.Blue) {
         //    mEndPhaseButton.SetActive(false);
         //}
@@ -850,8 +858,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Increments a turn. Note that turns consist of multiple phases.
     public void IncrementTurn() {
         // OnRoundEnd?.Invoke(); //inform listeners that the round ended
-        actualPlayer.PlayerSector.ResetMeepleCount();
-        opponentPlayer.PlayerSector.ResetMeepleCount();
+
+        actualPlayer.ResetMeepleCount();
+        opponentPlayer.ResetMeepleCount();
         turnTotal++;
         mTurnText.text = "Turn: " + GetTurn();
         if (IsServer) {

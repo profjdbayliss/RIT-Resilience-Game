@@ -5757,7 +5757,9 @@ MonoBehaviour:
   - {fileID: 988311466}
   facilityNameText: {fileID: 310921094}
   facilitySelectionButton: {fileID: 520008984}
+  facilityBoxImage: {fileID: 520008982}
   effectManager: {fileID: 325979397}
+  outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   isDown: 0
 --- !u!114 &325979394
 MonoBehaviour:
@@ -9180,7 +9182,9 @@ MonoBehaviour:
   - {fileID: 606468166}
   facilityNameText: {fileID: 96068603}
   facilitySelectionButton: {fileID: 92073679}
+  facilityBoxImage: {fileID: 92073677}
   effectManager: {fileID: 510286175}
+  outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   isDown: 0
 --- !u!114 &510286172
 MonoBehaviour:
@@ -18286,7 +18290,9 @@ MonoBehaviour:
   - {fileID: 470503063}
   facilityNameText: {fileID: 426345553}
   facilitySelectionButton: {fileID: 1599086105}
+  facilityBoxImage: {fileID: 1599086103}
   effectManager: {fileID: 1173674374}
+  outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   isDown: 0
 --- !u!61 &1173674371
 BoxCollider2D:
