@@ -40,7 +40,7 @@ public class Facility : MonoBehaviour {
 
     public bool isDown;
    // public bool IsFortified { get; set; } = false;
-    public bool IsBackdoored { get; set; } = false;
+   // public bool IsBackdoored { get; set; } = false;
 
 
     // Start is called before the first frame update
@@ -221,6 +221,16 @@ public class Facility : MonoBehaviour {
     }
     public void DebugAddSpecificEffect(string effect) {
         effectManager.DebugAddEffect(effect);
+    }
+    public void EnableFacilitySelection() {
+        facilitySelectionButton.interactable = true;
+    }
+    public void DisableFacilitySelection() {
+        facilitySelectionButton.interactable = false;
+    }
+    //called by the button
+    public void AddFacilityToSectorSelection() {
+        sectorItsAPartOf.AddFacilityToSelection(this);
     }
 
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class Sector : MonoBehaviour {
     public PlayerSector sectorName; // TODO: Move playersector here
@@ -43,6 +44,8 @@ public class Sector : MonoBehaviour {
     [SerializeField] private Material outlineMat;
     public int meeplesSpent = 0;
     public int numMeeplesRequired = 0;
+    public int numFacilitiesRequired = 0;
+    public HashSet<Facility> selectedFacilities;
 
     private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
         { PlayerSector.Communications, 3 },
@@ -63,6 +66,52 @@ public class Sector : MonoBehaviour {
         { PlayerSector.Transport, 14 }
     };
 
+    public bool HasSelectedFacilities() {
+        if (numFacilitiesRequired <= 0) return true;
+        if (selectedFacilities != null) {
+            return selectedFacilities.Count >= numFacilitiesRequired;
+        }
+        return false;
+    }
+    public List<Facility> GetSelectedFacilities() {
+        if (selectedFacilities == null)
+            return selectedFacilities.ToList();
+        return null;
+    }
+    public void EnableFacilitySelection(int numRequired) {
+        if (numRequired <= 0) {
+            Debug.LogError("Must require more than 0 facilities to select");
+            return;
+        }
+        selectedFacilities = new HashSet<Facility>();
+        //special case to select all facilities
+        if (numRequired == 3) {
+            foreach (Facility facility in selectedFacilities) {
+                if (facility != null) {
+                    selectedFacilities.Add(facility);
+                }
+            }
+            return;
+        }
+        foreach (Facility facility in selectedFacilities) {
+            if (facility != null) {
+                facility.EnableFacilitySelection();
+            }
+        }
+    }
+    public void DisableFacilitySelection() {
+        foreach (Facility facility in selectedFacilities) {
+            if (facility != null) {
+                facility.DisableFacilitySelection();
+            }
+        }
+    }
+    public void AddFacilityToSelection(Facility facility) {
+        if (selectedFacilities == null)
+            return;
+        selectedFacilities.Add(facility);
+        Debug.Log($"Added {facility.facilityName} to selected facilities");
+    }
 
     public void InformFacilitiesOfNewTurn() {
         foreach (Facility facility in facilities) {
