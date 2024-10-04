@@ -251,13 +251,13 @@ public class NWMeepleChangeEach : ICardAction
             switch(meepleType)
             {
                 case "Blue":
-                    playerInstance.playerSector.blueMeeples += card.data.meepleAmount;
+                    playerInstance.PlayerSector.blueMeeples += card.data.meepleAmount;
                     break;
                 case "Black":
-                    playerInstance.playerSector.blackMeeples += card.data.meepleAmount;
+                    playerInstance.PlayerSector.blackMeeples += card.data.meepleAmount;
                     break;
                 case "Purple":
-                    playerInstance.playerSector.purpleMeeples += card.data.meepleAmount;
+                    playerInstance.PlayerSector.purpleMeeples += card.data.meepleAmount;
                     break;
                 default:
                     Debug.Log("meeple type isnt black blue or purple for some reason");
@@ -304,7 +304,7 @@ public class NWIncOvertimeAmount : ICardAction
         //at the moment this method doesnt actually handle multiple sectors because
         //we dont know how to implement multiple sectors yet. that being said this doesnt 
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
-        playerInstance.playerSector.overTimeCharges++;
+        playerInstance.PlayerSector.overTimeCharges++;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -373,7 +373,7 @@ public class NWChangePhysPointsDice : ICardAction
         if ( diceRoll < card.data.minDiceRoll)
         {
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-            foreach(Facility facility in playerInstance.playerSector.facilities)
+            foreach(Facility facility in playerInstance.PlayerSector.facilities)
             {
                 facility.ChangeFacilityPoints(FacilityEffectTarget.Physical, card.data.facilityAmount);
             }
@@ -406,7 +406,7 @@ public class NWChangeFinPointsDice : ICardAction
         if (diceRoll < card.data.minDiceRoll)
         {
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-            foreach (Facility facility in playerInstance.playerSector.facilities)
+            foreach (Facility facility in playerInstance.PlayerSector.facilities)
             {
                 facility.ChangeFacilityPoints(FacilityEffectTarget.Financial, card.data.facilityAmount);
             }
@@ -448,13 +448,13 @@ public class NWChangeMeepleAmtDice : ICardAction
                     switch (meepleType)
                     {
                         case "Blue":
-                            playerInstance.playerSector.blueMeeples *= card.data.meepleAmount;
+                            playerInstance.PlayerSector.blueMeeples *= card.data.meepleAmount;
                             break;
                         case "Black":
-                            playerInstance.playerSector.blackMeeples *= card.data.meepleAmount;
+                            playerInstance.PlayerSector.blackMeeples *= card.data.meepleAmount;
                             break;
                         case "Purple":
-                            playerInstance.playerSector.purpleMeeples *= card.data.meepleAmount;
+                            playerInstance.PlayerSector.purpleMeeples *= card.data.meepleAmount;
                             break;
                         default:
                             Debug.Log("meeple type isnt black blue or purple for some reason");
@@ -469,13 +469,13 @@ public class NWChangeMeepleAmtDice : ICardAction
                     switch (meepleType)
                     {
                         case "Blue":
-                            playerInstance.playerSector.blueMeeples += card.data.meepleAmount;
+                            playerInstance.PlayerSector.blueMeeples += card.data.meepleAmount;
                             break;
                         case "Black":
-                            playerInstance.playerSector.blackMeeples += card.data.meepleAmount;
+                            playerInstance.PlayerSector.blackMeeples += card.data.meepleAmount;
                             break;
                         case "Purple":
-                            playerInstance.playerSector.purpleMeeples += card.data.meepleAmount;
+                            playerInstance.PlayerSector.purpleMeeples += card.data.meepleAmount;
                             break;
                         default:
                             Debug.Log("meeple type isnt black blue or purple for some reason");

@@ -102,7 +102,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DotSize: 0.4
     - _DotSpacing: 0.1
-    - _DotSpeed: 0.1
+    - _DotSpeed: 0.2
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
@@ -110,7 +110,7 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _OutlineWidth: 2.2
+    - _OutlineWidth: 3
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1

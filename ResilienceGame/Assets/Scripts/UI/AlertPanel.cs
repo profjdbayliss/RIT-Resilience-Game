@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,7 +10,7 @@ public class AlertPanel : MonoBehaviour {
     [SerializeField] GameObject textAlertPanel;
     [SerializeField] Transform ListPanel;
     [SerializeField] GameObject ListItemPrefab;
-
+    private readonly Queue<Action> onAlertFinish = new Queue<Action>();
     Queue<string> textAlertQueue = new Queue<string>();
     List<GameObject> effectListItems = new List<GameObject>();
 
@@ -18,14 +19,23 @@ public class AlertPanel : MonoBehaviour {
         textAlertPanel.SetActive(true);
         if (duration != -1) {
             StartCoroutine(HideTextFrame(duration));
+            
         }
+    }
+    
+    public void ShowTextAlert(string message, Action onFinish) {
+        ShowTextAlert(message);
+        onAlertFinish.Enqueue(onFinish);
     }
 
     public void ResolveTextAlert() {
         textAlertPanel.SetActive(false);
+        if (onAlertFinish.Count > 0) {
+            onAlertFinish.Dequeue()();  //callback when the alert is finished
+        }
         if (textAlertQueue.Count > 0) {
+            
             ShowTextAlert(textAlertQueue.Dequeue()); //assume all infinite duration (currently the case)
-
         }
     }
     private IEnumerator HideTextFrame(float time) {

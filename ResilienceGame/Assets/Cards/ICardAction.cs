@@ -15,7 +15,7 @@ public abstract class ICardAction
             CardTarget.Facility => $"on {facilityActedUpon.facilityName}",
             CardTarget.Card => $"on {cardActedUpon.data.name}",
             CardTarget.Hand => "",
-            _ => $"in {player.playerSector.sectorName}"
+            _ => $"in {player.PlayerSector.sectorName}"
         };
 
 

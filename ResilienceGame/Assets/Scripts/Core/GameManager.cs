@@ -251,8 +251,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //is this correct?
 
         // TODO: Set randomly
-        actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
-        actualPlayer.playerSector.Initialize(PlayerSector.Water);
+        Sector sector = gameCanvas.GetComponentInChildren<Sector>();
+        actualPlayer.PlayerSector = sector;
+        sector.owner = actualPlayer; //this should actually belong to the blue player not just whoever is 'actual player'
+        actualPlayer.PlayerSector.Initialize(PlayerSector.Water);
         //if (actualPlayer.playerTeam == PlayerTeam.Blue) {
         //    mEndPhaseButton.SetActive(false);
         //}
@@ -468,9 +470,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         StatusText.text = message;
     }
 
-    public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1) {
+    public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1, Action onAlertFinish = null) {
         if (player == actualPlayer) {
-            mAlertPanel.ShowTextAlert(message, duration);
+            if (onAlertFinish == null)
+                mAlertPanel.ShowTextAlert(message, duration);
+            else
+                mAlertPanel.ShowTextAlert(message, onAlertFinish);
         }
     }
     public void DisplayFacilityEffectChoiceMenu(Facility facility, CardPlayer player) {
@@ -844,7 +849,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Increments a turn. Note that turns consist of multiple phases.
     public void IncrementTurn() {
-       // OnRoundEnd?.Invoke(); //inform listeners that the round ended
+        // OnRoundEnd?.Invoke(); //inform listeners that the round ended
+        actualPlayer.PlayerSector.ResetMeepleCount();
+        opponentPlayer.PlayerSector.ResetMeepleCount();
         turnTotal++;
         mTurnText.text = "Turn: " + GetTurn();
         if (IsServer) {

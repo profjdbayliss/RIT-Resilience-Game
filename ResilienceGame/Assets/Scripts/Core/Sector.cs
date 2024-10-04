@@ -27,6 +27,7 @@ public class Sector : MonoBehaviour {
     private string fileLocation;
     // output atlas filename
     public string outputAtlasName;
+    public CardPlayer owner;
 
     [SerializeField] private GameObject sectorCanvas;
     public RawImage icon;
@@ -37,7 +38,11 @@ public class Sector : MonoBehaviour {
     //private const string FORTIFY_ICON_PATH = "images/Fortified.png";
     private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
-
+    [SerializeField] private Button[] meepleButtons;
+    [SerializeField] private Image[] meepleImages;
+    [SerializeField] private Material outlineMat;
+    public int meeplesSpent = 0;
+    public int numMeeplesRequired = 0;
 
     private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
         { PlayerSector.Communications, 3 },
@@ -142,15 +147,15 @@ public class Sector : MonoBehaviour {
         return sprites;
     }
     private void InitEffectSprites() {
-        
+
         string effectAtlasPath = Path.Combine(Application.streamingAssetsPath, EFFECT_ICON_PATH);
         Texture2D effectAtlasTexture = LoadTextureFromFile(effectAtlasPath);
         if (effectAtlasTexture != null) {
             EffectSprites = SliceSpriteSheet(
-                texture: effectAtlasTexture, 
-                spriteWidth: 50, 
-                spriteHeight: 50, 
-                columns: 3, 
+                texture: effectAtlasTexture,
+                spriteWidth: 50,
+                spriteHeight: 50,
+                columns: 3,
                 rows: 3);
         }
         else {
@@ -215,6 +220,7 @@ public class Sector : MonoBehaviour {
             blackMeeples -= card.data.blackCost;
             purpleMeeples -= card.data.purpleCost;
             numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost); //incrememnt the reference variable to hold total meeples spent
+            meeplesSpent += numMeeplesSpent;
             UpdateMeepleAmountUI();
             return true;
         }
@@ -225,7 +231,65 @@ public class Sector : MonoBehaviour {
         meeplesAmountText[1].text = blueMeeples.ToString();
         meeplesAmountText[2].text = purpleMeeples.ToString();
     }
+    public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
+        this.numMeeplesRequired = numMeeplesRequired;
+        GameManager.instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", owner, onAlertFinish: onFinish);
+        EnableMeepleButtons();
+
+    }
+
+    private void EnableMeepleButtons() {
+        foreach (Button button in meepleButtons) {
+            button.interactable = true;
+        }
+    }
+    private void DisableMeepleButtons() {
+        foreach (Button button in meepleButtons) {
+            button.interactable = false;
+        }
+    }
+    //called by the buttons in the sector canvas
+    public void TryButtonSpendMeeple(int index) {
+        if (meepleButtons[index].interactable) {
+            switch (index) {
+                case 0:
+                    blackMeeples--;
+                    meeplesSpent++;
+                    if (blackMeeples == 0) {
+                        meepleButtons[index].interactable = false;
+                    }
+                    break;
+                case 1:
+                    blueMeeples--;
+                    meeplesSpent++;
+                    if (blueMeeples == 0) {
+                        meepleButtons[index].interactable = false;
+                    }
+                    break;
+                case 2:
+                    purpleMeeples--;
+                    meeplesSpent++;
+                    if (purpleMeeples == 0) {
+                        meepleButtons[index].interactable = false;
+                    }
+                    break;
+            }
+            if (numMeeplesRequired > 0 && meeplesSpent > 0) {
+                numMeeplesRequired--;
+                if (numMeeplesRequired == 0) {
+                    GameManager.instance.mAlertPanel.ResolveTextAlert();
+                    DisableMeepleButtons();
+                }
+                else {
+                    GameManager.instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", owner);
+
+                }
+            }
+            UpdateMeepleAmountUI();
+        }
+    }
     public void ResetMeepleCount() {
+        meeplesSpent = 0;
         blueMeeples = blackMeeples = purpleMeeples = STARTING_MEEPLES;
         UpdateMeepleAmountUI();
     }

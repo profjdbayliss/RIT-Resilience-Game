@@ -72,7 +72,7 @@ public class CardPlayer : MonoBehaviour {
     [Header("Player Information")]
     public string playerName;
     public PlayerTeam playerTeam = PlayerTeam.Any;
-    public Sector playerSector;
+    public Sector PlayerSector { get; set; }
     public string DeckName = "";
 
     [Header("Game References")]
@@ -138,6 +138,7 @@ public class CardPlayer : MonoBehaviour {
         ReadyToPlay,
         ReturnCardsToDeck,
         DiscardCards,
+        SelectMeeplesWithUI,
         SelectCardsForCostChange
     }
     #endregion
@@ -193,7 +194,7 @@ public class CardPlayer : MonoBehaviour {
     public void RegisterFacilities() {
         registeredFacilities = true;
         Debug.Log($"Player {playerName} of team {playerTeam} registering facilities");
-        foreach (Facility facility in playerSector.facilities) {
+        foreach (Facility facility in PlayerSector.facilities) {
             ActiveFacilities.Add((int)facility.facilityType, facility.gameObject);
             FacilityIDs.Add((int)facility.facilityType);
         }
@@ -223,6 +224,23 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Card Action Functions
+
+    public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded) {
+        ChooseMeeples(amountOfMeeplesNeeded);
+        //TODO: move to an update loop checking ReadyState
+        SelectCardsInHand();
+        SelectMeeplesOnCards();
+    }
+    private void ChooseMeeples(int amountOfMeeplesNeeded) {
+        ReadyState = PlayerReadyState.SelectMeeplesWithUI;
+        PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => ReadyState = PlayerReadyState.SelectCardsForCostChange);
+    }
+    private void SelectCardsInHand() {
+
+    }
+    private void SelectMeeplesOnCards() {
+
+    }
     //Sets the variables required to force the player to discard a certain amout of cards
     public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
         ReadyState = PlayerReadyState.DiscardCards;         //set the player state to discard cards
@@ -278,8 +296,8 @@ public class CardPlayer : MonoBehaviour {
         };
     }
     public void InformSectorOfNewTurn() {
-        if (playerSector != null)
-            playerSector.InformFacilitiesOfNewTurn();
+        if (PlayerSector != null)
+            PlayerSector.InformFacilitiesOfNewTurn();
         else {
             Debug.Log($"{playerName}'s sector is null");
         }
@@ -308,10 +326,10 @@ public class CardPlayer : MonoBehaviour {
         return "Card not found";
     }
     public int GetTotalMeeples() {
-        return playerSector.GetTotalMeeples();
+        return PlayerSector.GetTotalMeeples();
     }
     public int GetMaxMeeples() {
-        return playerSector.GetMaxMeeples();
+        return PlayerSector.GetMaxMeeples();
     }
     private Facility FacilityPlayedOn() {
         Facility facility = null;
@@ -575,30 +593,30 @@ public class CardPlayer : MonoBehaviour {
      */
     void HandleDebugEffectCreation() {
 
-        if (playerSector == null || playerSector.facilities == null || playerSector.facilities.Length == 0) {
+        if (PlayerSector == null || PlayerSector.facilities == null || PlayerSector.facilities.Length == 0) {
             return;
         }
 
         if (Keyboard.current.digit1Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1":"1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1":"1")}");
         }
         else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
         else if (Keyboard.current.digit3Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;fin;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
         else if (Keyboard.current.digit4Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
         else if (Keyboard.current.digit5Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
         else if (Keyboard.current.digit6Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;phys&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
         else if (Keyboard.current.digit7Key.wasPressedThisFrame) {
-            playerSector.facilities[0].DebugAddSpecificEffect($"modp;all;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;all;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
         }
     }
     //These are for testing purposes to add/remove cards from the hand
@@ -625,8 +643,8 @@ public class CardPlayer : MonoBehaviour {
 
         //init once sector is ready
         if (!registeredFacilities) {
-            if (playerSector != null) {
-                if (playerSector.facilities != null && playerSector.facilities.Length > 0)
+            if (PlayerSector != null) {
+                if (PlayerSector.facilities != null && PlayerSector.facilities.Length > 0)
                     RegisterFacilities();
             }
         }
@@ -647,9 +665,9 @@ public class CardPlayer : MonoBehaviour {
             }
             if (Keyboard.current.f3Key.wasPressedThisFrame) {
                 if (GameManager.instance.actualPlayer == this) {
-                    if (playerSector != null) {
+                    if (PlayerSector != null) {
                         Debug.Log($"Facility info for player {playerName}");
-                        foreach (Facility facility in playerSector.facilities) {
+                        foreach (Facility facility in PlayerSector.facilities) {
                             facility.LogFacilityDebug();
                         }
                     }
@@ -1076,7 +1094,7 @@ public class CardPlayer : MonoBehaviour {
                     return ("Facility effect does not match card prereq effect", false);
                 }
             }
-            if (!playerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
+            if (!PlayerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
                 return ("Not enough meeples to play card", false);
             }
         }
