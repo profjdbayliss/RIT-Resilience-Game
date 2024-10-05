@@ -226,6 +226,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 break;
             case CardMessageType.ShareDiscardNumber:
             case CardMessageType.CardUpdate:
+            case CardMessageType.CardUpdateWithExtraFacilityInfo:
             case CardMessageType.ReduceCost:
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
@@ -487,7 +488,40 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
                             CardID = cardId,
-                            FacilityType = (FacilityType)facilityType,
+                            FacilityPlayedOnType = (FacilityType)facilityType,
+                        };
+                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.CardUpdateWithExtraFacilityInfo: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int effectUID = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityEffect1 = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityEffect2 = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityEffect3 = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update {
+                            Type = CardMessageType.CardUpdate,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            FacilityPlayedOnType = (FacilityType)facilityType,
+                            FacilityEffectUID = effectUID,
+                            AdditionalFacilitySelectedOne = (FacilityType)facilityEffect1,
+                            AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
+                            AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
@@ -531,7 +565,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Type = CardMessageType.RemoveEffect,
                             UniqueID = uniqueId,
                             CardID = cardId,
-                            FacilityType = (FacilityType)facilityType,
+                            FacilityPlayedOnType = (FacilityType)facilityType,
                             //EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
@@ -683,9 +717,42 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
                             CardID = cardId,
-                            FacilityType = (FacilityType)facilityType
+                            FacilityPlayedOnType = (FacilityType)facilityType
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.CardUpdateWithExtraFacilityInfo: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int effectUID = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityEffect1 = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityEffect2 = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int facilityEffect3 = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update {
+                            Type = CardMessageType.CardUpdate,
+                            UniqueID = uniqueId,
+                            CardID = cardId,
+                            FacilityPlayedOnType = (FacilityType)facilityType,
+                            FacilityEffectUID = effectUID,
+                            AdditionalFacilitySelectedOne = (FacilityType)facilityEffect1,
+                            AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
+                            AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
+                        };
+                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
@@ -728,7 +795,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Type = CardMessageType.RemoveEffect,
                             UniqueID = uniqueId,
                             CardID = cardId,
-                            FacilityType = (FacilityType)facilityType,
+                            FacilityPlayedOnType = (FacilityType)facilityType,
                             //EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);

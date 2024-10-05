@@ -15,6 +15,7 @@ public enum CardMessageType
     SharePlayerType,
     ShareDiscardNumber,
     CardUpdate,
+    CardUpdateWithExtraFacilityInfo,
     ReduceCost,
     RemoveEffect,
     DiscardCard,

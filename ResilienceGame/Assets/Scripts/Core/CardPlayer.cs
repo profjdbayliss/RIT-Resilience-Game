@@ -55,8 +55,11 @@ public struct Update {
     public int CardID;
     public int UniqueID;
     public int Amount;
-    public FacilityType FacilityType;
+    public FacilityType FacilityPlayedOnType;
     public int FacilityEffectUID;
+    public FacilityType AdditionalFacilitySelectedOne;
+    public FacilityType AdditionalFacilitySelectedTwo;
+    public FacilityType AdditionalFacilitySelectedThree;
 };
 
 public enum DiscardFromWhere {
@@ -236,7 +239,7 @@ public class CardPlayer : MonoBehaviour {
     }
     public void ResolveFacilitySelection() {
         ReadyState = PlayerReadyState.ReadyToPlay;
-        //todo: add what happens after facilities selected
+        
         var facilities = PlayerSector.GetSelectedFacilities(); //also doesn't work if we move sectors to the blue players 
         if (facilities == null) {
             Debug.LogError("selected facility list is null");
@@ -1269,7 +1272,7 @@ public class CardPlayer : MonoBehaviour {
             UniqueID = UniqueID,
             CardID = CardID,
             Amount = Amount,
-            FacilityType = facilityType,
+            FacilityPlayedOnType = facilityType,
             FacilityEffectUID = facilityEffectUID
         });
         if (sendUpdateImmediately) {
@@ -1313,8 +1316,8 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     void HandleRemoveEffectUpdate(Update update, CardPlayer opponent) {
-        if (update.FacilityType != FacilityType.None) {
-            if (ActiveFacilities.TryGetValue((int)update.FacilityType, out GameObject facilityGo)) {
+        if (update.FacilityPlayedOnType != FacilityType.None) {
+            if (ActiveFacilities.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo)) {
                 if (facilityGo.TryGetComponent(out Facility facility)) {
                     Debug.Log($"Looking to remove effect with uid {update.FacilityEffectUID} from {facility.facilityName}");
 
@@ -1329,16 +1332,16 @@ public class CardPlayer : MonoBehaviour {
         if (update.Type == CardMessageType.CardUpdate) {
             IsAnimating = true;
             //handle facility card play
-            if (update.FacilityType != FacilityType.None) {
+            if (update.FacilityPlayedOnType != FacilityType.None) {
                 HandleFacilityOpponentPlay(update, phase, opponent);
             }
             //handle non facility card
-            else if (update.FacilityType == FacilityType.None) {
+            else if (update.FacilityPlayedOnType == FacilityType.None) {
 
                 HandleFreeOpponentPlay(update, phase, opponent);
             }
             else {
-                Debug.LogError($"Failed to find facility of type: {update.FacilityType}");
+                Debug.LogError($"Failed to find facility of type: {update.FacilityPlayedOnType}");
             }
         }
         else if (update.Type == CardMessageType.DiscardCard) {
@@ -1350,7 +1353,7 @@ public class CardPlayer : MonoBehaviour {
             }
         }
         else {
-            Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityType}");
+            Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityPlayedOnType}");
         }
     }
     //handles when the shared logic of opponent card plays
@@ -1406,7 +1409,7 @@ public class CardPlayer : MonoBehaviour {
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
-        if (facilityList.TryGetValue((int)update.FacilityType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
+        if (facilityList.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
             Debug.Log($"{playerName} is creating card played on facility: {facility.facilityName}");
             if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
                 Card tempCard = cardObject.GetComponent<Card>();
@@ -1431,17 +1434,17 @@ public class CardPlayer : MonoBehaviour {
             playsForMessage.Add((int)phase);
             Update update = mUpdatesThisPhase.Dequeue();
             //public CardMessageType Type;int CardID;int UniqueID;int Amount;FacilityType FacilityType;FacilityEffectType Effect;
-            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|facility type:{update.FacilityType}");
+            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|facility type:{update.FacilityPlayedOnType}");
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
-            playsForMessage.Add((int)update.FacilityType);
+            playsForMessage.Add((int)update.FacilityPlayedOnType);
 
 
             if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);
             }
             else if (update.Type == CardMessageType.RemoveEffect) {
-                playsForMessage.Add((int)update.FacilityType);
+                playsForMessage.Add((int)update.FacilityPlayedOnType);
                 //playsForMessage.Add((int)update.EffectTarget);
             }
             //else if (update.Type == CardMessageType.RestorePoints) {
