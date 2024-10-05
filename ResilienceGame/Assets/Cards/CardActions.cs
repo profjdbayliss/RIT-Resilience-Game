@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using System.Linq;
 using System;
+using static Facility;
 
 // TODO: Rewrite card actions for Sector Down
 /*
@@ -161,38 +162,71 @@ public class SpreadEffect : ICardAction {
 }
 public class SelectFacilitiesRemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
-        void removeEffect(Facility facility, FacilityEffect effectToRemove) {
-            if (facility.TryRemoveEffect(effectToRemove)) {
-                Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facilityActedUpon.facilityName}");
+        if (player == GameManager.instance.actualPlayer) {
+            Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
+            void removeEffect(Facility facility, FacilityEffect effectToRemove) {
+                if (facility.TryRemoveEffect(effectToRemove)) {
+                    Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facilityActedUpon.facilityName}");
+                }
+                else {
+                    Debug.LogError($"Found effect to remove but then got a false value when trying to remove it");
+                }
             }
-            else {
-                Debug.LogError($"Found effect to remove but then got a false value when trying to remove it");
+
+            if (facilityActedUpon == null) {
+                Debug.LogError(card.data.name + " was played without a facility acted upon");
+                return;
             }
-        }
+            Sector sectorToActOn = facilityActedUpon.sectorItsAPartOf;
+            sectorToActOn.Owner.ForcePlayerSelectFacilities(
+                numFacilitiesToSelect: card.data.targetAmount,
+                onFacilitySelect: (selectedFacilities) => {
+                    selectedFacilities.ForEach(facility => {
+                        Debug.Log($"Selected facility: {facility.facilityName}");
+                        var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
 
-        if (facilityActedUpon == null) {
-            Debug.LogError(card.data.name + " was played without a facility acted upon");
-            return;
-        }
-        Sector sectorToActOn = facilityActedUpon.sectorItsAPartOf;
-        sectorToActOn.Owner.ForcePlayerSelectFacilities(
-            numFacilitiesToSelect: card.data.targetAmount,
-            onFacilitySelect: (facilities) => {
-                facilities.ForEach(facility => {
-                    Debug.Log($"Selected facility: {facility.facilityName}");
-                    var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
+                        if (effectsToRemove != null && effectsToRemove.Count > 0) {
+                            //Debug.Log($"Removable effects: {effectsToRemove.Count}");
+                            //effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
+                            removeEffect(facility, effectsToRemove[0]);
+                        }
+                        else {
+                            Debug.LogError($"No removable effects to remove on {facility.facilityName}");
+                        }
+                    });
 
-                    if (effectsToRemove != null && effectsToRemove.Count > 0) {
-                        //Debug.Log($"Removable effects: {effectsToRemove.Count}");
-                        //effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
-                        removeEffect(facility, effectsToRemove[0]);
+
+                    //send network update if actual player
+
+
+                    FacilityType facilityType1 = FacilityType.None;
+                    FacilityType facilityType2 = FacilityType.None;
+                    FacilityType faciltiyType3 = FacilityType.None;
+
+                    if (selectedFacilities.Count > 0) {
+                        facilityType1 = selectedFacilities[0].facilityType;
                     }
-                    else {
-                        Debug.LogError($"No removable effects to remove on {facility.facilityName}");
+                    if (selectedFacilities.Count > 1) {
+                        facilityType2 = selectedFacilities[1].facilityType;
                     }
+                    if (selectedFacilities.Count > 2) {
+                        faciltiyType3 = selectedFacilities[2].facilityType;
+                    }
+
+
+                    player.UpdateNextInQueueMessage(
+                    cardMessageType: CardMessageType.CardUpdateWithExtraFacilityInfo,
+                    CardID: card.data.cardID,
+                    UniqueID: card.UniqueID,
+                    Amount: card.data.effectCount, //not needed maybe?
+                    facilityDroppedOnType: FacilityType.None, //ensure if gets picked up by the sector update code in card player
+                    facilityType1: facilityType1,
+                    facilityType2: facilityType2,
+                    facilityType3: faciltiyType3,
+                    sendUpdate: true
+                );
                 });
-            });
+        }
     }
 
     /*

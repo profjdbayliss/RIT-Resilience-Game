@@ -1086,7 +1086,8 @@ public class CardPlayer : MonoBehaviour {
                 EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID);
                 playCount = 1;
                 playKey = card.UniqueID;
-                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, () => card.Play(this, opponentPlayer, facility)));
+                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, 
+                    () => card.Play(this, opponentPlayer, facility)));
 
                 break;
 
@@ -1262,11 +1263,48 @@ public class CardPlayer : MonoBehaviour {
         }
         GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
     }
+
     #endregion
 
-    #region Network Updates
+    #region Network
+    public void UpdateNextInQueueMessage(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
+        FacilityType facilityDroppedOnType = FacilityType.None, FacilityType facilityType1 = FacilityType.None,
+        FacilityType facilityType2 = FacilityType.None,
+        FacilityType facilityType3 = FacilityType.None, int facilityEffectUID = -1, bool sendUpdate = false) {
 
-    private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1, bool sendUpdateImmediately = false) {
+        if (mUpdatesThisPhase.Count > 0) {
+            var update = mUpdatesThisPhase.Dequeue();
+            update.Type = cardMessageType;
+            update.CardID = CardID;
+            update.UniqueID = UniqueID;
+            update.Amount = Amount != -1 ? Amount : update.Amount;
+            update.FacilityPlayedOnType = facilityDroppedOnType != FacilityType.None ?
+                                                facilityDroppedOnType : update.FacilityPlayedOnType;
+
+            update.AdditionalFacilitySelectedOne = facilityType1 != FacilityType.None ?
+                                                facilityType1 : update.AdditionalFacilitySelectedOne;
+
+            update.AdditionalFacilitySelectedTwo = facilityType2 != FacilityType.None ?
+                                                facilityType2 : update.AdditionalFacilitySelectedTwo;
+
+            update.AdditionalFacilitySelectedThree = facilityType3 != FacilityType.None ?
+                                                facilityType3 : update.AdditionalFacilitySelectedThree;
+
+            update.FacilityEffectUID = facilityEffectUID != -1 ?
+                                                facilityEffectUID : update.FacilityEffectUID;
+
+            mUpdatesThisPhase.Enqueue(update);
+            if (sendUpdate) {
+                GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
+            }
+        }
+        else {
+            Debug.LogWarning("Tried to update a network message in queue but the queue was empty!");
+        }
+
+    }
+    private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
+        FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1, bool sendUpdateImmediately = false) {
         mUpdatesThisPhase.Enqueue(new Update {
             Type = cardMessageType,
             UniqueID = UniqueID,
@@ -1279,7 +1317,8 @@ public class CardPlayer : MonoBehaviour {
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
     }
-    private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1) {
+    private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, 
+        FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1) {
         EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, facilityType, facilityEffectUID, true);
     }
 
@@ -1320,7 +1359,9 @@ public class CardPlayer : MonoBehaviour {
             if (ActiveFacilities.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo)) {
                 if (facilityGo.TryGetComponent(out Facility facility)) {
                     Debug.Log($"Looking to remove effect with uid {update.FacilityEffectUID} from {facility.facilityName}");
-
+                    if (update.FacilityEffectUID != -1) {
+                        facility.effectManager.RemoveEffectByUID(update.FacilityEffectUID); //TODO: change UID to type enum
+                    }
                 }
             }
         }
@@ -1329,7 +1370,7 @@ public class CardPlayer : MonoBehaviour {
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type}");
 
-        if (update.Type == CardMessageType.CardUpdate) {
+        if (update.Type == CardMessageType.CardUpdate || update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
             IsAnimating = true;
             //handle facility card play
             if (update.FacilityPlayedOnType != FacilityType.None) {
@@ -1377,6 +1418,7 @@ public class CardPlayer : MonoBehaviour {
                     opponent.HandCards.Remove(card.UniqueID); //remove the card from the opponent's hand
                     if (callPlay)
                         card.Play(player: opponent, opponent: this, facilityActedUpon: facility);
+
                     GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                     // After the current animation is done, check if there's another card queued
                     OnAnimationComplete();
@@ -1389,6 +1431,18 @@ public class CardPlayer : MonoBehaviour {
 
         }
     }
+    void RemoveFacilityEffectsFromCardUpdate(Update update) {
+        if (update.AdditionalFacilitySelectedOne != FacilityType.None) {
+            
+        }
+
+        if (update.AdditionalFacilitySelectedTwo != FacilityType.None) {
+
+        }
+        if (update.AdditionalFacilitySelectedThree != FacilityType.None) {
+
+        }
+    }
     //handles when the opponent plays a non facility/effect card
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         //Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
@@ -1397,7 +1451,14 @@ public class CardPlayer : MonoBehaviour {
         if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
             Card tempCard = cardObject.GetComponent<Card>();
             Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
-            HandleOpponentCardPlay(tempCard, null, opponent, callPlay: false);//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
+
+            //check for extra facility info
+            if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
+                //remove the effect from the facilities
+                RemoveFacilityEffectsFromCardUpdate(update);
+            }
+            //TODO: change the playersector call to the actual sector the card was played on somehow
+            HandleOpponentCardPlay(tempCard, PlayerSector.gameObject, opponent, callPlay: false);//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
         }
         else {
             Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
@@ -1408,16 +1469,23 @@ public class CardPlayer : MonoBehaviour {
     //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
+
         Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
+
         if (facilityList.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
+
             Debug.Log($"{playerName} is creating card played on facility: {facility.facilityName}");
+
             if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
                 Card tempCard = cardObject.GetComponent<Card>();
+
                 Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
+
                 HandleOpponentCardPlay(tempCard, facilityGo, opponent, facility);
             }
             else {
-                Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
+                Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in " +
+                    $"{opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
             }
         }
     }
@@ -1433,34 +1501,43 @@ public class CardPlayer : MonoBehaviour {
         if (mUpdatesThisPhase.Count > 0) {
             playsForMessage.Add((int)phase);
             Update update = mUpdatesThisPhase.Dequeue();
-            //public CardMessageType Type;int CardID;int UniqueID;int Amount;FacilityType FacilityType;FacilityEffectType Effect;
-            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|facility type:{update.FacilityPlayedOnType}");
+
+            // Log the update for debugging
+            Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|" +
+                $"facility type:{update.FacilityPlayedOnType}|effectUID:{update.FacilityEffectUID}|" +
+                $"additionalFacility1:{update.AdditionalFacilitySelectedOne}|" +
+                $"additionalFacility2:{update.AdditionalFacilitySelectedTwo}|" +
+                $"additionalFacility3:{update.AdditionalFacilitySelectedThree}");
+
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
             playsForMessage.Add((int)update.FacilityPlayedOnType);
-
 
             if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);
             }
             else if (update.Type == CardMessageType.RemoveEffect) {
                 playsForMessage.Add((int)update.FacilityPlayedOnType);
-                //playsForMessage.Add((int)update.EffectTarget);
+                // playsForMessage.Add((int)update.EffectTarget); // Uncomment if needed
             }
-            //else if (update.Type == CardMessageType.RestorePoints) {
-            //    playsForMessage.Add(update.Amount);
-            //    playsForMessage.Add((int)update.FacilityType);
-            //}
             else if (update.Type == CardMessageType.MeepleShare) {
-                // unique id is the player to share with
-                // card id is actually the meeple color
-                // amount is the number of meeples to share
+                // UniqueID is the player to share with
+                // CardID is the meeple color
+                // Amount is the number of meeples to share
                 playsForMessage.Add(update.Amount);
+            }
+            else if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
+                // Include the new fields in the message
+                playsForMessage.Add(update.FacilityEffectUID);
+                playsForMessage.Add((int)update.AdditionalFacilitySelectedOne);
+                playsForMessage.Add((int)update.AdditionalFacilitySelectedTwo);
+                playsForMessage.Add((int)update.AdditionalFacilitySelectedThree);
             }
             return update.Type;
         }
         return CardMessageType.None;
     }
+
 
     #endregion
 
