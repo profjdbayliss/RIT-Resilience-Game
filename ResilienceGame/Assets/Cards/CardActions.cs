@@ -183,10 +183,10 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
                     Debug.Log($"Selected facility: {facility.facilityName}");
                     var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
 
-                    if (effectsToRemove != null) {
-                        Debug.Log($"Removable effects: {effectsToRemove.Count}");
-                        effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
-                        //removeEffect(facility, effectsToRemove);
+                    if (effectsToRemove != null && effectsToRemove.Count > 0) {
+                        //Debug.Log($"Removable effects: {effectsToRemove.Count}");
+                        //effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
+                        removeEffect(facility, effectsToRemove[0]);
                     }
                     else {
                         Debug.LogError($"No removable effects to remove on {facility.facilityName}");
