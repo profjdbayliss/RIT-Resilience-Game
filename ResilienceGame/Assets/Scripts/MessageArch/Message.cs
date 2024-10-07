@@ -160,13 +160,13 @@ public class Message
     /// <summary>
     /// The ToString of this message.
     /// </summary>
-    /// <returns>A list of the type, sender id, and arguments in this message separated by colons.
-    ///</returns>
+    /// <returns>A list of the type, sender id, and arguments in this message separated by colons.</returns>
     public override string ToString() {
         StringBuilder str = new StringBuilder($"MessageType: {type}");
 
         if (hasArgs) {
             str.Append(", Args: ");
+
             if (isBytes) {
                 if (byteArguments != null && byteArguments.Count > 0) {
                     for (int i = 0; i < byteArguments.Count; i++) {
@@ -182,10 +182,34 @@ public class Message
                 if (arguments != null && arguments.Count > 0) {
                     for (int i = 0; i < arguments.Count; i++) {
                         str.Append($"[{GetUpdateNameFromInt(i)}]={arguments[i]}");
+
+                        // Additional details for specific arguments
                         if (type == CardMessageType.CardUpdate && i == 3) {
-                            // Assuming the 4th argument (index 3) is always FacilityType for CardUpdate
                             str.Append($" (FacilityType: {(FacilityType)arguments[i]})");
                         }
+
+                        // Additional specific types and their arguments
+                        if (type == CardMessageType.ReduceCost && i == 4) {
+                            str.Append($" (Amount: {arguments[i]})");
+                        }
+                        else if (type == CardMessageType.RemoveEffect && i == 3) {
+                            str.Append($" (FacilityPlayedOnType: {(FacilityType)arguments[i]})");
+                        }
+                        else if (type == CardMessageType.MeepleShare && i == 4) {
+                            str.Append($" (Amount: {arguments[i]})");
+                        }
+                        else if (type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
+                            if (i == 4) {
+                                str.Append($" (AdditionalFacility1: {(FacilityType)arguments[i]})");
+                            }
+                            else if (i == 5) {
+                                str.Append($" (AdditionalFacility2: {(FacilityType)arguments[i]})");
+                            }
+                            else if (i == 6) {
+                                str.Append($" (AdditionalFacility3: {(FacilityType)arguments[i]})");
+                            }
+                        }
+
                         if (i < arguments.Count - 1) str.Append(", ");
                     }
                 }
@@ -205,11 +229,16 @@ public class Message
         return i switch {
             0 => "Player ID",
             1 => "Unique Card ID",
-            3 => "Facility Type",
             2 => "Card ID",
+            3 => "Facility Type",
+            4 => "Additional Information", // Depending on type, it could be Amount or Facility Effect/Facility Type
+            5 => "Additional Facility 1",
+            6 => "Additional Facility 2",
+            7 => "Additional Facility 3",
             _ => ""
         };
     }
+
 
 
 }

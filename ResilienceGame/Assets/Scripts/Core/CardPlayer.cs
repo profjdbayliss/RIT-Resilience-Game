@@ -398,7 +398,7 @@ public class CardPlayer : MonoBehaviour {
 
     private bool TryRemoveEffectFromPlayerFacilityByType(FacilityType facilityType, FacilityEffectType effectTypeToRemove) {
         if (facilityType == FacilityType.None || effectTypeToRemove == FacilityEffectType.None) {
-            Debug.LogError("Invalid facility type or effect type");
+            //Debug.Log("Invalid facility type or effect type (probably just didnt select 3 facilities)"); //actually expected if passing in 2/3 or 1/3 facilities
             return false;
         }
         if (ActiveFacilities.TryGetValue((int)facilityType, out GameObject facilityObj)) {
@@ -1306,6 +1306,12 @@ public class CardPlayer : MonoBehaviour {
             update.FacilityEffectToRemoveType = facilityEffectTypeToRemove != FacilityEffectType.None ?
                                                 facilityEffectTypeToRemove : update.FacilityEffectToRemoveType;
 
+            Debug.Log($"updated most recent update: \n" +
+                $"Effect To Remove: {update.FacilityEffectToRemoveType}\n" +
+                $"Facility 1: {update.AdditionalFacilitySelectedOne}\n" +
+                $"Facility 2: {update.AdditionalFacilitySelectedTwo}\n" +
+                $"Facility 3: {update.AdditionalFacilitySelectedThree}");
+
             mUpdatesThisPhase.Enqueue(update);
             if (sendUpdate) {
                 GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
@@ -1351,6 +1357,7 @@ public class CardPlayer : MonoBehaviour {
                 opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
                 break;
             case CardMessageType.CardUpdate:
+            case CardMessageType.CardUpdateWithExtraFacilityInfo:
             case CardMessageType.DiscardCard:
             case CardMessageType.ReduceCost:
                 if (IsAnimating) {
@@ -1467,9 +1474,10 @@ public class CardPlayer : MonoBehaviour {
         if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
             Card tempCard = cardObject.GetComponent<Card>();
             Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
-
+            Debug.Log($"Update is of type: {update.Type}");
             //check for extra facility info
             if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
+                Debug.Log("Extra facility info found in card update");
                 //remove the effect from the facilities
                 RemoveFacilityEffectsFromCardUpdate(update);
             }

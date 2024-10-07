@@ -155,7 +155,7 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         if (player == GameManager.instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
-            
+            FacilityEffectType effectTypeToRemove = FacilityEffectType.None;
 
             if (facilityActedUpon == null) {
                 Debug.LogError(card.data.name + " was played without a facility acted upon");
@@ -172,6 +172,7 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
                         if (effectsToRemove != null && effectsToRemove.Count > 0) {
                             //Debug.Log($"Removable effects: {effectsToRemove.Count}");
                             //effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
+                            effectTypeToRemove = effectsToRemove[0].EffectType;
                             RemoveEffect(facility, effectsToRemove[0]);
                         }
                         else {
@@ -179,8 +180,6 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
                         }
                     });
 
-
-                    //send network update if actual player
 
 
                     FacilityType facilityType1 = FacilityType.None;
@@ -199,15 +198,16 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
 
 
                     player.UpdateNextInQueueMessage(
-                    cardMessageType: CardMessageType.CardUpdateWithExtraFacilityInfo,
-                    CardID: card.data.cardID,
-                    UniqueID: card.UniqueID,
-                    Amount: card.data.effectCount, //not needed maybe?
-                    facilityDroppedOnType: FacilityType.None, //ensure it gets picked up by the sector update code in card player
-                    facilityType1: facilityType1,
-                    facilityType2: facilityType2,
-                    facilityType3: faciltiyType3,
-                    sendUpdate: true
+                        cardMessageType: CardMessageType.CardUpdateWithExtraFacilityInfo,
+                        CardID: card.data.cardID,
+                        UniqueID: card.UniqueID,
+                        Amount: card.data.effectCount, //not needed maybe?
+                        facilityEffectTypeToRemove: effectTypeToRemove,
+                        facilityDroppedOnType: FacilityType.None, //ensure it gets picked up by the sector update code in card player
+                        facilityType1: facilityType1,
+                        facilityType2: facilityType2,
+                        facilityType3: faciltiyType3,
+                        sendUpdate: true
                 );
                 });
         }
