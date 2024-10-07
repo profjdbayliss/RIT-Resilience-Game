@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 using System.Security.Principal;
+using System.Runtime.InteropServices.ComTypes;
 
 public class Sector : MonoBehaviour {
     public PlayerSector sectorName; // TODO: Move playersector here
@@ -80,11 +81,12 @@ public class Sector : MonoBehaviour {
             return selectedFacilities.ToList();
         return null;
     }
-    public void EnableFacilitySelection(int numRequired) {
+    public int EnableFacilitySelection(int numRequired, PlayerTeam opponentTeam) {
         if (numRequired <= 0) {
             Debug.LogError("Must require more than 0 facilities to select");
-            return;
+            return 0;
         }
+        int numAvailForSelect = 0;
         selectedFacilities = new HashSet<Facility>();
         //special case to select all facilities
         if (numRequired == 3) {
@@ -93,15 +95,19 @@ public class Sector : MonoBehaviour {
                     selectedFacilities.Add(facility);
                 }
             }
-            return;
+            return 3;
         }
         foreach (Facility facility in facilities) {
             if (facility != null) {
-                facility.EnableFacilitySelection();
+                if (facility.HasRemovableEffects(opponentTeam: opponentTeam, true)) {
+                    numAvailForSelect++;
+                    facility.EnableFacilitySelection();
+                }
             }
         }
-        numFacilitiesRequired = numRequired;
+        numFacilitiesRequired = numAvailForSelect; //cap the number required at the number available
         Debug.Log("Enabled facility selection");
+        return numAvailForSelect;
     }
     public void DisableFacilitySelection() {
         foreach (Facility facility in facilities) {
@@ -189,8 +195,8 @@ public class Sector : MonoBehaviour {
         iconAtlasTexture.LoadImage(fileData);
     }
 
-    public bool HasRemovableEffectsOnFacilities(PlayerTeam playerTeam) {
-        return facilities.Any(facility => facility.HasRemovableEffects(playerTeam));
+    public bool HasRemovableEffectsOnFacilities(PlayerTeam opponentTeam) {
+        return facilities.Any(facility => facility.HasRemovableEffects(opponentTeam));
     }
     Sprite[] SliceSpriteSheet(Texture2D texture, int spriteWidth, int spriteHeight, int columns, int rows) {
         Sprite[] sprites = new Sprite[columns * rows];

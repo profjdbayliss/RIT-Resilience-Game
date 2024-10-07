@@ -163,7 +163,13 @@ public class Facility : MonoBehaviour {
         UpdateUI();
     }
     public bool HasRemovableEffects(PlayerTeam opponentTeam, bool removePointsPerTurn = true) {
-        return effectManager.GetRemoveableEffects(opponentTeam, removePointsPerTurn).Any();
+
+        return opponentTeam switch {
+            PlayerTeam.Blue => effectManager.HasEffectOfType(FacilityEffectType.Fortify),
+            PlayerTeam.Red => effectManager.HasEffectOfType(FacilityEffectType.Backdoor) ||
+                (removePointsPerTurn && effectManager.HasEffectOfType(FacilityEffectType.ModifyPointsPerTurn)),
+            _ => false
+        };
     }
 
     public bool HasEffectOfType(FacilityEffectType type) {
@@ -231,6 +237,7 @@ public class Facility : MonoBehaviour {
         effectManager.DebugAddEffect(effect);
     }
     public void EnableFacilitySelection() {
+
         facilityBoxImage.material = outlineMat;
         facilitySelectionButton.interactable = true;
     }

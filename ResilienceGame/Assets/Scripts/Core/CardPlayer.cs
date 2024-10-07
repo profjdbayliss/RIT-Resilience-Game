@@ -230,16 +230,25 @@ public class CardPlayer : MonoBehaviour {
 
     #region Card Action Functions
 
+    //called by card action to tell the player they need to select facilities to apply the card action to
     public void ForcePlayerSelectFacilities(int numFacilitiesToSelect, Action<List<Facility>> onFacilitySelect) {
         if (numFacilitiesToSelect <= 0) return;
         ReadyState = PlayerReadyState.SelectFacilties;
         Debug.Log($"Forcing {playerName} to select {numFacilitiesToSelect} facilities before continuing");
-        PlayerSector.EnableFacilitySelection(numFacilitiesToSelect);
+        
+        var numAvail = PlayerSector.EnableFacilitySelection(numFacilitiesToSelect, opponentTeam: GetOpponentTeam());
+
+        if (numAvail == 0) {
+            ReadyState = PlayerReadyState.ReadyToPlay;
+            Debug.LogError("No facilities available to select");
+            return;
+        }
+        GameManager.instance.DisplayAlertMessage($"Select {numAvail} facilities to apply the card effect", this);
         OnFacilitiesSelected = onFacilitySelect;
     }
     public void ResolveFacilitySelection() {
         ReadyState = PlayerReadyState.ReadyToPlay;
-        
+        GameManager.instance.mAlertPanel.ResolveTextAlert();
         var facilities = PlayerSector.GetSelectedFacilities(); //also doesn't work if we move sectors to the blue players 
         if (facilities == null) {
             Debug.LogError("selected facility list is null");
@@ -1061,7 +1070,6 @@ public class CardPlayer : MonoBehaviour {
         switch (phase) {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                // StackCards(facility.gameObject, card.gameObject, playerDropZone, GamePhase.Action); TODO: throwing null ref error?
                 card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
                 EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID, facilityType: facility.facilityType); //send the update to the opponent
@@ -1183,7 +1191,7 @@ public class CardPlayer : MonoBehaviour {
             if (card.data.effectString == "Remove") {
                 Facility facility = hoveredDropLocation.GetComponent<Facility>();
                 Sector sector = facility.sectorItsAPartOf;
-                if (!sector.HasRemovableEffectsOnFacilities(playerTeam)) {
+                if (!sector.HasRemovableEffectsOnFacilities(GetOpponentTeam())) {
                     return ("Sector does not have removable effects", false);
                 }
             }

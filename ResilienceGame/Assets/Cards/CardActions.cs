@@ -6,22 +6,6 @@ using System.Linq;
 using System;
 using static Facility;
 
-// TODO: Rewrite card actions for Sector Down
-/*
- *                                  "DrawAndDiscardCards":
-                                case "ShuffleAndDrawCards":
-                                case "ReduceCardCost":
-                                case "ChangeNetworkPoints":
-                                case "ChangeFinancialkPoints":
-                                case "ChangePhysicalPoints":
-                                case "AddEffect":
-                                case "RemoveEffectByTeam":
-                                case "NegateEffect":
-                                case "RemoveEffect":
-                                case "SpreadEffect":
-                                case "ChangeMeepleAmount":
-                                case "IncreaseOvertimeAmount":
-                                case "ShuffleCardsFromDiscard":*/
 public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
