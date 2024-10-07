@@ -189,6 +189,9 @@ public class Facility : MonoBehaviour {
     public bool TryRemoveEffect(FacilityEffect effect) {
         return effectManager.TryRemoveEffect(effect);
     }
+    public bool TryRemoveEffectByType(FacilityEffectType effect) {
+        return effectManager.TryRemoveEffectByType(effect);
+    }
     private void UpdateUI() {
         //pointsUI[0].text = physicalPoints.ToString();
         //pointsUI[1].text = finacialPoints.ToString();

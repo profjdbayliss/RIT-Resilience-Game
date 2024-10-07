@@ -505,7 +505,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int facilityType = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        int effectUID = GetIntFromByteArray(element, msg.payload);
+                        int effectType = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         int facilityEffect1 = GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -518,7 +518,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                             FacilityPlayedOnType = (FacilityType)facilityType,
-                            FacilityEffectUID = effectUID,
+                            FacilityEffectToRemoveType = (FacilityEffectType)effectType,
                             AdditionalFacilitySelectedOne = (FacilityType)facilityEffect1,
                             AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
@@ -734,7 +734,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int facilityType = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        int effectUID = GetIntFromByteArray(element, msg.payload);
+                        int effectType = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         int facilityEffect1 = GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -747,7 +747,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                             FacilityPlayedOnType = (FacilityType)facilityType,
-                            FacilityEffectUID = effectUID,
+                            FacilityEffectToRemoveType = (FacilityEffectType)effectType,
                             AdditionalFacilitySelectedOne = (FacilityType)facilityEffect1,
                             AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,

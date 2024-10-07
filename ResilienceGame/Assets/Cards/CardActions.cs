@@ -108,27 +108,18 @@ public class NegateEffect : ICardAction {
 public class RemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
 
-        void removeEffect(Facility facility, FacilityEffect effectToRemove) {
-            if (facility.TryRemoveEffect(effectToRemove)) {
-                Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facilityActedUpon.facilityName}");
-            }
-            else {
-                Debug.LogError($"Found effect to remove but then got a false value when trying to remove it");
-            }
-        }
-
         var effectsToRemove = facilityActedUpon.effectManager.GetRemoveableEffects(player.playerTeam, true);
         if (effectsToRemove != null && effectsToRemove.Count > 0) {
             if (effectsToRemove.Count > 1) {
                 for (var i = 0; i < card.data.effectCount; i++) {
                     var effectToRemove = effectsToRemove[i];
                     if (effectToRemove != null) {
-                        removeEffect(facilityActedUpon, effectToRemove);
+                        RemoveEffect(facilityActedUpon, effectToRemove);
                     }
                 }
             }
             else { //1 element
-                removeEffect(facilityActedUpon, effectsToRemove[0]);
+                RemoveEffect(facilityActedUpon, effectsToRemove[0]);
             }
         }
         else {
@@ -164,14 +155,7 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         if (player == GameManager.instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
-            void removeEffect(Facility facility, FacilityEffect effectToRemove) {
-                if (facility.TryRemoveEffect(effectToRemove)) {
-                    Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facilityActedUpon.facilityName}");
-                }
-                else {
-                    Debug.LogError($"Found effect to remove but then got a false value when trying to remove it");
-                }
-            }
+            
 
             if (facilityActedUpon == null) {
                 Debug.LogError(card.data.name + " was played without a facility acted upon");
@@ -188,7 +172,7 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
                         if (effectsToRemove != null && effectsToRemove.Count > 0) {
                             //Debug.Log($"Removable effects: {effectsToRemove.Count}");
                             //effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
-                            removeEffect(facility, effectsToRemove[0]);
+                            RemoveEffect(facility, effectsToRemove[0]);
                         }
                         else {
                             Debug.LogError($"No removable effects to remove on {facility.facilityName}");
@@ -219,7 +203,7 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
                     CardID: card.data.cardID,
                     UniqueID: card.UniqueID,
                     Amount: card.data.effectCount, //not needed maybe?
-                    facilityDroppedOnType: FacilityType.None, //ensure if gets picked up by the sector update code in card player
+                    facilityDroppedOnType: FacilityType.None, //ensure it gets picked up by the sector update code in card player
                     facilityType1: facilityType1,
                     facilityType2: facilityType2,
                     facilityType3: faciltiyType3,

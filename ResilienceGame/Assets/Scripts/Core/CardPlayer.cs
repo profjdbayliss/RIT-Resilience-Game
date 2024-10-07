@@ -56,7 +56,7 @@ public struct Update {
     public int UniqueID;
     public int Amount;
     public FacilityType FacilityPlayedOnType;
-    public int FacilityEffectUID;
+    public FacilityEffectType FacilityEffectToRemoveType;
     public FacilityType AdditionalFacilitySelectedOne;
     public FacilityType AdditionalFacilitySelectedTwo;
     public FacilityType AdditionalFacilitySelectedThree;
@@ -396,10 +396,23 @@ public class CardPlayer : MonoBehaviour {
         return (mUpdatesThisPhase.Count != 0);
     }
 
+    private bool TryRemoveEffectFromPlayerFacilityByType(FacilityType facilityType, FacilityEffectType effectTypeToRemove) {
+        if (facilityType == FacilityType.None || effectTypeToRemove == FacilityEffectType.None) {
+            Debug.LogError("Invalid facility type or effect type");
+            return false;
+        }
+        if (ActiveFacilities.TryGetValue((int)facilityType, out GameObject facilityObj)) {
+            Facility facility = facilityObj.GetComponent<Facility>();
+            return facility.TryRemoveEffectByType(effectTypeToRemove);
+        }
+        Debug.LogError("Facility type not found in active facilities");
+        return false;
+    }
+    
 
     #endregion
 
-    #region Card Drawing Functions
+        #region Card Drawing Functions
     public virtual void DrawCardsToFillHand() {
         int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
         if (numCards <= 0) {
@@ -1270,7 +1283,7 @@ public class CardPlayer : MonoBehaviour {
     public void UpdateNextInQueueMessage(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
         FacilityType facilityDroppedOnType = FacilityType.None, FacilityType facilityType1 = FacilityType.None,
         FacilityType facilityType2 = FacilityType.None,
-        FacilityType facilityType3 = FacilityType.None, int facilityEffectUID = -1, bool sendUpdate = false) {
+        FacilityType facilityType3 = FacilityType.None, FacilityEffectType facilityEffectTypeToRemove = FacilityEffectType.None, bool sendUpdate = false) {
 
         if (mUpdatesThisPhase.Count > 0) {
             var update = mUpdatesThisPhase.Dequeue();
@@ -1290,8 +1303,8 @@ public class CardPlayer : MonoBehaviour {
             update.AdditionalFacilitySelectedThree = facilityType3 != FacilityType.None ?
                                                 facilityType3 : update.AdditionalFacilitySelectedThree;
 
-            update.FacilityEffectUID = facilityEffectUID != -1 ?
-                                                facilityEffectUID : update.FacilityEffectUID;
+            update.FacilityEffectToRemoveType = facilityEffectTypeToRemove != FacilityEffectType.None ?
+                                                facilityEffectTypeToRemove : update.FacilityEffectToRemoveType;
 
             mUpdatesThisPhase.Enqueue(update);
             if (sendUpdate) {
@@ -1304,22 +1317,22 @@ public class CardPlayer : MonoBehaviour {
 
     }
     private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
-        FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1, bool sendUpdateImmediately = false) {
+        FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None, bool sendUpdateImmediately = false) {
         mUpdatesThisPhase.Enqueue(new Update {
             Type = cardMessageType,
             UniqueID = UniqueID,
             CardID = CardID,
             Amount = Amount,
             FacilityPlayedOnType = facilityType,
-            FacilityEffectUID = facilityEffectUID
+            FacilityEffectToRemoveType = facilityEffectToRemoveType
         });
         if (sendUpdateImmediately) {
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
     }
     private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, 
-        FacilityType facilityType = FacilityType.None, int facilityEffectUID = -1) {
-        EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, facilityType, facilityEffectUID, true);
+        FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None) {
+        EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, facilityType, facilityEffectToRemoveType, true);
     }
 
 
@@ -1358,9 +1371,11 @@ public class CardPlayer : MonoBehaviour {
         if (update.FacilityPlayedOnType != FacilityType.None) {
             if (ActiveFacilities.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo)) {
                 if (facilityGo.TryGetComponent(out Facility facility)) {
-                    Debug.Log($"Looking to remove effect with uid {update.FacilityEffectUID} from {facility.facilityName}");
-                    if (update.FacilityEffectUID != -1) {
-                        facility.effectManager.RemoveEffectByUID(update.FacilityEffectUID); //TODO: change UID to type enum
+                    Debug.Log($"Looking to remove effect with type {update.FacilityEffectToRemoveType} from {facility.facilityName}");
+                    if (update.FacilityEffectToRemoveType != FacilityEffectType.None) {
+                        if (facility.effectManager.TryRemoveEffectByType(update.FacilityEffectToRemoveType)) {
+                            Debug.Log($"Successfully removed {update.FacilityEffectToRemoveType} from {facility.name}");
+                        }
                     }
                 }
             }
@@ -1432,15 +1447,16 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     void RemoveFacilityEffectsFromCardUpdate(Update update) {
-        if (update.AdditionalFacilitySelectedOne != FacilityType.None) {
-            
+        Debug.Log("looking to remove debuffs from selected facilities:");
+        var rm1 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedOne, update.FacilityEffectToRemoveType);
+        var rm2 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedTwo, update.FacilityEffectToRemoveType);
+        var rm3 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedThree, update.FacilityEffectToRemoveType);
+
+        if (rm1 || rm2 || rm3) {
+            Debug.Log($"Successfully removed {update.FacilityEffectToRemoveType} from facilities");
         }
-
-        if (update.AdditionalFacilitySelectedTwo != FacilityType.None) {
-
-        }
-        if (update.AdditionalFacilitySelectedThree != FacilityType.None) {
-
+        else {
+            Debug.Log($"Failed to remove {update.FacilityEffectToRemoveType} from facilities");
         }
     }
     //handles when the opponent plays a non facility/effect card
@@ -1504,7 +1520,7 @@ public class CardPlayer : MonoBehaviour {
 
             // Log the update for debugging
             Debug.Log($"type:{update.Type}|card id:{update.CardID}|unique id:{update.UniqueID}|amount:{update.Amount}|" +
-                $"facility type:{update.FacilityPlayedOnType}|effectUID:{update.FacilityEffectUID}|" +
+                $"facility type:{update.FacilityPlayedOnType}|Effect Type:{update.FacilityEffectToRemoveType}|" +
                 $"additionalFacility1:{update.AdditionalFacilitySelectedOne}|" +
                 $"additionalFacility2:{update.AdditionalFacilitySelectedTwo}|" +
                 $"additionalFacility3:{update.AdditionalFacilitySelectedThree}");
@@ -1512,7 +1528,7 @@ public class CardPlayer : MonoBehaviour {
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
             playsForMessage.Add((int)update.FacilityPlayedOnType);
-
+            playsForMessage.Add((int)update.FacilityEffectToRemoveType);
             if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);
             }
@@ -1527,8 +1543,6 @@ public class CardPlayer : MonoBehaviour {
                 playsForMessage.Add(update.Amount);
             }
             else if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
-                // Include the new fields in the message
-                playsForMessage.Add(update.FacilityEffectUID);
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedOne);
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedTwo);
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedThree);

@@ -112,6 +112,15 @@ public class FacilityEffectManager : MonoBehaviour {
 
 
     }
+    public bool TryRemoveEffectByType(FacilityEffectType type) {
+        var result = activeEffects.Find(e => e.EffectType == type);
+        if (result != null) {
+            ForceRemoveEffect(result);
+            return true;
+        }
+        Debug.LogWarning($"Did not find effect on {facility.facilityName} with type {type} to remove!");
+        return false;
+    }
     public void RemoveEffectByUID(int uid) {
         var result = FindEffectByUID(uid);
         if (result != null && result.EffectType != FacilityEffectType.None) {
