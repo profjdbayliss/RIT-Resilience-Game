@@ -773,6 +773,8 @@ public class CardPlayer : MonoBehaviour {
 
         if (IsDraggingCard) {
             UpdateHoveredDropLocation();
+            if (hoveredDropLocation != null)
+                Debug.Log(hoveredDropLocation.name);
         }
 
         //wait and check for the proper amount of facilities selected
@@ -795,10 +797,10 @@ public class CardPlayer : MonoBehaviour {
         GameObject currentHoveredFacility = null; // Reset at the beginning of each update
         bool isOverAnyDropLocation = false;
 
-        //only highlight when the player is ready to play cards
-        if (ReadyState != PlayerReadyState.ReadyToPlay) {
-            return;
-        }
+        ////only highlight when the player is ready to play cards
+        //if (ReadyState != PlayerReadyState.ReadyToPlay) {
+        //    return;
+        //}
 
         Vector2 mousePosition = Mouse.current.position.ReadValue();
 

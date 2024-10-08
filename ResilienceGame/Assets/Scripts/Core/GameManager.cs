@@ -526,8 +526,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
     public bool CanHighlight() {
-        return actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed ||
-            actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue;
+        if (actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed) {
+            return actualPlayer.ReadyState == CardPlayer.PlayerReadyState.ReadyToPlay;
+        }
+        if (actualPlayer.playerTeam == PlayerTeam.Blue && MGamePhase == GamePhase.ActionBlue) {
+            return actualPlayer.ReadyState == CardPlayer.PlayerReadyState.ReadyToPlay;
+        }
+        return false;
+            
     }
     public bool IsActualPlayersTurn() {
         if (actualPlayer.playerTeam == PlayerTeam.Red) {
