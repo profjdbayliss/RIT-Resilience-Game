@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 using static Facility;
+using System.ComponentModel;
 
 public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
@@ -135,32 +136,55 @@ public class SpreadEffect : ICardAction {
         Debug.Log("card " + card.front.title + " canceled.");
     }
 }
-public class SelectFacilitiesRemoveEffect : ICardAction {
+public class SelectFacilitiesAddRemoveEffect : ICardAction {
+
+    
+    
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         if (player == GameManager.instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
             FacilityEffectType effectTypeToRemove = FacilityEffectType.None;
+            bool removeEffect = card.data.effectString == "Remove";
 
+            //uses the facility to grab the sector it was played on
             if (facilityActedUpon == null) {
                 Debug.LogError(card.data.name + " was played without a facility acted upon");
                 return;
             }
+
             Sector sectorToActOn = facilityActedUpon.sectorItsAPartOf;
+
+            if (sectorToActOn == null) {
+                Debug.LogError(card.data.name + " was played without a sector to act on");
+                return;
+            }
+
+            //uses sector owner instead of opponent in prep for multiple players
+
             sectorToActOn.Owner.ForcePlayerSelectFacilities(
                 numFacilitiesToSelect: card.data.targetAmount,
+                removeEffect: removeEffect,
+                preReqEffect: card.data.preReqEffectType,
                 onFacilitySelect: (selectedFacilities) => {
+                    //this code is run when the player has selected the facilities they want to remove effects from
                     selectedFacilities.ForEach(facility => {
                         Debug.Log($"Selected facility: {facility.facilityName}");
-                        var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
+                        if (removeEffect) {
+                            //find the effects that can be removed from the facility
+                            var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
 
-                        if (effectsToRemove != null && effectsToRemove.Count > 0) {
-                            //Debug.Log($"Removable effects: {effectsToRemove.Count}");
-                            //effectsToRemove.ForEach(f=> Debug.Log(f.EffectType));
-                            effectTypeToRemove = effectsToRemove[0].EffectType;
-                            RemoveEffect(facility, effectsToRemove[0]);
+                            //if there are effects to remove, remove the first one
+                            //this is a little weird because of Keylogging card
+                            if (effectsToRemove != null && effectsToRemove.Count > 0) {
+                                effectTypeToRemove = effectsToRemove[0].EffectType;
+                                RemoveEffect(facility, effectsToRemove[0]);
+                            }
+                            else {
+                                Debug.LogError($"No removable effects to remove on {facility.facilityName}");
+                            }
                         }
                         else {
-                            Debug.LogError($"No removable effects to remove on {facility.facilityName}");
+                            facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
                         }
                     });
 
@@ -180,20 +204,20 @@ public class SelectFacilitiesRemoveEffect : ICardAction {
                         faciltiyType3 = selectedFacilities[2].facilityType;
                     }
 
-
+                    //update the message in queue with the new facility info, then send the update
                     player.UpdateNextInQueueMessage(
                         cardMessageType: CardMessageType.CardUpdateWithExtraFacilityInfo,
                         CardID: card.data.cardID,
                         UniqueID: card.UniqueID,
                         Amount: card.data.effectCount, //not needed maybe?
-                        facilityEffectTypeToRemove: effectTypeToRemove,
+                        effectTargetType: effectTypeToRemove,
                         facilityDroppedOnType: FacilityType.None, //ensure it gets picked up by the sector update code in card player
                         facilityType1: facilityType1,
                         facilityType2: facilityType2,
                         facilityType3: faciltiyType3,
                         sendUpdate: true
-                );
-                });
+                    );
+                }); 
         }
     }
 

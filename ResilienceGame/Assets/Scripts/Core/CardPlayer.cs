@@ -231,12 +231,15 @@ public class CardPlayer : MonoBehaviour {
     #region Card Action Functions
 
     //called by card action to tell the player they need to select facilities to apply the card action to
-    public void ForcePlayerSelectFacilities(int numFacilitiesToSelect, Action<List<Facility>> onFacilitySelect) {
-        if (numFacilitiesToSelect <= 0) return;
+    public void ForcePlayerSelectFacilities(int numFacilitiesToSelect, bool removeEffect, FacilityEffectType preReqEffect, Action<List<Facility>> onFacilitySelect) {
+        if (numFacilitiesToSelect <= 0) {
+            Debug.LogWarning("Starting facility select with no facilities to select");
+            return;
+        }
         ReadyState = PlayerReadyState.SelectFacilties;
         Debug.Log($"Forcing {playerName} to select {numFacilitiesToSelect} facilities before continuing");
         
-        var numAvail = PlayerSector.EnableFacilitySelection(numFacilitiesToSelect, opponentTeam: GetOpponentTeam());
+        var numAvail = PlayerSector.EnableFacilitySelection(numFacilitiesToSelect, opponentTeam: GetOpponentTeam(), removeEffect, preReqEffect);
 
         if (numAvail == 0) {
             ReadyState = PlayerReadyState.ReadyToPlay;
@@ -1291,7 +1294,7 @@ public class CardPlayer : MonoBehaviour {
     public void UpdateNextInQueueMessage(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
         FacilityType facilityDroppedOnType = FacilityType.None, FacilityType facilityType1 = FacilityType.None,
         FacilityType facilityType2 = FacilityType.None,
-        FacilityType facilityType3 = FacilityType.None, FacilityEffectType facilityEffectTypeToRemove = FacilityEffectType.None, bool sendUpdate = false) {
+        FacilityType facilityType3 = FacilityType.None, FacilityEffectType effectTargetType = FacilityEffectType.None, bool sendUpdate = false) {
 
         if (mUpdatesThisPhase.Count > 0) {
             var update = mUpdatesThisPhase.Dequeue();
@@ -1311,8 +1314,8 @@ public class CardPlayer : MonoBehaviour {
             update.AdditionalFacilitySelectedThree = facilityType3 != FacilityType.None ?
                                                 facilityType3 : update.AdditionalFacilitySelectedThree;
 
-            update.FacilityEffectToRemoveType = facilityEffectTypeToRemove != FacilityEffectType.None ?
-                                                facilityEffectTypeToRemove : update.FacilityEffectToRemoveType;
+            update.FacilityEffectToRemoveType = effectTargetType != FacilityEffectType.None ?
+                                                effectTargetType : update.FacilityEffectToRemoveType;
 
             Debug.Log($"updated most recent update: \n" +
                 $"Effect To Remove: {update.FacilityEffectToRemoveType}\n" +

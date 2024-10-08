@@ -81,7 +81,7 @@ public class Sector : MonoBehaviour {
             return selectedFacilities.ToList();
         return null;
     }
-    public int EnableFacilitySelection(int numRequired, PlayerTeam opponentTeam) {
+    public int EnableFacilitySelection(int numRequired, PlayerTeam opponentTeam, bool removeEffect, FacilityEffectType preReqEffect) {
         if (numRequired <= 0) {
             Debug.LogError("Must require more than 0 facilities to select");
             return 0;
@@ -97,11 +97,23 @@ public class Sector : MonoBehaviour {
             }
             return 3;
         }
+        //get each of the facilities that can be selected
         foreach (Facility facility in facilities) {
             if (facility != null) {
-                if (facility.HasRemovableEffects(opponentTeam: opponentTeam, true)) {
-                    numAvailForSelect++;
-                    facility.EnableFacilitySelection();
+                //narrow down facility selection based on if the facility has removable effects
+                //for now, ignore preqreq effects for remove
+                if (removeEffect) {
+                    if (facility.HasRemovableEffects(opponentTeam: opponentTeam, true)) {
+                        numAvailForSelect++;
+                        facility.EnableFacilitySelection();
+                    }
+                }
+                else {
+                    if (preReqEffect == FacilityEffectType.None || facility.HasEffectOfType(preReqEffect)) {
+                        facility.EnableFacilitySelection();
+                        numAvailForSelect++;
+                    }
+                    
                 }
             }
         }
