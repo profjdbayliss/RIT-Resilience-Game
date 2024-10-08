@@ -27481,7 +27481,7 @@ MonoBehaviour:
   meeplesAmountText: []
   csvFileName: Sectors.csv
   outputAtlasName: sectorAtlas
-  owner: {fileID: 0}
+  Owner: {fileID: 0}
   sectorCanvas: {fileID: 0}
   icon: {fileID: 879134672}
   spriteSheetName: sectorIconAtlas.png
