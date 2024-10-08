@@ -144,7 +144,14 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
         if (player == GameManager.instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
             FacilityEffectType effectTypeToRemove = FacilityEffectType.None;
-            bool removeEffect = card.data.effectString == "Remove";
+            
+            
+            //List<FacilityEffect> cardEffects = FacilityEffect.CreateEffectsFromID(card.data.effectString);
+
+            //var removeEffect = cardEffects.Any(effect => effect.EffectType == FacilityEffectType.Remove);
+
+            var removeEffect = card.data.effectString.Contains("Remove");
+
 
             //uses the facility to grab the sector it was played on
             if (facilityActedUpon == null) {
@@ -169,23 +176,31 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                     //this code is run when the player has selected the facilities they want to remove effects from
                     selectedFacilities.ForEach(facility => {
                         Debug.Log($"Selected facility: {facility.facilityName}");
+                        //get the effect to remove before removing it so we can pass it across the network
                         if (removeEffect) {
-                            //find the effects that can be removed from the facility
-                            var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
+                            //finds backdoor or fortify only 1 from each facility
+                            var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false);
+                            effectTypeToRemove = effectsToRemove[0].EffectType; 
+                        }
+                        facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
 
-                            //if there are effects to remove, remove the first one
-                            //this is a little weird because of Keylogging card
-                            if (effectsToRemove != null && effectsToRemove.Count > 0) {
-                                effectTypeToRemove = effectsToRemove[0].EffectType;
-                                RemoveEffect(facility, effectsToRemove[0]);
-                            }
-                            else {
-                                Debug.LogError($"No removable effects to remove on {facility.facilityName}");
-                            }
-                        }
-                        else {
-                            facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
-                        }
+                        //if (removeEffect) {
+                        //    //find the effects that can be removed from the facility
+                        //    var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
+
+                        //    //if there are effects to remove, remove the first one
+                        //    //this is a little weird because of Keylogging card
+                        //    if (effectsToRemove != null && effectsToRemove.Count > 0) {
+                        //        effectTypeToRemove = effectsToRemove[0].EffectType;
+                        //        RemoveEffect(facility, effectsToRemove[0]);
+                        //    }
+                        //    else {
+                        //        Debug.LogError($"No removable effects to remove on {facility.facilityName}");
+                        //    }
+                        //}
+                        //else {
+                        //    facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
+                        //}
                     });
 
 

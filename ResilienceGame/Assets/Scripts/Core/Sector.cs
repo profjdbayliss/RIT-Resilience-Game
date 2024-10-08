@@ -117,9 +117,9 @@ public class Sector : MonoBehaviour {
                 }
             }
         }
-        numFacilitiesRequired = numAvailForSelect; //cap the number required at the number available
+        numFacilitiesRequired = Mathf.Min(numAvailForSelect, numRequired); //cap the number required at the number available
         Debug.Log("Enabled facility selection");
-        return numAvailForSelect;
+        return numFacilitiesRequired;
     }
     public void DisableFacilitySelection() {
         foreach (Facility facility in facilities) {

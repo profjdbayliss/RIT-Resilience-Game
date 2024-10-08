@@ -361,6 +361,9 @@ public class CardPlayer : MonoBehaviour {
     public int GetMeeplesSpent() {
         return mMeeplesSpent;
     }
+    public void ResetMeeplesSpent() {
+        mMeeplesSpent = 0;
+    }
     public int AddMeeplesSpent(int meeples) {
         mMeeplesSpent += meeples;
         return mMeeplesSpent;

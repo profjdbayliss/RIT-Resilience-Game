@@ -671,6 +671,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         // do nothing - most common scenario
                     }
                     else if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples()) {
+                        actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer); //still need to resolve the card played that spend the final meeples
                         Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
                         mIsActionAllowed = false;
                         DisplayGameStatus(mPlayerName.text + " has spent their meeples. Please push End Phase to continue.");
@@ -682,6 +683,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 else if (phaseJustChanged) {
                     mIsActionAllowed = true;
                     actualPlayer.InformSectorOfNewTurn();
+                    if (IsActualPlayersTurn()) {
+                        actualPlayer.ResetMeeplesSpent();
+                    }
+                    else {
+                        opponentPlayer.ResetMeeplesSpent();
+                    }
                     //opponentPlayer.InformSectorOfNewTurn();
                 }
 

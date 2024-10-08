@@ -158,6 +158,11 @@ public class FacilityEffectManager : MonoBehaviour {
     /// </summary>
     /// <param name="effect">The effect to add</param>
     private void AddEffect(FacilityEffect effect) {
+        //special case of a remove type from a card effect
+        if (effect.EffectType == FacilityEffectType.Remove) {
+            RemoveAllEffects();
+            return;
+        }
         if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
             return;
@@ -235,6 +240,7 @@ public class FacilityEffectManager : MonoBehaviour {
         Color color = effectIcon.color;
         var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
         effectIcon.color = newColor;
+        
         Debug.Log($"Toggling effect icon alpha to {newColor.a}");
     }
     /// <summary>
@@ -285,8 +291,8 @@ public class FacilityEffectManager : MonoBehaviour {
             case FacilityEffectType.Fortify:
                 if (IsBackdoored()) {
                     ToggleEffectImageAlpha();
-                    RemoveNegativeEffects();
                 }
+                RemoveNegativeEffects();
                 UpdateSpecialIcon(effect);
                 break;
             default:
@@ -368,10 +374,9 @@ public class FacilityEffectManager : MonoBehaviour {
         activeEffects.RemoveAll(effect => effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor);
     }
     private void RemoveAllEffects() {
-        if (IsBackdoored()) {
-            ToggleEffectImageAlpha();
+        while (activeEffects.Count > 0) {
+            AddRemoveEffect(activeEffects[0], false);
         }
-        activeEffects.Clear();
     }
 
     public void DisplayEffectImageTooltip() {
