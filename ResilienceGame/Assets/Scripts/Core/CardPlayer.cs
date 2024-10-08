@@ -1478,6 +1478,40 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log($"Failed to remove {update.FacilityEffectToRemoveType} from facilities");
         }
     }
+    void AddFacilityEffectsFromCardUpdate(Update update, Card card) {
+        Debug.Log("looking to add debuffs to selected facilities:");
+        FacilityEffectType preReqEffect = card.data.preReqEffectType;
+        var facilities =  new []{update.AdditionalFacilitySelectedOne,
+                                        update.AdditionalFacilitySelectedTwo,
+                                        update.AdditionalFacilitySelectedThree };
+
+        List<Facility> facilitiesToAffect = new List<Facility>(3);
+        // Loop through the facilities tuple
+        foreach (var facilityType in facilities) {
+            // Check if the facility type is not None
+            if (facilityType != FacilityType.None) {
+                // Try to get the facility from the ActiveFacilities dictionary
+                if (ActiveFacilities.TryGetValue((int)facilityType, out GameObject facilityGO)) {
+                    // Add the facility to the list of facilities to affect
+                    if (facilityGO.TryGetComponent(out Facility facility)) {
+                        if (preReqEffect == FacilityEffectType.None || facility.HasEffectOfType(preReqEffect)) {
+                            facilitiesToAffect.Add(facility);
+                        }
+                    }
+                        
+                }
+                else {
+                    // Handle the case where the facility is not found in ActiveFacilities
+                    Debug.LogError($"Facility of type {facilityType} not found in ActiveFacilities.");
+                }
+            }
+        }
+        //add the effects, already filtered for prereq effects
+        facilitiesToAffect.ForEach(facility => {
+            facility.AddRemoveEffectsByIdString(card.data.effectString, true, GetOpponentTeam());
+        });
+
+    }
     //handles when the opponent plays a non facility/effect card
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
         //Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
@@ -1490,8 +1524,14 @@ public class CardPlayer : MonoBehaviour {
             //check for extra facility info
             if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
                 Debug.Log("Extra facility info found in card update");
-                //remove the effect from the facilities
-                RemoveFacilityEffectsFromCardUpdate(update);
+                if (tempCard.data.effectString == "Remove") {
+                    //remove the effect from the facilities
+                    RemoveFacilityEffectsFromCardUpdate(update);
+                }
+                else {
+                    //add the effect if possible
+                    AddFacilityEffectsFromCardUpdate(update, tempCard);
+                }
             }
             //TODO: change the playersector call to the actual sector the card was played on somehow
             HandleOpponentCardPlay(tempCard, PlayerSector.gameObject, opponent, callPlay: false);//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
