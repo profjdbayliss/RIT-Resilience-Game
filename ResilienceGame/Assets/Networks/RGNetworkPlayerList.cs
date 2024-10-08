@@ -514,7 +514,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int facilityEffect3 = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         Update update = new Update {
-                            Type = CardMessageType.CardUpdate,
+                            Type = CardMessageType.CardUpdateWithExtraFacilityInfo,
                             UniqueID = uniqueId,
                             CardID = cardId,
                             FacilityPlayedOnType = (FacilityType)facilityType,
