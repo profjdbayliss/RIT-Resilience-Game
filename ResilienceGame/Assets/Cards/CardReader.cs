@@ -188,7 +188,7 @@ public class CardReader : MonoBehaviour {
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new SpreadEffect());
                                     break;
-                                case "SelectFacilitiesRemoveEffect":
+                                case "SelectFacilitiesAddRemoveEffect":
                                     tempCard.ActionList.Add(new SelectFacilitiesAddRemoveEffect());
                                     break;
                                 case "ChangeMeepleAmount":

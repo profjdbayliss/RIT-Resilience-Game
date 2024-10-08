@@ -949,7 +949,7 @@ public class CardPlayer : MonoBehaviour {
                     Debug.Log("didn't find a key to remove! " + playKey);
                 }
                 else {
-                    Debug.Log("removed key " + playKey + " and updating tracker UI");
+                   // Debug.Log("removed key " + playKey + " and updating tracker UI");
                     GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                 }
             }
@@ -1110,6 +1110,7 @@ public class CardPlayer : MonoBehaviour {
                 EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID);
                 playCount = 1;
                 playKey = card.UniqueID;
+                //start shrink animation
                 StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f, 
                     () => card.Play(this, opponentPlayer, facility)));
 
