@@ -168,6 +168,17 @@ public class FacilityEffectManager : MonoBehaviour {
             return;
         }
 
+        if (effect.EffectType == FacilityEffectType.Backdoor && IsBackdoored()) {
+            activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Backdoor).Duration = effect.Duration;
+            return;
+        }
+        else if (effect.EffectType == FacilityEffectType.Fortify && IsFortified()) {
+            activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Fortify).Duration = effect.Duration;
+
+            return;
+        }
+
+
         activeEffects.Add(effect);//add the effect to list
         //UpdateEffectUI(effect);
         ApplyEffect(effect);
