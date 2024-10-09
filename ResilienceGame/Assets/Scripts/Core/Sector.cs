@@ -49,6 +49,7 @@ public class Sector : MonoBehaviour {
     public int numMeeplesRequired = 0;
     public int numFacilitiesRequired = 0;
     public HashSet<Facility> selectedFacilities;
+    private Action OnMeeplesSelected;
 
     private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
         { PlayerSector.Communications, 3 },
@@ -311,6 +312,7 @@ public class Sector : MonoBehaviour {
         this.numMeeplesRequired = numMeeplesRequired;
         GameManager.instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", Owner, onAlertFinish: onFinish);
         EnableMeepleButtons();
+        OnMeeplesSelected = onFinish;
 
     }
 
@@ -354,6 +356,7 @@ public class Sector : MonoBehaviour {
                 numMeeplesRequired--;
                 if (numMeeplesRequired == 0) {
                     GameManager.instance.mAlertPanel.ResolveTextAlert();
+                    OnMeeplesSelected?.Invoke();
                     DisableMeepleButtons();
                 }
                 else {
