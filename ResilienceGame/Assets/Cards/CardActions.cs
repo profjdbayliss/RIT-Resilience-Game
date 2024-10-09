@@ -230,7 +230,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                         facilityType1: facilityType1,
                         facilityType2: facilityType2,
                         facilityType3: faciltiyType3,
-                        sendUpdate: true
+                        sendUpdate: true //TODO: move the network update to the end of animation?
                     );
                 }); 
         }

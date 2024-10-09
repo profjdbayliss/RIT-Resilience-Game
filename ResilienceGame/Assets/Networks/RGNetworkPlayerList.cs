@@ -231,6 +231,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
             case CardMessageType.DrawCard:
+            case CardMessageType.ReturnCardToDeck:
             case CardMessageType.MeepleShare: {
                     RGNetworkLongMessage msg = new RGNetworkLongMessage {
                         indexId = (uint)localPlayerID,
@@ -430,9 +431,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                                 playerTypes[existingPlayer] = (PlayerTeam)actualInt;
                                 Debug.Log("player " + playerNames[existingPlayer] + " already exists! new type is: " + playerTypes[existingPlayer]);
                             }
-
-
-
                         }
                         // now start the next phase
                         manager.RealGameStart();
@@ -470,6 +468,24 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId,
                         };
                         Debug.Log("client received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.ReturnCardToDeck: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update {
+                            Type = CardMessageType.ReturnCardToDeck,
+                            UniqueID = uniqueId,
+                            CardID = cardId
+                        };
+                        Debug.Log("client received ReturnCardToHand message from opponent containing playerID : " + msg.indexId + " and card id: " + cardId + " for game phase " + gamePhase);
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
@@ -697,6 +713,24 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId,
                         };
                         Debug.Log("server received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
+
+                        manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
+                    }
+                    break;
+                case CardMessageType.ReturnCardToDeck: {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int uniqueId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        Update update = new Update {
+                            Type = CardMessageType.ReturnCardToDeck,
+                            UniqueID = uniqueId,
+                            CardID = cardId
+                        };
+                        Debug.Log("server received ReturnCardToHand message from opponent containing playerID : " + msg.indexId + " and card id: " + cardId + " for game phase " + gamePhase);
 
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }

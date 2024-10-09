@@ -14,6 +14,7 @@ public enum CardMessageType
     IncrementTurn,
     SharePlayerType,
     ShareDiscardNumber,
+    ReturnCardToDeck,
     CardUpdate,
     CardUpdateWithExtraFacilityInfo,
     ReduceCost,
