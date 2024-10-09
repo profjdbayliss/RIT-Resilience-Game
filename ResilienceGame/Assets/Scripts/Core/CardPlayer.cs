@@ -122,6 +122,7 @@ public class CardPlayer : MonoBehaviour {
     public int AmountToSelect { get; set; } = 0;
     public int AmountToReturnToDeck { get; private set; } = 0;
     public List<Card> CardsAllowedToBeDiscard;
+    public List<Card> CardsAllowedToBeSelected;
     public Action OnCardsReturnedToDeck { get; set; }
     public Action<List<Facility>> OnFacilitiesSelected { get; set; }
 
@@ -287,7 +288,18 @@ public class CardPlayer : MonoBehaviour {
         ReadyState = PlayerReadyState.SelectCards;
         AmountToSelect = amount;
         //need like a select dropzone here
+        CardsAllowedToBeSelected = cardsAllowedToBeSelected;
+        Debug.Log($"Enabling {playerName} to select cards");
+    }
 
+    public void StopSelect()
+    {
+        ReadyState = PlayerReadyState.ReadyToPlay;
+        CardsAllowedToBeSelected?.ForEach(card => card.ToggleOutline(false));
+        CardsAllowedToBeSelected = null;
+        //need a select dropzone here
+        GameManager.instance.mAlertPanel.ResolveTextAlert();
+        Debug.Log($"Disabling {playerName}'s ability to select");
     }
 
     //Sets the variables required to force the player to discard a certain amout of cards
