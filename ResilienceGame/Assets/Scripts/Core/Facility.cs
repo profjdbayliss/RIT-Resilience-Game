@@ -38,11 +38,12 @@ public class Facility : MonoBehaviour {
     public FacilityEffectManager effectManager;
     private HoverActivateObject hoverEffect;
     [SerializeField] private Material outlineMat;
+    [SerializeField] private Image downedOverlay;
 
     // public FacilityEffect effect;
     //   public bool effectNegated;
 
-    public bool isDown;
+    public bool IsDown { get; private set; }
    // public bool IsFortified { get; set; } = false;
    // public bool IsBackdoored { get; set; } = false;
 
@@ -159,7 +160,7 @@ public class Facility : MonoBehaviour {
 
         Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
 
-        isDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
+        IsDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
         UpdateUI();
     }
     public bool HasRemovableEffects(PlayerTeam opponentTeam, bool removePointsPerTurn = true) {
@@ -176,7 +177,7 @@ public class Facility : MonoBehaviour {
         return effectManager.HasEffectOfType(type);
     }
 
-    public void SetFacilityPoints(int physical, int finacial, int network) {
+    public void SetupFacilityPoints(int physical, int finacial, int network) {
         maxPhysicalPoints = physicalPoints = physical;
         maxFinacialPoints = finacialPoints = finacial;
         maxNetworkPoints = networkPoints = network;
@@ -203,8 +204,11 @@ public class Facility : MonoBehaviour {
         //pointsUI[1].text = finacialPoints.ToString();
         //pointsUI[2].text = networkPoints.ToString();
         UpdatePointsUI();
-        if (isDown) {
-            // TODO: Change UI to show that the facility is down
+        if (IsDown) {
+            downedOverlay.enabled = true;
+        }
+        else {
+            downedOverlay.enabled = false;
         }
     }
 

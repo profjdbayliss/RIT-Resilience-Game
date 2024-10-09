@@ -277,7 +277,7 @@ public class Sector : MonoBehaviour {
         // TODO: check isDown;
         //I think this should work? - Mukund
         for (int i = 0; i < facilities.Length; i++) {
-            if (facilities[i].isDown) {
+            if (facilities[i].IsDown) {
                 facilitiesList[downedFacilities] = facilities[i];
                 downedFacilities++;
             }
@@ -447,7 +447,7 @@ public class Sector : MonoBehaviour {
                 Debug.Log($"Dependency not parsed: {values[j]}");
             }
         }
-        facility.SetFacilityPoints(
+        facility.SetupFacilityPoints(
             int.Parse(values[10]),
             int.Parse(values[11]),
             int.Parse(values[12])
