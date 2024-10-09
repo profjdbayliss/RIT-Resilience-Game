@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using static Facility;
 
 /// <summary>
 /// The types of messages. 
@@ -13,13 +14,15 @@ public enum CardMessageType
     IncrementTurn,
     SharePlayerType,
     ShareDiscardNumber,
+    ReturnCardToDeck,
     CardUpdate,
+    CardUpdateWithExtraFacilityInfo,
     ReduceCost,
-    RestorePoints,
     RemoveEffect,
     DiscardCard,
     MeepleShare,
     EndGame,
+    DrawCard,
     None
 }
 
@@ -158,34 +161,85 @@ public class Message
     /// <summary>
     /// The ToString of this message.
     /// </summary>
-    /// <returns>A list of the type, sender id, and arguments in this message separated by colons.
-    ///</returns>
-    public override string ToString()
-    {
-        StringBuilder str = new StringBuilder(type.ToString() + ":: ");
-        if (hasArgs)
-        {
-            int argcount = Count();
-            if (argcount != 0)
-            {
-                str.Append("::");
-                for (int i = 0; i < argcount; i++)
-                {
-                    if (i < argcount - 1)
-                    {
-                        str.Append(arguments[i] + ": ");
-                    }
-                    else
-                    {
-                        str.Append(arguments[i]);
+    /// <returns>A list of the type, sender id, and arguments in this message separated by colons.</returns>
+    public override string ToString() {
+        StringBuilder str = new StringBuilder($"MessageType: {type}");
+
+        if (hasArgs) {
+            str.Append(", Args: ");
+
+            if (isBytes) {
+                if (byteArguments != null && byteArguments.Count > 0) {
+                    for (int i = 0; i < byteArguments.Count; i++) {
+                        str.Append($"[{i}]={byteArguments[i]}");
+                        if (i < byteArguments.Count - 1) str.Append(", ");
                     }
                 }
-                
+                else {
+                    str.Append("(empty)");
+                }
             }
+            else {
+                if (arguments != null && arguments.Count > 0) {
+                    for (int i = 0; i < arguments.Count; i++) {
+                        str.Append($"[{GetUpdateNameFromInt(i)}]={arguments[i]}");
+
+                        // Additional details for specific arguments
+                        if (type == CardMessageType.CardUpdate && i == 3) {
+                            str.Append($" (FacilityType: {(FacilityType)arguments[i]})");
+                        }
+
+                        // Additional specific types and their arguments
+                        if (type == CardMessageType.ReduceCost && i == 4) {
+                            str.Append($" (Amount: {arguments[i]})");
+                        }
+                        else if (type == CardMessageType.RemoveEffect && i == 3) {
+                            str.Append($" (FacilityPlayedOnType: {(FacilityType)arguments[i]})");
+                        }
+                        else if (type == CardMessageType.MeepleShare && i == 4) {
+                            str.Append($" (Amount: {arguments[i]})");
+                        }
+                        else if (type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
+                            if (i == 4) {
+                                str.Append($" (AdditionalFacility1: {(FacilityType)arguments[i]})");
+                            }
+                            else if (i == 5) {
+                                str.Append($" (AdditionalFacility2: {(FacilityType)arguments[i]})");
+                            }
+                            else if (i == 6) {
+                                str.Append($" (AdditionalFacility3: {(FacilityType)arguments[i]})");
+                            }
+                        }
+
+                        if (i < arguments.Count - 1) str.Append(", ");
+                    }
+                }
+                else {
+                    str.Append("(empty)");
+                }
+            }
+        }
+        else {
+            str.Append(", No Args");
         }
 
         return str.ToString();
     }
-    
+
+    private string GetUpdateNameFromInt(int i) {
+        return i switch {
+            0 => "Player ID",
+            1 => "Unique Card ID",
+            2 => "Card ID",
+            3 => "Facility Type",
+            4 => "Additional Information", // Depending on type, it could be Amount or Facility Effect/Facility Type
+            5 => "Additional Facility 1",
+            6 => "Additional Facility 2",
+            7 => "Additional Facility 3",
+            _ => ""
+        };
+    }
+
+
 
 }

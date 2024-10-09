@@ -4,12 +4,15 @@ using System.IO;
 using System.Text;
 using System;
 using UnityEngine.UI;
+using System.Linq;
 
 public class CardReader : MonoBehaviour {
     // TODO: Currently used in two objects, one for each of Jessica's decks
 
     // deck name to use for the deck
     public string DeckName;
+
+
 
     // filename - directory path is assumed to be Application.streamingAssetsPath
     // extension is assumed to be csv
@@ -58,8 +61,8 @@ public class CardReader : MonoBehaviour {
                     if (singleLineCSVObjects.Length > 1) // excel adds an empty line at the end
                     {
                         //Debug.Log("number of items in a line is: " + singleLineCSVObjects.Length);
-                        if (!singleLineCSVObjects[5].Equals(string.Empty) && !singleLineCSVObjects[5].Equals("")) {
-                            filenames.Add(singleLineCSVObjects[5].Trim());
+                        if (!singleLineCSVObjects[27].Equals(string.Empty) && !singleLineCSVObjects[27].Equals("")) {
+                            filenames.Add(singleLineCSVObjects[27].Trim());
                         }
                         else {
                             filenames.Add(string.Empty);
@@ -125,7 +128,7 @@ public class CardReader : MonoBehaviour {
                     }
 
                     // TODO: If needed set teamID here
-                   // Debug.Log(DeckName);
+                    // Debug.Log(DeckName);
 
                     // 1:if there's one or more cards to be inserted into the deck
                     int numberOfCards = int.Parse(individualCSVObjects[1].Trim());
@@ -145,6 +148,10 @@ public class CardReader : MonoBehaviour {
                         string[] methods = individualCSVObjects[2].Split(';');
                         foreach (string type in methods) {
                             switch (type) {
+                                case "ReturnHandToDeckAndDraw":
+                                    tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
+                                    tempCard.ActionList.Add(new ReturnHandToDeckAndDraw());
+                                    break;
                                 case "DrawAndDiscardCards":
                                     // 17:  Cards drawn
                                     tempCard.data.drawAmount = int.Parse(individualCSVObjects[17]);
@@ -163,22 +170,26 @@ public class CardReader : MonoBehaviour {
                                     break;
                                 case "AddEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.data.effectIds = individualCSVObjects[19];
+                                    tempCard.data.effectString = individualCSVObjects[19];
                                     tempCard.ActionList.Add(new AddEffect());
                                     break;
                                 case "NegateEffect":
+                                    Debug.LogWarning("Negate Effect action is deprecated and will not function");
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                    tempCard.ActionList.Add(new NegateEffect());
+                                   // tempCard.ActionList.Add(new NegateEffect());
                                     break;
                                 case "RemoveEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
-                                    tempCard.data.effectIds = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
+                                    tempCard.data.effectString = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
                                     tempCard.ActionList.Add(new RemoveEffect());
                                     break;
                                 case "SpreadEffect":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new SpreadEffect());
+                                    break;
+                                case "SelectFacilitiesAddRemoveEffect":
+                                    tempCard.ActionList.Add(new SelectFacilitiesAddRemoveEffect());
                                     break;
                                 case "ChangeMeepleAmount":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
@@ -192,7 +203,27 @@ public class CardReader : MonoBehaviour {
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
                                     break;
-
+                                case "NWMeepleChangeEach":
+                                    tempCard.ActionList.Add(new NWMeepleChangeEach());
+                                    break;
+                                case "NWMeepleChangeChoice":
+                                    tempCard.ActionList.Add(new NWMeepleChangeChoice());
+                                    break;
+                                case "NWIncOvertimeAmount":
+                                    tempCard.ActionList.Add(new NWIncOvertimeAmount());
+                                    break;
+                                case "NWShuffleFromDiscard":
+                                    tempCard.ActionList.Add(new NWShuffleFromDiscard());
+                                    break;
+                                case "NWChangePhysPointsDice":
+                                    tempCard.ActionList.Add(new NWChangePhysPointsDice());
+                                    break;
+                                case "NWChangeFinPointsDice":
+                                    tempCard.ActionList.Add(new NWChangeFinPointsDice());
+                                    break;
+                                case "NWChangeMeepleAmtDice":
+                                    tempCard.ActionList.Add(new NWChangeMeepleAmtDice());
+                                    break;
                                 default:
                                     tempCard.data.cardType = CardType.None;
                                     break;
@@ -239,6 +270,7 @@ public class CardReader : MonoBehaviour {
                         // 6: set up the card title
                         // WORK: do we really need to set both of these?
                         tempCardFront.title = tempCardObj.name = individualCSVObjects[6];
+
                         tempCard.data.name = individualCSVObjects[6];
 
                         // Set up the card color. Could be done using csv
@@ -283,7 +315,7 @@ public class CardReader : MonoBehaviour {
                             tex3.Apply();
                         }
                         // TODO: Uncomment when a background Atlas is created
-                        //tempCardFront.background = tex3;
+                        tempCardFront.background = tex3;
 
                         // 11:  Meeple type changed
                         // TODO: May need enum implemented
@@ -308,13 +340,18 @@ public class CardReader : MonoBehaviour {
 
                         // 19:  Effect
                         //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19].Trim());
-                        tempCard.data.effectIds = individualCSVObjects[19].Trim();
+                        //string s = "";
+                        //for (int j = 0; j < individualCSVObjects.Length; j++) {
+                        //    s += $"{j}: {individualCSVObjects[j]}\n";
+                        //}
+                        //Debug.Log(s);
+                        tempCard.data.effectString = individualCSVObjects[19].Trim();
 
                         // 20:  Number of Effects TODO: this line is wrong in csv if its actually used anywhere
                         tempCard.data.effectCount = int.Parse(individualCSVObjects[20].Trim());
 
                         // 21:  Prereq Effect
-                        tempCard.data.preReqEffectId = int.Parse(individualCSVObjects[21].Trim());
+                        tempCard.data.preReqEffectType = Enum.Parse<FacilityEffectType>(individualCSVObjects[21].Trim());
 
                         // 22:  Duration
                         tempCard.data.duration = int.Parse(individualCSVObjects[22].Trim());
@@ -323,6 +360,7 @@ public class CardReader : MonoBehaviour {
                         tempCard.data.hasDoomEffect = bool.Parse(individualCSVObjects[23].Trim());
 
                         // 24:  Dice roll minimum [I thought dice rolls were done away with?]
+                        tempCard.data.minDiceRoll = int.Parse(individualCSVObjects[24].Trim());
 
                         // 25:  Flavor Text
                         // Replace csv semi-colons with appropiate commas

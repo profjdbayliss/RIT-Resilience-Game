@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class CardInfoDisplay : MonoBehaviour {
 
     public TextMeshProUGUI cardInfo;
-    private bool displayCardInfo = true;
+    private bool displayCardInfo = false;
     public GameObject cardInfoPanel;
     public Toggle cardInfoToggle;
     private bool panelActive = false;
@@ -47,11 +47,9 @@ public class CardInfoDisplay : MonoBehaviour {
         // Card information
         sb.AppendLine($"Name: {card.front.title}");
         sb.AppendLine($"Desc: {card.front.description}");
-        sb.AppendLine($"State: {card.state}");
+        sb.AppendLine($"State: {card.State}");
         sb.AppendLine($"Target: {card.target}");
-        sb.AppendLine($"Attacking Cards: {card.AttackingCards.Count}");
-        sb.AppendLine($"Modifying Cards: {card.ModifyingCards.Count}");
-
+        sb.AppendLine($"UID: {card.UniqueID}");
         // Actions
         sb.AppendLine("Actions:");
         //Debug.Log($"Card Action List Count: {card.ActionList.Count}");
@@ -63,14 +61,13 @@ public class CardInfoDisplay : MonoBehaviour {
         sb.AppendLine("Card Data:");
         sb.AppendLine($"Card Type: {card.data.cardType}");
         sb.AppendLine($"Effects: ");
-        foreach (var s in card.data.effectIds.Split(';')) {
+        foreach (var s in card.data.effectString.Split(';')) {
             sb.AppendLine($"- {s}");
         }
-        sb.AppendLine($"PreReq Effect: {FacilityEffect.GetEffectInfoFromId(card.data.preReqEffectId)}");
+        sb.AppendLine($"PreReq Effect: {card.data.preReqEffectType}");
         sb.AppendLine($"Effect Count: {card.data.effectCount}");
-        sb.AppendLine($"Duration: {card.data.duration}");
         sb.AppendLine($"Has Doom Effect: {card.data.hasDoomEffect}");
-        sb.AppendLine($"Percent Success: {card.data.percentSuccess}");
+        sb.AppendLine($"Shared card id: {card.data.cardID}");
 
         cardInfo.text = sb.ToString();
     }

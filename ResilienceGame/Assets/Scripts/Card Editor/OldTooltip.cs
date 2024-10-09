@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using TMPro;
 
-public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class OldTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public GameObject tooltipPrefab;
     public string tooltipText;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Card;
 
+
 public enum CardType
 {
     Station,
@@ -31,11 +32,12 @@ public struct CardData
     public int removeAmount;
     public int targetAmount;
     public int facilityAmount;
-    public string effectIds;
-    public int preReqEffectId;
+    public string effectString;
+    public FacilityEffectType preReqEffectType;
     public int effectCount;
     public int duration;
     public bool hasDoomEffect;
+    public int minDiceRoll;
     public string[] meepleType;
     public float meepleAmount;
     public PlayerSector[] onlyPlayedOn;

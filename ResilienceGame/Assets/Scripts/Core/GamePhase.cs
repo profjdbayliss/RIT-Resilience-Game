@@ -2,8 +2,14 @@
 public enum GamePhase
 {
     Start,
-    Draw,
-    Bonus,
-    Action,
+    DrawRed,
+    DrawBlue,
+    BonusRed,
+    BonusBlue,
+    ActionRed,
+    ActionBlue,
+    DiscardRed,
+    DiscardBlue,
+    PlayWhite,
     End
 };

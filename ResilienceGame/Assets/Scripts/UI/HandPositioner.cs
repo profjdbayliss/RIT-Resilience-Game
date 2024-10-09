@@ -34,7 +34,7 @@ public class HandPositioner : MonoBehaviour {
 
     //TODO: unknown if there is a real max cards in game rules but there should be for technical reasons if nothing else
     private const int MIN_CARDS = 3;
-    private const int MAX_CARDS = 10;
+    //private const int MAX_CARDS = 10;
 
 
     public Card CurrentHoveredCard;
@@ -46,7 +46,6 @@ public class HandPositioner : MonoBehaviour {
         rect = GetComponent<RectTransform>();
 
     }
-
 
     /// <summary>
     /// Tells the hand positioner that a card is being dragged
@@ -66,7 +65,7 @@ public class HandPositioner : MonoBehaviour {
     /// </summary>
     /// <param name="card">The card to enter the hand</param>
     public void ReturnCardToHand(Card card) {
-        card.state = CardState.CardDrawn;
+        card.SetCardState(CardState.CardDrawn);
         Debug.Log($"Sending {card.front.title} to hand");
         card.transform.SetParent(transform, false);
         card.transform.SetSiblingIndex(card.HandPosition);
@@ -100,8 +99,6 @@ public class HandPositioner : MonoBehaviour {
         cards.Remove(card.GetComponent<Card>());
         //  Destroy(card);
     }
-
-
 
     private void Update() {
         HandleNewCards();
@@ -225,7 +222,6 @@ public class HandPositioner : MonoBehaviour {
             card.transform.localScale = Vector3.Lerp(card.transform.localScale, Vector3.one * targetScale, Time.deltaTime * hoverTransitionSpeed);
         }
     }
-
     //Allows other classes to subscribe to the onCardHover event
     public void AddCardHoverListener(UnityAction<Card> listener) {
         onCardHover.AddListener(listener);

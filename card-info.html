@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,122 +8,221 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #ffffff;
             margin: 0;
             padding: 20px;
         }
+
         .card-container {
             display: flex;
             flex-wrap: wrap;
+            
             gap: 20px;
         }
+
         .card {
+            position: relative;
+            min-height: fit-content;
             width: 250px;
             border: 1px solid #ccc;
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .card-title {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
         }
+
         .card-info {
             font-size: 14px;
             margin-bottom: 5px;
         }
+
         .method-list {
             list-style-type: none;
             padding-left: 0;
             margin: 5px 0;
         }
+
         .method-item {
             margin-bottom: 3px;
         }
+
         .card-cost {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             margin-top: 10px;
         }
+
         .cost-item {
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 5px;
             font-weight: bold;
         }
-        .doom-card {
+
+        .description-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .doom-bg {
             background-color: #ffcccc;
+        }
+
+        .flavour-text {
+            
+            margin-top: 10px;
+            font-size: 12px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .doom-card {
+            background-color: #ffe6e6;
             padding: 5px;
             border-radius: 5px;
             font-weight: bold;
             margin-top: 10px;
         }
+        .flavor-box {
+            display: flex;
+            align-items: end;
+        }
+
         #loading {
             font-size: 18px;
             text-align: center;
             margin-top: 20px;
         }
+
         #error {
             color: red;
             font-size: 18px;
             text-align: center;
             margin-top: 20px;
         }
+        @media print {
+        body {
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact; /* Ensures background colors are printed */
+            print-color-adjust: exact; /* Standard property for compatibility */
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 columns for a 4x4 layout */
+            gap: 0; /* No gap between cards to fit them all on the page */
+            page-break-inside: avoid;
+        }
+
+        .card {
+            width: 1.875in; /* Adjust card width */
+            height: 2.25in;  /* Adjust card height to ensure it fits */
+            border: 1px solid #000;
+            border-radius: 0; /* Remove border radius */
+            box-shadow: none; /* Remove shadows for print */
+            margin: 0;
+            padding: 0 5;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .card-title {
+            font-size: 10px; /* Reduce title font size */
+            margin-bottom: 0; /* Reduce margin below title */
+        }
+
+        .description-box {
+            font-size: 8px; /* Reduce description font size */
+            margin-top: 2px;
+            padding: 4px;
+        }
+
+        .flavour-text {
+            font-size: 7px; /* Reduce flavor text size */
+            font-style: italic;
+            margin-top: auto; /* Pushes flavor text to the bottom */
+            color: #666;
+        }
+        .card-img {
+            text-align: center; /* Center the image */
+        }
+        .card-img img {
+            max-width: 1.1in;
+            margin: auto; /* Center the image */
+            max-height: 1in; /* Limit the image height further */
+        }
+
+        .card-cost {
+            font-size: 8px; /* Reduce cost text size */
+        }
+
+        @page {
+            size: 8.5in 11in; /* Letter size */
+            margin: 0.5in; /* Half-inch margins */
+        }
+    }
+
+
+    
     </style>
 </head>
+
 <body>
     <div id="loading">Loading card data...</div>
     <div id="error" style="display: none;"></div>
     <div class="card-container" id="cardContainer"></div>
 
     <script>
+        const buildDupes = true;
+        const skipRed = true;
+        const skipBlue = true;
+        const skipWhite = false;
         const csv_path = 'ResilienceGame\\Assets\\StreamingAssets\\SectorDownCards.csv';
+        const img_path = 'ResilienceGame\\Assets\\StreamingAssets\\';
         function parseCSV(csv) {
             const lines = csv.split('\n');
             const headers = lines[0].split(',');
             return lines.slice(1).map(line => {
                 const values = line.split(',');
                 return headers.reduce((obj, header, index) => {
-                    obj[header] = values[index] || ''; // Use empty string if value is undefined
+                    obj[header.trim()] = (values[index] || '').trim(); // Trim both the header and the value
                     return obj;
                 }, {});
             });
         }
 
+
         function createCardElement(card) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.style.backgroundColor = getTeamColor(card.Team);
 
-            const methods = (card.Method || '').split(';');
-            const methodHtml = methods.length > 1
-                ? `<strong>Methods:</strong>
-                   <ul class="method-list">
-                     ${methods.map(method => `<li class="method-item">${method.trim()}</li>`).join('')}
-                   </ul>`
-                : `<strong>Method:</strong> ${card.Method || 'N/A'}`;
+            const imgPath = card.imgLocation === "" ? "https://craftypixels.com/placeholder-image/300.png/fff/fff" : img_path + card.imgLocation;
 
             cardElement.innerHTML = `
-                <div class="card-title">${card.Title || 'Untitled'}</div>
-                <div class="card-info">${methodHtml}</div>
-                <div class="card-info"><strong>Target:</strong> ${card.Target || 'N/A'}</div>
-                <div class="card-info"><strong>Sectors:</strong> ${card.SectorsAffected || 'N/A'}</div>
+                <div class="card-title" style="background-color: ${getTeamColor(card.Team)};">${card.Title || 'Untitled'}</div>
+                <div class="card-img"><img src="${imgPath}" alt="Card Image" style="width: 100%;"></div>
                 <div class="card-cost">
                     ${parseInt(card.BlueCost) > 0 ? `<span class="cost-item" style="background-color: #add8e6;">Blue: ${card.BlueCost}</span>` : ''}
                     ${parseInt(card.BlackCost) > 0 ? `<span class="cost-item" style="background-color: #d3d3d3;">Black: ${card.BlackCost}</span>` : ''}
                     ${parseInt(card.PurpleCost) > 0 ? `<span class="cost-item" style="background-color: #e6e6fa;">Purple: ${card.PurpleCost}</span>` : ''}
                 </div>
-                ${parseInt(card.CardsDrawn) > 0 ? `<div class="card-info"><strong>Cards Drawn:</strong> ${card.CardsDrawn}</div>` : ''}
-                ${parseInt(card.CardsRemoved) > 0 ? `<div class="card-info"><strong>Cards Removed:</strong> ${card.CardsRemoved}</div>` : ''}
-                ${parseInt(card.FacilityPoint) > 0 ? `<div class="card-info"><strong>Facility Points:</strong> ${card.FacilityPoint}</div>` : ''}
-                ${parseInt(card.Duration) > 0 ? `<div class="card-info"><strong>Duration:</strong> ${card.Duration}</div>` : ''}
-                ${card.DoomEffect === 'TRUE' ? '<div class="doom-card">DOOM CARD</div>' : ''}
-                <div class="card-info"><strong>Description:</strong> ${card.Description || 'No description available.'}</div>
-                <div class="card-info"><strong>Flavour Text:</strong> ${card.FlavourText || 'No flavour text available.'}</div>
+                <div class="description-box ${card.DoomEffect === 'TRUE' ? 'doom-bg' : ''}">${card.Description || 'No description available.'}</div>
+                <div class="flavor-box"><div class="flavour-text">${card.FlavourText || ''}</div></div>
             `;
 
             return cardElement;
         }
+
+
 
         function getTeamColor(team) {
             switch ((team || '').toLowerCase()) {
@@ -140,8 +240,25 @@
         function displayCards(cardData) {
             const cardContainer = document.getElementById('cardContainer');
             cardData.forEach(card => {
-                const cardElement = createCardElement(card);
-                cardContainer.appendChild(cardElement);
+                if (card.Title === '') {
+                    return;
+                }
+                if (skipRed && card.Team.toLowerCase() === 'red') {
+                    return;
+                }
+                if (skipBlue && card.Team.toLowerCase() === 'blue') {
+                    return;
+                }
+                if (skipWhite && card.Team.toLowerCase().includes('white')) {
+                    return;
+                }
+                const numCards = buildDupes ? card.Duplication : 1;
+                //console.log(card.Team);
+                for (let i = 0; i < numCards; i++) {
+                    const cardElement = createCardElement(card);
+                    cardContainer.appendChild(cardElement);
+                }
+
             });
         }
 
@@ -174,4 +291,5 @@
             });
     </script>
 </body>
+
 </html>

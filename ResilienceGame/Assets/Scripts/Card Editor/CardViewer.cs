@@ -34,7 +34,7 @@ public class CardViewer : MonoBehaviour
     public TMP_Text impactText;
     public TMP_Text descriptionText;
     public TMP_Text costText;
-    public Tooltip metaDataTip;
+    public OldTooltip metaDataTip;
 
     [Header("Card Editor Inputs")]
     //public TMP_InputField teamInput;
