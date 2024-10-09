@@ -119,6 +119,7 @@ public class CardPlayer : MonoBehaviour {
     public bool IsAnimating { get; set; } = false;
     public PlayerReadyState ReadyState { get; set; } = PlayerReadyState.ReadyToPlay;
     public int AmountToDiscard { get; set; } = 0;
+    public int AmountToSelect { get; set; } = 0;
     public int AmountToReturnToDeck { get; private set; } = 0;
     public List<Card> CardsAllowedToBeDiscard;
     public Action OnCardsReturnedToDeck { get; set; }
@@ -143,6 +144,7 @@ public class CardPlayer : MonoBehaviour {
         ReadyToPlay,
         ReturnCardsToDeck,
         DiscardCards,
+        SelectCards,
         SelectFacilties,
         SelectMeeplesWithUI,
         SelectCardsForCostChange
@@ -261,22 +263,33 @@ public class CardPlayer : MonoBehaviour {
         PlayerSector.DisableFacilitySelection();
         OnFacilitiesSelected?.Invoke(facilities);
     }
-    public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded) {
+    public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
         ChooseMeeples(amountOfMeeplesNeeded);
         //TODO: move to an update loop checking ReadyState
-        SelectCardsInHand();
+        SelectCardsInHand(player, card);
         SelectMeeplesOnCards();
     }
     private void ChooseMeeples(int amountOfMeeplesNeeded) {
         ReadyState = PlayerReadyState.SelectMeeplesWithUI;
         PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => ReadyState = PlayerReadyState.SelectCardsForCostChange);//example
     }
-    private void SelectCardsInHand() {
+    private void SelectCardsInHand(CardPlayer player, Card card) {
+        GameManager.instance.DisplayAlertMessage($"Choose {card.data.targetAmount} cards to reduce meeple cost", player);
 
     }
     private void SelectMeeplesOnCards() {
 
     }
+
+    //Sets the variables required to force the player to select a certain amount of cards
+    public void AddSelectEvent(int amount, List<Card> cardsAllowedToBeSelected = null)
+    {
+        ReadyState = PlayerReadyState.SelectCards;
+        AmountToSelect = amount;
+        //need like a select dropzone here
+
+    }
+
     //Sets the variables required to force the player to discard a certain amout of cards
     public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
         ReadyState = PlayerReadyState.DiscardCards;         //set the player state to discard cards

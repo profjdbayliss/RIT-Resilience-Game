@@ -325,7 +325,7 @@ public class ShuffleCardsFromDiscard : ICardAction {
 
 public class ReduceCardCost : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        player.ChooseMeeplesThenReduceCardCost((int)card.data.meepleAmount);
+        player.ChooseMeeplesThenReduceCardCost((int)card.data.meepleAmount, player, card);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
