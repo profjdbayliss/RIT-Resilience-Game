@@ -1009,18 +1009,6 @@ public class CardPlayer : MonoBehaviour {
                 if (ReadyState == PlayerReadyState.ReturnCardsToDeck) {
                     Debug.Log("Returning card to deck");
                     ReturnCardToDeck(card, true);
-                    //TODO: this is not correct??
-                    //update the card update with the card that was returned
-                    //if (mUpdatesThisPhase.TryPeek(out Update update)) {
-                    //    if (update.Type == CardMessageType.CardUpdate) {
-                    //        if (update.DiscardedOrReturnedCardUIDs == null || update.DiscardedOrReturnedCardUIDs == "") {
-                    //            update.DiscardedOrReturnedCardUIDs = card.UniqueID.ToString();
-                    //        }
-                    //        else {
-                    //            update.DiscardedOrReturnedCardUIDs += ";" + card.UniqueID;
-                    //        }
-                    //    }
-                    //}
                     AmountToReturnToDeck--;
                     if (AmountToReturnToDeck > 0) {
                         GameManager.instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} more cards to the deck", this); //update alert message
@@ -1029,9 +1017,6 @@ public class CardPlayer : MonoBehaviour {
                         OnCardsReturnedToDeck?.Invoke(); //Resolve the action after cards have been returned to deck
                         GameManager.instance.mAlertPanel.ResolveTextAlert(); //remove alert message
                         ReadyState = PlayerReadyState.ReadyToPlay; //reset player state
-                        //update opponent now that the update has all the info it needs
-                        //dont think this is needed since we now send an update on every card return
-                        //GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
                     }
 
                 }
