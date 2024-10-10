@@ -256,16 +256,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //assign the owner of the sector as the blue player
         sector.Owner = actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer;
         //give the sector to both players
-        //id imagine eventually red player will have a sector, but it will change depending on which game board(sector) they are currently looking at
+        //all players will most likely need a list of all sectors
         actualPlayer.AssignSector(sector);
         opponentPlayer.AssignSector(sector);
+
+
         sector.Initialize(PlayerSector.Water);
-        //actualPlayer.PlayerSector = sector;
-        //sector.owner = actualPlayer; //this should actually belong to the blue player not just whoever is 'actual player'
-        //actualPlayer.PlayerSector.Initialize(PlayerSector.Water);
-        //if (actualPlayer.playerTeam == PlayerTeam.Blue) {
-        //    mEndPhaseButton.SetActive(false);
-        //}
 
         // in this game people go in parallel to each other
         // per phase
@@ -486,17 +482,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 mAlertPanel.ShowTextAlert(message, onAlertFinish);
         }
     }
-    public void DisplayFacilityEffectChoiceMenu(Facility facility, CardPlayer player) {
-        //if (!facility) return;
-        //FacilityEffectManager effectManager = facility.effectManager;
-        //if (!effectManager) return;
-        //var opponentEffects = effectManager.GetEffectsCreatedByTeam(player.GetOpponentTeam());
-        //if (opponentEffects.Count == 0) {
-        //    var opponentEffects2 = effectManager.GetEffectsCreatedByTeam(player.playerTeam);
-        //    Debug.LogWarning($"No {player.GetOpponentTeam()} effects found on facility. Were you trying to get {player.playerTeam} effects with count {opponentEffects2.Count}?");
-        //    return;
-        //}
-        //mAlertPanel.ShowEffectList(opponentEffects);
+    public void DisplayFacilityEffectChoiceMenu(Card card, int numRequired) {
+        mAlertPanel.AddCardToSelectionMenu(card.gameObject);
+        //check for max number then call
+        mAlertPanel.ToggleCardSelectionPanel(true);
 
     }
     // WORK: rewrite for this card game

@@ -42,9 +42,10 @@ public class AlertPanel : MonoBehaviour {
         yield return new WaitForSeconds(time);
         ResolveTextAlert();
     }
-    public void AddCardToSelectionMenu(GameObject card) {
+    public int AddCardToSelectionMenu(GameObject card) {
         cardList.Add(card);
         card.transform.SetParent(ListPanel);
+        return cardList.Count;
         
 
     }
