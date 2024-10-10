@@ -122,6 +122,7 @@ public class CardPlayer : MonoBehaviour {
     public int AmountToSelect { get; set; } = 0;
     public int AmountToReturnToDeck { get; private set; } = 0;
     public List<Card> CardsAllowedToBeDiscard;
+    public List<Card> CardsAllowedToBeSelected;
     public Action OnCardsReturnedToDeck { get; set; }
     public Action<List<Facility>> OnFacilitiesSelected { get; set; }
 
@@ -144,7 +145,6 @@ public class CardPlayer : MonoBehaviour {
         ReadyToPlay,
         ReturnCardsToDeck,
         DiscardCards,
-        SelectCards,
         SelectFacilties,
         SelectMeeplesWithUI,
         SelectCardsForCostChange
@@ -264,18 +264,16 @@ public class CardPlayer : MonoBehaviour {
         OnFacilitiesSelected?.Invoke(facilities);
     }
     public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
-        ChooseMeeples(amountOfMeeplesNeeded);
-        //TODO: move to an update loop checking ReadyState
-        SelectCardsInHand(player, card);
-        SelectMeeplesOnCards();
+        ChooseMeeples(amountOfMeeplesNeeded, player, card);
     }
-    private void ChooseMeeples(int amountOfMeeplesNeeded) {
+    private void ChooseMeeples(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
         ReadyState = PlayerReadyState.SelectMeeplesWithUI;
-        PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => ReadyState = PlayerReadyState.SelectCardsForCostChange);//example
+        PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => SelectCardsInHand(player, card));
+        SelectMeeplesOnCards();
     }
     private void SelectCardsInHand(CardPlayer player, Card card) {
         GameManager.instance.DisplayAlertMessage($"Choose {card.data.targetAmount} cards to reduce meeple cost", player);
-
+        AddSelectEvent(card.data.targetAmount);
     }
     private void SelectMeeplesOnCards() {
 
@@ -284,10 +282,21 @@ public class CardPlayer : MonoBehaviour {
     //Sets the variables required to force the player to select a certain amount of cards
     public void AddSelectEvent(int amount, List<Card> cardsAllowedToBeSelected = null)
     {
-        ReadyState = PlayerReadyState.SelectCards;
+        ReadyState = PlayerReadyState.SelectCardsForCostChange;
         AmountToSelect = amount;
         //need like a select dropzone here
+        CardsAllowedToBeSelected = cardsAllowedToBeSelected;
+        Debug.Log($"Enabling {playerName} to select cards");
+    }
 
+    public void StopSelect()
+    {
+        ReadyState = PlayerReadyState.ReadyToPlay;
+        CardsAllowedToBeSelected?.ForEach(card => card.ToggleOutline(false));
+        CardsAllowedToBeSelected = null;
+        //need a select dropzone here
+        GameManager.instance.mAlertPanel.ResolveTextAlert();
+        Debug.Log($"Disabling {playerName}'s ability to select");
     }
 
     //Sets the variables required to force the player to discard a certain amout of cards
