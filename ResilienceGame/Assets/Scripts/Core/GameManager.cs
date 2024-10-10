@@ -482,7 +482,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 mAlertPanel.ShowTextAlert(message, onAlertFinish);
         }
     }
-    public void DisplayFacilityEffectChoiceMenu(Card card, int numRequired) {
+    public void DisplayCardChoiceMenu(Card card, int numRequired) {
         mAlertPanel.AddCardToSelectionMenu(card.gameObject);
         //check for max number then call
         mAlertPanel.ToggleCardSelectionPanel(true);

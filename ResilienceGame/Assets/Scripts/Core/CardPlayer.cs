@@ -1043,7 +1043,9 @@ public class CardPlayer : MonoBehaviour {
                     return card;
                 }
                 else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
-
+                    GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect);
+                    AmountToSelect--;
+                    handPositioner.cards.Remove(card);
                 }
 
             }
