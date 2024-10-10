@@ -482,10 +482,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 mAlertPanel.ShowTextAlert(message, onAlertFinish);
         }
     }
-    public void DisplayCardChoiceMenu(Card card, int numRequired) {
+    public void DisplayCardChoiceMenu(Card card, int numRequired)
+    {
         mAlertPanel.AddCardToSelectionMenu(card.gameObject);
-        //check for max number then call
-        mAlertPanel.ToggleCardSelectionPanel(true);
+        if (numRequired == 0)
+            mAlertPanel.ToggleCardSelectionPanel(true);
 
     }
     // WORK: rewrite for this card game

@@ -11565,6 +11565,7 @@ MonoBehaviour:
   cardStackingCanvas: {fileID: 2138364093}
   hoveredDropLocation: {fileID: 0}
   CardsAllowedToBeDiscard: []
+  CardsAllowedToBeSelected: []
 --- !u!1 &689357524
 GameObject:
   m_ObjectHideFlags: 0
@@ -18049,6 +18050,7 @@ MonoBehaviour:
   cardStackingCanvas: {fileID: 2138364093}
   hoveredDropLocation: {fileID: 0}
   CardsAllowedToBeDiscard: []
+  CardsAllowedToBeSelected: []
 --- !u!1 &1134896414
 GameObject:
   m_ObjectHideFlags: 0

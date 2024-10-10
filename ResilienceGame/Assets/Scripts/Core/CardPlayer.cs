@@ -1043,9 +1043,12 @@ public class CardPlayer : MonoBehaviour {
                     return card;
                 }
                 else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
-                    GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect);
-                    AmountToSelect--;
-                    handPositioner.cards.Remove(card);
+                    if (AmountToSelect > 0)
+                    {
+                        GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect--);
+                        handPositioner.cards.Remove(card);
+                    }
+                    else ReadyState = PlayerReadyState.SelectMeeplesWithUI;
                 }
 
             }
