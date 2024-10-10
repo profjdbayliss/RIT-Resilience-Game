@@ -1048,7 +1048,7 @@ public class CardPlayer : MonoBehaviour {
                         GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect--);
                         handPositioner.cards.Remove(card);
                     }
-                    else ReadyState = PlayerReadyState.SelectMeeplesWithUI;
+                    else ReadyState = PlayerReadyState.ReadyToPlay;
                 }
 
             }
