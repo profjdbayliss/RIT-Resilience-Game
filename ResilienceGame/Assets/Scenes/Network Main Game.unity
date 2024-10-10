@@ -3734,8 +3734,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textAlertTextMesh: {fileID: 1513553827}
   textAlertPanel: {fileID: 1795422238}
-  ListPanel: {fileID: 0}
-  ListItemPrefab: {fileID: 0}
+  ListPanel: {fileID: 530362674}
+  ListItemPrefab: {fileID: 7661936473909244145, guid: 6fe05ae3f2b55f94894f0036816cbaed, type: 3}
 --- !u!224 &228889692
 RectTransform:
   m_ObjectHideFlags: 0
