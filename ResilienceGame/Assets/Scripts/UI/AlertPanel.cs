@@ -50,7 +50,7 @@ public class AlertPanel : MonoBehaviour {
 
     }
     public void ToggleCardSelectionPanel(bool enable) {
-        ListPanel.gameObject.SetActive(enable;
+        ListPanel.gameObject.SetActive(enable);
     }
    
 
