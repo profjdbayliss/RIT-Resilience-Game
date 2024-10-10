@@ -12,7 +12,7 @@ public class AlertPanel : MonoBehaviour {
     [SerializeField] GameObject ListItemPrefab;
     private readonly Queue<Action> onAlertFinish = new Queue<Action>();
     Queue<string> textAlertQueue = new Queue<string>();
-    List<GameObject> effectListItems = new List<GameObject>();
+    List<GameObject> cardList = new List<GameObject>();
 
     public void ShowTextAlert(string message, float duration = -1) {
         textAlertTextMesh.text = message;
@@ -41,6 +41,15 @@ public class AlertPanel : MonoBehaviour {
     private IEnumerator HideTextFrame(float time) {
         yield return new WaitForSeconds(time);
         ResolveTextAlert();
+    }
+    public void AddCardToSelectionMenu(GameObject card) {
+        cardList.Add(card);
+        card.transform.SetParent(ListPanel);
+        
+
+    }
+    public void ToggleCardSelectionPanel(bool enable) {
+        ListPanel.gameObject.SetActive(enable;
     }
    
 
