@@ -552,7 +552,15 @@ public class CardPlayer : MonoBehaviour {
         else {
             // since there are multiples of each card type potentially
             // in a deck they need a unique id outside of the card's id
-            tempCard.UniqueID = GameManager.instance.UniqueCardIdCount++;
+            //tempCard.UniqueID = GameManager.instance.UniqueCardIdCount++;
+            if (GameManager.instance.IsServer) {
+                tempCard.UniqueID = RGNetworkPlayerList.instance.DrawCardForPlayer(RGNetworkPlayerList.instance.localPlayerID);
+            }
+            else {
+                //assign temp unique id before getting a real one from network
+                tempCard.UniqueID = GameManager.instance.UniqueCardIdCount++; 
+            }
+            
         }
 
         // set the info on the card front
@@ -1405,7 +1413,9 @@ public class CardPlayer : MonoBehaviour {
         switch (update.Type) {
             case CardMessageType.DrawCard:
                 Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
-                opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); //draw cards for opponent but dont update network which would cause an infinite loop
+
+                //draw cards for opponent but dont update network which would cause an infinite loop
+                opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); 
                 break;
             case CardMessageType.CardUpdate:
             case CardMessageType.CardUpdateWithExtraFacilityInfo:
@@ -1637,6 +1647,7 @@ public class CardPlayer : MonoBehaviour {
     }
 
     #region Network Helpers
+
 
 
     public CardMessageType GetNextUpdateInMessageFormat(ref List<int> playsForMessage, GamePhase phase) {

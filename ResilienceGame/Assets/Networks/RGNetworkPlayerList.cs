@@ -30,6 +30,16 @@ public struct RGNetworkLongMessage : NetworkMessage {
 public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public static RGNetworkPlayerList instance;
 
+    int nextCardUID = 0;
+    Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
+
+    public int DrawCardForPlayer(int playerId) {
+        Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
+        int cardUID = nextCardUID++;
+        drawnCardUIDs[playerId] = cardUID;
+        return cardUID;
+    }
+
     public int localPlayerID;
     public string localPlayerName;
     public List<int> playerIDs = new List<int>();
@@ -67,6 +77,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerTypes[i] = PlayerTeam.Any;
         }
     }
+
+   
 
     public void SetPlayerType(PlayerTeam type) {
         if (isServer) {
@@ -232,6 +244,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.DiscardCard:
             case CardMessageType.DrawCard:
             case CardMessageType.ReturnCardToDeck:
+            case CardMessageType.ChangeCardID:
             case CardMessageType.MeepleShare: {
                     RGNetworkLongMessage msg = new RGNetworkLongMessage {
                         indexId = (uint)localPlayerID,
@@ -453,6 +466,30 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
+                case CardMessageType.ChangeCardID: {
+                        int element = 0;
+                        int cardId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int newUID = GetIntFromByteArray(element, msg.payload);
+
+                        // Check if this message is for the current client
+                        if (msg.indexId == localPlayerID) {
+                            // Update the card with the new UID
+                            if (manager.actualPlayer.HandCards.TryGetValue(cardId, out GameObject cardGo)) {
+                                if (cardGo.TryGetComponent(out Card drawnCard)) {
+                                    if (drawnCard != null) {
+                                        drawnCard.UniqueID = newUID;
+                                        Debug.Log($"Client updated card {cardId} with new UID {newUID}");
+                                        break;
+                                    }
+                                }
+                            }
+                            Debug.LogError($"Client received a card UID update for a non existent card");
+                        }
+                    }
+                    break;
+
+
                 case CardMessageType.DrawCard: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -707,9 +744,23 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
+                       // int cardId = GetIntFromByteArray(0, msg.payload);
+                        int newUID = DrawCardForPlayer((int)senderId); // Assign UID from server
+
+                        // Send the new UID back to the client
+                        RGNetworkLongMessage assignUIDMessage = new RGNetworkLongMessage {
+                            indexId = msg.indexId, //reuse the senderId to filter by client
+                            type = (uint)CardMessageType.ChangeCardID,
+                            count = 2, // cardID and UID
+                            payload = BitConverter.GetBytes(cardId).Concat(BitConverter.GetBytes(newUID)).ToArray()
+                        };
+                        NetworkServer.SendToAll(assignUIDMessage);
+
+                        Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
+
                         Update update = new Update {
                             Type = CardMessageType.DrawCard,
-                            UniqueID = uniqueId,
+                            UniqueID = newUID,
                             CardID = cardId,
                         };
                         Debug.Log("server received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
@@ -717,6 +768,23 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromOpponent(update, gamePhase, msg.indexId);
                     }
                     break;
+               //case CardMessageType.ChangeCardID: {
+               //         int cardId = GetIntFromByteArray(0, msg.payload);
+               //         int newUID = DrawCardForPlayer((int)senderId); // Assign UID from server
+
+               //         // Send the new UID back to the client
+               //         RGNetworkLongMessage assignUIDMessage = new RGNetworkLongMessage {
+               //             indexId = msg.indexId, //reuse the senderId to filter by client
+               //             type = (uint)CardMessageType.ChangeCardID,
+               //             count = 2, // cardID and UID
+               //             payload = BitConverter.GetBytes(cardId).Concat(BitConverter.GetBytes(newUID)).ToArray()
+               //         };
+               //         NetworkServer.SendToAll(assignUIDMessage);
+
+               //         Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
+               //     }
+               //     break;
+
                 case CardMessageType.ReturnCardToDeck: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
