@@ -115,6 +115,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private int roundsLeft = 30;
     private int turnTotal = 0;
     private const int BASE_MAX_TURNS = 30;
+    private int numTurnsTillWhiteCard = 0;
+    private int numWhiteCardOfSameTypePlayed = 0;
+    private const int MIN_TURNS_TILL_WHITE_CARD = 2;
+    private const int MAX_TURNS_TILL_WHITE_CARD = 5;
+    private const float WHITE_CARD_POS_CHANCE = 0.5f;
+    private bool playWhite = false;
+    private bool playedPosWhiteCard = false;
 
     public int UniqueCardIdCount = 0;
 
@@ -167,6 +174,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
             roundsLeft = BASE_MAX_TURNS;
             turnTotal = 0;
+            numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5 turns
             mTurnText.text = "" + GetTurnsLeft();
             mPhaseText.text = "Phase: " + MGamePhase.ToString();
             mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
@@ -598,7 +606,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
             GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
-            GamePhase.DiscardRed => (turnTotal % 3 == 0) ? GamePhase.DrawBlue : GamePhase.PlayWhite,
+            GamePhase.DiscardRed => playWhite ? GamePhase.DrawBlue : GamePhase.PlayWhite,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
             GamePhase.BonusBlue => GamePhase.ActionBlue,
@@ -725,22 +733,48 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.PlayWhite:
-                //if(turnTotal % 9 == 0)
-                //{
-                //    //positive white
-                //    Debug.Log("Playing positive white card on turn " + turnTotal);
-                //    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
-                //    positiveWhiteCards[randCard].Play(null, null);
-                //    positiveWhiteCards.RemoveAt(randCard);
-                //}
-                //else
-                //{
-                //    //negative white
-                //    Debug.Log("Playing negative white card on turn " + turnTotal);
-                //    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
-                //    negativeWhiteCards[randCard].Play(null, null);
-                //    negativeWhiteCards.RemoveAt(randCard);
-                //}
+                void PlayPos() {
+                    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
+                    Debug.Log("Playing positive white card on turn " + turnTotal);
+                    //TODO: Play the card
+                    //positiveWhiteCards[randCard].Play(null, null);
+                    //  positiveWhiteCards.RemoveAt(randCard);
+                }
+
+                void PlayNeg() {
+                    Debug.Log("Playing negative white card on turn " + turnTotal);
+                    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
+                    //TODO: Play the card
+                    //  negativeWhiteCards[randCard].Play(null, null);
+                    //  negativeWhiteCards.RemoveAt(randCard);
+                }
+
+
+                if (UnityEngine.Random.Range(0f, 1f) > WHITE_CARD_POS_CHANCE) {
+
+                    if (numWhiteCardOfSameTypePlayed >= 2) {
+                        PlayNeg();
+                        playedPosWhiteCard = false;
+                        numWhiteCardOfSameTypePlayed = 0;
+                    }
+                    if (playedPosWhiteCard)
+                        numWhiteCardOfSameTypePlayed++;
+
+                    playedPosWhiteCard = true;
+                    PlayPos();
+                }
+                else {
+                    if (numWhiteCardOfSameTypePlayed >= 2) {
+                        PlayPos();
+                        playedPosWhiteCard = true;
+                        numWhiteCardOfSameTypePlayed = 0;
+                    }
+                    if (!playedPosWhiteCard)
+                        numWhiteCardOfSameTypePlayed++;
+
+                    playedPosWhiteCard = false;
+                    PlayNeg();
+                }
                 break;
             case GamePhase.End:
                 // end of game phase
@@ -869,6 +903,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         opponentPlayer.ResetMeepleCount();
         turnTotal++;
         roundsLeft--;
+        numTurnsTillWhiteCard--;
+        if (numTurnsTillWhiteCard == 0) {
+            playWhite = true;
+            numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+        }
         mTurnText.text = "" + GetTurnsLeft();
         if (IsServer) {
             Debug.Log("server adding increment turn message");
