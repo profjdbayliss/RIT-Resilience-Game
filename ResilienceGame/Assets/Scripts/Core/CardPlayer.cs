@@ -1047,6 +1047,7 @@ public class CardPlayer : MonoBehaviour {
                     {
                         GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect--);
                         handPositioner.cards.Remove(card);
+                        Debug.Log(card + " selected for Training");
                     }
                     else ReadyState = PlayerReadyState.ReadyToPlay;
                 }
@@ -1215,6 +1216,11 @@ public class CardPlayer : MonoBehaviour {
                 return ("Must discard one of the highlighted cards", false); //highlighted cards must be discarded
             }
             return ("Must discard cards first", false); //didn't drop on the discard drop zone
+        }
+        else if(ReadyState == PlayerReadyState.SelectCardsForCostChange)
+        {
+            //im not sure what i should check for just yet so j gonna return true
+            return ("Valid card selection", true);
         }
         else {
             //check prereq effects on cards for effect cards played on single facilities
