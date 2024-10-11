@@ -112,7 +112,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool mCreateWaterAtlas = false;
     public bool mCreatePosWhiteAtlas = false;
     public bool mCreateNegWhiteAtlas = false;
+    private int roundsLeft = 30;
     private int turnTotal = 0;
+    private const int BASE_MAX_TURNS = 30;
 
     public int UniqueCardIdCount = 0;
 
@@ -163,8 +165,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // init various objects to be used in the game
             //gameCanvas.SetActive(true);
             alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
+            roundsLeft = BASE_MAX_TURNS;
             turnTotal = 0;
-            mTurnText.text = "Turn: " + GetTurn();
+            mTurnText.text = "" + GetTurnsLeft();
             mPhaseText.text = "Phase: " + MGamePhase.ToString();
             mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
@@ -594,7 +597,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.Start => GamePhase.DrawRed,
             GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
             GamePhase.BonusRed => GamePhase.ActionRed,
-            GamePhase.ActionRed => GamePhase.DiscardRed,
+            GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
             GamePhase.DiscardRed => (turnTotal % 3 == 0) ? GamePhase.DrawBlue : GamePhase.PlayWhite,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
@@ -865,15 +868,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
         actualPlayer.ResetMeepleCount();
         opponentPlayer.ResetMeepleCount();
         turnTotal++;
-        mTurnText.text = "Turn: " + GetTurn();
+        roundsLeft--;
+        mTurnText.text = "" + GetTurnsLeft();
         if (IsServer) {
             Debug.Log("server adding increment turn message");
             AddMessage(new Message(CardMessageType.IncrementTurn));
         }
     }
     // Gets which turn it is.
-    public int GetTurn() {
-        return turnTotal;
+    public int GetTurnsLeft() {
+        return roundsLeft;
     }
 
     #endregion
@@ -926,6 +930,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // Various turn and game info.
         myTurn = false;
         turnTotal = 0;
+        roundsLeft = BASE_MAX_TURNS;
         gameStarted = false;
         MNumberDiscarded = 0;
         mNumberDefense = 0;
