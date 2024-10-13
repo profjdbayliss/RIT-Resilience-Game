@@ -31,7 +31,8 @@ public class Sector : MonoBehaviour {
     private string fileLocation;
     // output atlas filename
     public string outputAtlasName;
-    public CardPlayer Owner;
+    
+    public CardPlayer Owner { get; private set; }
 
     [SerializeField] private GameObject sectorCanvas;
     public RawImage icon;
@@ -45,6 +46,7 @@ public class Sector : MonoBehaviour {
     [SerializeField] private Button[] meepleButtons;
     [SerializeField] private Image[] meepleImages;
     [SerializeField] private Material outlineMat;
+    [SerializeField] private TextMeshProUGUI sectorOwnerText;
     public int meeplesSpent = 0;
     public int numMeeplesRequired = 0;
     public int numFacilitiesRequired = 0;
@@ -81,6 +83,10 @@ public class Sector : MonoBehaviour {
         if (selectedFacilities != null)
             return selectedFacilities.ToList();
         return null;
+    }
+    public void SetOwner(CardPlayer player) {
+        Owner = player;
+        sectorOwnerText.text = player.playerName;
     }
     public int EnableFacilitySelection(int numRequired, PlayerTeam opponentTeam, bool removeEffect, FacilityEffectType preReqEffect) {
         if (numRequired <= 0) {

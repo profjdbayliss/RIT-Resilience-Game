@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -6,6 +7,7 @@ using Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static Facility;
 
 /// <summary>
 /// This class belongs to a facility and manages the effects that are applied to it
@@ -16,15 +18,81 @@ public class FacilityEffectManager : MonoBehaviour {
     private bool hasNegatedEffectThisRound = false;
     [SerializeField] private Transform effectParent;
     [SerializeField] private GameObject effectPrefab;
-    [SerializeField] private Image effectIcon;
-    [SerializeField] private GameObject counterBackground;
-    [SerializeField] private TextMeshProUGUI counterText;
+    [SerializeField] private RectTransform facilityEffectMenu;
+    public EffectPopoutState effectTargetState = EffectPopoutState.Hide;
+    private EffectPopoutState effectPopoutState = EffectPopoutState.Hide;
+    private Vector2 effectHiddenPos;
+    private float effectPopoutSpeed = 10f;
+    private float effectPopoutDistance = 100f;
+    public Coroutine effectPopoutRoutine;
+    //[SerializeField] private Image effectIcon;
+    //[SerializeField] private GameObject counterBackground;
+    //  [SerializeField] private TextMeshProUGUI counterText;
 
+    // [SerializeField] private GameObject uiElementPrefab;
+    //  [SerializeField] private Transform uiElementParent;
 
     public static Sprite[] EffectSprites { get => Sector.EffectSprites; }
     private int counter = 0;
     private void Start() {
         facility = GetComponent<Facility>();
+        facilityEffectMenu = effectParent.GetComponent<RectTransform>();
+        effectHiddenPos = facilityEffectMenu.localPosition;
+    }
+    private void Update() {
+        if (effectPopoutState != effectTargetState) {
+            MoveEffectPopout();
+        }
+    }
+    private void MoveEffectPopout() {
+        // Cancel any ongoing coroutine to prevent overlapping transitions
+        if (effectPopoutRoutine != null) {
+            StopCoroutine(effectPopoutRoutine);
+        }
+
+
+        // Determine target state and start the transition coroutine
+        if (effectPopoutState == EffectPopoutState.Hide) {
+            effectTargetState = EffectPopoutState.Show;
+            // Debug.Log("Showing effect menu");
+            facilityEffectMenu.localPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
+
+            // effectPopoutRoutine = StartCoroutine(MoveUI(facilityEffectMenu, effectHiddenPos, effectHiddenPos - new Vector2(0, effectPopoutDistance)));
+        }
+        else {
+            // Debug.Log("Hiding effect menu");
+            effectTargetState = EffectPopoutState.Hide;
+            facilityEffectMenu.localPosition = effectHiddenPos;
+            //  effectPopoutRoutine = StartCoroutine(MoveUI(facilityEffectMenu, facilityEffectMenu.anchoredPosition, effectHiddenPos));
+        }
+    }
+    private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos) {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < effectPopoutSpeed) {
+            // Calculate the cubic eased value
+            float t = elapsedTime / effectPopoutSpeed;
+            t = CubicEaseInOut(t);
+
+            // Lerp position based on cubic easing
+            rectTransform.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure the final position is the target position
+        rectTransform.anchoredPosition = endPos;
+        effectPopoutState = effectTargetState;
+        // Debug.Log("Finished moving effect menu");
+    }
+    private float CubicEaseInOut(float t) {
+        if (t < 0.5f) {
+            return 4f * t * t * t; // ease-in
+        }
+        else {
+            t = (t - 1f);
+            return 1f + 4f * t * t * t; // ease-out
+        }
     }
 
 
@@ -183,75 +251,59 @@ public class FacilityEffectManager : MonoBehaviour {
         //UpdateEffectUI(effect);
         ApplyEffect(effect);
     }
-    public void UpdateSpecialIcon(FacilityEffect effect, bool add = true) {
-        if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
-            if (add) {
-                //Debug.Log($"Adding special effect icon to facility");
-                effectIcon.sprite = GetEffectSprite(effect).Item2;
-                counterBackground.SetActive(true);
-                counter = effect.Duration;
-                counterText.text = effect.Duration.ToString();
-            }
-            else {
-                counterBackground.SetActive(false);
-            }
-            ToggleEffectImageAlpha();
-        }
-    }
-    public void DecrementCounter() {
-        counter--;
-        counterText.text = counter.ToString();
-        if (counter == 0) {
-            counter = -1;
-            counterBackground.SetActive(false);
-        }
-    }
-    //add back ui element here
-    //public void UpdateEffectUI(FacilityEffect effect, bool add = true) {
+    //public void UpdateSpecialIcon(FacilityEffect effect, bool add = true) {
     //    if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
-    //        UpdateSpecialIcon(effect, add);
-    //        return;
-    //    }
-
-    //    int indexToUpdate = activeEffects.FindIndex(e => e.UniqueID == effect.UniqueID);
-
-    //    if (add) {
-    //        if (indexToUpdate != -1) {
-    //            // Effect exists, update or create its UI element
-    //            var (existingEffect, existingUI) = activeEffects[indexToUpdate];
-    //            if (existingUI == null) {
-    //                // Create new UI element
-    //                var newEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
-    //                newEffectUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
-
-    //                activeEffects[indexToUpdate] = (existingEffect, newEffectUI);
-    //            }
-    //            else {
-    //                // Update existing UI element
-    //                existingUI.SetIconAndText(GetEffectSprite(effect), effect.Magnitude);
-
-    //            }
+    //        if (add) {
+    //            //Debug.Log($"Adding special effect icon to facility");
+    //            effectIcon.sprite = GetEffectSprite(effect).Item2;
+    //            counterBackground.SetActive(true);
+    //            counter = effect.Duration;
+    //            counterText.text = effect.Duration.ToString();
+    //            facility.effectTargetState = Facility.EffectPopoutState.Show;
     //        }
     //        else {
-    //            Debug.LogError("Shouldn't ever happen - probably some effect UID error");
+    //            counterBackground.SetActive(false);
+    //            //if no shown effects
+    //            facility.effectTargetState = Facility.EffectPopoutState.Hide;
     //        }
-    //    }
-    //    else {
-    //        // Remove the effect element
-    //        if (indexToUpdate != -1) {
-    //            var (_, uiElement) = activeEffects[indexToUpdate];
-    //            activeEffects.RemoveAt(indexToUpdate);
-    //            if (uiElement != null) {
-    //                Destroy(uiElement.gameObject);
-    //            }
-    //        }
+    //        ToggleEffectImageAlpha();
     //    }
     //}
-    public void ToggleEffectImageAlpha() {
+    //public void DecrementCounter() {
+    //    counter--;
+    //    counterText.text = counter.ToString();
+    //    if (counter == 0) {
+    //        counter = -1;
+    //        counterBackground.SetActive(false);
+    //    }
+    //}
+
+
+    private void UpdateUI(FacilityEffect effect, bool add) {
+        Debug.Log($"Updating UI element for effect {effect.EffectType}");
+        if (!effect.HasUIElement) return;
+
+        if (add) {
+
+            var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
+            effect.UIElement = facilityEffectUI;
+            facilityEffectUI.Init(effect);
+            effectTargetState = EffectPopoutState.Show;
+        }
+        else {
+            Debug.Log($"Removing effect UI element {effect.EffectType}");
+            
+            if (!activeEffects.Any(effect => effect.HasUIElement)) {
+                effectTargetState = EffectPopoutState.Hide;
+            }
+            Destroy(effect.UIElement.gameObject);
+        }
+    }
+    public void ToggleEffectImageAlpha(Image effectIcon) {
         Color color = effectIcon.color;
         var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
         effectIcon.color = newColor;
-        
+
         Debug.Log($"Toggling effect icon alpha to {newColor.a}");
     }
     /// <summary>
@@ -297,18 +349,19 @@ public class FacilityEffectManager : MonoBehaviour {
                 ChangeFacilityPoints(effect);
                 break;
             case FacilityEffectType.Backdoor:
-                UpdateSpecialIcon(effect);
+                // UpdateSpecialIcon(effect);
                 break;
             case FacilityEffectType.Fortify:
                 if (IsBackdoored()) {
-                    ToggleEffectImageAlpha();
+                    // ToggleEffectImageAlpha();
                 }
                 RemoveNegativeEffects();
-                UpdateSpecialIcon(effect);
+
                 break;
             default:
                 break;
         }
+        UpdateUI(effect, true);
 
     }
 
@@ -319,16 +372,18 @@ public class FacilityEffectManager : MonoBehaviour {
     private void UnapplyEffect(FacilityEffect effect) {
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
-            case FacilityEffectType.ModifyPointsPerTurn:
                 ChangeFacilityPoints(effect, isRemoving: true);
                 break;
+
+            case FacilityEffectType.ModifyPointsPerTurn:
             case FacilityEffectType.Backdoor:
             case FacilityEffectType.Fortify:
-                UpdateSpecialIcon(effect, false);
+                //UpdateSpecialIcon(effect, false);
                 break;
             default:
                 break;
         }
+        UpdateUI(effect, false);
     }
     /// <summary>
     /// Called when the round is ended by the game manager
@@ -350,7 +405,11 @@ public class FacilityEffectManager : MonoBehaviour {
             if (effect.Duration > 0) {
                 // Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
                 effect.Duration--;
-                DecrementCounter();
+                if (effect.HasUIElement) {
+                    effect.UIElement.SetCounterText(effect.Duration.ToString());
+                }
+                // DecrementCounter();
+
                 if (effect.Duration == 0) {
                     ForceRemoveEffect(effect);
                 }
@@ -382,6 +441,12 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     void RemoveNegativeEffects() {
         //remove backdoor or points per turn effects
+        activeEffects.Where(
+            effect => effect.HasUIElement && 
+            (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor))
+            .ToList()
+            .ForEach(effect => UpdateUI(effect, false));
+
         activeEffects.RemoveAll(effect => effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor);
     }
     private void RemoveAllEffects() {
@@ -390,35 +455,8 @@ public class FacilityEffectManager : MonoBehaviour {
         }
     }
 
-    public void DisplayEffectImageTooltip() {
-        FacilityEffect activeIconEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify);
-        if (activeIconEffect == null) return;
-        string tooltip = activeIconEffect.EffectType switch {
-            FacilityEffectType.Fortify => $"Fortified - blocks the first red effect played on this facility each turn\n{activeIconEffect.Duration} turns remaining",
-            FacilityEffectType.Backdoor => $"Backdoored - allows certain red cards to be played on this facility\n{activeIconEffect.Duration} turns remaining",
-            _ => ""
-        };
-        if (tooltip != "") {
-            ToolTip.Instance.ShowTooltip(tooltip, Mouse.current.position.ReadValue());
-        }
-
-
-    }
-    public void HideEffectImageTooltip() {
-        ToolTip.HideTooltip();
-    }
 
     #region Effect Functions
-
-    //private void ApplyNegationChangeToFacility(FacilityEffect effect, bool negate) {
-    //    if (negate) {
-    //        ChangeFacilityPoints(effect, true); // Reverse effect
-    //    }
-    //    else {
-    //        ChangeFacilityPoints(effect); // Reapply effect
-    //    }
-    //}
-
 
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
         // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
@@ -426,17 +464,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
         facility.ChangeFacilityPoints(effect.Target, value);
     }
-    //public void NegateEffect(FacilityEffect effect) {
-    //    if (IsFortified() && effect.EffectType == FacilityEffectType.ModifyPoints && effect.Magnitude < 0 && !hasNegatedEffectThisRound) {
-    //        hasNegatedEffectThisRound = true;
-    //        return;
-    //    }
 
-    //    if (!effect.IsNegated) {
-    //        effect.IsNegated = true;
-    //        ApplyNegationChangeToFacility(effect, true); // Apply negation (reverse effect)
-    //    }
-    //}
 
     #endregion
 }

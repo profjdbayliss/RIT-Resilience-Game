@@ -16,8 +16,17 @@ public class Facility : MonoBehaviour {
         Transmission,
         Distribution
     };
+    public enum EffectPopoutState {
+        Show,
+        Hide
+    }
 
-
+    public EffectPopoutState effectTargetState = EffectPopoutState.Hide;
+    private EffectPopoutState effectPopoutState = EffectPopoutState.Hide;
+    private Vector2 effectHiddenPos;
+    private float effectPopoutSpeed = 10f;
+    private float effectPopoutDistance = 100f;
+    public Coroutine effectPopoutRoutine;
     public FacilityType facilityType;
     public string facilityName;
     public PlayerSector[] dependencies;
@@ -40,7 +49,7 @@ public class Facility : MonoBehaviour {
     private HoverActivateObject hoverEffect;
     [SerializeField] private Material outlineMat;
     [SerializeField] private Image downedOverlay;
-
+    [SerializeField] private RectTransform facilityEffectMenu;
 
     // public FacilityEffect effect;
     //   public bool effectNegated;
@@ -54,6 +63,7 @@ public class Facility : MonoBehaviour {
     public void Initialize() {
         hoverEffect = GetComponent<HoverActivateObject>();
         effectManager = GetComponent<FacilityEffectManager>();
+        effectHiddenPos = facilityEffectMenu.localPosition;
         // facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
         // pointsUI = new TextMeshProUGUI[3];
@@ -108,6 +118,63 @@ public class Facility : MonoBehaviour {
             pointImages[MAX_POINTS * 4 + i * 2 + 1] = filledPoint;
         }
     }
+
+    private void Update() {
+        if (effectPopoutState != effectTargetState) {
+            MoveEffectPopout();
+        }
+    }
+    private void MoveEffectPopout() {
+        // Cancel any ongoing coroutine to prevent overlapping transitions
+        if (effectPopoutRoutine != null) {
+            StopCoroutine(effectPopoutRoutine);
+        }
+
+
+        // Determine target state and start the transition coroutine
+        if (effectPopoutState == EffectPopoutState.Hide) {
+            effectTargetState = EffectPopoutState.Show;
+           // Debug.Log("Showing effect menu");
+            facilityEffectMenu.localPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
+
+           // effectPopoutRoutine = StartCoroutine(MoveUI(facilityEffectMenu, effectHiddenPos, effectHiddenPos - new Vector2(0, effectPopoutDistance)));
+        }
+        else {
+           // Debug.Log("Hiding effect menu");
+            effectTargetState = EffectPopoutState.Hide;
+            facilityEffectMenu.localPosition = effectHiddenPos;
+          //  effectPopoutRoutine = StartCoroutine(MoveUI(facilityEffectMenu, facilityEffectMenu.anchoredPosition, effectHiddenPos));
+        }
+    }
+    private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos) {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < effectPopoutSpeed) {
+            // Calculate the cubic eased value
+            float t = elapsedTime / effectPopoutSpeed;
+            t = CubicEaseInOut(t);
+
+            // Lerp position based on cubic easing
+            rectTransform.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure the final position is the target position
+        rectTransform.anchoredPosition = endPos;
+        effectPopoutState = effectTargetState;
+       // Debug.Log("Finished moving effect menu");
+    }
+    private float CubicEaseInOut(float t) {
+        if (t < 0.5f) {
+            return 4f * t * t * t; // ease-in
+        }
+        else {
+            t = (t - 1f);
+            return 1f + 4f * t * t * t; // ease-out
+        }
+    }
+
 
 
 

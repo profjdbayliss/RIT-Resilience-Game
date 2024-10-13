@@ -265,7 +265,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         
         Sector sector = gameCanvas.GetComponentInChildren<Sector>();
         //assign the owner of the sector as the blue player
-        sector.Owner = actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer;
+        sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
+
         //give the sector to both players
         //all players will most likely need a list of all sectors
         actualPlayer.AssignSector(sector);
