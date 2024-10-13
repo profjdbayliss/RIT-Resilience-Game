@@ -113,8 +113,8 @@ public class Facility : MonoBehaviour {
 
     public void UpdatePointsUI() {
         UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
-        UpdatePointTypeUI(1, finacialPoints, maxFinacialPoints);
-        UpdatePointTypeUI(2, networkPoints, maxNetworkPoints);
+        UpdatePointTypeUI(2, finacialPoints, maxFinacialPoints);
+        UpdatePointTypeUI(1, networkPoints, maxNetworkPoints);
     }
 
     private void UpdatePointTypeUI(int typeIndex, int currentPoints, int maxPoints) {
