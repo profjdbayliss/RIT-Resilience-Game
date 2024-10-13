@@ -19,11 +19,11 @@ public class FacilityEffectManager : MonoBehaviour {
     [SerializeField] private Transform effectParent;
     [SerializeField] private GameObject effectPrefab;
     [SerializeField] private RectTransform facilityEffectMenu;
-    public EffectPopoutState effectTargetState = EffectPopoutState.Hide;
-    private EffectPopoutState effectPopoutState = EffectPopoutState.Hide;
+    //  public EffectPopoutState effectTargetState = EffectPopoutState.Hide;
+    //  private EffectPopoutState effectPopoutState = EffectPopoutState.Hide;
     private Vector2 effectHiddenPos;
     private float effectPopoutSpeed = 10f;
-    private float effectPopoutDistance = 100f;
+    private float effectPopoutDistance = 110f;
     public Coroutine effectPopoutRoutine;
     //[SerializeField] private Image effectIcon;
     //[SerializeField] private GameObject counterBackground;
@@ -39,34 +39,7 @@ public class FacilityEffectManager : MonoBehaviour {
         facilityEffectMenu = effectParent.GetComponent<RectTransform>();
         effectHiddenPos = facilityEffectMenu.localPosition;
     }
-    private void Update() {
-        if (effectPopoutState != effectTargetState) {
-            MoveEffectPopout();
-        }
-    }
-    private void MoveEffectPopout() {
-        // Cancel any ongoing coroutine to prevent overlapping transitions
-        if (effectPopoutRoutine != null) {
-            StopCoroutine(effectPopoutRoutine);
-        }
-
-
-        // Determine target state and start the transition coroutine
-        if (effectPopoutState == EffectPopoutState.Hide) {
-            effectTargetState = EffectPopoutState.Show;
-            // Debug.Log("Showing effect menu");
-            facilityEffectMenu.localPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
-
-            // effectPopoutRoutine = StartCoroutine(MoveUI(facilityEffectMenu, effectHiddenPos, effectHiddenPos - new Vector2(0, effectPopoutDistance)));
-        }
-        else {
-            // Debug.Log("Hiding effect menu");
-            effectTargetState = EffectPopoutState.Hide;
-            facilityEffectMenu.localPosition = effectHiddenPos;
-            //  effectPopoutRoutine = StartCoroutine(MoveUI(facilityEffectMenu, facilityEffectMenu.anchoredPosition, effectHiddenPos));
-        }
-    }
-    private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos) {
+    private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos, Action callBack) {
         float elapsedTime = 0f;
 
         while (elapsedTime < effectPopoutSpeed) {
@@ -82,8 +55,9 @@ public class FacilityEffectManager : MonoBehaviour {
 
         // Ensure the final position is the target position
         rectTransform.anchoredPosition = endPos;
-        effectPopoutState = effectTargetState;
-        // Debug.Log("Finished moving effect menu");
+        // effectPopoutState = effectTargetState;
+        callBack?.Invoke();
+        Debug.Log("Finished moving effect menu");
     }
     private float CubicEaseInOut(float t) {
         if (t < 0.5f) {
@@ -251,52 +225,34 @@ public class FacilityEffectManager : MonoBehaviour {
         //UpdateEffectUI(effect);
         ApplyEffect(effect);
     }
-    //public void UpdateSpecialIcon(FacilityEffect effect, bool add = true) {
-    //    if (effect.EffectType == FacilityEffectType.Backdoor || effect.EffectType == FacilityEffectType.Fortify) {
-    //        if (add) {
-    //            //Debug.Log($"Adding special effect icon to facility");
-    //            effectIcon.sprite = GetEffectSprite(effect).Item2;
-    //            counterBackground.SetActive(true);
-    //            counter = effect.Duration;
-    //            counterText.text = effect.Duration.ToString();
-    //            facility.effectTargetState = Facility.EffectPopoutState.Show;
-    //        }
-    //        else {
-    //            counterBackground.SetActive(false);
-    //            //if no shown effects
-    //            facility.effectTargetState = Facility.EffectPopoutState.Hide;
-    //        }
-    //        ToggleEffectImageAlpha();
-    //    }
-    //}
-    //public void DecrementCounter() {
-    //    counter--;
-    //    counterText.text = counter.ToString();
-    //    if (counter == 0) {
-    //        counter = -1;
-    //        counterBackground.SetActive(false);
-    //    }
-    //}
 
 
     private void UpdateUI(FacilityEffect effect, bool add) {
-        Debug.Log($"Updating UI element for effect {effect.EffectType}");
+        // Debug.Log($"Updating UI element for effect {effect.EffectType}");
         if (!effect.HasUIElement) return;
+        if (effectPopoutRoutine != null) {
+            StopCoroutine(effectPopoutRoutine);
+        }
 
         if (add) {
 
             var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
             effect.UIElement = facilityEffectUI;
             facilityEffectUI.Init(effect);
-            effectTargetState = EffectPopoutState.Show;
+            facilityEffectMenu.localPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
+            // effectTargetState = EffectPopoutState.Show;
+           
         }
         else {
-            Debug.Log($"Removing effect UI element {effect.EffectType}");
-            
+            // Debug.Log($"Removing effect UI element {effect.EffectType}");
+            //   Debug.Log(activeEffects.Count);
             if (!activeEffects.Any(effect => effect.HasUIElement)) {
-                effectTargetState = EffectPopoutState.Hide;
+                //  effectTargetState = EffectPopoutState.Hide;
+                facilityEffectMenu.localPosition = effectHiddenPos;
+
+
             }
-            Destroy(effect.UIElement.gameObject);
+            
         }
     }
     public void ToggleEffectImageAlpha(Image effectIcon) {
@@ -304,7 +260,7 @@ public class FacilityEffectManager : MonoBehaviour {
         var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
         effectIcon.color = newColor;
 
-        Debug.Log($"Toggling effect icon alpha to {newColor.a}");
+        //  Debug.Log($"Toggling effect icon alpha to {newColor.a}");
     }
     /// <summary>
     /// Removes an effect from the facility
@@ -352,9 +308,9 @@ public class FacilityEffectManager : MonoBehaviour {
                 // UpdateSpecialIcon(effect);
                 break;
             case FacilityEffectType.Fortify:
-                if (IsBackdoored()) {
-                    // ToggleEffectImageAlpha();
-                }
+                //if (IsBackdoored()) {
+                //    // ToggleEffectImageAlpha();
+                //}
                 RemoveNegativeEffects();
 
                 break;
@@ -442,7 +398,7 @@ public class FacilityEffectManager : MonoBehaviour {
     void RemoveNegativeEffects() {
         //remove backdoor or points per turn effects
         activeEffects.Where(
-            effect => effect.HasUIElement && 
+            effect => effect.HasUIElement &&
             (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor))
             .ToList()
             .ForEach(effect => UpdateUI(effect, false));
