@@ -21,7 +21,7 @@ public class Facility : MonoBehaviour {
     public FacilityType facilityType;
     public string facilityName;
     public PlayerSector[] dependencies;
-    public GameObject facilityCanvas;
+    //public GameObject facilityCanvas;
     public Sector sectorItsAPartOf;
 
     public Image[] dependencyIcons;
@@ -30,7 +30,8 @@ public class Facility : MonoBehaviour {
     private int physicalPoints, finacialPoints, networkPoints;
 
     // private TextMeshProUGUI[] pointsUI;
-    public Image[][] pointImages; // [0] for Physical, [1] for Financial, [2] for Network
+    [SerializeField] private Transform pointsParent;
+    [SerializeField] private Image[] pointImages;
     private const int MAX_POINTS = 3;
     [SerializeField] private TextMeshProUGUI facilityNameText;
     [SerializeField] private Button facilitySelectionButton;
@@ -40,19 +41,20 @@ public class Facility : MonoBehaviour {
     [SerializeField] private Material outlineMat;
     [SerializeField] private Image downedOverlay;
 
+
     // public FacilityEffect effect;
     //   public bool effectNegated;
 
     public bool IsDown { get; private set; }
-   // public bool IsFortified { get; set; } = false;
-   // public bool IsBackdoored { get; set; } = false;
+    // public bool IsFortified { get; set; } = false;
+    // public bool IsBackdoored { get; set; } = false;
 
 
     // Start is called before the first frame update
     public void Initialize() {
         hoverEffect = GetComponent<HoverActivateObject>();
         effectManager = GetComponent<FacilityEffectManager>();
-        facilityCanvas = this.transform.gameObject;
+        // facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
         // pointsUI = new TextMeshProUGUI[3];
         //   effect = FacilityEffect.None;
@@ -72,31 +74,42 @@ public class Facility : MonoBehaviour {
         return effectManager.IsFortified();
     }
     private void SetupPointImages() {
-        pointImages = new Image[3][];
-        string[] pointTypes = { "PhysicalPoints", "FinancialPoints", "NetworkPoints" };
+        pointImages = new Image[MAX_POINTS * 6];
 
-        for (int i = 0; i < 3; i++) {
-            pointImages[i] = new Image[MAX_POINTS * 2]; // 2 images per point (empty and filled)
-            Transform pointsParent = transform.Find("Points").Find(pointTypes[i]);
+        //physical
+        var physicalPoints = pointsParent.GetChild(0); // PhysPointParent
+        for (int i = 0; i < physicalPoints.childCount; i++) {
+            var emptyPoint = physicalPoints.GetChild(i).GetChild(0).GetComponent<Image>(); // EmptyPoint
+            var filledPoint = physicalPoints.GetChild(i).GetChild(1).GetComponent<Image>(); // FilledPoint
 
-            for (int j = 0; j < MAX_POINTS; j++) {
-                Transform pointTransform;
+            pointImages[i * 2] = emptyPoint; // Even index for EmptyPoint
+            pointImages[i * 2 + 1] = filledPoint; // Odd index for FilledPoint
+        }
 
-                // Reverse the order for NetworkPoints (index 2)
-                if (i == 2) {
-                    // Reverse order for NetworkPoints
-                    pointTransform = pointsParent.Find($"Point{MAX_POINTS - j}");
-                }
-                else {
-                    // Normal order for PhysicalPoints and FinancialPoints
-                    pointTransform = pointsParent.Find($"Point{j + 1}");
-                }
 
-                pointImages[i][j * 2] = pointTransform.Find("EmptyPoint").GetComponent<Image>();
-                pointImages[i][j * 2 + 1] = pointTransform.Find("FilledPoint").GetComponent<Image>();
-            }
+
+        //network
+        var networkPoints = pointsParent.GetChild(1); // NetworkPointParent
+        for (int i = 0; i < networkPoints.childCount; i++) {
+            var emptyPoint = networkPoints.GetChild(i).GetChild(0).GetComponent<Image>();
+            var filledPoint = networkPoints.GetChild(i).GetChild(1).GetComponent<Image>();
+
+            pointImages[MAX_POINTS * 2 + i * 2] = emptyPoint;
+            pointImages[MAX_POINTS * 2 + i * 2 + 1] = filledPoint;
+        }
+
+        //financial
+        var financialPoints = pointsParent.GetChild(2); // FinancialPointParent
+        for (int i = 0; i < financialPoints.childCount; i++) {
+            var emptyPoint = financialPoints.GetChild(i).GetChild(0).GetComponent<Image>();
+            var filledPoint = financialPoints.GetChild(i).GetChild(1).GetComponent<Image>();
+
+            pointImages[MAX_POINTS * 4 + i * 2] = emptyPoint;
+            pointImages[MAX_POINTS * 4 + i * 2 + 1] = filledPoint;
         }
     }
+
+
 
     public void UpdatePointsUI() {
         UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
@@ -109,10 +122,12 @@ public class Facility : MonoBehaviour {
             bool shouldShow = i < maxPoints;
             bool isFilled = i < currentPoints;
 
-            SetImageAlpha(pointImages[typeIndex][i * 2], shouldShow ? 1 : 0);     // Empty point
-            SetImageAlpha(pointImages[typeIndex][i * 2 + 1], isFilled ? 1 : 0);   // Filled point
+            // Each point has two images: Empty (index i*2) and Filled (index i*2+1)
+            SetImageAlpha(pointImages[typeIndex * MAX_POINTS * 2 + i * 2], shouldShow ? 1 : 0);     // Empty point
+            SetImageAlpha(pointImages[typeIndex * MAX_POINTS * 2 + i * 2 + 1], isFilled ? 1 : 0);   // Filled point
         }
     }
+
 
     private void SetImageAlpha(Image image, float alpha) {
         Color color = image.color;
@@ -128,7 +143,7 @@ public class Facility : MonoBehaviour {
         void UpdatePoints(ref int points, int maxPoints) {
             points = Mathf.Clamp(points + value, 0, maxPoints);
         }
-        switch (target) { 
+        switch (target) {
             case FacilityEffectTarget.Physical:
                 UpdatePoints(ref physicalPoints, maxPhysicalPoints);
                 break;

@@ -161,14 +161,14 @@ public class Sector : MonoBehaviour {
         //    facilities[i].sectorItsAPartOf = this;
         //}
         //I really don't like writing it like this but its ok i guess....
-        meeplesAmountText = sectorCanvas.transform.GetChild(3).GetComponentsInChildren<TextMeshProUGUI>();
+        //meeplesAmountText = sectorCanvas.transform.GetChild(3).GetComponentsInChildren<TextMeshProUGUI>();
 
-        //added a child so swapping to this
-        facilities = sectorCanvas.GetComponentsInChildren<Facility>();
+       // added a child so swapping to this
+       // facilities = sectorCanvas.GetComponentsInChildren<Facility>();
         foreach (Facility facility in facilities) {
             facility.Initialize();
-            facility.sectorItsAPartOf = this;
-            facility.facilityCanvas = facility.gameObject;
+         //   facility.sectorItsAPartOf = this;
+         //   facility.facilityCanvas = facility.gameObject;
         }
 
 
@@ -439,6 +439,8 @@ public class Sector : MonoBehaviour {
         facility.facilityType = facilityType;
         facility.facilityName = values[1];
         facility.UpdateNameText();
+        
+        Debug.Log(facility.dependencies.Length);
         for (int j = 3; j < 6; j++) {
             if (Enum.TryParse(values[j], out PlayerSector enumName)) {
                 facility.dependencies[j - 3] = enumName;
