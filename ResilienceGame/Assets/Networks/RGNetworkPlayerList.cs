@@ -169,7 +169,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     }
                 }
                 break;
-
+            
             case CardMessageType.EndPhase: {
                     // turn taking is handled here because the list of players on 
                     // the network happens here
@@ -343,6 +343,38 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
+    public void SendStringToClients(string stringMsg) {
+        if (isServer) {
+            Message msg = new Message(CardMessageType.LogAction, stringMsg);
+            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+                indexId = (uint)localPlayerID,
+                type = (uint)msg.Type,
+                count = (uint)msg.byteArguments.Count,
+                payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
+            };
+
+            // Send to all clients
+            NetworkServer.SendToAll(netMsg);
+            Debug.Log("SERVER SENT string message: " + stringMsg);
+        }
+    }
+    public void SendStringToServer(string stringMsg) {
+        if (!isServer) {
+            Message msg = new Message(CardMessageType.LogAction, stringMsg);
+            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+                indexId = (uint)localPlayerID,
+                type = (uint)msg.Type,
+                count = (uint)msg.byteArguments.Count,
+                payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
+            };
+
+            // Send to all clients
+            NetworkClient.Send(netMsg);
+            Debug.Log("SERVER SENT string message: " + stringMsg);
+        }
+    }
+
+
     public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
         Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.indexId + " " + msg.type);
         uint senderId = msg.indexId;
@@ -353,6 +385,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 // nobody tells server to start a turn, so this shouldn't happen
                 Debug.Log("server start next phase message when it shouldn't!");
                 break;
+            
+
             case CardMessageType.EndPhase:
                 // end turn is handled here because the player list is kept
                 // in this class
@@ -461,6 +495,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                         // now start the next phase
                         manager.RealGameStart();
+                    }
+                    break;
+                case CardMessageType.LogAction: {
+                        string receivedString = Encoding.UTF8.GetString(msg.payload.ToArray());
+                        Debug.Log("CLIENT RECEIVED string message: " + receivedString);
+                        manager.AddActionLogMessage(receivedString, true); //now log the message to the action log
+                        // Handle the received string here
                     }
                     break;
                 case CardMessageType.SectorAssignment: {
@@ -761,6 +802,14 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             manager.DisplayGameStatus("Player " + playerNames[playerIndex] +
                                 " discarded " + discardCount + " cards.");
                         }
+                    }
+                    break;
+                case CardMessageType.LogAction: {
+                        string receivedString = Encoding.UTF8.GetString(msg.payload.ToArray());
+                        Debug.Log("SERVER RECEIVED string message: " + receivedString);
+                        manager.AddActionLogMessage(receivedString, true); //log the action locally
+                        //send it to the clients
+                        SendStringToClients(receivedString);
                     }
                     break;
                 case CardMessageType.DrawCard: {

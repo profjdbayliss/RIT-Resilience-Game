@@ -431,8 +431,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 opponentPlayer.LogPlayerInfo();
             }
             if (Keyboard.current.mKey.wasPressedThisFrame) {
-                AddActionLogMessage("Test message");
+                AddActionLogMessage("Test message", IsServer);
+                if (IsServer) {
+                    mRGNetworkPlayerList.SendStringToClients("Test message");
+                }
+                    
             }
+            
 
 
         }
@@ -472,9 +477,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
-    public void AddActionLogMessage(string message) {
-        Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
-        messageLog.Add(message);
+    public void AddActionLogMessage(string message, bool fromNet) {
+        if (fromNet || IsServer) {
+            Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
+            messageLog.Add(message);
+        }
+        else {
+            mRGNetworkPlayerList.SendStringToServer(message);
+        }
+        
     }
     public void SetSectorInView(Sector sector) {
         Debug.Log("setting sector in view to " + sector?.sectorName);

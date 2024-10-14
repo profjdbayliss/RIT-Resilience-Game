@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using static Facility;
 
@@ -24,6 +25,7 @@ public enum CardMessageType
     ChangeCardID,
     EndGame,
     DrawCard,
+    LogAction,
     SectorAssignment,
     None
 }
@@ -47,6 +49,7 @@ public class Message
         get { return hasArgs; }
         set { hasArgs = value; }
     }
+
 
     /// <summary>
     /// The type of a specific message.
@@ -135,6 +138,14 @@ public class Message
         arguments.Add(uniqueID);
         arguments.Add(cardID);
     }
+
+    public Message(CardMessageType t, string messageString) {
+        type = t;
+        hasArgs = true;
+        isBytes = true;
+        byteArguments = Encoding.UTF8.GetBytes(messageString).ToList();
+    }
+
 
     /// <summary>
     /// Gets a particular argument.
