@@ -16,8 +16,13 @@ public class Facility : MonoBehaviour {
         Transmission,
         Distribution
     };
+    public enum FacilityDependencyMenuState {
+        Open,
+        Closed,
+        LockedOpen
+    }
 
-    
+
     public FacilityType facilityType;
     public string facilityName;
     public PlayerSector[] dependencies;
@@ -25,6 +30,7 @@ public class Facility : MonoBehaviour {
     public Sector sectorItsAPartOf;
 
     public Image[] dependencyIcons;
+    
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     private int physicalPoints, finacialPoints, networkPoints;
@@ -40,7 +46,7 @@ public class Facility : MonoBehaviour {
     private HoverActivateObject hoverEffect;
     [SerializeField] private Material outlineMat;
     [SerializeField] private Image downedOverlay;
-    
+
 
     // public FacilityEffect effect;
     //   public bool effectNegated;
@@ -54,7 +60,6 @@ public class Facility : MonoBehaviour {
     public void Initialize() {
         hoverEffect = GetComponent<HoverActivateObject>();
         effectManager = GetComponent<FacilityEffectManager>();
-        
         // facilityCanvas = this.transform.gameObject;
         dependencies = new PlayerSector[3];
         // pointsUI = new TextMeshProUGUI[3];
@@ -109,10 +114,6 @@ public class Facility : MonoBehaviour {
             pointImages[MAX_POINTS * 4 + i * 2 + 1] = filledPoint;
         }
     }
-
-    
-    
-
 
 
 
@@ -275,5 +276,7 @@ public class Facility : MonoBehaviour {
         sectorItsAPartOf.AddFacilityToSelection(this);
         hoverEffect.ActivateHover();
     }
+    
+
 
 }
