@@ -36,6 +36,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool myTurn = false;
     public int activePlayerNumber;
 
+
+    [Header("Sectors")]
+    [SerializeField] List<Sector> activeSectors;
+    public Sector sectorInView;
+    int sectorIndex = -1;
+
     // Decks and Cards
     [Header("Decks and Cards")]
     public CardReader redDeckReader;
@@ -262,8 +268,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //is this correct?
 
         // TODO: Set randomly
+
+        //Sector sector = gameCanvas.GetComponentInChildren<Sector>();
+        Sector sector = activeSectors[UnityEngine.Random.Range(0, activeSectors.Count)];
+        sectorIndex = activeSectors.IndexOf(sector);
         
-        Sector sector = gameCanvas.GetComponentInChildren<Sector>();
+        
         //assign the owner of the sector as the blue player
         sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
 
@@ -271,9 +281,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //all players will most likely need a list of all sectors
         actualPlayer.AssignSector(sector);
         opponentPlayer.AssignSector(sector);
-
-
-        sector.Initialize(PlayerSector.Water);
+        sectorInView = sector;
+        activeSectors.ForEach(sector => sector.Initialize());
+        activeSectors.ForEach(sector => sector.gameObject.SetActive(false));
+        sector.gameObject.SetActive(true);
+        //sector.Initialize();
 
         // in this game people go in parallel to each other
         // per phase
@@ -445,6 +457,21 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
+
+    public void ViewPreviousSector() {
+        sectorIndex = sectorIndex - 1 > 0 ? sectorIndex - 1 : activeSectors.Count - 1;
+        sectorInView.gameObject.SetActive(false);
+        sectorInView = activeSectors[sectorIndex];
+        sectorInView.gameObject.SetActive(true);
+    }
+    public void ViewNextSector() {
+        sectorIndex = sectorIndex + 1 < activeSectors.Count ? sectorIndex + 1 : 0;
+        sectorInView.gameObject.SetActive(false);
+        sectorInView = activeSectors[sectorIndex];
+        sectorInView.gameObject.SetActive(true);
+    }
+
+
     public void UpdateUISizeTrackers() {
         //TODO: Add check for all red players
         deckSizeTracker.UpdateAllTrackerTexts(

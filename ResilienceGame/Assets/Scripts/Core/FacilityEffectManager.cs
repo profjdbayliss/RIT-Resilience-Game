@@ -288,7 +288,7 @@ public class FacilityEffectManager : MonoBehaviour {
                 break;
             //case FacilityEffectType.Backdoor:
             //case FacilityEffectType.ModifyPointsPerTurn:
-            //    // UpdateSpecialIcon(effect);
+            //    // UpdateSpecialIcon(effect); 
             //    break;
             case FacilityEffectType.Fortify:
                 //if (IsBackdoored()) {

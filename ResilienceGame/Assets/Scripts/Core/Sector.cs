@@ -149,11 +149,11 @@ public class Sector : MonoBehaviour {
             facility.UpdateForNextActionPhase();
         }
     }
-    public void Initialize(PlayerSector sector) {
+    public void Initialize() {
         InitEffectSprites();
         sectorCanvas = this.gameObject;
         // TODO: Remove when assigning sectors randomly implemented
-        sectorName = sector;
+       // sectorName = sector;
         overTimeCharges = 3;
 
         blackMeeples = blueMeeples = purpleMeeples = STARTING_MEEPLES;
@@ -181,11 +181,11 @@ public class Sector : MonoBehaviour {
         CSVRead();
         UpdateFacilityDependencyIcons();
 
-        //assign sector icon
-        Texture2D tex = new Texture2D(1, 1);
-        byte[] tempBytes = File.ReadAllBytes(Application.streamingAssetsPath + "/Images/" + sector.ToString() + ".png");
-        tex.LoadImage(tempBytes);
-        icon.texture = tex;
+        ////assign sector icon
+        //Texture2D tex = new Texture2D(1, 1);
+        //byte[] tempBytes = File.ReadAllBytes(Application.streamingAssetsPath + "/Images/" + sectorName + ".png");
+        //tex.LoadImage(tempBytes);
+        //icon.texture = tex;
         //Debug.Log(Application.streamingAssetsPath + "/images/" + sector.ToString() + ".png");
     }
     public int GetTotalMeeples() {
@@ -446,7 +446,7 @@ public class Sector : MonoBehaviour {
         facility.facilityName = values[1];
         facility.UpdateNameText();
         
-        Debug.Log(facility.dependencies.Length);
+       // Debug.Log(facility.dependencies.Length);
         for (int j = 3; j < 6; j++) {
             if (Enum.TryParse(values[j], out PlayerSector enumName)) {
                 facility.dependencies[j - 3] = enumName;
