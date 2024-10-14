@@ -82,38 +82,40 @@ public class Facility : MonoBehaviour {
     private void SetupPointImages() {
         pointImages = new Image[MAX_POINTS * 6];
 
-        //physical
+        // Physical points (counting from bottom to top)
         var physicalPoints = pointsParent.GetChild(0); // PhysPointParent
         for (int i = 0; i < physicalPoints.childCount; i++) {
-            var emptyPoint = physicalPoints.GetChild(i).GetChild(0).GetComponent<Image>(); // EmptyPoint
-            var filledPoint = physicalPoints.GetChild(i).GetChild(1).GetComponent<Image>(); // FilledPoint
+            var reverseIndex = physicalPoints.childCount - 1 - i; 
+            var emptyPoint = physicalPoints.GetChild(reverseIndex).GetChild(0).GetComponent<Image>(); // EmptyPoint
+            var filledPoint = physicalPoints.GetChild(reverseIndex).GetChild(1).GetComponent<Image>(); // FilledPoint
 
             pointImages[i * 2] = emptyPoint; // Even index for EmptyPoint
             pointImages[i * 2 + 1] = filledPoint; // Odd index for FilledPoint
         }
 
-
-
-        //network
+        // Network points (counting from bottom to top)
         var networkPoints = pointsParent.GetChild(1); // NetworkPointParent
         for (int i = 0; i < networkPoints.childCount; i++) {
-            var emptyPoint = networkPoints.GetChild(i).GetChild(0).GetComponent<Image>();
-            var filledPoint = networkPoints.GetChild(i).GetChild(1).GetComponent<Image>();
+            var reverseIndex = networkPoints.childCount - 1 - i; 
+            var emptyPoint = networkPoints.GetChild(reverseIndex).GetChild(0).GetComponent<Image>();
+            var filledPoint = networkPoints.GetChild(reverseIndex).GetChild(1).GetComponent<Image>();
 
             pointImages[MAX_POINTS * 2 + i * 2] = emptyPoint;
             pointImages[MAX_POINTS * 2 + i * 2 + 1] = filledPoint;
         }
 
-        //financial
+        // Financial points (counting from bottom to top)
         var financialPoints = pointsParent.GetChild(2); // FinancialPointParent
         for (int i = 0; i < financialPoints.childCount; i++) {
-            var emptyPoint = financialPoints.GetChild(i).GetChild(0).GetComponent<Image>();
-            var filledPoint = financialPoints.GetChild(i).GetChild(1).GetComponent<Image>();
+            var reverseIndex = financialPoints.childCount - 1 - i; 
+            var emptyPoint = financialPoints.GetChild(reverseIndex).GetChild(0).GetComponent<Image>();
+            var filledPoint = financialPoints.GetChild(reverseIndex).GetChild(1).GetComponent<Image>();
 
             pointImages[MAX_POINTS * 4 + i * 2] = emptyPoint;
             pointImages[MAX_POINTS * 4 + i * 2 + 1] = filledPoint;
         }
     }
+
 
 
 

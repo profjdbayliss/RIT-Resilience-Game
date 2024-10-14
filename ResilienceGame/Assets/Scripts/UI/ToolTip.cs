@@ -24,7 +24,7 @@ public class ToolTip : MonoBehaviour {
         float tooltipWidth = tooltipRect.rect.width;
         float tooltipHeight = tooltipRect.rect.height;
 
-        Debug.Log(tooltipWidth);
+        //Debug.Log(tooltipWidth);
 
         // Clamp the tooltip's position to ensure it doesn't go off-screen
         float clampedX = Mathf.Clamp(position.x, tooltipWidth / 2, screenWidth - tooltipWidth / 2);

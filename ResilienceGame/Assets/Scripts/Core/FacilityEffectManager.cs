@@ -283,12 +283,13 @@ public class FacilityEffectManager : MonoBehaviour {
         Debug.Log($"Applying effect {effect.EffectType} to {facility.facilityName}");
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
-            case FacilityEffectType.ModifyPointsPerTurn:
+            
                 ChangeFacilityPoints(effect);
                 break;
-            case FacilityEffectType.Backdoor:
-                // UpdateSpecialIcon(effect);
-                break;
+            //case FacilityEffectType.Backdoor:
+            //case FacilityEffectType.ModifyPointsPerTurn:
+            //    // UpdateSpecialIcon(effect);
+            //    break;
             case FacilityEffectType.Fortify:
                 //if (IsBackdoored()) {
                 //    // ToggleEffectImageAlpha();
@@ -308,7 +309,9 @@ public class FacilityEffectManager : MonoBehaviour {
     private void UpdateUI(FacilityEffect effect, bool add) {
         // Debug.Log($"Updating UI element for effect {effect.EffectType}");
         if (!effect.HasUIElement) return;
-        if (effectPopoutRoutine != null) {
+
+
+        if (effectPopoutRoutine != null && !activeEffects.Any(effect => effect.HasUIElement)) {
             StopCoroutine(effectPopoutRoutine);
         }
 
@@ -317,17 +320,20 @@ public class FacilityEffectManager : MonoBehaviour {
             var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
             effect.UIElement = facilityEffectUI;
             facilityEffectUI.Init(effect);
-            effectBoxParent.anchoredPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
-            effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent, 
-                effectHiddenPos, 
-                effectHiddenPos - new Vector2(0, effectPopoutDistance), 
-                null));
+           // effectBoxParent.anchoredPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
+
+            if (effectPopoutRoutine == null) {
+                effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
+                    effectHiddenPos,
+                    effectHiddenPos - new Vector2(0, effectPopoutDistance),
+                    null)); 
+            }
 
 
         }
         else {
             if (!activeEffects.Any(effect => effect.HasUIElement)) {
-                effectBoxParent.anchoredPosition = effectHiddenPos;
+              //  effectBoxParent.anchoredPosition = effectHiddenPos;
                 effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
                     effectHiddenPos - new Vector2(0, effectPopoutDistance),
                     effectHiddenPos,

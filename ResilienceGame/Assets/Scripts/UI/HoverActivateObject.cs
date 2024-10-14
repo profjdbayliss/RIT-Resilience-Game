@@ -8,10 +8,10 @@ using UnityEngine.UI;
 public class HoverActivateObject : MonoBehaviour {
     public Image hoverImage;
     public void ActivateHover() {
-        hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, 1f);
+        hoverImage.enabled = true;
     }
     public void DeactivateHover() {
-        hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, 0f);
+        hoverImage.enabled = false;
 
     }
 
