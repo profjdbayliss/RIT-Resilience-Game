@@ -24,6 +24,7 @@ public enum CardMessageType
     ChangeCardID,
     EndGame,
     DrawCard,
+    SectorAssignment,
     None
 }
 

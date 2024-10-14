@@ -76,7 +76,7 @@ public class CardPlayer : MonoBehaviour {
     [Header("Player Information")]
     public string playerName;
     public PlayerTeam playerTeam = PlayerTeam.Any;
-    public Sector PlayerSector { get; private set; }
+    public Sector PlayerSector;
     public string DeckName = "";
 
     [Header("Game References")]

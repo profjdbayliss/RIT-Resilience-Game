@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     [Header("Sectors")]
     [SerializeField] List<Sector> activeSectors;
+
+    public List<Sector> AssignableSectors { get; private set; }
     public Sector sectorInView;
     int sectorIndex = -1;
 
@@ -149,7 +151,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (playerDeckChoice != null) {
             // set this player's type
             switch (playerDeckChoice.value) {
-                // TODO: this is tied to the drop down menu
                 case 0:
                     playerType = PlayerTeam.Red;
                     break;
@@ -171,6 +172,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void StartGame() {
         if (!mStartGameRun) {
             Debug.Log("running start of game");
+
+            AssignableSectors = new List<Sector>(activeSectors);
+
             // basic init of player
             SetPlayerType();
             SetupActors();
@@ -264,27 +268,32 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             opponentPlayer.InitializeCards();
         }
-        //Moved this from player setup so that it updates the opponents game canvas as well
-        //is this correct?
-
-        // TODO: Set randomly
-
-        //Sector sector = gameCanvas.GetComponentInChildren<Sector>();
-        Sector sector = activeSectors[UnityEngine.Random.Range(0, activeSectors.Count)];
-        sectorIndex = activeSectors.IndexOf(sector);
-        
-        
-        //assign the owner of the sector as the blue player
-        sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
-
-        //give the sector to both players
-        //all players will most likely need a list of all sectors
-        actualPlayer.AssignSector(sector);
-        opponentPlayer.AssignSector(sector);
-        sectorInView = sector;
         activeSectors.ForEach(sector => sector.Initialize());
         activeSectors.ForEach(sector => sector.gameObject.SetActive(false));
-        sector.gameObject.SetActive(true);
+
+        if (IsServer) {
+            // Select and assign sector to both players
+            Sector sector = AssignableSectors[UnityEngine.Random.Range(0, AssignableSectors.Count)];
+            int sectorIndex = AssignableSectors.IndexOf(sector);
+
+            // Assign sector ownership to the players
+            sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
+            actualPlayer.AssignSector(sector);
+            opponentPlayer.AssignSector(sector);
+            //sectorInView = sector;
+
+            // Remove the sector from the list and activate it
+            AssignableSectors.Remove(sector);
+            SetSectorInView(sector);
+
+            // Create a message to send the sector assignment to all clients
+            Message sectorMsg = new Message(CardMessageType.SectorAssignment, new List<int> { sectorIndex });
+            AddMessage(sectorMsg);
+        }
+
+
+        
+
         //sector.Initialize();
 
         // in this game people go in parallel to each other
@@ -457,7 +466,21 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
-
+    public void SetSectorInView(Sector sector) {
+        Debug.Log("setting sector in view to " + sector?.sectorName);
+        if (sector != null)
+            SetSectorInView(activeSectors.IndexOf(sector));
+    }
+    public void SetSectorInView(int index) {
+        Debug.Log("setting sector in view to " + index);
+        if (index >= 0 && index < activeSectors.Count) {
+            if (sectorInView != null)
+                sectorInView.gameObject.SetActive(false);
+            sectorInView = activeSectors[index];
+            sectorInView.gameObject.SetActive(true);
+            sectorIndex = index;
+        }
+    }
     public void ViewPreviousSector() {
         sectorIndex = sectorIndex - 1 > 0 ? sectorIndex - 1 : activeSectors.Count - 1;
         sectorInView.gameObject.SetActive(false);

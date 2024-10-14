@@ -156,6 +156,20 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     }
                 }
                 break;
+            case CardMessageType.SectorAssignment: {
+                    if (isServer) {
+                        RGNetworkLongMessage sectorMsg = new RGNetworkLongMessage {
+                            indexId = (uint)localPlayerID,
+                            type = (uint)data.Type,
+                            count = (uint)data.arguments.Count,
+                            payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
+                        };
+                        NetworkServer.SendToAll(sectorMsg);
+                        Debug.Log("SERVER SENT sector assignment to clients.");
+                    }
+                }
+                break;
+
             case CardMessageType.EndPhase: {
                     // turn taking is handled here because the list of players on 
                     // the network happens here
@@ -449,6 +463,20 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.RealGameStart();
                     }
                     break;
+                case CardMessageType.SectorAssignment: {
+                        // Get the assigned sector index from the message payload
+                        int sectorIndex = GetIntFromByteArray(0, msg.payload);
+
+                        // Find the assigned sector and set it for the client
+                        Sector assignedSector = manager.AssignableSectors[sectorIndex];
+                        //assignedSector.SetOwner(RGNetworkPlayerList.instance.localPlayerID == 0 ? manager.actualPlayer : manager.opponentPlayer);
+                        assignedSector.SetOwner(manager.actualPlayer.playerTeam == PlayerTeam.Blue ? manager.actualPlayer : manager.opponentPlayer);
+                        manager.SetSectorInView(assignedSector);
+                        manager.actualPlayer.AssignSector(assignedSector);
+                        Debug.Log("CLIENT RECEIVED sector assignment: Sector " + assignedSector.sectorName);
+                    }
+                    break;
+
                 case CardMessageType.ShareDiscardNumber: {
                         uint count = msg.count;
 
