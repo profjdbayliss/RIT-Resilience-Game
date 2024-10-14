@@ -89,6 +89,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public TextMeshProUGUI titlee;
     public AlertPanel mAlertPanel;
     public DeckSizeTracker deckSizeTracker;
+    [SerializeField] private GameObject gameLogMessagePrefab;
+    [SerializeField] private Transform gameLogParent;
+
 
     // End Game
     [Header("End Game")]
@@ -427,7 +430,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 actualPlayer.LogPlayerInfo();
                 opponentPlayer.LogPlayerInfo();
             }
-            
+            if (Keyboard.current.mKey.wasPressedThisFrame) {
+                AddActionLogMessage("Test message");
+            }
+
 
         }
         if (isInit) {
@@ -466,6 +472,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
+    public void AddActionLogMessage(string message) {
+        Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
+        messageLog.Add(message);
+    }
     public void SetSectorInView(Sector sector) {
         Debug.Log("setting sector in view to " + sector?.sectorName);
         if (sector != null)
