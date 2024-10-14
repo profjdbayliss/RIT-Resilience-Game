@@ -222,11 +222,10 @@ public class CardPlayer : MonoBehaviour {
             }
             //Debug.Log($"Adding {tag} to cardDropLocations");
             cardDropLocations.Add(tag, dropZone.gameObject);
-
+            Debug.Log(dropZone.name);
             //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
         // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
-
 
     }
     #endregion
