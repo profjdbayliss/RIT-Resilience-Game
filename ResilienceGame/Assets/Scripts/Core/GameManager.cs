@@ -133,6 +133,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private const float WHITE_CARD_POS_CHANCE = 0.5f;
     private bool playWhite = false;
     private bool playedPosWhiteCard = false;
+    private bool hasWhiteCardPlayed = true; //TODO change when implementing white cards
 
     public int UniqueCardIdCount = 0;
 
@@ -807,6 +808,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 void PlayPos() {
                     int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
                     Debug.Log("Playing positive white card on turn " + turnTotal);
+                    hasWhiteCardPlayed = true;
                     //TODO: Play the card
                     //positiveWhiteCards[randCard].Play(null, null);
                     //  positiveWhiteCards.RemoveAt(randCard);
@@ -815,36 +817,40 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 void PlayNeg() {
                     Debug.Log("Playing negative white card on turn " + turnTotal);
                     int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
+                    hasWhiteCardPlayed = true;
                     //TODO: Play the card
                     //  negativeWhiteCards[randCard].Play(null, null);
                     //  negativeWhiteCards.RemoveAt(randCard);
                 }
 
+                if (!hasWhiteCardPlayed) {
 
-                if (UnityEngine.Random.Range(0f, 1f) > WHITE_CARD_POS_CHANCE) {
 
-                    if (numWhiteCardOfSameTypePlayed >= 2) {
-                        PlayNeg();
-                        playedPosWhiteCard = false;
-                        numWhiteCardOfSameTypePlayed = 0;
-                    }
-                    if (playedPosWhiteCard)
-                        numWhiteCardOfSameTypePlayed++;
+                    if (UnityEngine.Random.Range(0f, 1f) > WHITE_CARD_POS_CHANCE) {
 
-                    playedPosWhiteCard = true;
-                    PlayPos();
-                }
-                else {
-                    if (numWhiteCardOfSameTypePlayed >= 2) {
-                        PlayPos();
+                        if (numWhiteCardOfSameTypePlayed >= 2) {
+                            PlayNeg();
+                            playedPosWhiteCard = false;
+                            numWhiteCardOfSameTypePlayed = 0;
+                        }
+                        if (playedPosWhiteCard)
+                            numWhiteCardOfSameTypePlayed++;
+
                         playedPosWhiteCard = true;
-                        numWhiteCardOfSameTypePlayed = 0;
+                        PlayPos();
                     }
-                    if (!playedPosWhiteCard)
-                        numWhiteCardOfSameTypePlayed++;
+                    else {
+                        if (numWhiteCardOfSameTypePlayed >= 2) {
+                            PlayPos();
+                            playedPosWhiteCard = true;
+                            numWhiteCardOfSameTypePlayed = 0;
+                        }
+                        if (!playedPosWhiteCard)
+                            numWhiteCardOfSameTypePlayed++;
 
-                    playedPosWhiteCard = false;
-                    PlayNeg();
+                        playedPosWhiteCard = false;
+                        PlayNeg();
+                    }
                 }
                 break;
             case GamePhase.End:

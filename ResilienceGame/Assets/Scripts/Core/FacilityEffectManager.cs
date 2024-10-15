@@ -47,7 +47,7 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     #endregion
 
-    
+
 
     #region Debug
 
@@ -111,7 +111,7 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     //returns a list of effects that can be removed,
     //these are effects marked with the correct type that are created by the opponent team
-    public List<FacilityEffect> GetRemoveableEffects(PlayerTeam playerTeam, bool removePointsPerTurnEffects = false) {
+    public List<FacilityEffect> GetEffectsRemovableByTeam(PlayerTeam playerTeam, bool removePointsPerTurnEffects = false) {
         var opponentTeam = playerTeam == PlayerTeam.Red ? PlayerTeam.Blue : PlayerTeam.Red;
         return GetEffectsCreatedByTeam(opponentTeam).Where(effect => effect.IsRemoveable).ToList();
     }
@@ -147,17 +147,14 @@ public class FacilityEffectManager : MonoBehaviour {
         }
 
     }
-    
+
     #region Remove Effects
     void RemoveNegativeEffects() {
-        //remove backdoor or points per turn effects
-        activeEffects.Where(
-            effect => effect.HasUIElement &&
-            (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor))
-            .ToList()
-            .ForEach(effect => UpdateUI(effect, false));
+        var negativeEffects = activeEffects
+            .Where(effect => effect.EffectType == FacilityEffectType.ModifyPoints ||
+                             effect.EffectType == FacilityEffectType.Backdoor).ToList();
 
-        activeEffects.RemoveAll(effect => effect.EffectType == FacilityEffectType.ModifyPointsPerTurn || effect.EffectType == FacilityEffectType.Backdoor);
+        negativeEffects.ForEach(effect => RemoveEffect(effect, true));
     }
     private void RemoveAllEffects() {
         while (activeEffects.Count > 0) {
@@ -244,16 +241,29 @@ public class FacilityEffectManager : MonoBehaviour {
     #endregion
 
     #region Add Effects
-    
+
     /// <summary>
     /// Adds an effect to the facility
     /// </summary>
     /// <param name="effect">The effect to add</param>
     private void AddEffect(FacilityEffect effect) {
+
+      
+        
         //special case of a remove type from a card effect
-        if (effect.EffectType == FacilityEffectType.Remove) {
+        if (effect.EffectType == FacilityEffectType.RemoveAll) {
             RemoveAllEffects();
             return;
+        }
+        else if (effect.EffectType == FacilityEffectType.RemoveOne) {
+            Debug.Log($"Removing one effect from {facility.facilityName}");
+            var team = effect.CreatedByTeam == PlayerTeam.Red ? PlayerTeam.Red : PlayerTeam.Blue;
+            var removeable = GetEffectsRemovableByTeam(team, false);
+            Debug.Log($"Found {removeable.Count} effects to remove on facility {facility.facilityName}");
+            if (removeable.Count > 0) {
+                RemoveEffect(removeable.First());
+                return;
+            }
         }
         if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
@@ -261,12 +271,15 @@ public class FacilityEffectManager : MonoBehaviour {
         }
 
         if (effect.EffectType == FacilityEffectType.Backdoor && IsBackdoored()) {
-            activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Backdoor).Duration = effect.Duration;
+            var activeBackdoor = activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Backdoor);
+            activeBackdoor.Duration = effect.Duration;
+            activeBackdoor.UIElement.SetCounterText(activeBackdoor.Duration.ToString());
             return;
         }
         else if (effect.EffectType == FacilityEffectType.Fortify && IsFortified()) {
-            activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Fortify).Duration = effect.Duration;
-
+            var activeFortify = activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Fortify);
+            activeFortify.Duration = effect.Duration;
+            activeFortify.UIElement.SetCounterText(activeFortify.Duration.ToString());
             return;
         }
 
@@ -283,7 +296,7 @@ public class FacilityEffectManager : MonoBehaviour {
         Debug.Log($"Applying effect {effect.EffectType} to {facility.facilityName}");
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
-            
+
                 ChangeFacilityPoints(effect);
                 break;
             //case FacilityEffectType.Backdoor:
@@ -320,26 +333,31 @@ public class FacilityEffectManager : MonoBehaviour {
             var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
             effect.UIElement = facilityEffectUI;
             facilityEffectUI.Init(effect);
-           // effectBoxParent.anchoredPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
+            // effectBoxParent.anchoredPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
 
             if (effectPopoutRoutine == null) {
                 effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
                     effectHiddenPos,
                     effectHiddenPos - new Vector2(0, effectPopoutDistance),
-                    null)); 
+                    null));
             }
 
 
         }
         else {
+            //if there are no other effects with a ui element, hide the effect box
             if (!activeEffects.Any(effect => effect.HasUIElement)) {
-              //  effectBoxParent.anchoredPosition = effectHiddenPos;
+                //  effectBoxParent.anchoredPosition = effectHiddenPos;
                 effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
                     effectHiddenPos - new Vector2(0, effectPopoutDistance),
                     effectHiddenPos,
                     effect.UIElement.gameObject));
             }
-            
+            //otherwise just remove the ui element
+            else {
+                Destroy(effect.UIElement.gameObject);
+            }
+
         }
     }
     public void ToggleEffectImageAlpha(Image effectIcon) {
@@ -370,7 +388,7 @@ public class FacilityEffectManager : MonoBehaviour {
         if (endPos == effectHiddenPos) {
             Destroy(objectToDestroy);
         }
-        
+
         Debug.Log("Finished moving effect menu");
     }
     private float CubicEaseInOut(float t) {
@@ -392,7 +410,11 @@ public class FacilityEffectManager : MonoBehaviour {
     public void UpdateForNextActionPhase() {
         // Debug.Log($"Updating for new action phase for Facility {facility.facilityName}");
         //update all effects
-        foreach (var effect in activeEffects) {
+
+        var currentActiveEffects = new List<FacilityEffect>(activeEffects);
+
+
+        foreach (var effect in currentActiveEffects) {
             //only update effects that are created by the team whos turn it is
             //this will be called twice once in action red and once in action blue
             //we need to update the correct effects on both clients each phase

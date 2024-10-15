@@ -23,7 +23,8 @@ public enum FacilityEffectType {
     Fortify,
     ModifyPoints,
     ModifyPointsPerTurn,
-    Remove,
+    RemoveOne,
+    RemoveAll,
     None
 }
 
@@ -155,7 +156,8 @@ public class FacilityEffect {
             "modppt" => FacilityEffectType.ModifyPointsPerTurn,
             "fortify" => FacilityEffectType.Fortify,
             "backdoor" => FacilityEffectType.Backdoor,
-            "remove" => FacilityEffectType.Remove,
+            "removeone" => FacilityEffectType.RemoveOne,
+            "removeall" => FacilityEffectType.RemoveAll,
             _ => FacilityEffectType.None
         };
     }
@@ -165,7 +167,8 @@ public class FacilityEffect {
             FacilityEffectType.ModifyPointsPerTurn => "modppt",
             FacilityEffectType.Fortify => "fortify",
             FacilityEffectType.Backdoor => "backdoor",
-            FacilityEffectType.Remove => "remove",
+            FacilityEffectType.RemoveOne => "removeone",
+            FacilityEffectType.RemoveAll => "removeall",
             _ => ""
         };
     }

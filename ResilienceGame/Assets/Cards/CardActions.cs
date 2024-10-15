@@ -93,7 +93,7 @@ public class NegateEffect : ICardAction {
 public class RemoveEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
 
-        var effectsToRemove = facilityActedUpon.effectManager.GetRemoveableEffects(player.playerTeam, true);
+        var effectsToRemove = facilityActedUpon.effectManager.GetEffectsRemovableByTeam(player.playerTeam, true);
         if (effectsToRemove != null && effectsToRemove.Count > 0) {
             if (effectsToRemove.Count > 1) {
                 for (var i = 0; i < card.data.effectCount; i++) {
@@ -179,7 +179,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                         //get the effect to remove before removing it so we can pass it across the network
                         if (removeEffect) {
                             //finds backdoor or fortify only 1 from each facility
-                            var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false);
+                            var effectsToRemove = facility.effectManager.GetEffectsRemovableByTeam(player.playerTeam, removePointsPerTurnEffects: false);
                             effectTypeToRemove = effectsToRemove[0].EffectType; 
                         }
                         facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
