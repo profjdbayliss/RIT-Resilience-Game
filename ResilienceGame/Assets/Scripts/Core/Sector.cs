@@ -542,7 +542,7 @@ public class Sector : MonoBehaviour {
                 Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); // top middle just off the screen
                 cardRect.anchoredPosition = topMiddle;
                 card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
-                cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); // set parent to game canvas and keep world position
+                cardRect.SetParent(sectorCanvas.transform, true); //parent to the sector canvas to only show anim on active sector
                 cardGameObject.SetActive(true);
                 //Debug.Log($"Added card to screen, starting animation");
                 // Start the card animation
