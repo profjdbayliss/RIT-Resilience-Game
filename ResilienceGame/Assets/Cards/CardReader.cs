@@ -257,10 +257,10 @@ public class CardReader : MonoBehaviour {
 
                         // 4: is this card only played on a specific player type?
                         string[] onlyPlayedOn = individualCSVObjects[4].Trim().Split(';');
-                        tempCard.data.onlyPlayedOn = new PlayerSector[4];
+                        tempCard.data.onlyPlayedOn = new SectorType[4];
                         for (int j = 0; j < onlyPlayedOn.Length; j++) {
                             // TODO: Better to do string[] then TryParse when checking sector being played on?
-                            if (Enum.TryParse(onlyPlayedOn[j], out PlayerSector sector)) { tempCard.data.onlyPlayedOn[j] = sector; }
+                            if (Enum.TryParse(onlyPlayedOn[j], out SectorType sector)) { tempCard.data.onlyPlayedOn[j] = sector; }
                             else { Debug.Log("Parse failed"); }
                         }
 

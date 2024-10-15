@@ -25,7 +25,7 @@ public class Facility : MonoBehaviour {
 
     public FacilityType facilityType;
     public string facilityName;
-    public PlayerSector[] dependencies;
+    public SectorType[] dependencies;
     //public GameObject facilityCanvas;
     public Sector sectorItsAPartOf;
 
@@ -61,7 +61,7 @@ public class Facility : MonoBehaviour {
         hoverEffect = GetComponent<HoverActivateObject>();
         effectManager = GetComponent<FacilityEffectManager>();
         // facilityCanvas = this.transform.gameObject;
-        dependencies = new PlayerSector[3];
+        dependencies = new SectorType[3];
         // pointsUI = new TextMeshProUGUI[3];
         //   effect = FacilityEffect.None;
         //   effectNegated = false;

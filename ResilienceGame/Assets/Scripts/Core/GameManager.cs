@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     [Header("Sectors")]
     [SerializeField] List<Sector> activeSectors;
-
+    public readonly Dictionary<SectorType, Sector> AllSectors = new Dictionary<SectorType, Sector>();
     public List<Sector> AssignableSectors { get; private set; }
     public Sector sectorInView;
     int sectorIndex = -1;
@@ -177,6 +177,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.Log("running start of game");
 
             AssignableSectors = new List<Sector>(activeSectors);
+            activeSectors.ForEach(sector => AllSectors.Add(sector.sectorName, sector)); //store for O(1) access
 
             // basic init of player
             SetPlayerType();
@@ -271,8 +272,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             opponentPlayer.InitializeCards();
         }
-        activeSectors.ForEach(sector => sector.Initialize());
-        activeSectors.ForEach(sector => sector.gameObject.SetActive(false));
+        activeSectors.ForEach(sector => {
+            sector.Initialize();
+            sector.ToggleSectorVisuals(false);
+        });
 
         if (IsServer) {
             // Select and assign sector to both players
@@ -496,23 +499,19 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log("setting sector in view to " + index);
         if (index >= 0 && index < activeSectors.Count) {
             if (sectorInView != null)
-                sectorInView.gameObject.SetActive(false);
+                sectorInView.ToggleSectorVisuals(false);
             sectorInView = activeSectors[index];
-            sectorInView.gameObject.SetActive(true);
+            sectorInView.ToggleSectorVisuals(true);
             sectorIndex = index;
         }
     }
     public void ViewPreviousSector() {
         sectorIndex = sectorIndex - 1 > 0 ? sectorIndex - 1 : activeSectors.Count - 1;
-        sectorInView.gameObject.SetActive(false);
-        sectorInView = activeSectors[sectorIndex];
-        sectorInView.gameObject.SetActive(true);
+        SetSectorInView(sectorIndex);
     }
     public void ViewNextSector() {
         sectorIndex = sectorIndex + 1 < activeSectors.Count ? sectorIndex + 1 : 0;
-        sectorInView.gameObject.SetActive(false);
-        sectorInView = activeSectors[sectorIndex];
-        sectorInView.gameObject.SetActive(true);
+        SetSectorInView(sectorIndex);
     }
 
 
@@ -593,7 +592,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void DisablePlayerDiscard(CardPlayer player) {
         if (actualPlayer == player) {
-            MIsDiscardAllowed = true;
+            MIsDiscardAllowed = false;
             player.StopDiscard();
             UpdateUISizeTrackers();
         }

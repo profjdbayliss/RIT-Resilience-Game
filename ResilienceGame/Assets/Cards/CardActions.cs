@@ -348,7 +348,7 @@ public class NWMeepleChangeEach : ICardAction {
         //we dont know how to implement multiple sectors yet. that being said this doesnt 
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
         foreach (string meepleType in card.data.meepleType) {
-            playerInstance.PlayerSector.AddSubtractMeepleAmount(
+            playerInstance.AddSubtractMeepleAmount(
                 meepleType switch {
                     "Blue" => 0,
                     "Black" => 1,
@@ -510,7 +510,7 @@ public class NWChangeMeepleAmtDice : ICardAction {
             if (card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
             {
                 foreach (string meepleType in card.data.meepleType) {
-                    playerInstance.PlayerSector.MultiplyMeepleAmount(
+                    playerInstance.MultiplyMeepleAmount(
                         meepleType switch {
                             "Blue" => 0,
                             "Black" => 1,
@@ -522,7 +522,7 @@ public class NWChangeMeepleAmtDice : ICardAction {
             }
             else {
                 foreach (string meepleType in card.data.meepleType) {
-                    playerInstance.PlayerSector.AddSubtractMeepleAmount(
+                    playerInstance.AddSubtractMeepleAmount(
                         meepleType switch {
                             "Blue" => 0,
                             "Black" => 1,

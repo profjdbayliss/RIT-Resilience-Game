@@ -12,7 +12,7 @@ using System.Runtime.InteropServices.ComTypes;
 public class Sector : MonoBehaviour {
     #region Fields
     [Header("Player and Sector Info")]
-    public PlayerSector sectorName; // TODO: Move PlayerSector here
+    public SectorType sectorName; // TODO: Move PlayerSector here
     public CardPlayer Owner { get; private set; }
     [SerializeField] private TextMeshProUGUI sectorOwnerText;
     [SerializeField] private GameObject sectorCanvas;
@@ -21,21 +21,7 @@ public class Sector : MonoBehaviour {
     public Facility[] facilities;
     public int overTimeCharges; // Tracks how often a sector can mandate overtime
 
-    [Header("Meeple Info")]
-    public float blueMeeples;
-    public float blackMeeples;
-    public float purpleMeeples;
-
-    public const int STARTING_MEEPLES = 2;
-    private readonly float[] maxMeeples = { 2, 2, 2 };
-
-    public TextMeshProUGUI[] meeplesAmountText;
-    [SerializeField] private Button[] meepleButtons;
-    [SerializeField] private Image[] meepleImages;
-    private Action OnMeeplesSelected;
-
-    public int meeplesSpent = 0;
-    public int numMeeplesRequired = 0;
+    
 
     [Header("Facility Selection")]
     public int numFacilitiesRequired = 0;
@@ -55,23 +41,23 @@ public class Sector : MonoBehaviour {
     [SerializeField] private Material outlineMat;
 
 
-    private readonly Dictionary<PlayerSector, int> ICON_INDICIES = new Dictionary<PlayerSector, int> {
-        { PlayerSector.Communications, 3 },
-        { PlayerSector.Energy, 7 },
-        { PlayerSector.Water, 15 },
-        { PlayerSector.Information, 13 },
-        { PlayerSector.Chemical, 1 },
-        { PlayerSector.Commercial, 2 },
-        { PlayerSector.Manufacturing, 11 },
-        { PlayerSector.Dams, 4 },
-        { PlayerSector.Defense, 5 },
-        { PlayerSector.Emergency, 6 },
-        { PlayerSector.Financial, 8 },
-        { PlayerSector.Agriculture, 0 },
-        { PlayerSector.Government, 9 },
-        { PlayerSector.Healthcare, 10 },
-        { PlayerSector.Nuclear, 12 },
-        { PlayerSector.Transport, 14 }
+    private readonly Dictionary<SectorType, int> ICON_INDICIES = new Dictionary<SectorType, int> {
+        { SectorType.Communications, 3 },
+        { SectorType.Energy, 7 },
+        { SectorType.Water, 15 },
+        { SectorType.Information, 13 },
+        { SectorType.Chemical, 1 },
+        { SectorType.Commercial, 2 },
+        { SectorType.Manufacturing, 11 },
+        { SectorType.Dams, 4 },
+        { SectorType.Defense, 5 },
+        { SectorType.Emergency, 6 },
+        { SectorType.Financial, 8 },
+        { SectorType.Agriculture, 0 },
+        { SectorType.Government, 9 },
+        { SectorType.Healthcare, 10 },
+        { SectorType.Nuclear, 12 },
+        { SectorType.Transport, 14 }
     };
     #endregion
 
@@ -187,7 +173,7 @@ public class Sector : MonoBehaviour {
 
             if (!string.IsNullOrEmpty(values[8])) {
                 isCore = bool.Parse(values[8].Trim());
-                Debug.Log($"Is it a core sector? {isCore}");
+               // Debug.Log($"Is it a core sector? {isCore}");
             }
         }
         reader.Close();
@@ -214,7 +200,7 @@ public class Sector : MonoBehaviour {
 
         // Debug.Log(facility.dependencies.Length);
         for (int j = 3; j < 6; j++) {
-            if (Enum.TryParse(values[j], out PlayerSector enumName)) {
+            if (Enum.TryParse(values[j], out SectorType enumName)) {
                 facility.dependencies[j - 3] = enumName;
             }
             else {
@@ -264,10 +250,10 @@ public class Sector : MonoBehaviour {
     }
     public void Initialize() {
         InitEffectSprites();
-        sectorCanvas = this.gameObject;
+      //  sectorCanvas = this.gameObject;
         overTimeCharges = 3;
 
-        blackMeeples = blueMeeples = purpleMeeples = STARTING_MEEPLES;
+        
         foreach (Facility facility in facilities) {
             facility.Initialize();
         }
@@ -281,13 +267,7 @@ public class Sector : MonoBehaviour {
     #endregion
 
     #region New Round
-    public void ResetMeepleCount() {
-        meeplesSpent = 0;
-        blackMeeples = maxMeeples[0];
-        blueMeeples = maxMeeples[1];
-        purpleMeeples = maxMeeples[2];
-        UpdateMeepleAmountUI();
-    }
+    
     public void InformFacilitiesOfNewTurn() {
         foreach (Facility facility in facilities) {
             facility.UpdateForNextActionPhase();
@@ -331,12 +311,7 @@ public class Sector : MonoBehaviour {
         }
         return null;
     }
-    public int GetTotalMeeples() {
-        return (int)(blueMeeples + blackMeeples + purpleMeeples);
-    }
-    public int GetMaxMeeples() {
-        return (int)Mathf.Floor(maxMeeples.Aggregate((a, b) => a + b));
-    }
+    
     #endregion
 
     #region Facility Downing
@@ -357,115 +332,14 @@ public class Sector : MonoBehaviour {
 
     #endregion
 
-    #region Meeple Spending
-    public bool CanAffordCardPlay(Card card) {
-        return card.data.blueCost <= blueMeeples &&
-            card.data.blackCost <= blackMeeples &&
-            card.data.purpleCost <= purpleMeeples;
-    }
-    public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
-        if (CanAffordCardPlay(card)) {
-            blueMeeples -= card.data.blueCost;
-            blackMeeples -= card.data.blackCost;
-            purpleMeeples -= card.data.purpleCost;
-            numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost); //incrememnt the reference variable to hold total meeples spent
-            meeplesSpent += numMeeplesSpent;
-            UpdateMeepleAmountUI();
-            return true;
-        }
-        return false;
-    }
-    #endregion
+    
 
     #region Interface
-    private void UpdateMeepleAmountUI() {
-        meeplesAmountText[0].text = blackMeeples.ToString();
-        meeplesAmountText[1].text = blueMeeples.ToString();
-        meeplesAmountText[2].text = purpleMeeples.ToString();
+    public void ToggleSectorVisuals(bool enable) {
+        sectorCanvas.SetActive(enable);
     }
+    
 
-    #endregion
-
-    #region Meeple chosing
-    public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
-        this.numMeeplesRequired = numMeeplesRequired;
-        GameManager.instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", Owner, onAlertFinish: onFinish);
-        EnableMeepleButtons();
-        OnMeeplesSelected = onFinish;
-
-    }
-
-    private void EnableMeepleButtons() {
-        foreach (Button button in meepleButtons) {
-            button.interactable = true;
-        }
-    }
-    private void DisableMeepleButtons() {
-        foreach (Button button in meepleButtons) {
-            button.interactable = false;
-        }
-    }
-    //called by the buttons in the sector canvas
-    public void TryButtonSpendMeeple(int index) {
-        if (meepleButtons[index].interactable) {
-            switch (index) {
-                case 0:
-                    blackMeeples--;
-                    meeplesSpent++;
-                    if (blackMeeples == 0) {
-                        meepleButtons[index].interactable = false;
-                    }
-                    break;
-                case 1:
-                    blueMeeples--;
-                    meeplesSpent++;
-                    if (blueMeeples == 0) {
-                        meepleButtons[index].interactable = false;
-                    }
-                    break;
-                case 2:
-                    purpleMeeples--;
-                    meeplesSpent++;
-                    if (purpleMeeples == 0) {
-                        meepleButtons[index].interactable = false;
-                    }
-                    break;
-            }
-            if (numMeeplesRequired > 0 && meeplesSpent > 0) {
-                numMeeplesRequired--;
-                if (numMeeplesRequired == 0) {
-                    GameManager.instance.mAlertPanel.ResolveTextAlert();
-                    OnMeeplesSelected?.Invoke();
-                    DisableMeepleButtons();
-                }
-                else {
-                    GameManager.instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", Owner);
-
-                }
-            }
-            UpdateMeepleAmountUI();
-        }
-    }
-    #endregion
-
-    #region Adjust Max Meeple Amount
-    public void AddSubtractMeepleAmount(int index, float numMeeples) {
-        if (index < 0 || index >= 3) return;
-        maxMeeples[index] += numMeeples;
-        if (maxMeeples[index] < 0) maxMeeples[index] = 0;
-
-        if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
-        if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
-        if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
-        UpdateMeepleAmountUI();
-    }
-    public void MultiplyMeepleAmount(int index, float multiplier) {
-        if (index < 0 || index >= 3) return;
-        var reduceAmt = (int)Mathf.Floor(maxMeeples[index] * multiplier);   //don't reduce by a half value...why were meeples floats ever
-        if (reduceAmt > 0) {
-            AddSubtractMeepleAmount(index, reduceAmt);
-        }
-    }
     #endregion
 
     #region Receiving Network Updates

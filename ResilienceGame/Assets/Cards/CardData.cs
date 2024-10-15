@@ -40,5 +40,5 @@ public struct CardData
     public int minDiceRoll;
     public string[] meepleType;
     public float meepleAmount;
-    public PlayerSector[] onlyPlayedOn;
+    public SectorType[] onlyPlayedOn;
 }

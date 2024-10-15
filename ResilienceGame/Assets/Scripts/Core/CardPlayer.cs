@@ -14,6 +14,7 @@ using static UnityEngine.PlayerLoop.EarlyUpdate;
 using static Facility;
 using System;
 using System.Text;
+using static UnityEngine.UI.GridLayoutGroup;
 #region enums
 // Enum to track player type
 public enum PlayerTeam {
@@ -24,7 +25,7 @@ public enum PlayerTeam {
     None
 };
 
-public enum PlayerSector {
+public enum SectorType {
     // TODO: Randomly assign to blue players at the start of the game, starting with the core sectors
     Communications, //Core
     Energy, //Core
@@ -130,7 +131,21 @@ public class CardPlayer : MonoBehaviour {
     private int facilityCount = 0;
     private bool registeredFacilities = false;
 
-    [Header("Meeples")]
+    [Header("Meeple Info")]
+    public float blueMeeples;
+    public float blackMeeples;
+    public float purpleMeeples;
+
+    public const int STARTING_MEEPLES = 2;
+    private readonly float[] maxMeeples = { 2, 2, 2 };
+
+    public TextMeshProUGUI[] meeplesAmountText;
+    [SerializeField] private Button[] meepleButtons;
+    [SerializeField] private Image[] meepleImages;
+    private Action OnMeeplesSelected;
+
+    public int meeplesSpent = 0;
+    public int numMeeplesRequired = 0;
     private int mMeeplesSpent = 0;
 
     [Header("Scoring")]
@@ -151,6 +166,108 @@ public class CardPlayer : MonoBehaviour {
     }
     #endregion
 
+    #region Interface Updates + Meeple Spending
+    public bool CanAffordCardPlay(Card card) {
+        return card.data.blueCost <= blueMeeples &&
+            card.data.blackCost <= blackMeeples &&
+            card.data.purpleCost <= purpleMeeples;
+    }
+    public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
+        if (CanAffordCardPlay(card)) {
+            blueMeeples -= card.data.blueCost;
+            blackMeeples -= card.data.blackCost;
+            purpleMeeples -= card.data.purpleCost;
+            numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost); //incrememnt the reference variable to hold total meeples spent
+            meeplesSpent += numMeeplesSpent;
+            UpdateMeepleAmountUI();
+            return true;
+        }
+        return false;
+    }
+    public void AddSubtractMeepleAmount(int index, float numMeeples) {
+        if (index < 0 || index >= 3) return;
+        maxMeeples[index] += numMeeples;
+        if (maxMeeples[index] < 0) maxMeeples[index] = 0;
+
+        if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
+        if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
+        if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
+        UpdateMeepleAmountUI();
+    }
+    public void MultiplyMeepleAmount(int index, float multiplier) {
+        if (index < 0 || index >= 3) return;
+        var reduceAmt = (int)Mathf.Floor(maxMeeples[index] * multiplier);   //don't reduce by a half value...why were meeples floats ever
+        if (reduceAmt > 0) {
+            AddSubtractMeepleAmount(index, reduceAmt);
+        }
+    }
+    private void UpdateMeepleAmountUI() {
+        meeplesAmountText[0].text = blackMeeples.ToString();
+        meeplesAmountText[1].text = blueMeeples.ToString();
+        meeplesAmountText[2].text = purpleMeeples.ToString();
+    }
+    public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
+        this.numMeeplesRequired = numMeeplesRequired;
+        GameManager.instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this, onAlertFinish: onFinish);
+        EnableMeepleButtons();
+        OnMeeplesSelected = onFinish;
+
+    }
+
+    private void EnableMeepleButtons() {
+        foreach (Button button in meepleButtons) {
+            button.interactable = true;
+        }
+    }
+    private void DisableMeepleButtons() {
+        foreach (Button button in meepleButtons) {
+            button.interactable = false;
+        }
+    }
+    //called by the buttons in the sector canvas
+    public void TryButtonSpendMeeple(int index) {
+        if (meepleButtons[index].interactable) {
+            switch (index) {
+                case 0:
+                    blackMeeples--;
+                    meeplesSpent++;
+                    if (blackMeeples == 0) {
+                        meepleButtons[index].interactable = false;
+                    }
+                    break;
+                case 1:
+                    blueMeeples--;
+                    meeplesSpent++;
+                    if (blueMeeples == 0) {
+                        meepleButtons[index].interactable = false;
+                    }
+                    break;
+                case 2:
+                    purpleMeeples--;
+                    meeplesSpent++;
+                    if (purpleMeeples == 0) {
+                        meepleButtons[index].interactable = false;
+                    }
+                    break;
+            }
+            if (numMeeplesRequired > 0 && meeplesSpent > 0) {
+                numMeeplesRequired--;
+                if (numMeeplesRequired == 0) {
+                    GameManager.instance.mAlertPanel.ResolveTextAlert();
+                    OnMeeplesSelected?.Invoke();
+                    DisableMeepleButtons();
+                }
+                else {
+                    GameManager.instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this);
+
+                }
+            }
+            UpdateMeepleAmountUI();
+        }
+    }
+
+    #endregion
+
     #region Initialization
     public void Start() {
 
@@ -161,26 +278,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         InitDropLocations();
-        //// discard rectangle information for AABB collisions
-        //RectTransform discardRectTransform = discardDropZone.GetComponent<RectTransform>();
-        //discardDropMin.x = discardRectTransform.position.x - (discardRectTransform.rect.width / 2);
-        //discardDropMin.y = discardRectTransform.position.y - (discardRectTransform.rect.height / 2);
-        //discardDropMax.x = discardRectTransform.position.x + (discardRectTransform.rect.width / 2);
-        //discardDropMax.y = discardRectTransform.position.y + (discardRectTransform.rect.height / 2);
-
-        //// played area rectangle information for AABB collisions
-        //RectTransform playedRectTransform = playerDropZone.GetComponent<RectTransform>();
-        //playedDropMin.x = playedRectTransform.position.x - (playedRectTransform.rect.width / 2);
-        //playedDropMin.y = playedRectTransform.position.y - (playedRectTransform.rect.height / 2);
-        //playedDropMax.x = playedRectTransform.position.x + (playedRectTransform.rect.width / 2);
-        //playedDropMax.y = playedRectTransform.position.y + (playedRectTransform.rect.height / 2);
-
-        //// playing on opponent area rectangle information
-        //RectTransform opponentRectTransform = opponentDropZone.GetComponent<RectTransform>();
-        //opponentDropMin.x = opponentRectTransform.position.x - (opponentRectTransform.rect.width / 2);
-        //opponentDropMin.y = opponentRectTransform.position.y - (opponentRectTransform.rect.height / 2);
-        //opponentDropMax.x = opponentRectTransform.position.x + (opponentRectTransform.rect.width / 2);
-        //opponentDropMax.y = opponentRectTransform.position.y + (opponentRectTransform.rect.height / 2);
+        blackMeeples = blueMeeples = purpleMeeples = STARTING_MEEPLES;
 
     }
     public void InitializeCards() {
@@ -222,7 +320,7 @@ public class CardPlayer : MonoBehaviour {
             }
             //Debug.Log($"Adding {tag} to cardDropLocations");
             cardDropLocations.Add(tag, dropZone.gameObject);
-          //  Debug.Log(dropZone.name);
+            //  Debug.Log(dropZone.name);
             //cardDropColliders.Add(tag, dropZone.GetComponent<Collider2D>());
         }
         // Debug.Log("Card Drop Locations: " + cardDropLocations.Count);
@@ -267,7 +365,7 @@ public class CardPlayer : MonoBehaviour {
     }
     private void ChooseMeeples(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
         ReadyState = PlayerReadyState.SelectMeeplesWithUI;
-        PlayerSector.ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => SelectCardsInHand(player, card));
+        ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => SelectCardsInHand(player, card));
         SelectMeeplesOnCards();
     }
     private void SelectCardsInHand(CardPlayer player, Card card) {
@@ -279,8 +377,7 @@ public class CardPlayer : MonoBehaviour {
     }
 
     //Sets the variables required to force the player to select a certain amount of cards
-    public void AddSelectEvent(int amount, List<Card> cardsAllowedToBeSelected = null)
-    {
+    public void AddSelectEvent(int amount, List<Card> cardsAllowedToBeSelected = null) {
         ReadyState = PlayerReadyState.SelectCardsForCostChange;
         AmountToSelect = amount;
         //need like a select dropzone here
@@ -288,8 +385,7 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log($"Enabling {playerName} to select cards");
     }
 
-    public void StopSelect()
-    {
+    public void StopSelect() {
         ReadyState = PlayerReadyState.ReadyToPlay;
         CardsAllowedToBeSelected?.ForEach(card => card.ToggleOutline(false));
         CardsAllowedToBeSelected = null;
@@ -338,8 +434,6 @@ public class CardPlayer : MonoBehaviour {
     }
     //Called by a card action to return the entire hand to the deck and draw a new hand
     public void ReturnHandToDeckAndDraw(int amount) {
-        //TODO: update opponent that this happened
-        //the size of the deck will update correctly, but the deck IDs will not be updated (i think)
         HandCards.Values.ToList().ForEach(card => {
             ReturnCardToDeck(card.GetComponent<Card>(), true);
         });
@@ -359,8 +453,17 @@ public class CardPlayer : MonoBehaviour {
 
     #region Helpers
     public void ResetMeepleCount() {
-        if (PlayerSector != null)
-            PlayerSector.ResetMeepleCount();
+        meeplesSpent = 0;
+        blackMeeples = maxMeeples[0];
+        blueMeeples = maxMeeples[1];
+        purpleMeeples = maxMeeples[2];
+        UpdateMeepleAmountUI();
+    }
+    public int GetTotalMeeples() {
+        return (int)(blueMeeples + blackMeeples + purpleMeeples);
+    }
+    public int GetMaxMeeples() {
+        return (int)Mathf.Floor(maxMeeples.Aggregate((a, b) => a + b));
     }
     //TODO: update for more than 2 players
     public Sector GetActiveSector() {
@@ -409,11 +512,11 @@ public class CardPlayer : MonoBehaviour {
         }
         return "Card not found";
     }
-    public int GetTotalMeeples() {
-        return PlayerSector.GetTotalMeeples();
-    }
-    public int GetMaxMeeples() {
-        return PlayerSector.GetMaxMeeples();
+    private SectorType SectorPlayedOn() {
+        if (cardDroppedOnObject != null) {
+            return cardDroppedOnObject.GetComponentInParent<Sector>().sectorName;
+        }
+        return SectorType.Any;
     }
     private Facility FacilityPlayedOn() {
         Facility facility = null;
@@ -557,9 +660,9 @@ public class CardPlayer : MonoBehaviour {
             }
             else {
                 //assign temp unique id before getting a real one from network
-                tempCard.UniqueID = GameManager.instance.UniqueCardIdCount++; 
+                tempCard.UniqueID = GameManager.instance.UniqueCardIdCount++;
             }
-            
+
         }
 
         // set the info on the card front
@@ -970,6 +1073,10 @@ public class CardPlayer : MonoBehaviour {
                                 HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
                             }
                             break;
+                        case CardDropZoneTag.FREE_PLAY:
+                            Debug.Log($"Handing a sectorwide drop");
+                            HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            break;
                         default:
                             Debug.Log("card not dropped in card drop zone");
                             handPositioner.ReturnCardToHand(card);
@@ -1050,8 +1157,7 @@ public class CardPlayer : MonoBehaviour {
                     return card;
                 }
                 else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
-                    if (AmountToSelect > 0)
-                    {
+                    if (AmountToSelect > 0) {
                         GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect--);
                         handPositioner.cards.Remove(card);
                         Debug.Log(card + " selected for Training");
@@ -1141,7 +1247,14 @@ public class CardPlayer : MonoBehaviour {
     //Called when a non-Facility/Effect target card is dropped in the play area
     private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
         Debug.Log($"Handling non facility card - {card.front.title}");
-        Facility facility = FacilityPlayedOn(); //still need this for sector cards
+        // Facility facility = FacilityPlayedOn(); //still need this for sector cards
+        var sectorType = SectorPlayedOn();
+        if (sectorType == SectorType.Any || sectorType == SectorType.All) {
+            Debug.LogError("Sector type is not valid for card play");
+            return;
+        }
+
+        Sector sector = GameManager.instance.AllSectors[sectorType];
         switch (phase) {
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
@@ -1153,7 +1266,7 @@ public class CardPlayer : MonoBehaviour {
                 playKey = card.UniqueID;
                 //start shrink animation
                 StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f,
-                    () => card.Play(this, opponentPlayer, facility)));
+                    () => card.Play(this, opponentPlayer, sector.facilities[0]))); //pass the first facility in the sector, we just use it to get the sector later
 
                 break;
 
@@ -1224,14 +1337,14 @@ public class CardPlayer : MonoBehaviour {
             }
             return ("Must discard cards first", false); //didn't drop on the discard drop zone
         }
-        else if(ReadyState == PlayerReadyState.SelectCardsForCostChange)
-        {
+        else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
             //im not sure what i should check for just yet so j gonna return true
             return ("Valid card selection", true);
         }
         else {
             //check prereq effects on cards for effect cards played on single facilities
             if (card.data.preReqEffectType != FacilityEffectType.None) {
+
                 Facility facility = hoveredDropLocation.GetComponent<Facility>();
                 if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
                     return ("Facility effect does not match card prereq effect", false);
@@ -1245,7 +1358,7 @@ public class CardPlayer : MonoBehaviour {
                     return ("Sector does not have removable effects", false);
                 }
             }
-            if (!PlayerSector.TrySpendMeeples(card, ref mMeeplesSpent)) {
+            if (!TrySpendMeeples(card, ref mMeeplesSpent)) {
                 return ("Not enough meeples to play card", false);
             }
         }
@@ -1414,7 +1527,7 @@ public class CardPlayer : MonoBehaviour {
                 Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
 
                 //draw cards for opponent but dont update network which would cause an infinite loop
-                opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false); 
+                opponent.DrawSpecificCard(update.CardID, opponentDropZone, uid: update.UniqueID, updateNetwork: false);
                 break;
             case CardMessageType.CardUpdate:
             case CardMessageType.CardUpdateWithExtraFacilityInfo:
