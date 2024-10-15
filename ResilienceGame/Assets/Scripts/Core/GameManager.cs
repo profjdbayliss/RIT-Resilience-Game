@@ -568,7 +568,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void DisplayCardChoiceMenu(Card card, int numRequired)
     {
         mAlertPanel.AddCardToSelectionMenu(card.gameObject);
-        if (numRequired == 0)
+        if (numRequired < 3)
             mAlertPanel.ToggleCardSelectionPanel(true);
 
     }

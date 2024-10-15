@@ -374,6 +374,13 @@ public class CardPlayer : MonoBehaviour {
         AddSelectEvent(card.data.targetAmount);
     }
     private void SelectMeeplesOnCards() {
+        //Enable Meeple Interface
+
+        //Store the chosen colours for each card
+
+        //Reduce meeple costs for those cards
+
+        //ask mike about like an animation showing it going back to the hand
 
     }
 
@@ -1158,12 +1165,13 @@ public class CardPlayer : MonoBehaviour {
                     return card;
                 }
                 else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
-                    if (AmountToSelect > 0) {
+                    if (AmountToSelect > 0)
+                    {
                         GameManager.instance.DisplayCardChoiceMenu(card, AmountToSelect--);
                         handPositioner.cards.Remove(card);
                         Debug.Log(card + " selected for Training");
                     }
-                    else ReadyState = PlayerReadyState.ReadyToPlay;
+                    else StopSelect();
                 }
 
             }
