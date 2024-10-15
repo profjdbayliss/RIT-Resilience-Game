@@ -575,7 +575,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.ReturnCardToDeck: {
@@ -593,7 +593,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received ReturnCardToHand message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + " for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.CardUpdate: {
@@ -617,7 +617,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.CardUpdateWithExtraFacilityInfo: {
@@ -653,7 +653,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.ReduceCost: {
@@ -674,7 +674,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.RemoveEffect: {
@@ -698,7 +698,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.DiscardCard: {
@@ -717,7 +717,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.MeepleShare: {
@@ -740,7 +740,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("client received update message from opponent containing player to share with : " + playerToShareWith +
                             " and meeple color " + meepleColor + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 default:
@@ -848,7 +848,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                //case CardMessageType.ChangeCardID: {
@@ -883,7 +883,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received ReturnCardToHand message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + " for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.CardUpdate: {
@@ -909,7 +909,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.CardUpdateWithExtraFacilityInfo: {
@@ -945,7 +945,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.ReduceCost: {
@@ -966,7 +966,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
 
@@ -991,7 +991,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.DiscardCard: {
@@ -1010,7 +1010,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 case CardMessageType.MeepleShare: {
@@ -1033,7 +1033,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("server received update message from opponent containing player to share with : " + playerToShareWith +
                             " and meeple color " + meepleColor + "for game phase " + gamePhase);
 
-                        manager.AddUpdateFromOpponent(update, gamePhase, msg.playerID);
+                        manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
                 default:

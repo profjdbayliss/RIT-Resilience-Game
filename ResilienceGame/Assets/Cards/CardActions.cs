@@ -166,9 +166,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 return;
             }
 
-            //uses sector owner instead of opponent in prep for multiple players
-
-            sectorToActOn.Owner.ForcePlayerSelectFacilities(
+            player.ForcePlayerSelectFacilities(
                 numFacilitiesToSelect: card.data.targetAmount,
                 removeEffect: removeEffect,
                 preReqEffect: card.data.preReqEffectType,
@@ -184,23 +182,6 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                         }
                         facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
 
-                        //if (removeEffect) {
-                        //    //find the effects that can be removed from the facility
-                        //    var effectsToRemove = facility.effectManager.GetRemoveableEffects(player.playerTeam, removePointsPerTurnEffects: false); //finds backdoor or fortify only 1 from each facility
-
-                        //    //if there are effects to remove, remove the first one
-                        //    //this is a little weird because of Keylogging card
-                        //    if (effectsToRemove != null && effectsToRemove.Count > 0) {
-                        //        effectTypeToRemove = effectsToRemove[0].EffectType;
-                        //        RemoveEffect(facility, effectsToRemove[0]);
-                        //    }
-                        //    else {
-                        //        Debug.LogError($"No removable effects to remove on {facility.facilityName}");
-                        //    }
-                        //}
-                        //else {
-                        //    facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
-                        //}
                     });
 
 

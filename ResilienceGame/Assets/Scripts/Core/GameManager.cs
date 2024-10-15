@@ -963,15 +963,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
 
-    public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
+    public void AddUpdateFromPlayer(Update update, GamePhase phase, uint playerIndex) {
 
-        //TODO: remove
-        try {
-            actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
-        }
-        catch (Exception e) {
-            Debug.LogError("Error in adding update from opponent: " + e.Message);
-        }
+        //send card updates to the sector the card was played on
         switch (update.Type) {
             case CardMessageType.CardUpdate:
             case CardMessageType.CardUpdateWithExtraFacilityInfo:
@@ -982,7 +976,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
                 }
                 break;
-            default:
+                //pass other updates to the card player
+                //TODO: list of all players
+            default: 
+                try {
+                    actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
+                }
+                catch (Exception e) {
+                    Debug.LogError("Error in adding update from opponent: " + e.Message);
+                }
                 break;
         }
 
