@@ -140,7 +140,7 @@ public class CardPlayer : MonoBehaviour {
     public float purpleMeeples;
 
     public const int STARTING_MEEPLES = 2;
-    private readonly float[] maxMeeples = { 2, 2, 2 };
+    private float[] maxMeeples = { 2, 2, 2 };
 
     public TextMeshProUGUI[] meeplesAmountText;
     [SerializeField] private Button[] meepleButtons;
@@ -851,6 +851,13 @@ public class CardPlayer : MonoBehaviour {
                     Debug.Log($"Player {playerName} does not have an assigned sector");
                 }
             }
+        }
+        if (Keyboard.current.tabKey.wasPressedThisFrame) {
+            maxMeeples = new float[]{ 99, 99 ,99 };
+            blueMeeples = 99;
+            blackMeeples = 99;
+            purpleMeeples = 99;
+            UpdateMeepleAmountUI();
         }
     }
     public void HandleMenuToggle() {
