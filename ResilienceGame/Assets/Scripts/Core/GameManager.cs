@@ -965,8 +965,28 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void AddUpdateFromOpponent(Update update, GamePhase phase, uint playerIndex) {
 
-        actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
+        //TODO: remove
+        try {
+            actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
+        }
+        catch (Exception e) {
+            Debug.LogError("Error in adding update from opponent: " + e.Message);
+        }
+        switch (update.Type) {
+            case CardMessageType.CardUpdate:
+            case CardMessageType.CardUpdateWithExtraFacilityInfo:
+                if (AllSectors.TryGetValue(update.sectorPlayedOn, out Sector sector)) {
+                    sector.AddUpdateFromPlayer(update, phase, opponentPlayer); //TODO: change to reference a list of players somewhere
+                }
+                else {
+                    Debug.LogWarning($"sector type not found in update not passing to sector");
+                }
+                break;
+            default:
+                break;
+        }
 
+        
     }
     #endregion
 
