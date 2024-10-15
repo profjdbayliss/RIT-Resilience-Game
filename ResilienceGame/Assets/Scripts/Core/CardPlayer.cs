@@ -62,6 +62,7 @@ public struct Update {
     public FacilityType AdditionalFacilitySelectedOne;
     public FacilityType AdditionalFacilitySelectedTwo;
     public FacilityType AdditionalFacilitySelectedThree;
+    public SectorType sectorPlayedOn;
 };
 
 public enum DiscardFromWhere {
@@ -1223,7 +1224,10 @@ public class CardPlayer : MonoBehaviour {
             case GamePhase.ActionRed:
                 card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
-                EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID, facilityType: facility.facilityType); //send the update to the opponent
+                EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, 
+                                    card.data.cardID, card.UniqueID, 
+                                    sectorType: facility.sectorItsAPartOf.sectorName, 
+                                    facilityType: facility.facilityType); //send the update to the opponent
 
                 // card.Play(this, opponentPlayer, facility);
                 playCount = 1;
@@ -1262,7 +1266,7 @@ public class CardPlayer : MonoBehaviour {
                 card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
 
-                EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID);
+                EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID, sectorType: sectorType);
                 playCount = 1;
                 playKey = card.UniqueID;
                 //start shrink animation
@@ -1461,7 +1465,7 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Network
-    public void UpdateNextInQueueMessage(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
+    public void UpdateNextInQueueMessage(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityDroppedOnType = FacilityType.None, FacilityType facilityType1 = FacilityType.None,
         FacilityType facilityType2 = FacilityType.None,
         FacilityType facilityType3 = FacilityType.None, FacilityEffectType effectTargetType = FacilityEffectType.None, bool sendUpdate = false) {
@@ -1503,13 +1507,14 @@ public class CardPlayer : MonoBehaviour {
         }
 
     }
-    private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
+    private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None, bool sendUpdateImmediately = false) {
         mUpdatesThisPhase.Enqueue(new Update {
             Type = cardMessageType,
             UniqueID = UniqueID,
             CardID = CardID,
             Amount = Amount,
+            sectorPlayedOn = sectorType,
             FacilityPlayedOnType = facilityType,
             FacilityEffectToRemoveType = facilityEffectToRemoveType
         });
@@ -1517,13 +1522,14 @@ public class CardPlayer : MonoBehaviour {
             GameManager.instance.SendUpdatesToOpponent(GameManager.instance.MGamePhase, this);
         }
     }
-    private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1,
+    private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None) {
-        EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, facilityType, facilityEffectToRemoveType, true);
+        EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, sectorType, facilityType, facilityEffectToRemoveType, true);
     }
 
 
     //called by the game manager to add an update to the player's queue from the opponent's actions
+    //THIS is the first place where card updates are passed to the player
     public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
         /*
             CardUpdate,
@@ -1589,7 +1595,7 @@ public class CardPlayer : MonoBehaviour {
     }
     //Actually process the card action, used to create the update queue and is called when the update is ready to be resolved
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
-        Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type}");
+        Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type} on sector {update.sectorPlayedOn}");
 
         if (update.Type == CardMessageType.CardUpdate || update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
             IsAnimating = true;
@@ -1784,6 +1790,7 @@ public class CardPlayer : MonoBehaviour {
 
             playsForMessage.Add(update.UniqueID);
             playsForMessage.Add(update.CardID);
+            playsForMessage.Add((int)update.sectorPlayedOn);
             playsForMessage.Add((int)update.FacilityPlayedOnType);
             playsForMessage.Add((int)update.FacilityEffectToRemoveType);
             if (update.Type == CardMessageType.ReduceCost) {
