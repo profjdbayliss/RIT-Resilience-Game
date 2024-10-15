@@ -77,7 +77,8 @@ public class CardPlayer : MonoBehaviour {
     [Header("Player Information")]
     public string playerName;
     public PlayerTeam playerTeam = PlayerTeam.Any;
-    public Sector PlayerSector;
+
+    public Sector PlayerSector { get; set; }
     public string DeckName = "";
 
     [Header("Game References")]
@@ -339,7 +340,7 @@ public class CardPlayer : MonoBehaviour {
         ReadyState = PlayerReadyState.SelectFacilties;
         Debug.Log($"Forcing {playerName} to select {numFacilitiesToSelect} facilities before continuing");
 
-        var numAvail = PlayerSector.EnableFacilitySelection(numFacilitiesToSelect, opponentTeam: GetOpponentTeam(), removeEffect, preReqEffect);
+        var numAvail = GameManager.instance.sectorInView.EnableFacilitySelection(numFacilitiesToSelect, opponentTeam: GetOpponentTeam(), removeEffect, preReqEffect);
 
         if (numAvail == 0) {
             ReadyState = PlayerReadyState.ReadyToPlay;
@@ -352,12 +353,12 @@ public class CardPlayer : MonoBehaviour {
     public void ResolveFacilitySelection() {
         ReadyState = PlayerReadyState.ReadyToPlay;
         GameManager.instance.mAlertPanel.ResolveTextAlert();
-        var facilities = PlayerSector.GetSelectedFacilities(); //also doesn't work if we move sectors to the blue players 
+        var facilities = GameManager.instance.sectorInView.GetSelectedFacilities(); 
         if (facilities == null) {
             Debug.LogError("selected facility list is null");
             return;
         }
-        PlayerSector.DisableFacilitySelection();
+        GameManager.instance.sectorInView.DisableFacilitySelection();
         OnFacilitiesSelected?.Invoke(facilities);
     }
     public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
@@ -466,9 +467,9 @@ public class CardPlayer : MonoBehaviour {
         return (int)Mathf.Floor(maxMeeples.Aggregate((a, b) => a + b));
     }
     //TODO: update for more than 2 players
-    public Sector GetActiveSector() {
-        return PlayerSector == null ? GameManager.instance.opponentPlayer.PlayerSector : PlayerSector;
-    }
+    //public Sector GetActiveSector() {
+    //    return PlayerSector == null ? GameManager.instance.opponentPlayer.PlayerSector : PlayerSector;
+    //}
     public void AssignSector(Sector sector) {
         PlayerSector = sector;
     }
@@ -1352,8 +1353,17 @@ public class CardPlayer : MonoBehaviour {
             }
             //check for 'Remove' effect for sector cards
             if (card.data.effectString == "Remove") {
-                Facility facility = hoveredDropLocation.GetComponent<Facility>();
-                Sector sector = facility.sectorItsAPartOf;
+                Sector sector = null;
+                if (hoveredDropLocation.TryGetComponent(out Facility facility)) {
+                    sector = facility.sectorItsAPartOf;
+                }
+                else {
+                    sector = hoveredDropLocation.GetComponentInParent<Sector>();    
+                }
+                if (sector == null) {
+                    Debug.LogError($"Sector should be found here");
+                    return ("Sector card must be played on a sector", false);
+                }
                 if (!sector.HasRemovableEffectsOnFacilities(GetOpponentTeam())) {
                     return ("Sector does not have removable effects", false);
                 }

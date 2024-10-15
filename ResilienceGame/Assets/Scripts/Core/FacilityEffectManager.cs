@@ -307,7 +307,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
     #region Interface Updates
     private void UpdateUI(FacilityEffect effect, bool add) {
-        // Debug.Log($"Updating UI element for effect {effect.EffectType}");
+        Debug.Log($"Updating UI element for effect {effect.EffectType} and has ui: {effect.HasUIElement}");
         if (!effect.HasUIElement) return;
 
 
