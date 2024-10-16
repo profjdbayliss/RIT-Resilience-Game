@@ -32,11 +32,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public PlayerTeam playerType = PlayerTeam.Any;
     public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
+    public List<CardPlayer> networkPlayers = new List<CardPlayer>();
     public CardPlayer opponentPlayer;
     private bool myTurn = false;
     public int activePlayerNumber;
-    [SerializeField] private List<CardPlayer> playerList;
-    public Dictionary<uint, CardPlayer> playerDictionary;
+   // [SerializeField] private List<CardPlayer> playerList;
+    public Dictionary<int, CardPlayer> playerDictionary = new Dictionary<int, CardPlayer>();
 
     [Header("Sectors")]
     [SerializeField] List<Sector> activeSectors;

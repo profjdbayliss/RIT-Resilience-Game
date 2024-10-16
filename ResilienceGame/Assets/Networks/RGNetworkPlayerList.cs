@@ -29,6 +29,7 @@ public struct RGNetworkLongMessage : NetworkMessage {
 
 public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public static RGNetworkPlayerList instance;
+   // [SerializeField] private GameObject cardPlayerPrefab;
 
     int nextCardUID = 0;
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
@@ -57,10 +58,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     public void Start() {
-        manager = GameObject.FindObjectOfType<GameManager>();
+        manager = GameManager.Instance;// GameObject.FindObjectOfType<GameManager>();
         Debug.Log("start run on RGNetworkPlayerList.cs");
     }
-    public void AddPlayer(int id, string name) {
+    public void AddPlayer(int id, string name, CardPlayer cardPlayer) {
         if (isServer) {
             Debug.Log("adding player to server : " + id);
             playerIDs.Add(id);
@@ -68,6 +69,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerTurnTakenFlags.Add(false);
             playerTypes.Add(PlayerTeam.Any);
             playerNames.Add(name);
+            if (id != 0) {
+                manager.networkPlayers.Add(cardPlayer);
+                manager.playerDictionary.Add(id, cardPlayer);
+                //TODO remove
+
+                manager.opponentPlayer = cardPlayer;
+            }
 
         }
     }
