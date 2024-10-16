@@ -1018,6 +1018,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
         return roundsLeft;
     }
 
+    public void ChangeRoundsLeft(int change)
+    {
+        if (roundsLeft + change < 0)
+        {
+            roundsLeft = 0;
+        }
+        else roundsLeft += change;
+    }
+
     #endregion
 
     #region Tutorial

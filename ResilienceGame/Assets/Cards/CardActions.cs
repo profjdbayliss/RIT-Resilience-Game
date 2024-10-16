@@ -137,9 +137,6 @@ public class SpreadEffect : ICardAction {
     }
 }
 public class SelectFacilitiesAddRemoveEffect : ICardAction {
-
-    
-    
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         if (player == GameManager.Instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
@@ -244,6 +241,26 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
     }
 }
 
+public class ReduceTurnsLeftByBackdoor : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        int turnsRemoved = 0;
+        Sector sectorActedUpon = facilityActedUpon.sectorItsAPartOf;
+        foreach(Facility facility in sectorActedUpon.facilities)
+        {
+            if (facility.HasEffectOfType(FacilityEffectType.Backdoor))
+                turnsRemoved += card.data.facilityAmount;
+        }
+        GameManager.Instance.ChangeRoundsLeft(-turnsRemoved);
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
 
 public class ChangeMeepleAmount : ICardAction {
     //deprecated?
