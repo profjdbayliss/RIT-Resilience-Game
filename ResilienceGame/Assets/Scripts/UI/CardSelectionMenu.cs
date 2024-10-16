@@ -11,6 +11,7 @@ public class CardSelectionMenu : MonoBehaviour {
     public bool IsInitialized { get; private set; } = false;
 
     [SerializeField] Color blueButtonColor, redButtonColor;
+    
 
     // Function to create buttons for each card in the deck
     public void CreateCardButtons(List<Card> deck) {
@@ -51,7 +52,7 @@ public class CardSelectionMenu : MonoBehaviour {
 
     // Function to handle the card being drawn when the button is pressed
     private void OnCardButtonPressed(Card selectedCard) {
-        GameManager.instance.actualPlayer.DrawSpecificCard(selectedCard.data.cardID, GameManager.instance.userInterface.handDropZone, uid: -1, updateNetwork: true);
+        GameManager.Instance.actualPlayer.DrawSpecificCard(selectedCard.data.cardID, UserInterface.Instance.handDropZone, uid: -1, updateNetwork: true);
         DisableMenu();
     }
 

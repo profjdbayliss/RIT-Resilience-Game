@@ -91,8 +91,8 @@ public class FacilityEffectManager : MonoBehaviour {
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
         //Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
         return effect.CreatedByTeam switch {
-            PlayerTeam.Red => GameManager.instance.MGamePhase == GamePhase.ActionRed,
-            PlayerTeam.Blue => GameManager.instance.MGamePhase == GamePhase.ActionBlue,
+            PlayerTeam.Red => GameManager.Instance.MGamePhase == GamePhase.ActionRed,
+            PlayerTeam.Blue => GameManager.Instance.MGamePhase == GamePhase.ActionBlue,
             _ => false
         };
     }

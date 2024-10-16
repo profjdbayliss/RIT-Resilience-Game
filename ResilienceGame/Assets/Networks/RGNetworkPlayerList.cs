@@ -530,7 +530,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Debug.Log("setting player discard to " + discardCount);
 
                             // let the game manager display the new info
-                            manager.DisplayGameStatus("Player " + playerNames[playerIndex] +
+                            UserInterface.Instance.DisplayGameStatus("Player " + playerNames[playerIndex] +
                                 " discarded " + discardCount + " cards.");
                         }
                     }
@@ -805,7 +805,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             //NetworkServer.SendToAll(msg);
 
                             // let the game manager display the new info
-                            manager.DisplayGameStatus("Player " + playerNames[playerIndex] +
+                            UserInterface.Instance.DisplayGameStatus("Player " + playerNames[playerIndex] +
                                 " discarded " + discardCount + " cards.");
                         }
                     }

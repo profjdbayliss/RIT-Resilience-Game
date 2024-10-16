@@ -11,11 +11,11 @@ public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
         List<Card> drawnCards = new List<Card>();
-        if (player == GameManager.instance.actualPlayer) {
+        if (player == GameManager.Instance.actualPlayer) {
             player.DrawNumberOfCards(card.data.drawAmount, drawnCards, highlight: (card.data.removeAmount > 0), updateNetwork: true);
             if (card.data.removeAmount > 0) {
-                GameManager.instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
-                GameManager.instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
+                UserInterface.Instance.DisplayAlertMessage($"Discard {card.data.removeAmount} of the highlighted cards", player); //display alert message
+                GameManager.Instance.AllowPlayerDiscard(player, card.data.removeAmount, drawnCards);    //allow player to discard cards  
             }
             base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
         }
@@ -28,7 +28,7 @@ public class DrawAndDiscardCards : ICardAction {
 public class ShuffleAndDrawCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
-        if (player == GameManager.instance.actualPlayer) {
+        if (player == GameManager.Instance.actualPlayer) {
             player.ForcePlayerReturnCardsToDeck(card.data.removeAmount, () => {
                 player.DrawNumberOfCards(card.data.drawAmount, updateNetwork: true);
             });
@@ -42,7 +42,7 @@ public class ShuffleAndDrawCards : ICardAction {
 public class ReturnHandToDeckAndDraw : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " played.");
-        if (player == GameManager.instance.actualPlayer) {
+        if (player == GameManager.Instance.actualPlayer) {
             player.ReturnHandToDeckAndDraw(card.data.drawAmount);
             base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
         }
@@ -141,7 +141,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
     
     
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        if (player == GameManager.instance.actualPlayer) {
+        if (player == GameManager.Instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
             FacilityEffectType effectTypeToRemove = FacilityEffectType.None;
             
@@ -322,9 +322,9 @@ public class ReduceCardCost : ICardAction {
 public class NWMeepleChangeEach : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         CardPlayer playerInstance;
-        if (GameManager.instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.instance.actualPlayer;
-        else playerInstance = GameManager.instance.opponentPlayer;
+        if (GameManager.Instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.Instance.actualPlayer;
+        else playerInstance = GameManager.Instance.opponentPlayer;
         //at the moment this method doesnt actually handle multiple sectors because
         //we dont know how to implement multiple sectors yet. that being said this doesnt 
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
@@ -367,9 +367,9 @@ public class NWMeepleChangeChoice : ICardAction {
 public class NWIncOvertimeAmount : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         CardPlayer playerInstance;
-        if (GameManager.instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.instance.actualPlayer;
-        else playerInstance = GameManager.instance.opponentPlayer;
+        if (GameManager.Instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.Instance.actualPlayer;
+        else playerInstance = GameManager.Instance.opponentPlayer;
         //at the moment this method doesnt actually handle multiple sectors because
         //we dont know how to implement multiple sectors yet. that being said this doesnt 
         //use stuff like facilityactedupon and relies directly upon the game manager singleton
@@ -394,9 +394,9 @@ public class NWShuffleFromDiscard : ICardAction {
         //shuffled from discard except the description
         GameObject[] cardsShuffledFromDiscard = new GameObject[5];
         CardPlayer playerInstance;
-        if (GameManager.instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.instance.actualPlayer;
-        else playerInstance = GameManager.instance.opponentPlayer;
+        if (GameManager.Instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.Instance.actualPlayer;
+        else playerInstance = GameManager.Instance.opponentPlayer;
         if (playerInstance.Discards.Count == 0) {
             Debug.LogWarning("The discard pile is empty");
             return;
@@ -426,9 +426,9 @@ public class NWShuffleFromDiscard : ICardAction {
 public class NWChangePhysPointsDice : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         CardPlayer playerInstance;
-        if (GameManager.instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.instance.actualPlayer;
-        else playerInstance = GameManager.instance.opponentPlayer;
+        if (GameManager.Instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.Instance.actualPlayer;
+        else playerInstance = GameManager.Instance.opponentPlayer;
         int diceRoll = UnityEngine.Random.Range(1, 6);
         if (diceRoll < card.data.minDiceRoll) {
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
@@ -453,9 +453,9 @@ public class NWChangePhysPointsDice : ICardAction {
 public class NWChangeFinPointsDice : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         CardPlayer playerInstance;
-        if (GameManager.instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.instance.actualPlayer;
-        else playerInstance = GameManager.instance.opponentPlayer;
+        if (GameManager.Instance.playerType == PlayerTeam.Blue)
+            playerInstance = GameManager.Instance.actualPlayer;
+        else playerInstance = GameManager.Instance.opponentPlayer;
         int diceRoll = UnityEngine.Random.Range(1, 6);
         if (diceRoll < card.data.minDiceRoll) {
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
@@ -484,9 +484,9 @@ public class NWChangeMeepleAmtDice : ICardAction {
         int diceRoll = UnityEngine.Random.Range(1, 6);
         if (diceRoll < card.data.minDiceRoll) {
             CardPlayer playerInstance;
-            if (GameManager.instance.playerType == PlayerTeam.Blue)
-                playerInstance = GameManager.instance.actualPlayer;
-            else playerInstance = GameManager.instance.opponentPlayer;
+            if (GameManager.Instance.playerType == PlayerTeam.Blue)
+                playerInstance = GameManager.Instance.actualPlayer;
+            else playerInstance = GameManager.Instance.opponentPlayer;
             Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
             if (card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
             {

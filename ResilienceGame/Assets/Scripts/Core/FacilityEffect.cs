@@ -66,7 +66,7 @@ public class FacilityEffect {
         Magnitude = magnitude;
         Duration = duration;
         CreatedEffects = new List<FacilityEffect>();
-        UniqueID = GameManager.instance.UniqueFacilityEffectIdCount++;
+        UniqueID = GameManager.Instance.UniqueFacilityEffectIdCount++;
         EffectCreatedOnRoundEndIdString = createdEffectID;
     }
     

@@ -556,7 +556,7 @@ public class Sector : MonoBehaviour {
                     //many of them work very differently from the standard card.Play so those Play functions are not called
                     resolveCardAction?.Invoke(cUpdate, card);
 
-                    GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
+                    UserInterface.Instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
                     // After the current animation is done, check if there's another card queued
                     OnAnimationComplete();
                 }));
