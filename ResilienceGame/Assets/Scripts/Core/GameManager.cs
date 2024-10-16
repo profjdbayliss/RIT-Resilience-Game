@@ -192,13 +192,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
             roundsLeft = BASE_MAX_TURNS;
             turnTotal = 0;
             numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5 turns
-           // mTurnText.text = "" + GetTurnsLeft();
-           // mPhaseText.text = "Phase: " + MGamePhase.ToString();
-         //   mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
+                                                                                                                    // mTurnText.text = "" + GetTurnsLeft();
+                                                                                                                    // mPhaseText.text = "Phase: " + MGamePhase.ToString();
+                                                                                                                    //   mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
-         //   mPlayerDeckType.text = "" + playerType;
+            //   mPlayerDeckType.text = "" + playerType;
 
-            
+
 
             // tell everybody else of this player's type
             if (!IsServer) {
@@ -255,7 +255,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.Log("player ids greater than zero for realstart");
             if (RGNetworkPlayerList.instance.localPlayerID == 0) {
                 UserInterface.Instance.SetOpponentNameAndDeckText(
-                    RGNetworkPlayerList.instance.playerNames[1], 
+                    RGNetworkPlayerList.instance.playerNames[1],
                     RGNetworkPlayerList.instance.playerTypes[1].ToString());
                 //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[1];
                 //mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[1];
@@ -268,7 +268,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     RGNetworkPlayerList.instance.playerTypes[0].ToString());
                 //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[0];
                 opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[0];
-               // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
+                // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
                 opponentType = RGNetworkPlayerList.instance.playerTypes[0];
             }
             // TODO: Probably needs rewrite when more players added
@@ -309,8 +309,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             AddMessage(sectorMsg);
         }
 
-        Debug.Log($"actual player game object: {actualPlayer.gameObject.name}");
-        Debug.Log($"opponent player game object: {opponentPlayer.gameObject.name}");
+        // Debug.Log($"actual player game object: {actualPlayer.gameObject.name}");
+        //  Debug.Log($"opponent player game object: {opponentPlayer.gameObject.name}");
 
 
 
@@ -545,7 +545,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
 
-    
+
     //// display info about the game's status on the screen
     //public void DisplayGameStatus(string message) {
     //    StatusText.text = message;
@@ -1085,8 +1085,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // now start the game again
         UserInterface.Instance.ToggleStartScreen(true);
         UserInterface.Instance.ToggleGameCanvas(false);
-       // startScreen.SetActive(true);
-       // gameCanvas.SetActive(false);
+        // startScreen.SetActive(true);
+        // gameCanvas.SetActive(false);
         endGameCanvas.SetActive(false);
 
         // set the network player ready to play again
