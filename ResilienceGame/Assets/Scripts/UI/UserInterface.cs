@@ -50,8 +50,9 @@ public class UserInterface : MonoBehaviour {
         mPhaseText.text = "Phase: " + GameManager.Instance.MGamePhase.ToString();
         mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
         mPlayerDeckType.text = "" + playerType;
+        Debug.Log($"Creating UI for {RGNetworkPlayerList.instance.localPlayerName} who is type {playerType}");
         if (playerType != PlayerTeam.Red) {
-            Destroy(meepleButtons[3].gameObject);
+            meepleButtons[3].gameObject.SetActive(false);
         }
     }
 

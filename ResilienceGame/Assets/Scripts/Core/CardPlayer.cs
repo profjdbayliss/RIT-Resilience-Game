@@ -179,7 +179,7 @@ public class CardPlayer : MonoBehaviour {
             purpleMeeples -= card.data.purpleCost;
             numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost); //incrememnt the reference variable to hold total meeples spent
             meeplesSpent += numMeeplesSpent;
-            userInterface.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+            UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
             return true;
         }
         return false;
@@ -190,21 +190,21 @@ public class CardPlayer : MonoBehaviour {
                 blackMeeples--;
                 meeplesSpent++;
                 if (blackMeeples == 0) {
-                    userInterface.DisableMeepleButtonByIndex(index);
+                    UserInterface.Instance.DisableMeepleButtonByIndex(index);
                 }
                 break;
             case 1:
                 blueMeeples--;
                 meeplesSpent++;
                 if (blueMeeples == 0) {
-                    userInterface.DisableMeepleButtonByIndex(index);
+                    UserInterface.Instance.DisableMeepleButtonByIndex(index);
                 }
                 break;
             case 2:
                 purpleMeeples--;
                 meeplesSpent++;
                 if (purpleMeeples == 0) {
-                    userInterface.DisableMeepleButtonByIndex(index);
+                    UserInterface.Instance.DisableMeepleButtonByIndex(index);
                 }
                 break;
         }
@@ -213,14 +213,14 @@ public class CardPlayer : MonoBehaviour {
             if (numMeeplesRequired == 0) {
                 UserInterface.Instance.ResolveTextAlert();
                 OnMeeplesSelected?.Invoke();
-                userInterface.DisableMeepleButtons();
+                UserInterface.Instance.DisableMeepleButtons();
             }
             else {
                 UserInterface.Instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this);
 
             }
         }
-        userInterface.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
     }
     public void AddSubtractMeepleAmount(int index, float numMeeples) {
         if (index < 0 || index >= 3) return;
@@ -230,7 +230,7 @@ public class CardPlayer : MonoBehaviour {
         if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
         if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
         if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
-        userInterface.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
     }
     public void MultiplyMeepleAmount(int index, float multiplier) {
         if (index < 0 || index >= 3) return;
@@ -247,7 +247,7 @@ public class CardPlayer : MonoBehaviour {
     public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
         this.numMeeplesRequired = numMeeplesRequired;
         UserInterface.Instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this, onAlertFinish: onFinish);
-        userInterface.EnableMeepleButtons();
+        UserInterface.Instance.EnableMeepleButtons();
         OnMeeplesSelected = onFinish;
 
     }
