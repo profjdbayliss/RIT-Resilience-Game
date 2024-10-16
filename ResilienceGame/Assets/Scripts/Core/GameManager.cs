@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Static Members
     public static GameManager instance;
     private static bool hasStartedAlready = false;
-  //  public static event Action OnRoundEnd;
+    //  public static event Action OnRoundEnd;
 
     // Debug
     public bool DEBUG_ENABLED = true;
@@ -35,7 +35,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public CardPlayer opponentPlayer;
     private bool myTurn = false;
     public int activePlayerNumber;
-
+    [SerializeField] private List<CardPlayer> playerList;
+    public Dictionary<uint, CardPlayer> playerDictionary;
 
     [Header("Sectors")]
     [SerializeField] List<Sector> activeSectors;
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // UI Elements
     [Header("UI Elements")]
+    public UserInterface userInterface;
     public GameObject gameCanvas;
     public GameObject startScreen;
     public GameObject alertScreenParent;
@@ -299,7 +301,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
 
-        
+
 
         //sector.Initialize();
 
@@ -358,24 +360,20 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
 
             reader = positiveWhiteDeckReader.GetComponent<CardReader>();
-            if(reader != null)
-            {
+            if (reader != null) {
                 positiveWhiteCards = reader.CSVRead(mCreatePosWhiteAtlas);
                 CardPlayer.AddCards(positiveWhiteCards);
             }
-            else
-            {
+            else {
                 Debug.Log("Positive white deck reader is null.");
             }
 
             reader = negativeWhiteDeckReader.GetComponent<CardReader>();
-            if(reader != null)
-            {
-                negativeWhiteCards = reader.CSVRead(mCreateNegWhiteAtlas); 
+            if (reader != null) {
+                negativeWhiteCards = reader.CSVRead(mCreateNegWhiteAtlas);
                 CardPlayer.AddCards(negativeWhiteCards);
             }
-            else
-            {
+            else {
                 Debug.Log("Negative white deck reader is null.");
             }
 
@@ -418,8 +416,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // Initialize the deck info and set various
         // player zones active
         actualPlayer.InitializeCards();
-        actualPlayer.discardDropZone.SetActive(true);
-        actualPlayer.handDropZone.SetActive(true);
+        userInterface.discardDropZone.SetActive(true);
+        userInterface.handDropZone.SetActive(true);
 
     }
 
@@ -439,9 +437,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 if (IsServer) {
                     mRGNetworkPlayerList.SendStringToClients("Test message");
                 }
-                    
+
             }
-            
+
 
 
         }
@@ -476,7 +474,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
 
-    
+
 
     #endregion
 
@@ -489,7 +487,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         else {
             mRGNetworkPlayerList.SendStringToServer(message);
         }
-        
+
     }
     public void SetSectorInView(Sector sector) {
         Debug.Log("setting sector in view to " + sector?.sectorName);
@@ -519,9 +517,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void UpdateUISizeTrackers() {
         //TODO: Add check for all red players
         deckSizeTracker.UpdateAllTrackerTexts(
-            playerDeckSize: actualPlayer.DeckIDs.Count, 
-            playerHandSize: actualPlayer.HandCards.Count, 
-            opponentDeckSize: opponentPlayer.DeckIDs.Count, 
+            playerDeckSize: actualPlayer.DeckIDs.Count,
+            playerHandSize: actualPlayer.HandCards.Count,
+            opponentDeckSize: opponentPlayer.DeckIDs.Count,
             opponentHandSize: opponentPlayer.HandCards.Count);
     }
     // WORK: there is no menu?????
@@ -543,14 +541,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Show the cards and game UI for player.
     public void ShowPlayUI() {
-        actualPlayer.handDropZone.SetActive(true);
-        actualPlayer.discardDropZone.SetActive(true);
+        userInterface.handDropZone.SetActive(true);
+        userInterface.discardDropZone.SetActive(true);
     }
 
     // Hide the cards and game UI for the player.
     public void HidePlayUI() {
-        actualPlayer.handDropZone.SetActive(false);
-        actualPlayer.discardDropZone.SetActive(false);
+        userInterface.handDropZone.SetActive(false);
+        userInterface.discardDropZone.SetActive(false);
     }
     // display info about the game's status on the screen
     public void DisplayGameStatus(string message) {
@@ -565,8 +563,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 mAlertPanel.ShowTextAlert(message, onAlertFinish);
         }
     }
-    public void DisplayCardChoiceMenu(Card card, int numRequired)
-    {
+    public void DisplayCardChoiceMenu(Card card, int numRequired) {
         mAlertPanel.AddCardToSelectionMenu(card.gameObject);
         if (numRequired < 3)
             mAlertPanel.ToggleCardSelectionPanel(true);
@@ -606,7 +603,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             return actualPlayer.ReadyState == CardPlayer.PlayerReadyState.ReadyToPlay;
         }
         return false;
-            
+
     }
     public bool IsActualPlayersTurn() {
         if (actualPlayer.playerTeam == PlayerTeam.Red) {
@@ -719,7 +716,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     if (IsActualPlayersTurn()) {
                         actualPlayer.DrawCardsToFillHand();
                         // set the discard area to work if necessary
-                        actualPlayer.discardDropZone.SetActive(true);
+                        userInterface.discardDropZone.SetActive(true);
                         MNumberDiscarded = 0;
                     }
                     DisplayGameStatus("[TEAM COLOR] has drawn " + actualPlayer.HandCards.Count + " cards each.");
@@ -782,7 +779,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     //reset player discard amounts
                     MIsDiscardAllowed = true;
                     Debug.Log($"setting discard drop active");
-                    actualPlayer.discardDropZone.SetActive(true);
+                    userInterface.discardDropZone.SetActive(true);
                     MNumberDiscarded = 0;
                     DisplayGameStatus(mPlayerName.text + " has " + actualPlayer.HandCards.Count + " cards in hand.");
                     DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
@@ -791,7 +788,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                     if (MIsDiscardAllowed) {
                         MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
-                        
+
                         if (!actualPlayer.NeedsToDiscard()) {
                             Debug.Log("Ending discard phase after finishing discarding");
                             MIsDiscardAllowed = false;
@@ -876,13 +873,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     // make sure we have a full hand
                     // actualPlayer.DrawCards();
                     // set the discard area to work if necessary
-                    actualPlayer.discardDropZone.SetActive(false);
+                    userInterface.discardDropZone.SetActive(false);
                     MIsDiscardAllowed = false;
 
                     // clear any remaining drops since we're ending the phase now (dont think this is needed anymore)
                     //actualPlayer.ClearDropState();
 
-                   // Debug.Log("ending draw and discard game phase!");
+                    // Debug.Log("ending draw and discard game phase!");
 
                     // send a message with number of discards of the player
                     Message msg;
@@ -951,7 +948,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
         while (player.HasUpdates()) {
-           // Debug.Log("Checking for updates to send to opponent");
+            // Debug.Log("Checking for updates to send to opponent");
             Message msg;
             List<int> tmpList = new List<int>(4);
             CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
@@ -976,9 +973,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
                 }
                 break;
-                //pass other updates to the card player
-                //TODO: list of all players
-            default: 
+            //pass other updates to the card player
+            //TODO: list of all players
+            default:
                 try {
                     actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
                 }
@@ -988,7 +985,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
         }
 
-        
+
     }
     #endregion
 
