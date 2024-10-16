@@ -23,6 +23,7 @@ public enum FacilityEffectType {
     Fortify,
     ModifyPoints,
     ModifyPointsPerTurn,
+    ProtectPoints,
     RemoveOne,
     RemoveAll,
     None
@@ -154,6 +155,7 @@ public class FacilityEffect {
         return typeString.ToLower() switch {
             "modp" => FacilityEffectType.ModifyPoints,
             "modppt" => FacilityEffectType.ModifyPointsPerTurn,
+            "protp" => FacilityEffectType.ProtectPoints,
             "fortify" => FacilityEffectType.Fortify,
             "backdoor" => FacilityEffectType.Backdoor,
             "removeone" => FacilityEffectType.RemoveOne,
@@ -165,6 +167,7 @@ public class FacilityEffect {
         return type switch {
             FacilityEffectType.ModifyPoints => "modp",
             FacilityEffectType.ModifyPointsPerTurn => "modppt",
+            FacilityEffectType.ProtectPoints => "protp",
             FacilityEffectType.Fortify => "fortify",
             FacilityEffectType.Backdoor => "backdoor",
             FacilityEffectType.RemoveOne => "removeone",

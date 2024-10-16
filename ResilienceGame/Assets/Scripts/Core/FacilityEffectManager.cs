@@ -86,6 +86,13 @@ public class FacilityEffectManager : MonoBehaviour {
         // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? 0 : 1); //dont give points back when removing effects
 
+        FacilityEffect protectPointsEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.ProtectPoints);
+        if (protectPointsEffect != null)
+        {
+            if (effect.Magnitude < 0 && effect.Target == protectPointsEffect.Target)
+                return;
+        }
+
         facility.ChangeFacilityPoints(effect.Target, value);
     }
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
