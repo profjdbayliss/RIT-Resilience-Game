@@ -251,58 +251,63 @@ public class GameManager : MonoBehaviour, IRGObservable {
             gameObjectCard.SetActive(true);
         }
 
-        //// set up the opponent name text
-        //if (RGNetworkPlayerList.instance.playerIDs.Count > 0) {
-        //    Debug.Log("player ids greater than zero for realstart");
-        //    if (RGNetworkPlayerList.instance.localPlayerID == 0) {
-        //        UserInterface.Instance.SetOpponentNameAndDeckText(
-        //            RGNetworkPlayerList.instance.playerNames[1],
-        //            RGNetworkPlayerList.instance.playerTypes[1].ToString());
-        //        //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[1];
-        //        //mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[1];
-        //        opponentType = RGNetworkPlayerList.instance.playerTypes[1];
-        //        opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[1];
-        //    }
-        //    else {
-        //        UserInterface.Instance.SetOpponentNameAndDeckText(
-        //            RGNetworkPlayerList.instance.playerNames[0],
-        //            RGNetworkPlayerList.instance.playerTypes[0].ToString());
-        //        //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[0];
-        //        opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[0];
-        //        // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
-        //        opponentType = RGNetworkPlayerList.instance.playerTypes[0];
-        //    }
-        //    // TODO: Probably needs rewrite when more players added
-        //    if (opponentType == PlayerTeam.Red) {
-        //        //opponentPlayer = energyPlayer;
-        //        opponentPlayer.playerTeam = PlayerTeam.Red;
-        //        opponentPlayer.DeckName = "red";
-        //    }
-        //    else {
-        //        //opponentPlayer = waterPlayer;
-        //        opponentPlayer.playerTeam = PlayerTeam.Blue;
-        //        opponentPlayer.DeckName = "blue";
-        //    }
-        //    opponentPlayer.InitializeCards();
-        //}
-        //activeSectors.ForEach(sector => {
-        //    sector.Initialize();
-        //    sector.ToggleSectorVisuals(false);
-        //});
-
-
-        var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
-        Debug.Log($"{actualPlayer.playerName}'s manager found {rgNetPlayers.Length} players in the scene");
-        RGNetworkPlayerList.instance.playerTypes.ForEach(playerType => Debug.Log($"{playerType}"));
-        for (int i = 0; i < rgNetPlayers.Length; i++) {
-            //Debug.Log($"{rgNetPlayers[i].name} - {rgNetPlayers[i].mPlayerID} - {rgNetPlayers[i].mPlayerName}");
-            var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
-            var id = rgNetPlayers[i].mPlayerID;
-            cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
-            cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
-            cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
-
+        // make sure to show all our cards
+        foreach (GameObject gameObjectCard in actualPlayer.HandCards.Values) {
+            gameObjectCard.SetActive(true);
         }
+
+        // set up the opponent name text
+        if (RGNetworkPlayerList.instance.playerIDs.Count > 0) {
+           Debug.Log("player ids greater than zero for realstart");
+           if (RGNetworkPlayerList.instance.localPlayerID == 0) {
+               UserInterface.Instance.SetOpponentNameAndDeckText(
+                   RGNetworkPlayerList.instance.playerNames[1],
+                   RGNetworkPlayerList.instance.playerTypes[1].ToString());
+               //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[1];
+               //mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[1];
+               opponentType = RGNetworkPlayerList.instance.playerTypes[1];
+               opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[1];
+           }
+           else {
+               UserInterface.Instance.SetOpponentNameAndDeckText(
+                   RGNetworkPlayerList.instance.playerNames[0],
+                   RGNetworkPlayerList.instance.playerTypes[0].ToString());
+               //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[0];
+               opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[0];
+               // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
+               opponentType = RGNetworkPlayerList.instance.playerTypes[0];
+           }
+           // TODO: Probably needs rewrite when more players added
+           if (opponentType == PlayerTeam.Red) {
+               //opponentPlayer = energyPlayer;
+               opponentPlayer.playerTeam = PlayerTeam.Red;
+               opponentPlayer.DeckName = "red";
+           }
+           else {
+               //opponentPlayer = waterPlayer;
+               opponentPlayer.playerTeam = PlayerTeam.Blue;
+               opponentPlayer.DeckName = "blue";
+           }
+           opponentPlayer.InitializeCards();
+        }
+        activeSectors.ForEach(sector => {
+           sector.Initialize();
+           sector.ToggleSectorVisuals(false);
+        });
+
+
+        // var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
+        // Debug.Log($"{actualPlayer.playerName}'s manager found {rgNetPlayers.Length} players in the scene");
+        // RGNetworkPlayerList.instance.playerTypes.ForEach(playerType => Debug.Log($"{playerType}"));
+        // for (int i = 0; i < rgNetPlayers.Length; i++) {
+        //     //Debug.Log($"{rgNetPlayers[i].name} - {rgNetPlayers[i].mPlayerID} - {rgNetPlayers[i].mPlayerName}");
+        //     var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
+        //     var id = rgNetPlayers[i].mPlayerID;
+        //     cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
+        //     cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
+        //     cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
+
+        // }
 
 
 
