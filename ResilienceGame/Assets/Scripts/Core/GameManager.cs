@@ -991,6 +991,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
                 }
                 break;
+            case CardMessageType.ChangeTurnsLeft:
+                //ChangeRoundsLeft(update.Amount);
+                break;
             //pass other updates to the card player
             //TODO: list of all players
             default:
