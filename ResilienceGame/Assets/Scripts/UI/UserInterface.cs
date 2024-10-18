@@ -82,11 +82,11 @@ public class UserInterface : MonoBehaviour {
             actualPlayer.SpendMeepleWithButton(index);
         }
     }
-    public void EnableDropZone() {
-        hoveredDropLocation.SetActive(true);
+    public void EnableDiscardDrop() {
+        discardDropZone.SetActive(true);
     }
-    public void DisableDropZone() {
-        hoveredDropLocation.SetActive(false);
+    public void DisableDiscardDrop() {
+        discardDropZone.SetActive(false);
     }
     public void EnableMeepleButtonByIndex(int index) {
         meepleButtons[index].interactable = true;

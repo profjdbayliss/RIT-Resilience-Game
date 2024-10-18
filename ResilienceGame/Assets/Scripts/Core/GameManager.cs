@@ -737,7 +737,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     if (IsActualPlayersTurn()) {
                         actualPlayer.DrawCardsToFillHand();
                         // set the discard area to work if necessary
-                        UserInterface.Instance.discardDropZone.SetActive(true);
+                        UserInterface.Instance.EnableDiscardDrop();
 
                         MNumberDiscarded = 0;
                     }
@@ -801,7 +801,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     //reset player discard amounts
                     MIsDiscardAllowed = true;
                     Debug.Log($"setting discard drop active");
-                    UserInterface.Instance.discardDropZone.SetActive(true);
+                   // UserInterface.Instance.discardDropZone.SetActive(true);
+                    UserInterface.Instance.EnableDiscardDrop();
                     MNumberDiscarded = 0;
                     UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has " + actualPlayer.HandCards.Count + " cards in hand.");
                     UserInterface.Instance.DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
@@ -895,7 +896,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     // make sure we have a full hand
                     // actualPlayer.DrawCards();
                     // set the discard area to work if necessary
-                    UserInterface.Instance.discardDropZone.SetActive(false);
+                    UserInterface.Instance.DisableDiscardDrop();
+                  //  UserInterface.Instance.discardDropZone.SetActive(false);
                     MIsDiscardAllowed = false;
 
                     // clear any remaining drops since we're ending the phase now (dont think this is needed anymore)

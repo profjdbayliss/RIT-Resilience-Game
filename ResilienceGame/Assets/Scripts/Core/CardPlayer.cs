@@ -443,7 +443,7 @@ public class CardPlayer : MonoBehaviour {
     public void AddDiscardEvent(int amount, List<Card> cardsAllowedToBeDiscard = null) {
         ReadyState = PlayerReadyState.DiscardCards;         //set the player state to discard cards
         AmountToDiscard = amount;                           //set the amount of cards to discard
-        UserInterface.Instance.EnableDropZone();                   //enable the discard drop zone
+        UserInterface.Instance.EnableDiscardDrop();                   //enable the discard drop zone
         CardsAllowedToBeDiscard = cardsAllowedToBeDiscard;  //holds the cards that are allowed to be discarded (like draw 3 discard 1 of them)
         Debug.Log($"Enabling {playerName}'s discard temporarily");
     }
@@ -452,7 +452,7 @@ public class CardPlayer : MonoBehaviour {
         ReadyState = PlayerReadyState.ReadyToPlay;
         CardsAllowedToBeDiscard?.ForEach(card => card.ToggleOutline(false));    //turn off the outline on the cards that were allowed to be discarded
         CardsAllowedToBeDiscard = null;             //dispose of the list
-        UserInterface.Instance.DisableDropZone();           //disable the discard drop zone
+        UserInterface.Instance.DisableDiscardDrop();           //disable the discard drop zone
         UserInterface.Instance.ResolveTextAlert();    //hide alert panel
         Debug.Log($"Disabling {playerName}'s discard");
     }
