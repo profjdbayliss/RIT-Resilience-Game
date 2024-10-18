@@ -1074,7 +1074,7 @@ public class CardPlayer : MonoBehaviour {
 
     #region Play Update Loop
     //original PlayCard function that is called from the update loop
-    public virtual int HandlePlayCard(GamePhase phase, CardPlayer opponentPlayer) {
+    public virtual int HandlePlayCard(GamePhase phase) {
         int playCount = 0;
         int playKey = 0;
 
@@ -1099,19 +1099,19 @@ public class CardPlayer : MonoBehaviour {
                     //check where the card was dropped based on the tag
                     switch (cardDroppedOnObject.tag) {
                         case CardDropZoneTag.DISCARD:
-                            HandleDiscardDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            HandleDiscardDrop(card, phase, ref playCount, ref playKey);
                             break;
                         case CardDropZoneTag.FACILITY:
                             if (card.target == CardTarget.Facility || card.target == CardTarget.Effect) {
-                                HandleFacilityDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                                HandleFacilityDrop(card, phase, ref playCount, ref playKey);
                             }
                             else {
-                                HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                                HandleFreePlayDrop(card, phase, ref playCount, ref playKey);
                             }
                             break;
                         case CardDropZoneTag.FREE_PLAY:
                             Debug.Log($"Handing a sectorwide drop");
-                            HandleFreePlayDrop(card, phase, opponentPlayer, ref playCount, ref playKey);
+                            HandleFreePlayDrop(card, phase, ref playCount, ref playKey);
                             break;
                         default:
                             Debug.Log("card not dropped in card drop zone");
@@ -1211,7 +1211,7 @@ public class CardPlayer : MonoBehaviour {
         return null;
     }
     //Called when a card is dropped onto the discard drop area
-    private void HandleDiscardDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+    private void HandleDiscardDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
         bool discard = false;
         switch (phase) {
             case GamePhase.DrawBlue:
@@ -1249,7 +1249,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //Called when a Facility/Effect target card is dropped in the play area
-    private void HandleFacilityDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+    private void HandleFacilityDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
 
         Facility facility = FacilityPlayedOn();
         Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
@@ -1270,7 +1270,7 @@ public class CardPlayer : MonoBehaviour {
 
                 // Start the animation
 
-                StartCoroutine(card.AnimateCardToPosition(facility.transform.position, .6f, () => card.Play(this, opponentPlayer, facility)));
+                StartCoroutine(card.AnimateCardToPosition(facility.transform.position, .6f, () => card.Play(this, null, facility)));
 
                 break;
 
@@ -1284,7 +1284,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //Called when a non-Facility/Effect target card is dropped in the play area
-    private void HandleFreePlayDrop(Card card, GamePhase phase, CardPlayer opponentPlayer, ref int playCount, ref int playKey) {
+    private void HandleFreePlayDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
         Debug.Log($"Handling non facility card - {card.front.title}");
         // Facility facility = FacilityPlayedOn(); //still need this for sector cards
         var sectorType = SectorPlayedOn();
@@ -1305,7 +1305,7 @@ public class CardPlayer : MonoBehaviour {
                 playKey = card.UniqueID;
                 //start shrink animation
                 StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f,
-                    () => card.Play(this, opponentPlayer, sector.facilities[0]))); //pass the first facility in the sector, we just use it to get the sector later
+                    () => card.Play(this, null, sector.facilities[0]))); //pass the first facility in the sector, we just use it to get the sector later
 
                 break;
 

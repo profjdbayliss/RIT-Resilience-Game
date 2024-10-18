@@ -6,6 +6,7 @@ using Yarn.Unity;
 using UnityEngine.InputSystem;
 using System.IO;
 using System;
+using System.Linq;
 
 public class GameManager : MonoBehaviour, IRGObservable {
 
@@ -33,10 +34,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
     public List<CardPlayer> networkPlayers = new List<CardPlayer>();
-    public CardPlayer opponentPlayer;
+    // public CardPlayer opponentPlayer;
     private bool myTurn = false;
     public int activePlayerNumber;
-   // [SerializeField] private List<CardPlayer> playerList;
+    // [SerializeField] private List<CardPlayer> playerList;
     public Dictionary<int, CardPlayer> playerDictionary = new Dictionary<int, CardPlayer>();
 
     [Header("Sectors")]
@@ -137,6 +138,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool playWhite = false;
     private bool playedPosWhiteCard = false;
     private bool hasWhiteCardPlayed = true; //TODO change when implementing white cards
+    private int assignedSectors = 0;
+    private int numBluePlayers = 0;
 
     public int UniqueCardIdCount = 0;
 
@@ -217,6 +220,42 @@ public class GameManager : MonoBehaviour, IRGObservable {
         mStartGameRun = true;
         Debug.Log("start game set!");
     }
+    public void AssignSectorToPlayer(int playerIndex, int sectorType) {
+        if (playerDictionary.ContainsKey(playerIndex)) {
+            assignedSectors++;
+            var player = playerDictionary[playerIndex];
+            var sector = AssignableSectors[sectorType];
+            if (sector == null) {
+                Debug.LogError($"Missing sector when assigning to player");
+                return;
+            }
+            sector.SetOwner(player);
+            player.AssignSector(sector);
+            AssignableSectors.Remove(sector);
+
+            //all sectors have been assigned
+            if (assignedSectors >= numBluePlayers) {
+                Debug.Log($"Client {actualPlayer.playerName} has finished assigning all sectors to blue players");
+                //turn off leftover sectors
+                AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+                activeSectors.RemoveAll(AssignableSectors.Contains);
+
+                //blue player look at their sector
+                if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                    SetSectorInView(actualPlayer.PlayerSector);
+                }
+                else { //red player look at the first sector for now
+                    SetSectorInView(activeSectors[0]);
+                    //temp assign in view sector to red player
+                    actualPlayer.PlayerSector = activeSectors[0];
+                }
+            }
+
+        }
+        else {
+            Debug.LogError($"Player index {playerIndex} not found in player dictionary");
+        }
+    }
 
     public void RealGameStart() {
         Debug.Log("running 2nd start of game");
@@ -256,80 +295,136 @@ public class GameManager : MonoBehaviour, IRGObservable {
             gameObjectCard.SetActive(true);
         }
 
-        // set up the opponent name text
-        if (RGNetworkPlayerList.instance.playerIDs.Count > 0) {
-           Debug.Log("player ids greater than zero for realstart");
-           if (RGNetworkPlayerList.instance.localPlayerID == 0) {
-               UserInterface.Instance.SetOpponentNameAndDeckText(
-                   RGNetworkPlayerList.instance.playerNames[1],
-                   RGNetworkPlayerList.instance.playerTypes[1].ToString());
-               //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[1];
-               //mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[1];
-               opponentType = RGNetworkPlayerList.instance.playerTypes[1];
-               opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[1];
-           }
-           else {
-               UserInterface.Instance.SetOpponentNameAndDeckText(
-                   RGNetworkPlayerList.instance.playerNames[0],
-                   RGNetworkPlayerList.instance.playerTypes[0].ToString());
-               //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[0];
-               opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[0];
-               // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
-               opponentType = RGNetworkPlayerList.instance.playerTypes[0];
-           }
-           // TODO: Probably needs rewrite when more players added
-           if (opponentType == PlayerTeam.Red) {
-               //opponentPlayer = energyPlayer;
-               opponentPlayer.playerTeam = PlayerTeam.Red;
-               opponentPlayer.DeckName = "red";
-           }
-           else {
-               //opponentPlayer = waterPlayer;
-               opponentPlayer.playerTeam = PlayerTeam.Blue;
-               opponentPlayer.DeckName = "blue";
-           }
-           opponentPlayer.InitializeCards();
-        }
+        //// set up the opponent name text
+        //if (RGNetworkPlayerList.instance.playerIDs.Count > 0) {
+        //   Debug.Log("player ids greater than zero for realstart");
+        //   if (RGNetworkPlayerList.instance.localPlayerID == 0) {
+        //       UserInterface.Instance.SetOpponentNameAndDeckText(
+        //           RGNetworkPlayerList.instance.playerNames[1],
+        //           RGNetworkPlayerList.instance.playerTypes[1].ToString());
+        //       //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[1];
+        //       //mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[1];
+        //       opponentType = RGNetworkPlayerList.instance.playerTypes[1];
+        //       opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[1];
+        //   }
+        //   else {
+        //       UserInterface.Instance.SetOpponentNameAndDeckText(
+        //           RGNetworkPlayerList.instance.playerNames[0],
+        //           RGNetworkPlayerList.instance.playerTypes[0].ToString());
+        //       //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[0];
+        //       opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[0];
+        //       // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
+        //       opponentType = RGNetworkPlayerList.instance.playerTypes[0];
+        //   }
+        //   // TODO: Probably needs rewrite when more players added
+        //   if (opponentType == PlayerTeam.Red) {
+        //       //opponentPlayer = energyPlayer;
+        //       opponentPlayer.playerTeam = PlayerTeam.Red;
+        //       opponentPlayer.DeckName = "red";
+        //   }
+        //   else {
+        //       //opponentPlayer = waterPlayer;
+        //       opponentPlayer.playerTeam = PlayerTeam.Blue;
+        //       opponentPlayer.DeckName = "blue";
+        //   }
+        //   opponentPlayer.InitializeCards();
+        //}
         activeSectors.ForEach(sector => {
-           sector.Initialize();
-           sector.ToggleSectorVisuals(false);
+            sector.Initialize();
+            sector.ToggleSectorVisuals(false);
         });
 
 
-        // var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
-        // Debug.Log($"{actualPlayer.playerName}'s manager found {rgNetPlayers.Length} players in the scene");
-        // RGNetworkPlayerList.instance.playerTypes.ForEach(playerType => Debug.Log($"{playerType}"));
-        // for (int i = 0; i < rgNetPlayers.Length; i++) {
-        //     //Debug.Log($"{rgNetPlayers[i].name} - {rgNetPlayers[i].mPlayerID} - {rgNetPlayers[i].mPlayerName}");
-        //     var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
-        //     var id = rgNetPlayers[i].mPlayerID;
-        //     cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
-        //     cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
-        //     cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
+        var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
+        Debug.Log($"{actualPlayer.playerName}'s manager found {rgNetPlayers.Length} players in the scene");
+        //RGNetworkPlayerList.instance.playerTypes.ForEach(playerType => Debug.Log($"{playerType}"));
+        for (int i = 0; i < rgNetPlayers.Length; i++) {
+            //Debug.Log($"{rgNetPlayers[i].name} - {rgNetPlayers[i].mPlayerID} - {rgNetPlayers[i].mPlayerName}");
+            var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
+            var id = rgNetPlayers[i].mPlayerID;
+            cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
+            cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
+            cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
+            cardPlayer.InitializeCards();
+            playerDictionary.Add(id, cardPlayer);
+            if (cardPlayer.playerTeam == PlayerTeam.Blue) {
+                numBluePlayers++;
+            }
+        }
 
-        // }
-
-
+        foreach (var kvp in playerDictionary) {
+            Debug.Log($"[{kvp.Key}] - {kvp.Value.playerName} - {kvp.Value.playerTeam}");
+        }
 
         if (IsServer) {
-            // Select and assign sector to both players
-            Sector sector = AssignableSectors[UnityEngine.Random.Range(0, AssignableSectors.Count)];
-            int sectorIndex = AssignableSectors.IndexOf(sector);
+            //List<CardPlayer> bluePlayers = new List<CardPlayer>(playerDictionary.Values);
+            //var redPlayers = bluePlayers.Where(player => player.playerTeam == PlayerTeam.Red).ToList();
+            //bluePlayers.RemoveAll(redPlayers.Contains);
 
-            // Assign sector ownership to the players
-            sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
-            actualPlayer.AssignSector(sector);
-            opponentPlayer.AssignSector(sector);
-            //sectorInView = sector;
+            foreach (var kvp in playerDictionary) {
+                var player = kvp.Value;
+                if (player.playerTeam == PlayerTeam.Red) continue;
 
-            // Remove the sector from the list and activate it
-            AssignableSectors.Remove(sector);
-            SetSectorInView(sector);
+                Sector sector = AssignableSectors[UnityEngine.Random.Range(0, AssignableSectors.Count)];
+                int sectorIndex = AssignableSectors.IndexOf(sector);
 
-            // Create a message to send the sector assignment to all clients
-            Message sectorMsg = new Message(CardMessageType.SectorAssignment, new List<int> { sectorIndex });
-            AddMessage(sectorMsg);
+                sector.SetOwner(player);
+                player.AssignSector(sector);
+
+                // Remove the sector from the list and activate it
+                AssignableSectors.Remove(sector);
+
+
+                // Create a message to send the sector assignment to all clients
+                //Message sectorMsg = new Message(CardMessageType.SectorAssignment, new List<int> { sectorIndex });
+                //AddMessage(sectorMsg);
+                var sectorPayload = new List<int> { kvp.Key, sectorIndex }; // player id, sector index pairs
+                var sectorMsg = new Message(CardMessageType.SectorAssignment, sectorPayload);
+                AddMessage(sectorMsg);
+
+            }
+            //turn off leftover sectors
+            AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+            activeSectors.RemoveAll(AssignableSectors.Contains);
+
+            //blue player look at their sector
+            if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                SetSectorInView(actualPlayer.PlayerSector);
+            }
+            else { //red player look at the first sector for now
+                SetSectorInView(activeSectors[0]);
+                //temp assign in view sector to red player.
+                actualPlayer.PlayerSector = activeSectors[0];
+            }
+
+
         }
+        else {
+
+        }
+
+
+
+        ////2 players
+        //if (IsServer) {
+        //    // Select and assign sector to both players
+        //    Sector sector = AssignableSectors[UnityEngine.Random.Range(0, AssignableSectors.Count)];
+        //    int sectorIndex = AssignableSectors.IndexOf(sector);
+
+        //    // Assign sector ownership to the players
+        //    sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
+        //    actualPlayer.AssignSector(sector);
+        //    opponentPlayer.AssignSector(sector);
+        //    //sectorInView = sector;
+
+        //    // Remove the sector from the list and activate it
+        //    AssignableSectors.Remove(sector);
+        //    SetSectorInView(sector);
+
+        //    // Create a message to send the sector assignment to all clients
+        //    Message sectorMsg = new Message(CardMessageType.SectorAssignment, new List<int> { sectorIndex });
+        //    AddMessage(sectorMsg);
+        //}
 
         // Debug.Log($"actual player game object: {actualPlayer.gameObject.name}");
         //  Debug.Log($"opponent player game object: {opponentPlayer.gameObject.name}");
@@ -464,8 +559,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (DEBUG_ENABLED) {
             if (Keyboard.current.f1Key.wasPressedThisFrame) {
                 Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
-                actualPlayer.LogPlayerInfo();
-                opponentPlayer.LogPlayerInfo();
+                //actualPlayer.LogPlayerInfo();
+                //opponentPlayer.LogPlayerInfo();
+                foreach (var kvp in playerDictionary) {
+                    kvp.Value.LogPlayerInfo();
+                }
             }
             if (Keyboard.current.mKey.wasPressedThisFrame) {
                 AddActionLogMessage("Test message", IsServer);
@@ -535,10 +633,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void ViewPreviousSector() {
         sectorIndex = sectorIndex - 1 > 0 ? sectorIndex - 1 : activeSectors.Count - 1;
         SetSectorInView(sectorIndex);
+        if (actualPlayer.playerTeam == PlayerTeam.Red) {
+            actualPlayer.PlayerSector = sectorInView;
+        }
     }
     public void ViewNextSector() {
         sectorIndex = sectorIndex + 1 < activeSectors.Count ? sectorIndex + 1 : 0;
         SetSectorInView(sectorIndex);
+        if (actualPlayer.playerTeam == PlayerTeam.Red) {
+            actualPlayer.PlayerSector = sectorInView;
+        }
     }
 
 
@@ -592,8 +696,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void ShowEndGameCanvas() {
         MGamePhase = GamePhase.End;
         endGameCanvas.SetActive(true);
-        endGameText.text = actualPlayer.playerName + " ends the game with score " + actualPlayer.GetScore() +
-            " and " + opponentPlayer.playerName + " ends the game with score " + opponentPlayer.GetScore();
+        //endGameText.text = actualPlayer.playerName + " ends the game with score " + actualPlayer.GetScore() +
+        //    " and " + opponentPlayer.playerName + " ends the game with score " + opponentPlayer.GetScore();
 
         //WriteListToFile(Path.Combine(Application.streamingAssetsPath, "messages.log"), messageLog);
     }
@@ -754,7 +858,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                     else {
                         if (MIsDiscardAllowed) {
-                            MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
+                            MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase);
                         }
                     }
                 }
@@ -769,13 +873,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         // do nothing - most common scenario
                     }
                     else if (actualPlayer.GetMeeplesSpent() >= actualPlayer.GetMaxMeeples()) {
-                        actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer); //still need to resolve the card played that spend the final meeples
+                        actualPlayer.HandlePlayCard(MGamePhase); //still need to resolve the card played that spend the final meeples
                         Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
                         mIsActionAllowed = false;
                         UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has spent their meeples. Please push End Phase to continue.");
                     }
                     else {
-                        actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
+                        actualPlayer.HandlePlayCard(MGamePhase);
                     }
                 }
                 else if (phaseJustChanged) {
@@ -784,9 +888,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     if (IsActualPlayersTurn()) {
                         actualPlayer.ResetMeeplesSpent();
                     }
-                    else {
-                        opponentPlayer.ResetMeeplesSpent();
-                    }
+                    //else {
+                    //    opponentPlayer.ResetMeeplesSpent();
+                    //}
                     //opponentPlayer.InformSectorOfNewTurn();
                 }
 
@@ -801,7 +905,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     //reset player discard amounts
                     MIsDiscardAllowed = true;
                     Debug.Log($"setting discard drop active");
-                   // UserInterface.Instance.discardDropZone.SetActive(true);
+                    // UserInterface.Instance.discardDropZone.SetActive(true);
                     UserInterface.Instance.EnableDiscardDrop();
                     MNumberDiscarded = 0;
                     UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has " + actualPlayer.HandCards.Count + " cards in hand.");
@@ -810,7 +914,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 else {
 
                     if (MIsDiscardAllowed) {
-                        MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase, opponentPlayer);
+                        MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase);
 
                         if (!actualPlayer.NeedsToDiscard()) {
                             Debug.Log("Ending discard phase after finishing discarding");
@@ -897,7 +1001,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     // actualPlayer.DrawCards();
                     // set the discard area to work if necessary
                     UserInterface.Instance.DisableDiscardDrop();
-                  //  UserInterface.Instance.discardDropZone.SetActive(false);
+                    //  UserInterface.Instance.discardDropZone.SetActive(false);
                     MIsDiscardAllowed = false;
 
                     // clear any remaining drops since we're ending the phase now (dont think this is needed anymore)
@@ -992,7 +1096,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             case CardMessageType.CardUpdate:
             case CardMessageType.CardUpdateWithExtraFacilityInfo:
                 if (AllSectors.TryGetValue(update.sectorPlayedOn, out Sector sector)) {
-                    sector.AddUpdateFromPlayer(update, phase, opponentPlayer); //TODO: change to reference a list of players somewhere
+                    sector.AddUpdateFromPlayer(update, phase, playerDictionary[(int)playerIndex]); 
                 }
                 else {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
@@ -1005,14 +1109,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //TODO: list of all players
             default:
                 try {
-                    actualPlayer.AddUpdateFromOpponent(update, phase, opponentPlayer);
+                    actualPlayer.AddUpdateFromOpponent(update, phase, playerDictionary[(int)playerIndex]);
                 }
                 catch (Exception e) {
                     Debug.LogError("Error in adding update from opponent: " + e.Message);
                 }
                 break;
         }
-
+    }
+    public void LogActionToAllPlayers(Update update, GamePhase phase, uint playerIndex) {
 
     }
     #endregion
@@ -1023,8 +1128,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void IncrementTurn() {
         // OnRoundEnd?.Invoke(); //inform listeners that the round ended
 
-        actualPlayer.ResetMeepleCount();
-        opponentPlayer.ResetMeepleCount();
+        //actualPlayer.ResetMeepleCount();
+        //opponentPlayer.ResetMeepleCount();
+        playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount());
         turnTotal++;
         roundsLeft--;
         numTurnsTillWhiteCard--;
@@ -1044,10 +1150,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         return roundsLeft;
     }
 
-    public void ChangeRoundsLeft(int change)
-    {
-        if (roundsLeft + change < 0)
-        {
+    public void ChangeRoundsLeft(int change) {
+        if (roundsLeft + change < 0) {
             roundsLeft = 0;
         }
         else roundsLeft += change;
@@ -1093,8 +1197,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #region Reset
 
     public void ResetForNewGame() {
-        actualPlayer.ResetForNewGame();
-        opponentPlayer.ResetForNewGame();
+        //actualPlayer.ResetForNewGame();
+        //opponentPlayer.ResetForNewGame();
+
+        playerDictionary.Values.ToList().ForEach(player => player.ResetForNewGame());
 
         // where are we in game phases?
         MGamePhase = GamePhase.Start;

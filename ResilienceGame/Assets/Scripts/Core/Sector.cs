@@ -79,7 +79,9 @@ public class Sector : MonoBehaviour {
         if (numRequired == 3) {
             foreach (Facility facility in facilities) {
                 if (facility != null) {
-                    selectedFacilities.Add(facility);
+                    if (facility.HasEffectOfType(preReqEffect)) {
+                        selectedFacilities.Add(facility);
+                    }
                 }
             }
             return 3;

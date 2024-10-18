@@ -141,8 +141,8 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
         if (player == GameManager.Instance.actualPlayer) {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
             FacilityEffectType effectTypeToRemove = FacilityEffectType.None;
-            
-            
+
+
             //List<FacilityEffect> cardEffects = FacilityEffect.CreateEffectsFromID(card.data.effectString);
 
             //var removeEffect = cardEffects.Any(effect => effect.EffectType == FacilityEffectType.Remove);
@@ -175,7 +175,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                         if (removeEffect) {
                             //finds backdoor or fortify only 1 from each facility
                             var effectsToRemove = facility.effectManager.GetEffectsRemovableByTeam(player.playerTeam, removePointsPerTurnEffects: false);
-                            effectTypeToRemove = effectsToRemove[0].EffectType; 
+                            effectTypeToRemove = effectsToRemove[0].EffectType;
                         }
                         facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
 
@@ -210,7 +210,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                         facilityType3: faciltiyType3,
                         sendUpdate: true //TODO: move the network update to the end of animation?
                     );
-                }); 
+                });
         }
     }
 
@@ -241,14 +241,11 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
     }
 }
 
-public class ReduceTurnsLeftByBackdoor : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+public class ReduceTurnsLeftByBackdoor : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         int turnsRemoved = 0;
         Sector sectorActedUpon = facilityActedUpon.sectorItsAPartOf;
-        foreach(Facility facility in sectorActedUpon.facilities)
-        {
+        foreach (Facility facility in sectorActedUpon.facilities) {
             if (facility.HasEffectOfType(FacilityEffectType.Backdoor))
                 turnsRemoved += card.data.facilityAmount;
         }
@@ -256,8 +253,7 @@ public class ReduceTurnsLeftByBackdoor : ICardAction
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
@@ -337,31 +333,31 @@ public class ReduceCardCost : ICardAction {
 /// give each sector a give number of meeples of each type
 /// </summary>
 public class NWMeepleChangeEach : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        CardPlayer playerInstance;
-        if (GameManager.Instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.Instance.actualPlayer;
-        else playerInstance = GameManager.Instance.opponentPlayer;
-        //at the moment this method doesnt actually handle multiple sectors because
-        //we dont know how to implement multiple sectors yet. that being said this doesnt 
-        //use stuff like facilityactedupon and relies directly upon the game manager singleton
-        foreach (string meepleType in card.data.meepleType) {
-            playerInstance.AddSubtractMeepleAmount(
-                meepleType switch {
-                    "Blue" => 0,
-                    "Black" => 1,
-                    "Purple" => 2,
-                    _ => -1
-                },
-            card.data.meepleAmount);
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    CardPlayer playerInstance;
+    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
+    //        playerInstance = GameManager.Instance.actualPlayer;
+    //    else playerInstance = GameManager.Instance.opponentPlayer;
+    //    //at the moment this method doesnt actually handle multiple sectors because
+    //    //we dont know how to implement multiple sectors yet. that being said this doesnt 
+    //    //use stuff like facilityactedupon and relies directly upon the game manager singleton
+    //    foreach (string meepleType in card.data.meepleType) {
+    //        playerInstance.AddSubtractMeepleAmount(
+    //            meepleType switch {
+    //                "Blue" => 0,
+    //                "Black" => 1,
+    //                "Purple" => 2,
+    //                _ => -1
+    //            },
+    //        card.data.meepleAmount);
 
-        }
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //    }
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 }
 
 /// <summary>
@@ -382,21 +378,21 @@ public class NWMeepleChangeChoice : ICardAction {
 /// Nation-wide increase overtime amount
 /// </summary>
 public class NWIncOvertimeAmount : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        CardPlayer playerInstance;
-        if (GameManager.Instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.Instance.actualPlayer;
-        else playerInstance = GameManager.Instance.opponentPlayer;
-        //at the moment this method doesnt actually handle multiple sectors because
-        //we dont know how to implement multiple sectors yet. that being said this doesnt 
-        //use stuff like facilityactedupon and relies directly upon the game manager singleton
-        playerInstance.PlayerSector.overTimeCharges++;
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    CardPlayer playerInstance;
+    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
+    //        playerInstance = GameManager.Instance.actualPlayer;
+    //    else playerInstance = GameManager.Instance.opponentPlayer;
+    //    //at the moment this method doesnt actually handle multiple sectors because
+    //    //we dont know how to implement multiple sectors yet. that being said this doesnt 
+    //    //use stuff like facilityactedupon and relies directly upon the game manager singleton
+    //    playerInstance.PlayerSector.overTimeCharges++;
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 }
 
 /// <summary>
@@ -406,88 +402,88 @@ public class NWIncOvertimeAmount : ICardAction {
 /// blue players
 /// </summary>
 public class NWShuffleFromDiscard : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        //nowhere in the csv does it indicate the number of cards that should be 
-        //shuffled from discard except the description
-        GameObject[] cardsShuffledFromDiscard = new GameObject[5];
-        CardPlayer playerInstance;
-        if (GameManager.Instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.Instance.actualPlayer;
-        else playerInstance = GameManager.Instance.opponentPlayer;
-        if (playerInstance.Discards.Count == 0) {
-            Debug.LogWarning("The discard pile is empty");
-            return;
-        }
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    //nowhere in the csv does it indicate the number of cards that should be 
+    //    //shuffled from discard except the description
+    //    GameObject[] cardsShuffledFromDiscard = new GameObject[5];
+    //    CardPlayer playerInstance;
+    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
+    //        playerInstance = GameManager.Instance.actualPlayer;
+    //    else playerInstance = GameManager.Instance.opponentPlayer;
+    //    if (playerInstance.Discards.Count == 0) {
+    //        Debug.LogWarning("The discard pile is empty");
+    //        return;
+    //    }
 
-        for (int i = 0; i < cardsShuffledFromDiscard.Length; i++) {
-            int randomIndex = UnityEngine.Random.Range(0, playerInstance.Discards.Count);
-            cardsShuffledFromDiscard[i] = playerInstance.Discards.ElementAt(randomIndex).Value;
-            int key = playerInstance.Discards.ElementAt(randomIndex).Key;
-            playerInstance.Discards.Remove(key);
-            while (playerInstance.HandCards.ContainsKey(key)) {
-                key++;
-            }
-            playerInstance.HandCards.Add(key, cardsShuffledFromDiscard[i]);
-        }
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //    for (int i = 0; i < cardsShuffledFromDiscard.Length; i++) {
+    //        int randomIndex = UnityEngine.Random.Range(0, playerInstance.Discards.Count);
+    //        cardsShuffledFromDiscard[i] = playerInstance.Discards.ElementAt(randomIndex).Value;
+    //        int key = playerInstance.Discards.ElementAt(randomIndex).Key;
+    //        playerInstance.Discards.Remove(key);
+    //        while (playerInstance.HandCards.ContainsKey(key)) {
+    //            key++;
+    //        }
+    //        playerInstance.HandCards.Add(key, cardsShuffledFromDiscard[i]);
+    //    }
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 }
 
 /// <summary>
 /// Changes physical points across all sectors if they fail a dice roll
 /// </summary>
 public class NWChangePhysPointsDice : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        CardPlayer playerInstance;
-        if (GameManager.Instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.Instance.actualPlayer;
-        else playerInstance = GameManager.Instance.opponentPlayer;
-        int diceRoll = UnityEngine.Random.Range(1, 6);
-        if (diceRoll < card.data.minDiceRoll) {
-            Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-            foreach (Facility facility in playerInstance.PlayerSector.facilities) {
-                facility.ChangeFacilityPoints(FacilityEffectTarget.Physical, card.data.facilityAmount);
-            }
-        }
-        else {
-            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-        }
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    CardPlayer playerInstance;
+    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
+    //        playerInstance = GameManager.Instance.actualPlayer;
+    //    else playerInstance = GameManager.Instance.opponentPlayer;
+    //    int diceRoll = UnityEngine.Random.Range(1, 6);
+    //    if (diceRoll < card.data.minDiceRoll) {
+    //        Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+    //        foreach (Facility facility in playerInstance.PlayerSector.facilities) {
+    //            facility.ChangeFacilityPoints(FacilityEffectTarget.Physical, card.data.facilityAmount);
+    //        }
+    //    }
+    //    else {
+    //        Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+    //    }
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 }
 
 /// <summary>
 /// Changes financial points across all sectors if they fail a dice roll
 /// </summary>
 public class NWChangeFinPointsDice : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        CardPlayer playerInstance;
-        if (GameManager.Instance.playerType == PlayerTeam.Blue)
-            playerInstance = GameManager.Instance.actualPlayer;
-        else playerInstance = GameManager.Instance.opponentPlayer;
-        int diceRoll = UnityEngine.Random.Range(1, 6);
-        if (diceRoll < card.data.minDiceRoll) {
-            Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-            foreach (Facility facility in playerInstance.PlayerSector.facilities) {
-                facility.ChangeFacilityPoints(FacilityEffectTarget.Financial, card.data.facilityAmount);
-            }
-        }
-        else {
-            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-        }
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    CardPlayer playerInstance;
+    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
+    //        playerInstance = GameManager.Instance.actualPlayer;
+    //    else playerInstance = GameManager.Instance.opponentPlayer;
+    //    int diceRoll = UnityEngine.Random.Range(1, 6);
+    //    if (diceRoll < card.data.minDiceRoll) {
+    //        Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+    //        foreach (Facility facility in playerInstance.PlayerSector.facilities) {
+    //            facility.ChangeFacilityPoints(FacilityEffectTarget.Financial, card.data.facilityAmount);
+    //        }
+    //    }
+    //    else {
+    //        Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+    //    }
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 }
 
 /// <summary>
@@ -497,50 +493,51 @@ public class NWChangeFinPointsDice : ICardAction {
 /// stuff yet to my knowledge
 /// </summary>
 public class NWChangeMeepleAmtDice : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        int diceRoll = UnityEngine.Random.Range(1, 6);
-        if (diceRoll < card.data.minDiceRoll) {
-            CardPlayer playerInstance;
-            if (GameManager.Instance.playerType == PlayerTeam.Blue)
-                playerInstance = GameManager.Instance.actualPlayer;
-            else playerInstance = GameManager.Instance.opponentPlayer;
-            Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-            if (card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
-            {
-                foreach (string meepleType in card.data.meepleType) {
-                    playerInstance.MultiplyMeepleAmount(
-                        meepleType switch {
-                            "Blue" => 0,
-                            "Black" => 1,
-                            "Purple" => 2,
-                            _ => -1
-                        },
-                        card.data.meepleAmount);
-                }
-            }
-            else {
-                foreach (string meepleType in card.data.meepleType) {
-                    playerInstance.AddSubtractMeepleAmount(
-                        meepleType switch {
-                            "Blue" => 0,
-                            "Black" => 1,
-                            "Purple" => 2,
-                            _ => -1
-                        },
-                        card.data.meepleAmount);
-                }
-            }
-        }
-        else {
-            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-        }
-        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    int diceRoll = UnityEngine.Random.Range(1, 6);
+    //    if (diceRoll < card.data.minDiceRoll) {
+    //        CardPlayer playerInstance;
+    //        if (GameManager.Instance.playerType == PlayerTeam.Blue)
+    //            playerInstance = GameManager.Instance.actualPlayer;
+    //        else playerInstance = GameManager.Instance.opponentPlayer;
+    //        Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
+    //        if (card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
+    //        {
+    //            foreach (string meepleType in card.data.meepleType) {
+    //                playerInstance.MultiplyMeepleAmount(
+    //                    meepleType switch {
+    //                        "Blue" => 0,
+    //                        "Black" => 1,
+    //                        "Purple" => 2,
+    //                        _ => -1
+    //                    },
+    //                    card.data.meepleAmount);
+    //            }
+    //        }
+    //        else {
+    //            foreach (string meepleType in card.data.meepleType) {
+    //                playerInstance.AddSubtractMeepleAmount(
+    //                    meepleType switch {
+    //                        "Blue" => 0,
+    //                        "Black" => 1,
+    //                        "Purple" => 2,
+    //                        _ => -1
+    //                    },
+    //                    card.data.meepleAmount);
+    //            }
+    //        }
+    //    }
+    //    else {
+    //        Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+    //    }
+    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
+    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    //}
 }
+    
 
 
 

@@ -50,6 +50,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     private List<bool> playerTurnTakenFlags = new List<bool>();
     public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
     public List<string> playerNames = new List<string>();
+    private Dictionary<int, NetworkConnectionToClient> playerConnections = new Dictionary<int, NetworkConnectionToClient>();
+
 
     private void Awake() {
         instance = this;
@@ -61,20 +63,21 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         manager = GameManager.Instance;// GameObject.FindObjectOfType<GameManager>();
         Debug.Log("start run on RGNetworkPlayerList.cs");
     }
-    public void AddPlayer(int id, string name, CardPlayer cardPlayer) {
+    public void AddPlayer(int id, string name, CardPlayer cardPlayer, NetworkConnectionToClient conn) {
         if (isServer) {
             Debug.Log("adding player to server : " + id);
             playerIDs.Add(id);
             playerNetworkReadyFlags.Add(true);
             playerTurnTakenFlags.Add(false);
             playerTypes.Add(PlayerTeam.Any);
+            playerConnections[id] = conn; // Store the connection
             playerNames.Add(name);
             if (id != 0) {
                 manager.networkPlayers.Add(cardPlayer);
-                manager.playerDictionary.Add(id, cardPlayer);
+               // manager.playerDictionary.Add(id, cardPlayer);
                 //TODO remove
 
-                manager.opponentPlayer = cardPlayer;
+               // manager.opponentPlayer = cardPlayer;
             }
 
         }
@@ -382,12 +385,27 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
+    //send message to specific client via net ID
+    public void SendMessageToClient(int playerId, RGNetworkLongMessage msg) {
+        if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn)) {
+            conn.Send<RGNetworkLongMessage>(msg);
+            Debug.Log($"Server sent message to player ID {playerId}");
+        }
+        else {
+            Debug.LogError($"No connection found for player ID {playerId}");
+        }
+    }
+
 
     public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
         Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
-
+        // Update the connection mapping
+        int playerId = (int)msg.playerID;
+        if (!playerConnections.ContainsKey(playerId)) {
+            playerConnections[playerId] = client;
+        }
         switch (type) {
             case CardMessageType.StartNextPhase:
                 // nobody tells server to start a turn, so this shouldn't happen
@@ -501,8 +519,9 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                                 Debug.Log("player " + playerNames[existingPlayer] + " already exists! new type is: " + playerTypes[existingPlayer]);
                             }
                         }
-                        // now start the next phase
+                        // no start game
                         manager.RealGameStart();
+
                     }
                     break;
                 case CardMessageType.LogAction: {
@@ -514,15 +533,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     break;
                 case CardMessageType.SectorAssignment: {
                         // Get the assigned sector index from the message payload
-                        int sectorIndex = GetIntFromByteArray(0, msg.payload);
+                        int element = 0;
+                        int playerIndex = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int sectorIndex = GetIntFromByteArray(element, msg.payload);
+                        manager.AssignSectorToPlayer(playerIndex, sectorIndex);
 
-                        // Find the assigned sector and set it for the client
-                        Sector assignedSector = manager.AssignableSectors[sectorIndex];
-                        //assignedSector.SetOwner(RGNetworkPlayerList.instance.localPlayerID == 0 ? manager.actualPlayer : manager.opponentPlayer);
-                        assignedSector.SetOwner(manager.actualPlayer.playerTeam == PlayerTeam.Blue ? manager.actualPlayer : manager.opponentPlayer);
-                        manager.SetSectorInView(assignedSector);
-                        manager.actualPlayer.AssignSector(assignedSector);
-                        Debug.Log("CLIENT RECEIVED sector assignment: Sector " + assignedSector.sectorName);
+
+
+                        Debug.Log("CLIENT RECEIVED sector assignment: Sector " + sectorIndex);
                     }
                     break;
 
@@ -771,7 +790,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         Debug.Log("SERVER RECEIVED LONG MESSAGE::: " + msg.playerID + " " + msg.type);
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
-
+        // Update the connection mapping
+        int playerId = (int)msg.playerID;
+        if (!playerConnections.ContainsKey(playerId)) {
+            playerConnections[playerId] = client;
+        }
         if (msg.playerID != localPlayerID) {
             switch (type) {
                 case CardMessageType.SharePlayerType: {

@@ -197,7 +197,9 @@ public class Facility : MonoBehaviour {
     }
 
     public bool HasEffectOfType(FacilityEffectType type) {
-        return effectManager.HasEffectOfType(type);
+        var hasEffect = effectManager.HasEffectOfType(type);
+        Debug.Log($"Checking if facility {facilityName} has effect of type {type} : {hasEffect}");
+        return hasEffect;
     }
 
     public void SetupFacilityPoints(int physical, int finacial, int network) {

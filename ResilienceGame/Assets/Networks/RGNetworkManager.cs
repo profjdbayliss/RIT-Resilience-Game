@@ -40,7 +40,7 @@ public class RGNetworkManager : NetworkManager
         var cardPlayer = player.cardPlayerInstance;
         
         // Add to network player list
-        RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer);
+        RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
 
 
         // Instantiate CardPlayer for each player
