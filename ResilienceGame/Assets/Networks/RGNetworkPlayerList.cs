@@ -378,10 +378,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 count = (uint)msg.byteArguments.Count,
                 payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
             };
-
-            // Send to all clients
             NetworkClient.Send(netMsg);
-            Debug.Log("SERVER SENT string message: " + stringMsg);
+            Debug.Log("CLIENT SENT string message: " + stringMsg);
         }
     }
 
@@ -846,7 +844,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("SERVER RECEIVED string message: " + receivedString);
                         manager.AddActionLogMessage(receivedString, true); //log the action locally
                         //send it to the clients
-                        SendStringToClients(receivedString);
+                        //SendStringToClients(receivedString);
                     }
                     break;
                 case CardMessageType.DrawCard: {

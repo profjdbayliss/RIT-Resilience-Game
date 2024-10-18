@@ -113,6 +113,7 @@ public class UserInterface : MonoBehaviour {
     public void AddActionLogMessage(string message, bool fromNet, bool IsServer, ref List<string> messageLog) {
         if (fromNet || IsServer) {
             Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
+            Debug.Log($"Created log message: {message}");   
             messageLog.Add(message);
             if (IsServer) {
                 RGNetworkPlayerList.instance.SendStringToClients(message);

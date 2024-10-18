@@ -565,13 +565,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     kvp.Value.LogPlayerInfo();
                 }
             }
-            if (Keyboard.current.mKey.wasPressedThisFrame) {
-                AddActionLogMessage("Test message", IsServer);
-                if (IsServer) {
-                    mRGNetworkPlayerList.SendStringToClients("Test message");
-                }
-
-            }
+            
 
 
 
@@ -782,6 +776,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         if (MGamePhase == GamePhase.Start) {
             ProgressPhase();
+            actualPlayer.DrawCardsToFillHand();
         }
         else {
             if (!myTurn) {
@@ -819,6 +814,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (!MGamePhase.Equals(mPreviousGamePhase)) {
             phaseJustChanged = true;
             UserInterface.Instance.SetPhaseText(MGamePhase.ToString());
+            actualPlayer.ReadyState = CardPlayer.PlayerReadyState.ReadyToPlay;
             //mPhaseText.text = MGamePhase.ToString();
             mPreviousGamePhase = phase;
             //SkipTutorial();
@@ -992,6 +988,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Ends the phase.
     public void EndPhase() {
         UserInterface.Instance.ResolveTextAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
+
         switch (MGamePhase) {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
@@ -1039,6 +1036,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             UserInterface.Instance.ToggleEndPhaseButton(false);
             AddMessage(new Message(CardMessageType.EndPhase));
             myTurn = false;
+            actualPlayer.ReadyState = CardPlayer.PlayerReadyState.EndedPhase;
         }
     }
     #endregion

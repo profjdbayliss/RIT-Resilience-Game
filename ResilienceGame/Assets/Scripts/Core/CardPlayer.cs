@@ -83,7 +83,7 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Card Collections")]
     public static Dictionary<int, Card> cards = new Dictionary<int, Card>();
-  //  public List<int> FacilityIDs = new List<int>(10);
+    //  public List<int> FacilityIDs = new List<int>(10);
     public List<int> DeckIDs = new List<int>(52);
     public Dictionary<int, GameObject> HandCards = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> Discards = new Dictionary<int, GameObject>();
@@ -100,7 +100,7 @@ public class CardPlayer : MonoBehaviour {
     //public GameObject discardDropZone;
     //public GameObject handDropZone;
     //public GameObject opponentDropZone;
-   // public UserInterface userInterface;
+    // public UserInterface userInterface;
     //  public GameObject cardStackingCanvas;
 
     [Header("Card Positioning")]
@@ -140,7 +140,7 @@ public class CardPlayer : MonoBehaviour {
     private float[] maxMeeples = { 2, 2, 2 };
 
     //public TextMeshProUGUI[] meeplesAmountText;
-   // [SerializeField] private Button[] meepleButtons;
+    // [SerializeField] private Button[] meepleButtons;
     //[SerializeField] private Image[] meepleImages;
     private Action OnMeeplesSelected;
 
@@ -162,7 +162,8 @@ public class CardPlayer : MonoBehaviour {
         DiscardCards,
         SelectFacilties,
         SelectMeeplesWithUI,
-        SelectCardsForCostChange
+        SelectCardsForCostChange,
+        EndedPhase
     }
     #endregion
 
@@ -340,7 +341,7 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log($"Player {playerName} of team {playerTeam} registering facilities");
         foreach (Facility facility in PlayerSector.facilities) {
             ActiveFacilities.Add((int)facility.facilityType, facility.gameObject);
-           // FacilityIDs.Add((int)facility.facilityType);
+            // FacilityIDs.Add((int)facility.facilityType);
         }
     }
     public static void AddCards(List<Card> cardList) {
@@ -828,7 +829,7 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Debug
-    
+
     void HandleDebugInput() {
         //force add backdoor or fortify to hovered facility
         if (GameManager.Instance.actualPlayer == this) {
@@ -872,7 +873,7 @@ public class CardPlayer : MonoBehaviour {
             }
         }
         if (Keyboard.current.tabKey.wasPressedThisFrame) {
-            maxMeeples = new float[]{ 99, 99 ,99 };
+            maxMeeples = new float[] { 99, 99, 99 };
             blueMeeples = 99;
             blackMeeples = 99;
             purpleMeeples = 99;
@@ -1329,10 +1330,12 @@ public class CardPlayer : MonoBehaviour {
     private bool ValidateCardPlay(Card card) {
         string response = "";
         bool canPlay = false;
+
         if (AmountToReturnToDeck > 0) {
             Debug.Log($"Returning {card.front.title} to deck");
             return true;
         }
+
         switch (GameManager.Instance.MGamePhase) {
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
@@ -1351,8 +1354,8 @@ public class CardPlayer : MonoBehaviour {
                 (response, canPlay) = ValidateDiscardPlay(card);
                 break;
         }
-        Debug.Log($"Playing {card.front.title} on {UserInterface.Instance.hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}");
-        Debug.Log(response);
+
+        Debug.Log($"Playing {card.front.title} on {UserInterface.Instance.hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}\n{response}");
 
         return canPlay;
     }
@@ -1362,60 +1365,62 @@ public class CardPlayer : MonoBehaviour {
         }
         return ("Must discard on the discard drop zone", false);
     }
-    private (string, bool) ValidateActionPlay(Card card) {
-        Debug.Log("Checking if card can be played in action phase");
-        if (!GameManager.Instance.IsActualPlayersTurn())
-            return ($"It is not {playerTeam}'s turn", false);
-        if (ReadyState == PlayerReadyState.SelectFacilties) {
-            return ($"Player must select facilities before playing cards", false);
+    private (string, bool) ValidateDiscardDuringActionPlay(Card card) {
+        if (!GameManager.Instance.MIsDiscardAllowed)
+            return ("Game manager says discard is not allowed", false);
+        if (UserInterface.Instance.hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
+            if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
+                return ("Discard any card allowed", true);
+            if (CardsAllowedToBeDiscard.Contains(card)) //only highlighted cards can be discarded
+                return ("Allowing discard of valid card", true);
+            return ("Must discard one of the highlighted cards", false); //highlighted cards must be discarded
         }
-        //handle player having to discard cards during action phase
-        //quitting out of the function early with true here is fine since these cards arent actually getting played/meeples spent
-        else if (ReadyState == PlayerReadyState.DiscardCards && GameManager.Instance.MIsDiscardAllowed) {
-            if (UserInterface.Instance.hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
-                if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
-                    return ("Discard any card allowed", true);
-                if (CardsAllowedToBeDiscard.Contains(card)) //only highlighted cards can be discarded
-                    return ("Allowing discard of valid card", true);
-                return ("Must discard one of the highlighted cards", false); //highlighted cards must be discarded
-            }
-            return ("Must discard cards first", false); //didn't drop on the discard drop zone
-        }
-        else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
-            //im not sure what i should check for just yet so j gonna return true
-            return ("Valid card selection", true);
-        }
-        else {
-            //check prereq effects on cards for effect cards played on single facilities
-            if (card.data.preReqEffectType != FacilityEffectType.None) {
+        return ("Must discard cards first", false); //didn't drop on the discard drop zone
+    }
+    private (string, bool) ValidateActionAndReadyPlay(Card card) {
+        //check prereq effects on cards for effect cards played on single facilities
+        if (card.data.preReqEffectType != FacilityEffectType.None) {
 
-                Facility facility = UserInterface.Instance.hoveredDropLocation.GetComponent<Facility>();
-                if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
-                    return ("Facility effect does not match card prereq effect", false);
-                }
+            Facility facility = UserInterface.Instance.hoveredDropLocation.GetComponent<Facility>();
+            if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
+                return ("Facility effect does not match card prereq effect", false);
             }
-            //check for 'Remove' effect for sector cards
-            if (card.data.effectString == "Remove") {
-                Sector sector = null;
-                if (UserInterface.Instance.hoveredDropLocation.TryGetComponent(out Facility facility)) {
-                    sector = facility.sectorItsAPartOf;
-                }
-                else {
-                    sector = UserInterface.Instance.hoveredDropLocation.GetComponentInParent<Sector>();
-                }
-                if (sector == null) {
-                    Debug.LogError($"Sector should be found here");
-                    return ("Sector card must be played on a sector", false);
-                }
-                if (!sector.HasRemovableEffectsOnFacilities(GetOpponentTeam())) {
-                    return ("Sector does not have removable effects", false);
-                }
+        }
+        //check for 'Remove' effect for sector cards
+        if (card.data.effectString == "Remove") {
+            Sector sector = null;
+            if (UserInterface.Instance.hoveredDropLocation.TryGetComponent(out Facility facility)) {
+                sector = facility.sectorItsAPartOf;
             }
-            if (!TrySpendMeeples(card, ref mMeeplesSpent)) {
-                return ("Not enough meeples to play card", false);
+            else {
+                sector = UserInterface.Instance.hoveredDropLocation.GetComponentInParent<Sector>();
             }
+            if (sector == null) {
+                Debug.LogError($"Sector should be found here");
+                return ("Sector card must be played on a sector", false);
+            }
+            if (!sector.HasRemovableEffectsOnFacilities(GetOpponentTeam())) {
+                return ("Sector does not have removable effects", false);
+            }
+        }
+        if (!TrySpendMeeples(card, ref mMeeplesSpent)) {
+            return ("Not enough meeples to play card", false);
         }
         return ("Valid action play", true);
+    }
+    private (string, bool) ValidateActionPlay(Card card) {
+        Debug.Log("Checking if card can be played in action phase");
+        if (!GameManager.Instance.IsActualPlayersTurn())    //make sure its the player's turn
+            return ($"It is not {playerTeam}'s turn", false);
+
+        return ReadyState switch {
+            PlayerReadyState.SelectFacilties => ($"Player must select facilities before playing cards", false),
+            PlayerReadyState.DiscardCards => ValidateDiscardDuringActionPlay(card),
+            PlayerReadyState.SelectCardsForCostChange => ("Valid card selection", true),
+            PlayerReadyState.EndedPhase => ("Cannot play cards after phase has ended", false),
+            PlayerReadyState.ReadyToPlay => ValidateActionAndReadyPlay(card),
+            _ => ("Invalid state", false),
+        };
     }
 
     private (string, bool) CanDiscardCard(Card card) {
@@ -1906,7 +1911,7 @@ public class CardPlayer : MonoBehaviour {
             Destroy(gameObject);
         }
 
-       // FacilityIDs.Clear();
+        // FacilityIDs.Clear();
         DeckIDs.Clear();
         HandCards.Clear();
         Discards.Clear();
