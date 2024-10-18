@@ -17,7 +17,8 @@ public class Sector : MonoBehaviour {
     public SectorType sectorName; // TODO: Move PlayerSector here
     public CardPlayer Owner { get; private set; }
     [SerializeField] private TextMeshProUGUI sectorOwnerText;
-    [SerializeField] private GameObject sectorCanvas;
+    [SerializeField] private Canvas sectorCanvas;
+    [SerializeField] private BoxCollider2D[] facilityColliders;
     public bool isCore; // Indicates if this is the core sector
     public HashSet<Facility> selectedFacilities;
     public Facility[] facilities;
@@ -79,7 +80,7 @@ public class Sector : MonoBehaviour {
         if (numRequired == 3) {
             foreach (Facility facility in facilities) {
                 if (facility != null) {
-                    if (facility.HasEffectOfType(preReqEffect)) {
+                    if (facility.HasEffectOfType(preReqEffect) || preReqEffect == FacilityEffectType.None) {
                         selectedFacilities.Add(facility);
                     }
                 }
@@ -364,7 +365,10 @@ public class Sector : MonoBehaviour {
 
     #region Interface
     public void ToggleSectorVisuals(bool enable) {
-        sectorCanvas.SetActive(enable);
+        sectorCanvas.enabled = enable;
+        foreach (BoxCollider2D collider in facilityColliders) {
+            collider.enabled = enable;
+        }
     }
 
 
