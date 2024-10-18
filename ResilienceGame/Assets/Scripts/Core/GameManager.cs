@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.Log("running start of game");
 
             AssignableSectors = new List<Sector>(activeSectors);
-            activeSectors.ForEach(sector => AllSectors.Add(sector.sectorName, sector)); //store for O(1) access
+            activeSectors.ForEach(sector => AllSectors.Add(sector.sectorName, sector)); 
 
             // basic init of player
             SetPlayerType();
@@ -612,7 +612,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Interface Updates
-    public void AddActionLogMessage(string message, bool fromNet) {
+    public void AddActionLogMessage(string message, bool fromNet = false) {
         UserInterface.Instance.AddActionLogMessage(message, fromNet, IsServer, ref messageLog);
     }
     public void SetSectorInView(Sector sector) {
@@ -1116,9 +1116,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
         }
-    }
-    public void LogActionToAllPlayers(Update update, GamePhase phase, uint playerIndex) {
-
     }
     #endregion
 

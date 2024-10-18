@@ -114,6 +114,9 @@ public class UserInterface : MonoBehaviour {
         if (fromNet || IsServer) {
             Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
             messageLog.Add(message);
+            if (IsServer) {
+                RGNetworkPlayerList.instance.SendStringToClients(message);
+            }
         }
         else {
             RGNetworkPlayerList.instance.SendStringToServer(message);

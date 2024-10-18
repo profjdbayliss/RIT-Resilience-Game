@@ -1223,6 +1223,7 @@ public class CardPlayer : MonoBehaviour {
                 card.SetCardState(CardState.CardNeedsToBeDiscarded);
                 playCount = 1;
                 discard = true;
+
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
@@ -1245,7 +1246,7 @@ public class CardPlayer : MonoBehaviour {
             EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
             card.gameObject.SetActive(false);
             UserInterface.Instance.UpdateUISizeTrackers();
-
+            //GameManager.Instance.AddActionLogMessage($"{playerName} discarded {card.data.name}");
         }
     }
     //Called when a Facility/Effect target card is dropped in the play area
@@ -1266,7 +1267,8 @@ public class CardPlayer : MonoBehaviour {
                 // card.Play(this, opponentPlayer, facility);
                 playCount = 1;
                 playKey = card.UniqueID;
-
+                //log the play
+                GameManager.Instance.AddActionLogMessage($"{playerName} played {card.front.title} on {facility.facilityName} in sector {facility.sectorItsAPartOf.sectorName}");
 
                 // Start the animation
 
@@ -1303,6 +1305,9 @@ public class CardPlayer : MonoBehaviour {
                 EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID, sectorType: sectorType);
                 playCount = 1;
                 playKey = card.UniqueID;
+
+                GameManager.Instance.AddActionLogMessage($"{playerName} played {card.front.title} on sector {sector.sectorName}");
+
                 //start shrink animation
                 StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f,
                     () => card.Play(this, null, sector.facilities[0]))); //pass the first facility in the sector, we just use it to get the sector later
