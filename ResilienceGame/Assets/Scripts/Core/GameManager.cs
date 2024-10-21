@@ -295,41 +295,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         foreach (GameObject gameObjectCard in actualPlayer.HandCards.Values) {
             gameObjectCard.SetActive(true);
         }
-
-        //// set up the opponent name text
-        //if (RGNetworkPlayerList.instance.playerIDs.Count > 0) {
-        //   Debug.Log("player ids greater than zero for realstart");
-        //   if (RGNetworkPlayerList.instance.localPlayerID == 0) {
-        //       UserInterface.Instance.SetOpponentNameAndDeckText(
-        //           RGNetworkPlayerList.instance.playerNames[1],
-        //           RGNetworkPlayerList.instance.playerTypes[1].ToString());
-        //       //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[1];
-        //       //mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[1];
-        //       opponentType = RGNetworkPlayerList.instance.playerTypes[1];
-        //       opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[1];
-        //   }
-        //   else {
-        //       UserInterface.Instance.SetOpponentNameAndDeckText(
-        //           RGNetworkPlayerList.instance.playerNames[0],
-        //           RGNetworkPlayerList.instance.playerTypes[0].ToString());
-        //       //mOpponentName.text = RGNetworkPlayerList.instance.playerNames[0];
-        //       opponentPlayer.playerName = RGNetworkPlayerList.instance.playerNames[0];
-        //       // mOpponentDeckType.text = "" + RGNetworkPlayerList.instance.playerTypes[0];
-        //       opponentType = RGNetworkPlayerList.instance.playerTypes[0];
-        //   }
-        //   // TODO: Probably needs rewrite when more players added
-        //   if (opponentType == PlayerTeam.Red) {
-        //       //opponentPlayer = energyPlayer;
-        //       opponentPlayer.playerTeam = PlayerTeam.Red;
-        //       opponentPlayer.DeckName = "red";
-        //   }
-        //   else {
-        //       //opponentPlayer = waterPlayer;
-        //       opponentPlayer.playerTeam = PlayerTeam.Blue;
-        //       opponentPlayer.DeckName = "blue";
-        //   }
-        //   opponentPlayer.InitializeCards();
-        //}
         activeSectors.ForEach(sector => {
             sector.Initialize();
             sector.ToggleSectorVisuals(false);
@@ -337,10 +302,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
         var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
-        Debug.Log($"{actualPlayer.playerName}'s manager found {rgNetPlayers.Length} players in the scene");
-        //RGNetworkPlayerList.instance.playerTypes.ForEach(playerType => Debug.Log($"{playerType}"));
+
+        //create and populate the players using the network player list
         for (int i = 0; i < rgNetPlayers.Length; i++) {
-            //Debug.Log($"{rgNetPlayers[i].name} - {rgNetPlayers[i].mPlayerID} - {rgNetPlayers[i].mPlayerName}");
             var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
             var id = rgNetPlayers[i].mPlayerID;
             cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
@@ -353,20 +317,37 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
 
-        foreach (var kvp in playerDictionary) {
-            Debug.Log($"[{kvp.Key}] - {kvp.Value.playerName} - {kvp.Value.playerTeam}");
-        }
+        //foreach (var kvp in playerDictionary) {
+        //    Debug.Log($"[{kvp.Key}] - {kvp.Value.playerName} - {kvp.Value.playerTeam}");
+        //}
+        
 
+
+
+        //assign sectors to all players
         if (IsServer) {
-            //List<CardPlayer> bluePlayers = new List<CardPlayer>(playerDictionary.Values);
-            //var redPlayers = bluePlayers.Where(player => player.playerTeam == PlayerTeam.Red).ToList();
-            //bluePlayers.RemoveAll(redPlayers.Contains);
 
+            var sectorList = new List<Sector>();
+            var coreSectors = activeSectors.Where(sector => sector.isCore).ToList();
+            var nonCoreSectors = activeSectors.Where(sector => !sector.isCore).ToList();
+            var bluePlayers = playerDictionary.Where(kvp => kvp.Value.playerTeam == PlayerTeam.Blue).ToList();
+            for (int i = 0; i < bluePlayers.Count; i++) {
+                Sector sectorToAssign;
+                if (i % 4 == 0) {
+                    sectorToAssign = coreSectors[UnityEngine.Random.Range(0, coreSectors.Count)];
+                }
+                else {
+                    sectorToAssign = nonCoreSectors[UnityEngine.Random.Range(0, nonCoreSectors.Count)];
+                }
+                sectorList.Add(sectorToAssign);
+            }
+            Debug.Log($"number of sectors to assign: {sectorList.Count}");
+            int numAssigned = 0;
             foreach (var kvp in playerDictionary) {
                 var player = kvp.Value;
                 if (player.playerTeam == PlayerTeam.Red) continue;
 
-                Sector sector = AssignableSectors[UnityEngine.Random.Range(0, AssignableSectors.Count)];
+                Sector sector = sectorList[numAssigned++];
                 int sectorIndex = AssignableSectors.IndexOf(sector);
 
                 sector.SetOwner(player);
@@ -375,10 +356,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // Remove the sector from the list and activate it
                 AssignableSectors.Remove(sector);
 
-
-                // Create a message to send the sector assignment to all clients
-                //Message sectorMsg = new Message(CardMessageType.SectorAssignment, new List<int> { sectorIndex });
-                //AddMessage(sectorMsg);
                 var sectorPayload = new List<int> { kvp.Key, sectorIndex }; // player id, sector index pairs
                 var sectorMsg = new Message(CardMessageType.SectorAssignment, sectorPayload);
                 AddMessage(sectorMsg);
@@ -387,6 +364,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //turn off leftover sectors
             AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
             activeSectors.RemoveAll(AssignableSectors.Contains);
+            
 
             //blue player look at their sector
             if (actualPlayer.playerTeam == PlayerTeam.Blue) {
@@ -400,39 +378,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
         }
-        else {
-
-        }
-
-
-
-        ////2 players
-        //if (IsServer) {
-        //    // Select and assign sector to both players
-        //    Sector sector = AssignableSectors[UnityEngine.Random.Range(0, AssignableSectors.Count)];
-        //    int sectorIndex = AssignableSectors.IndexOf(sector);
-
-        //    // Assign sector ownership to the players
-        //    sector.SetOwner(actualPlayer.playerTeam == PlayerTeam.Blue ? actualPlayer : opponentPlayer);
-        //    actualPlayer.AssignSector(sector);
-        //    opponentPlayer.AssignSector(sector);
-        //    //sectorInView = sector;
-
-        //    // Remove the sector from the list and activate it
-        //    AssignableSectors.Remove(sector);
-        //    SetSectorInView(sector);
-
-        //    // Create a message to send the sector assignment to all clients
-        //    Message sectorMsg = new Message(CardMessageType.SectorAssignment, new List<int> { sectorIndex });
-        //    AddMessage(sectorMsg);
-        //}
-
-        // Debug.Log($"actual player game object: {actualPlayer.gameObject.name}");
-        //  Debug.Log($"opponent player game object: {opponentPlayer.gameObject.name}");
-
-
-
-        //sector.Initialize();
 
         // in this game people go in parallel to each other
         // per phase
