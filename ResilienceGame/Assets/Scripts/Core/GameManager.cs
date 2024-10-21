@@ -622,21 +622,25 @@ public class GameManager : MonoBehaviour, IRGObservable {
             sectorInView = activeSectors[index];
             sectorInView.ToggleSectorVisuals(true);
             sectorIndex = index;
+            if (actualPlayer.playerTeam == PlayerTeam.Red) {
+                actualPlayer.PlayerSector = sectorInView;
+            }
+            else{
+                //change color based on if you are the owner
+                UserInterface.Instance.SetInfoBackground(sectorInView == actualPlayer.PlayerSector ? 1 : 2);
+            }
         }
     }
     public void ViewPreviousSector() {
-        sectorIndex = sectorIndex - 1 > 0 ? sectorIndex - 1 : activeSectors.Count - 1;
+        sectorIndex = sectorIndex - 1 >= 0 ? sectorIndex - 1 : activeSectors.Count - 1;
         SetSectorInView(sectorIndex);
-        if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            actualPlayer.PlayerSector = sectorInView;
-        }
+        
     }
+
     public void ViewNextSector() {
         sectorIndex = sectorIndex + 1 < activeSectors.Count ? sectorIndex + 1 : 0;
         SetSectorInView(sectorIndex);
-        if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            actualPlayer.PlayerSector = sectorInView;
-        }
+        
     }
 
 

@@ -9681,8 +9681,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 16777215
+  m_fontColor: {r: 1, g: 1, b: 1, a: 0}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -11042,8 +11042,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 16777215
+  m_fontColor: {r: 1, g: 1, b: 1, a: 0}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -23428,7 +23428,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.00005722046}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1603293178
@@ -27925,8 +27925,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 16777215
+  m_fontColor: {r: 1, g: 1, b: 1, a: 0}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -29509,6 +29509,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actualPlayer: {fileID: 1125198114}
   opponentPlayer: {fileID: 680164116}
+  infoBackgrounds:
+  - {fileID: 21300000, guid: dc8d850cee978d945983f9f3ddd87c1a, type: 3}
+  - {fileID: 21300000, guid: 55d6daf4d8f40e34785ba4771c71dbe9, type: 3}
+  - {fileID: 21300000, guid: 890180dd6e44a5e438b2cadaf68add39, type: 3}
   gameCanvas: {fileID: 1994761815}
   startScreen: {fileID: 1214050761}
   alertScreenParent: {fileID: 1349611814}
@@ -29543,7 +29547,8 @@ MonoBehaviour:
   - {fileID: 373914472}
   gameLogMessagePrefab: {fileID: 3437537833877610067, guid: 6aaa75fb7ea4f5e479f6994b95d04656, type: 3}
   gameLogParent: {fileID: 1603293177}
-  hoveredDropLocation: {fileID: 0}
+  infoBg: {fileID: 1435450569}
+  hoveredDropLocation: {fileID: 348541168}
 --- !u!1 &2034736619
 GameObject:
   m_ObjectHideFlags: 0

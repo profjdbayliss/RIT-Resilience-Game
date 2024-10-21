@@ -11,7 +11,8 @@ public class UserInterface : MonoBehaviour {
     public CardPlayer opponentPlayer; //TODO: remove this and replace with a list of players
 
     public static UserInterface Instance;
-
+    [SerializeField]
+    private Sprite[] infoBackgrounds;
 
     [Header("UI Elements")]
     public Canvas gameCanvas;
@@ -40,6 +41,8 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Button[] meepleButtons;
     [SerializeField] private GameObject gameLogMessagePrefab;
     [SerializeField] private Transform gameLogParent;
+    [SerializeField] private Image infoBg;
+
 
     [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
@@ -169,6 +172,10 @@ public class UserInterface : MonoBehaviour {
     }
     public void SetTurnText(string text) {
         mTurnText.text = text;
+    }
+    public void SetInfoBackground(int index) {
+        if (index >= 0 && index < infoBackgrounds.Length)
+            infoBg.sprite = infoBackgrounds[index];
     }
 
 }
