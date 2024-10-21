@@ -1305,8 +1305,8 @@ public class CardPlayer : MonoBehaviour {
 
                 EnqueueCardMessageUpdate(
                     CardMessageType.CardUpdate,
-                    card.data.cardID, 
-                    card.UniqueID, 
+                    card.data.cardID,
+                    card.UniqueID,
                     sectorType: sectorType,
                     sendUpdateImmediately: card.ActionList.First() is ReduceTurnsLeftByBackdoor);
                 playCount = 1;
@@ -1420,6 +1420,23 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.Instance.IsActualPlayersTurn())    //make sure its the player's turn
             return ($"It is not {playerTeam}'s turn", false);
+
+        //dont allow playing on allied sectors outside of doom clock and DC effect cards
+        if (UserInterface.Instance.hoveredDropLocation.TryGetComponent(out Facility facility)) {
+            var sector = facility.sectorItsAPartOf;
+            if (sector.sectorName != PlayerSector.sectorName) {
+                if (!GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
+                    return ("Cannot play on allied sectors outside of doomclock", false);
+                }
+                else if (GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
+                    if (!card.data.hasDoomEffect) {
+                        return ($"Cannot play {card.data.name} on allied sectors", false);
+                    }
+                }
+                
+            }
+            
+        }
 
         return ReadyState switch {
             PlayerReadyState.SelectFacilties => ($"Player must select facilities before playing cards", false),

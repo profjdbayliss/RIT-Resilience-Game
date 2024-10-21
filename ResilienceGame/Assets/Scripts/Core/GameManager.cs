@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private int mNumberDefense = 0;
     public bool MIsDiscardAllowed { get; private set; } = false;
     private bool mIsActionAllowed = false;
-    private bool isDoomClockActive = false;
+    public bool IsDoomClockActive { get; set; } = false;
 
 
     // UI Elements
@@ -795,12 +795,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public GamePhase GetNextPhase() {
         return MGamePhase switch {
             GamePhase.Start => GamePhase.DrawRed,
-            GamePhase.DrawRed => isDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
+            GamePhase.DrawRed => IsDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
             GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
             GamePhase.DiscardRed => playWhite ? GamePhase.DrawBlue : GamePhase.PlayWhite,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
-            GamePhase.DrawBlue => isDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
+            GamePhase.DrawBlue => IsDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
             GamePhase.BonusBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
             GamePhase.DiscardBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
