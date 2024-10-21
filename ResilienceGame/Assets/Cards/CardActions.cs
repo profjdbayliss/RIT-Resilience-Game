@@ -258,6 +258,19 @@ public class ReduceTurnsLeftByBackdoor : ICardAction {
     }
 }
 
+public class TemporaryReductionOfTurnsLeft : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
 public class ChangeMeepleAmount : ICardAction {
     //deprecated?
     //this action existed for like 3 cards all of which actually did different things
