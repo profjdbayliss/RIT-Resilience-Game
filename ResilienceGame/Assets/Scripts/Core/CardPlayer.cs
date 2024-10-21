@@ -1382,6 +1382,9 @@ public class CardPlayer : MonoBehaviour {
         if (card.data.preReqEffectType != FacilityEffectType.None) {
 
             Facility facility = UserInterface.Instance.hoveredDropLocation.GetComponent<Facility>();
+            if (facility == null) {
+                return ("Facility not found on hovered drop location", false);
+            }
             if (!facility.HasEffectOfType(card.data.preReqEffectType)) {
                 return ("Facility effect does not match card prereq effect", false);
             }

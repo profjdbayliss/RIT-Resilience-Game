@@ -911,7 +911,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId
                         };
                         Debug.Log("server received ReturnCardToHand message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + " for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -937,7 +937,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             FacilityPlayedOnType = (FacilityType)facilityType
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -973,7 +973,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
                         };
                         Debug.Log("server received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -994,7 +994,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Amount = amount,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1019,7 +1019,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             //EffectTarget = (FacilityEffectType)effect,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1038,7 +1038,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1061,7 +1061,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing player to share with : " + playerToShareWith +
                             " and meeple color " + meepleColor + "for game phase " + gamePhase);
-
+                        NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
