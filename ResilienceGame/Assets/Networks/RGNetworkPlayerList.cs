@@ -856,23 +856,23 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
-                       // int cardId = GetIntFromByteArray(0, msg.payload);
-                        int newUID = DrawCardForPlayer((int)senderId); // Assign UID from server
+                        // int cardId = GetIntFromByteArray(0, msg.payload);
+                        //  int newUID = DrawCardForPlayer((int)senderId); // Assign UID from server
 
-                        // Send the new UID back to the client
-                        RGNetworkLongMessage assignUIDMessage = new RGNetworkLongMessage {
-                            playerID = msg.playerID, //reuse the senderId to filter by client
-                            type = (uint)CardMessageType.ChangeCardID,
-                            count = 2, // cardID and UID
-                            payload = BitConverter.GetBytes(cardId).Concat(BitConverter.GetBytes(newUID)).ToArray()
-                        };
-                        NetworkServer.SendToAll(assignUIDMessage);
+                        //Send the new UID back to the client
+                        //RGNetworkLongMessage assignUIDMessage = new RGNetworkLongMessage {
+                        //    playerID = msg.playerID, //reuse the senderId to filter by client
+                        //    type = (uint)CardMessageType.DrawCard,
+                        //    count = 2, // cardID and UID
+                        //    payload = BitConverter.GetBytes(cardId).Concat(BitConverter.GetBytes(uniqueId)).ToArray()
+                        //};
+                        NetworkServer.SendToAll(msg); //relay draw card message to clients
 
-                        Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
+                        //  Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
 
                         Update update = new Update {
                             Type = CardMessageType.DrawCard,
-                            UniqueID = newUID,
+                            UniqueID = uniqueId,
                             CardID = cardId,
                         };
                         Debug.Log("server received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);

@@ -1107,7 +1107,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //TODO: list of all players
             default:
                 try {
-                    actualPlayer.AddUpdateFromOpponent(update, phase, playerDictionary[(int)playerIndex]);
+                    Debug.Log($"{actualPlayer.playerName} is adding an update from player id {(int)playerIndex} who it thinks is: {playerDictionary[(int)playerIndex].playerName}");
+                    actualPlayer.AddUpdateFromPlayer(update, phase, playerDictionary[(int)playerIndex]);
                 }
                 catch (Exception e) {
                     Debug.LogError("Error in adding update from opponent: " + e.Message);

@@ -1577,14 +1577,14 @@ public class CardPlayer : MonoBehaviour {
     #region Receiving 
     //called by the game manager to add an update to the player's queue from the opponent's actions
     //THIS is the first place where card updates are passed to the player
-    public void AddUpdateFromOpponent(Update update, GamePhase phase, CardPlayer opponent) {
+    public void AddUpdateFromPlayer(Update update, GamePhase phase, CardPlayer otherPlayer) {
 
         switch (update.Type) {
             case CardMessageType.DrawCard:
-                Debug.Log($"{playerName} received card draw from {opponent.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
+                Debug.Log($"{playerName} received card draw from {otherPlayer.playerName} who drew {GetCardNameFromID(update.CardID)} with uid {update.UniqueID}");
 
                 //draw cards for opponent but dont update network which would cause an infinite loop
-                opponent.DrawSpecificCard(update.CardID, UserInterface.Instance.opponentDropZone, uid: update.UniqueID, updateNetwork: false);
+                otherPlayer.DrawSpecificCard(update.CardID, UserInterface.Instance.opponentDropZone, uid: update.UniqueID, updateNetwork: false);
                 break;
             //  case CardMessageType.CardUpdate:
             //   case CardMessageType.CardUpdateWithExtraFacilityInfo: 
@@ -1596,15 +1596,15 @@ public class CardPlayer : MonoBehaviour {
                 //    return;
                 //}
                 // If no animation is in progress, handle the card play immediately
-                ProcessCardPlay(update, phase, opponent);
+                ProcessCardPlay(update, phase, otherPlayer);
                 break;
             case CardMessageType.ReturnCardToDeck:
-                Debug.Log($"{playerName} received return card to hand message from {opponent.playerName}");
-                HandleReturnCardToHandUpdate(update, opponent);
+                Debug.Log($"{playerName} received return card to hand message from {otherPlayer.playerName}");
+                HandleReturnCardToHandUpdate(update, otherPlayer);
                 break;
             case CardMessageType.RemoveEffect:
-                Debug.Log($"{playerName} received remove effect from {opponent.playerName}");
-                HandleRemoveEffectUpdate(update, opponent);
+                Debug.Log($"{playerName} received remove effect from {otherPlayer.playerName}");
+                HandleRemoveEffectUpdate(update, otherPlayer);
                 break;
         }
     }
