@@ -60,7 +60,8 @@ public class FacilityEffect {
         //TODO: add more ui elements here
         HasUIElement = effectType == FacilityEffectType.ModifyPointsPerTurn ||
                         effectType == FacilityEffectType.Backdoor ||
-                        effectType == FacilityEffectType.Fortify;
+                        effectType == FacilityEffectType.Fortify ||
+                        effectType == FacilityEffectType.ProtectPoints;
 
 
         Target = target;
@@ -102,16 +103,20 @@ public class FacilityEffect {
             FacilityEffectType effectType = ParseEffectType(effectParts[0]);
             effects.Add(new FacilityEffect(effectType, FacilityEffectTarget.None, "", 0, 3));
             //set the team created field
-            if (effectType == FacilityEffectType.Backdoor)
+            if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.ModifyPointsPerTurn)
                 effects[^1].CreatedByTeam = PlayerTeam.Red;
-            else if (effectType == FacilityEffectType.Fortify)
+            else if (effectType == FacilityEffectType.Fortify || effectType == FacilityEffectType.ProtectPoints)
                 effects[^1].CreatedByTeam = PlayerTeam.Blue;
             effects[^1].EffectIdString = effectString;
             return effects;
 
         }
         string targetInfoString = effectParts[1];
-        int magnitude = int.Parse(effectParts[2]);
+        int magnitude = 0;
+        try {
+            magnitude = int.Parse(effectParts[2]);
+        }
+        catch (Exception e) {}
 
         var effectTypes = effectTypeString.Split('&');
         //create an effect for each effect type

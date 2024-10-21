@@ -55,7 +55,7 @@ public class ReturnHandToDeckAndDraw : ICardAction {
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         // PlayerTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
-        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
+        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam, (card.data.duration != 0 ? card.data.duration : -1));
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

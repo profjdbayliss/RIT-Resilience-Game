@@ -211,10 +211,13 @@ public class Facility : MonoBehaviour {
     }
 
     //adds or remove effect by the string in the csv file 
-    public void AddRemoveEffectsByIdString(string idString, bool isAdding, PlayerTeam team) {
+    public void AddRemoveEffectsByIdString(string idString, bool isAdding, PlayerTeam team, int duration = -1) {
         var effects = FacilityEffect.CreateEffectsFromID(idString);
         effects.ForEach(effect => {
             effect.CreatedByTeam = team;
+            if (duration != -1) {
+                effect.Duration = duration;
+            }
             effectManager.AddRemoveEffect(effect, isAdding);
         });
     }
