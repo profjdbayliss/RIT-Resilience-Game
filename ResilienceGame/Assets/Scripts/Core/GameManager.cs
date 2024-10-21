@@ -880,7 +880,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 else if (phaseJustChanged) {
                     mIsActionAllowed = true;
-                    actualPlayer.InformSectorOfNewTurn();
+                    //actualPlayer.InformSectorOfNewTurn();
                     if (IsActualPlayersTurn()) {
                         actualPlayer.ResetMeeplesSpent();
                     }
@@ -1126,6 +1126,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         //actualPlayer.ResetMeepleCount();
         //opponentPlayer.ResetMeepleCount();
+        activeSectors.ForEach(sector => sector.InformFacilitiesOfNewTurn()); //update all facilities of turn end
         playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount());
         turnTotal++;
         roundsLeft--;

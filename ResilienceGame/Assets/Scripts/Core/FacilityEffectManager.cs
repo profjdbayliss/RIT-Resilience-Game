@@ -422,10 +422,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
 
         foreach (var effect in currentActiveEffects) {
-            //only update effects that are created by the team whos turn it is
-            //this will be called twice once in action red and once in action blue
-            //we need to update the correct effects on both clients each phase
-            if (!IsEffectCreatorsTurn(effect)) return;
+           
 
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
                 var effects = FacilityEffect.CreateEffectsFromID(effect.EffectCreatedOnRoundEndIdString);

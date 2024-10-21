@@ -525,13 +525,13 @@ public class CardPlayer : MonoBehaviour {
             _ => PlayerTeam.Any
         };
     }
-    public void InformSectorOfNewTurn() {
-        if (PlayerSector != null)
-            PlayerSector.InformFacilitiesOfNewTurn();
-        else {
-            Debug.Log($"{playerName}'s sector is null");
-        }
-    }
+    //public void InformSectorOfNewTurn() {
+    //    if (PlayerSector != null)
+    //        PlayerSector.InformFacilitiesOfNewTurn();
+    //    else {
+    //        Debug.Log($"{playerName}'s sector is null");
+    //    }
+    //}
 
     //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
     public void ResetCardToInHand(Card card) {
