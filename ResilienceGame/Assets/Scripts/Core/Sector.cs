@@ -375,6 +375,10 @@ public class Sector : MonoBehaviour {
     #endregion
 
     #region Receiving Network Updates
+    //TODO: add more effects that need to call the play function here
+    private bool DoesUpdateCallCardPlay(Card card) {
+        return card.ActionList.First() is ReduceTurnsLeftByBackdoor;
+    }
     public void AddUpdateFromPlayer(Update update, GamePhase phase, CardPlayer player) {
         Debug.Log($"Sector {sectorName} received update of type {update.Type} from {player.playerName}");
         if (IsAnimating) {
@@ -428,7 +432,8 @@ public class Sector : MonoBehaviour {
             Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {player.playerTeam}'s hand");
             Debug.Log($"Update is of type: {update.Type}");
             //check for extra facility info
-            if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
+            if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo
+                ) {
                 Debug.Log("Extra facility info found in card update");
                 if (tempCard.data.effectString == "Remove") {
                     //remove the effect from the facilities
@@ -439,13 +444,18 @@ public class Sector : MonoBehaviour {
                     OnAnimationResolveCardAction = (update, card) => AddFacilityEffectsFromCardUpdate(update, tempCard, player.playerTeam);
                 }
             }
+            //grab the first facility in the sector, this is fine because these card types are not for specific facilities
+            Facility tempFacility = GameManager.Instance.AllSectors[update.sectorPlayedOn].facilities[0];
+            //Debug.Log($"Update:\ncard uid: {update.UniqueID}\ncard id: " +
+            //    $"{update.CardID}\ntype: {update.Type}\nSector: {update.sectorPlayedOn}\nFacility: {update.FacilityPlayedOnType}");
             CreateCardAnimation(
                 tempCard,
                 gameObject,
                 player,
-                callPlay: false,
+                callPlay: DoesUpdateCallCardPlay(tempCard),//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
                 resolveCardAction: OnAnimationResolveCardAction,
-                cUpdate: update);//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
+                cUpdate: update,
+                facility: tempFacility);
         }
         else {
             Debug.LogError($"{sectorName} was looking for card with uid {update.UniqueID} but did not find it in {player.playerName}'s hand which has size [{player.HandCards.Count}]");

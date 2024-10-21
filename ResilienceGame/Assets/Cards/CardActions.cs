@@ -244,11 +244,13 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
 public class ReduceTurnsLeftByBackdoor : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         int turnsRemoved = 0;
+        Debug.Log($"Facility: {facilityActedUpon.name}");
         Sector sectorActedUpon = facilityActedUpon.sectorItsAPartOf;
         foreach (Facility facility in sectorActedUpon.facilities) {
             if (facility.HasEffectOfType(FacilityEffectType.Backdoor))
                 turnsRemoved += card.data.facilityAmount;
         }
+        Debug.Log(card.front.title + " played. Turns removed: " + turnsRemoved);
         GameManager.Instance.ChangeRoundsLeft(-turnsRemoved);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }

@@ -1303,7 +1303,12 @@ public class CardPlayer : MonoBehaviour {
                 card.SetCardState(CardState.CardInPlay);
                 ActiveCards.Add(card.UniqueID, card.gameObject);
 
-                EnqueueCardMessageUpdate(CardMessageType.CardUpdate, card.data.cardID, card.UniqueID, sectorType: sectorType);
+                EnqueueCardMessageUpdate(
+                    CardMessageType.CardUpdate,
+                    card.data.cardID, 
+                    card.UniqueID, 
+                    sectorType: sectorType,
+                    sendUpdateImmediately: card.ActionList.First() is ReduceTurnsLeftByBackdoor);
                 playCount = 1;
                 playKey = card.UniqueID;
 

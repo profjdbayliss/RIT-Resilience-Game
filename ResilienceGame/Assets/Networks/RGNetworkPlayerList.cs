@@ -366,7 +366,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
             // Send to all clients
             NetworkServer.SendToAll(netMsg);
-            Debug.Log("SERVER SENT string message: " + stringMsg);
+           // Debug.Log("SERVER SENT string message: " + stringMsg);
         }
     }
     public void SendStringToServer(string stringMsg) {
@@ -379,7 +379,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
             };
             NetworkClient.Send(netMsg);
-            Debug.Log("CLIENT SENT string message: " + stringMsg);
+          //  Debug.Log("CLIENT SENT string message: " + stringMsg);
         }
     }
 
@@ -387,7 +387,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public void SendMessageToClient(int playerId, RGNetworkLongMessage msg) {
         if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn)) {
             conn.Send<RGNetworkLongMessage>(msg);
-            Debug.Log($"Server sent message to player ID {playerId}");
+        //    Debug.Log($"Server sent message to player ID {playerId}");
         }
         else {
             Debug.LogError($"No connection found for player ID {playerId}");
@@ -477,7 +477,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     public void OnClientReceiveLongMessage(RGNetworkLongMessage msg) {
-        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: " + msg.ToString());
+        var playerName = msg.playerID + "";
+        if (manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player)) {
+            playerName = player.playerName;
+        }
+
+        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: From: " + playerName + " of type: " + (CardMessageType)msg.type);
+
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
 
@@ -785,8 +791,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         return readyToStart;
     }
     public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg) {
-        Debug.Log("SERVER RECEIVED LONG MESSAGE::: " + msg.playerID + " " + msg.type);
-        uint senderId = msg.playerID;
+        var playerName = msg.playerID + "";
+        if (manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player)) {
+            playerName = player.playerName;
+        }
+
+        Debug.Log("SERVER RECEIVED LONG MESSAGE::: From: " + playerName + " of type: " + (CardMessageType)msg.type); uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
         // Update the connection mapping
         int playerId = (int)msg.playerID;

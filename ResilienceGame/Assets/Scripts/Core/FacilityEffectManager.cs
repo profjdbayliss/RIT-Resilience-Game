@@ -35,7 +35,7 @@ public class FacilityEffectManager : MonoBehaviour {
     //  [SerializeField] private Transform uiElementParent;
 
     public static Sprite[] EffectSprites { get => Sector.EffectSprites; }
-    private int counter = 0;
+   
 
     #endregion
 
