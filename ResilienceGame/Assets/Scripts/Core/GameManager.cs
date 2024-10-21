@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool MIsDiscardAllowed { get; private set; } = false;
     private bool mIsActionAllowed = false;
     public bool IsDoomClockActive { get; set; } = false;
+    private int numDoomClockTurnsLeft = 3;
 
 
     // UI Elements
@@ -702,6 +703,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
+    public void StartDoomClock() {
+        IsDoomClockActive = true;
+        numDoomClockTurnsLeft = 3;
+        UserInterface.Instance.SetDoomClockActive(true);
+    }
+    public void ReduceDoomClockTurns() {
+        numDoomClockTurnsLeft--;
+        UserInterface.Instance.UpdateDoomClockTurnsLeft(numDoomClockTurnsLeft);
+    }
     public void AllowPlayerDiscard(CardPlayer player, int amount, List<Card> cardsAllowedToDiscard = null) {
         if (actualPlayer == player) {
             Debug.Log($"Player {player.playerName} must discard {amount} cards");

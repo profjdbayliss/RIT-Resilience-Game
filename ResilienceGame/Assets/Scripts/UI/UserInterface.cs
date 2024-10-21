@@ -13,6 +13,7 @@ public class UserInterface : MonoBehaviour {
     public static UserInterface Instance;
     [SerializeField]
     private Sprite[] infoBackgrounds;
+    [SerializeField] private Sprite[] doomClockSprites;
 
     [Header("UI Elements")]
     public Canvas gameCanvas;
@@ -42,6 +43,8 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private GameObject gameLogMessagePrefab;
     [SerializeField] private Transform gameLogParent;
     [SerializeField] private Image infoBg;
+    [SerializeField] private Image doomClockImage;
+    [SerializeField] private GameObject doomClockBg;
 
 
     [Header("Drag and Drop")]
@@ -176,6 +179,15 @@ public class UserInterface : MonoBehaviour {
     public void SetInfoBackground(int index) {
         if (index >= 0 && index < infoBackgrounds.Length)
             infoBg.sprite = infoBackgrounds[index];
+    }
+    public void SetDoomClockActive(bool active, int index = 0) {
+        doomClockBg.SetActive(active);
+        if (active) {
+            doomClockImage.sprite = doomClockSprites[index];
+        }
+    }
+    public void UpdateDoomClockTurnsLeft(int turnsLeft) {
+        doomClockImage.sprite = doomClockSprites[^turnsLeft];
     }
 
 }
