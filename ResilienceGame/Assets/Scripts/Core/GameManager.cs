@@ -1146,10 +1146,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public void ChangeRoundsLeft(int change) {
-        if (roundsLeft + change < 0) {
+        if (roundsLeft + change < 0)
+        {
             roundsLeft = 0;
         }
         else roundsLeft += change;
+        UserInterface.Instance.SetTurnText($"{roundsLeft}");
     }
 
     #endregion
