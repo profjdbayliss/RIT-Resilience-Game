@@ -154,7 +154,8 @@ public class CardPlayer : MonoBehaviour {
 
     // Private fields
     //private static int sUniqueIDCount = 0;
-    private Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
+    public Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
+    
 
     // Enum definition
     public enum PlayerReadyState {

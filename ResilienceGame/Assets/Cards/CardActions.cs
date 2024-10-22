@@ -266,6 +266,7 @@ public class TemporaryReductionOfTurnsLeft : ICardAction
     {
         GameManager.Instance.bluffTurnCheck = card.data.duration;
         GameManager.Instance.HandleBluffStart(card.data.duration);
+        Debug.Log("Played Hard Bluff");
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

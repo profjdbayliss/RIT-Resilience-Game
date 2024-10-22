@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using System.IO;
 using System;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class GameManager : MonoBehaviour, IRGObservable {
 
@@ -18,7 +19,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Debug
     public bool DEBUG_ENABLED = true;
-
+    public bool simulateSectors = true;
     // Game State
     [Header("Game State")]
     public GamePhase MGamePhase = GamePhase.Start;
@@ -493,6 +494,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     kvp.Value.LogPlayerInfo();
                 }
             }
+            if (Keyboard.current.f9Key.wasPressedThisFrame) {
+                Debug.Log($"Player has {actualPlayer.mUpdatesThisPhase.Count} updates in queue:");
+                foreach (Update update in actualPlayer.mUpdatesThisPhase) {
+                    Debug.Log(
+                              $"Type: {update.Type}\n" +
+                              $"Card ID: {update.CardID}\n" +
+                              $"Unique ID: {update.UniqueID}\n" +
+                              $"Amount: {update.Amount}\n" +
+                              $"Facility Played On Type: {update.FacilityPlayedOnType}\n" +
+                              $"Facility Effect to Remove Type: {update.FacilityEffectToRemoveType}\n" +
+                              $"Additional Facility Selected 1: {update.AdditionalFacilitySelectedOne}\n" +
+                              $"Additional Facility Selected 2: {update.AdditionalFacilitySelectedTwo}\n" +
+                              $"Additional Facility Selected 3: {update.AdditionalFacilitySelectedThree}\n" +
+                              $"Sector Played On: {update.sectorPlayedOn}\n" +
+                              $"==============================");
+                }
+            }
 
 
 
@@ -656,7 +674,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             UserInterface.Instance.ToggleDownedSectorInMenu((int)kvp.Key, kvp.Value.IsDown);
         }
         var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
-        
+
         if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
 
             StartDoomClock();
@@ -1206,7 +1224,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Sector Simulation
     public void SimulateSectors() {
+        if (!simulateSectors) return;
         if (!IsServer) return;
+
         var sectorStatus = new List<(int sectorType, bool[] facilityStatus)>();
         if (MGamePhase == GamePhase.ActionBlue) {
             Debug.Log($"Simulating restore on {SimulatedSectors.Count} sectors");
