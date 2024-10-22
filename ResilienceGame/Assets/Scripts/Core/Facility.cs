@@ -33,7 +33,7 @@ public class Facility : MonoBehaviour {
     
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
-    private int physicalPoints, finacialPoints, networkPoints;
+    private int physicalPoints, financialPoints, networkPoints;
 
     // private TextMeshProUGUI[] pointsUI;
     [SerializeField] private Transform pointsParent;
@@ -51,9 +51,11 @@ public class Facility : MonoBehaviour {
     // public FacilityEffect effect;
     //   public bool effectNegated;
 
-    public bool IsDown { get; private set; }
-    // public bool IsFortified { get; set; } = false;
-    // public bool IsBackdoored { get; set; } = false;
+    public bool IsDown =>
+    (physicalPoints == 0 ? 1 : 0) +
+    (financialPoints == 0 ? 1 : 0) +
+    (networkPoints == 0 ? 1 : 0) == 2;
+
 
 
     // Start is called before the first frame update
@@ -121,7 +123,7 @@ public class Facility : MonoBehaviour {
 
     public void UpdatePointsUI() {
         UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
-        UpdatePointTypeUI(2, finacialPoints, maxFinacialPoints);
+        UpdatePointTypeUI(2, financialPoints, maxFinacialPoints);
         UpdatePointTypeUI(1, networkPoints, maxNetworkPoints);
     }
 
@@ -156,7 +158,7 @@ public class Facility : MonoBehaviour {
                 UpdatePoints(ref physicalPoints, maxPhysicalPoints);
                 break;
             case FacilityEffectTarget.Financial:
-                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref financialPoints, maxFinacialPoints);
                 break;
             case FacilityEffectTarget.Network:
                 UpdatePoints(ref networkPoints, maxNetworkPoints);
@@ -166,24 +168,24 @@ public class Facility : MonoBehaviour {
                 UpdatePoints(ref physicalPoints, maxPhysicalPoints);
                 break;
             case FacilityEffectTarget.FinancialPhysical:
-                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref financialPoints, maxFinacialPoints);
                 UpdatePoints(ref physicalPoints, maxPhysicalPoints);
                 break;
             case FacilityEffectTarget.FinancialNetwork:
-                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref financialPoints, maxFinacialPoints);
                 UpdatePoints(ref networkPoints, maxNetworkPoints);
                 break;
             case FacilityEffectTarget.All:
                 UpdatePoints(ref physicalPoints, maxPhysicalPoints);
-                UpdatePoints(ref finacialPoints, maxFinacialPoints);
+                UpdatePoints(ref financialPoints, maxFinacialPoints);
                 UpdatePoints(ref networkPoints, maxNetworkPoints);
                 break;
 
         }
 
-        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {finacialPoints} financial points, and {networkPoints} network points.");
+        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {financialPoints} financial points, and {networkPoints} network points.");
 
-        IsDown = (physicalPoints == 0 || finacialPoints == 0 || networkPoints == 0);
+        
         UpdateUI();
     }
     public bool HasRemovableEffects(PlayerTeam opponentTeam, bool removePointsPerTurn = true) {
@@ -204,7 +206,7 @@ public class Facility : MonoBehaviour {
 
     public void SetupFacilityPoints(int physical, int finacial, int network) {
         maxPhysicalPoints = physicalPoints = physical;
-        maxFinacialPoints = finacialPoints = finacial;
+        maxFinacialPoints = financialPoints = finacial;
         maxNetworkPoints = networkPoints = network;
 
         UpdateUI();
@@ -244,7 +246,7 @@ public class Facility : MonoBehaviour {
         StringBuilder facilityInfo = new StringBuilder();
         facilityInfo.Append($"Facility Name: {facilityName} ");
         facilityInfo.Append($"Physical Points: {physicalPoints}/{maxPhysicalPoints} ");
-        facilityInfo.Append($"Financial Points: {finacialPoints}/{maxFinacialPoints} ");
+        facilityInfo.Append($"Financial Points: {financialPoints}/{maxFinacialPoints} ");
         facilityInfo.Append($"Network Points: {networkPoints}/{maxNetworkPoints} ");
 
         var effects = effectManager.GetEffects();

@@ -316,14 +316,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 numBluePlayers++;
             }
         }
-
-        //foreach (var kvp in playerDictionary) {
-        //    Debug.Log($"[{kvp.Key}] - {kvp.Value.playerName} - {kvp.Value.playerTeam}");
-        //}
-        
-
-
-
         //assign sectors to all players
         if (IsServer) {
 
