@@ -1331,7 +1331,7 @@ public class CardPlayer : MonoBehaviour {
                     card.data.cardID,
                     card.UniqueID,
                     sectorType: sectorType,
-                    sendUpdateImmediately: card.ActionList.First() is ReduceTurnsLeftByBackdoor);
+                    sendUpdateImmediately: Sector.DoesUpdateCallCardPlay(card));
                 playCount = 1;
                 playKey = card.UniqueID;
 

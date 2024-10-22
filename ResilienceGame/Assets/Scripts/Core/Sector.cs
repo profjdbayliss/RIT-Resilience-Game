@@ -387,7 +387,7 @@ public class Sector : MonoBehaviour {
 
     #region Receiving Network Updates
     //TODO: add more effects that need to call the play function here
-    private bool DoesUpdateCallCardPlay(Card card) {
+    public bool DoesUpdateCallCardPlay(Card card) {
         return card.ActionList.First() is ReduceTurnsLeftByBackdoor;
     }
     public void AddUpdateFromPlayer(Update update, GamePhase phase, CardPlayer player) {
