@@ -928,7 +928,7 @@ public class CardPlayer : MonoBehaviour {
                 }
             }
         }
-        if (Keyboard.current.tabKey.wasPressedThisFrame) {
+        if (Keyboard.current.f5Key.wasPressedThisFrame) {
             maxMeeples = new float[] { 99, 99, 99, 99 };
             blueMeeples = 99;
             blackMeeples = 99;
