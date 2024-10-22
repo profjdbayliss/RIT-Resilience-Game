@@ -389,9 +389,10 @@ public class Sector : MonoBehaviour {
     //TODO: add more effects that need to call the play function here
     public static bool DoesUpdateCallCardPlay(Card card) {
         var action = card.ActionList.First();
-        
+
         return action is ReduceTurnsLeftByBackdoor ||
-            action is TemporaryReductionOfTurnsLeft;
+            action is TemporaryReductionOfTurnsLeft ||
+            action is CancelTemporaryReductionOfTurns;
     }
     public void AddUpdateFromPlayer(Update update, GamePhase phase, CardPlayer player) {
         Debug.Log($"Sector {sectorName} received update of type {update.Type} from {player.playerName}");
