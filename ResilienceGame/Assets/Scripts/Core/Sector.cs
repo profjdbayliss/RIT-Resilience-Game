@@ -14,7 +14,7 @@ using static Facility;
 public class Sector : MonoBehaviour {
     #region Fields
     [Header("Player and Sector Info")]
-    public SectorType sectorName; // TODO: Move PlayerSector here
+    public SectorType sectorName; 
     public CardPlayer Owner { get; private set; }
     [SerializeField] private TextMeshProUGUI sectorOwnerText;
     [SerializeField] private Canvas sectorCanvas;

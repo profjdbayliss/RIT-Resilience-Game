@@ -24,6 +24,9 @@ public class PlayerPopupMenuItem : MonoBehaviour {
             FacilityBoxes.ForEach(box => box.SetActive(false));
             SectorIcon.sprite = RedIcon;
         }
+        else {
+          //  SectorIcon.sprite = Player.PlayerSector.
+        }
 
     }
 
