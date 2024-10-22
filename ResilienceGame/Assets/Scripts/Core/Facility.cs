@@ -30,10 +30,13 @@ public class Facility : MonoBehaviour {
     public Sector sectorItsAPartOf;
 
     public Image[] dependencyIcons;
-    
+
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
-    private int physicalPoints, financialPoints, networkPoints;
+    public int[] Points = new int[3];
+    //public int Points[0];
+  //  public int FinancialPoints;
+  //  public int NetworkPoints;
 
     // private TextMeshProUGUI[] pointsUI;
     [SerializeField] private Transform pointsParent;
@@ -52,9 +55,9 @@ public class Facility : MonoBehaviour {
     //   public bool effectNegated;
 
     public bool IsDown =>
-    (physicalPoints == 0 ? 1 : 0) +
-    (financialPoints == 0 ? 1 : 0) +
-    (networkPoints == 0 ? 1 : 0) == 2;
+    (Points[0] == 0 ? 1 : 0) +
+    (Points[2] == 0 ? 1 : 0) +
+    (Points[1] == 0 ? 1 : 0) == 2;
 
 
 
@@ -87,7 +90,7 @@ public class Facility : MonoBehaviour {
         // Physical points (counting from bottom to top)
         var physicalPoints = pointsParent.GetChild(0); // PhysPointParent
         for (int i = 0; i < physicalPoints.childCount; i++) {
-            var reverseIndex = physicalPoints.childCount - 1 - i; 
+            var reverseIndex = physicalPoints.childCount - 1 - i;
             var emptyPoint = physicalPoints.GetChild(reverseIndex).GetChild(0).GetComponent<Image>(); // EmptyPoint
             var filledPoint = physicalPoints.GetChild(reverseIndex).GetChild(1).GetComponent<Image>(); // FilledPoint
 
@@ -98,7 +101,7 @@ public class Facility : MonoBehaviour {
         // Network points (counting from bottom to top)
         var networkPoints = pointsParent.GetChild(1); // NetworkPointParent
         for (int i = 0; i < networkPoints.childCount; i++) {
-            var reverseIndex = networkPoints.childCount - 1 - i; 
+            var reverseIndex = networkPoints.childCount - 1 - i;
             var emptyPoint = networkPoints.GetChild(reverseIndex).GetChild(0).GetComponent<Image>();
             var filledPoint = networkPoints.GetChild(reverseIndex).GetChild(1).GetComponent<Image>();
 
@@ -109,7 +112,7 @@ public class Facility : MonoBehaviour {
         // Financial points (counting from bottom to top)
         var financialPoints = pointsParent.GetChild(2); // FinancialPointParent
         for (int i = 0; i < financialPoints.childCount; i++) {
-            var reverseIndex = financialPoints.childCount - 1 - i; 
+            var reverseIndex = financialPoints.childCount - 1 - i;
             var emptyPoint = financialPoints.GetChild(reverseIndex).GetChild(0).GetComponent<Image>();
             var filledPoint = financialPoints.GetChild(reverseIndex).GetChild(1).GetComponent<Image>();
 
@@ -122,9 +125,9 @@ public class Facility : MonoBehaviour {
 
 
     public void UpdatePointsUI() {
-        UpdatePointTypeUI(0, physicalPoints, maxPhysicalPoints);
-        UpdatePointTypeUI(2, financialPoints, maxFinacialPoints);
-        UpdatePointTypeUI(1, networkPoints, maxNetworkPoints);
+        UpdatePointTypeUI(0, Points[0], maxPhysicalPoints);
+        UpdatePointTypeUI(2, Points[2], maxFinacialPoints);
+        UpdatePointTypeUI(1, Points[1], maxNetworkPoints);
     }
 
     private void UpdatePointTypeUI(int typeIndex, int currentPoints, int maxPoints) {
@@ -155,35 +158,35 @@ public class Facility : MonoBehaviour {
         }
         switch (target) {
             case FacilityEffectTarget.Physical:
-                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                UpdatePoints(ref Points[0], maxPhysicalPoints);
                 break;
             case FacilityEffectTarget.Financial:
-                UpdatePoints(ref financialPoints, maxFinacialPoints);
+                UpdatePoints(ref Points[2], maxFinacialPoints);
                 break;
             case FacilityEffectTarget.Network:
-                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                UpdatePoints(ref Points[1], maxNetworkPoints);
                 break;
             case FacilityEffectTarget.NetworkPhysical:
-                UpdatePoints(ref networkPoints, maxNetworkPoints);
-                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                UpdatePoints(ref Points[1], maxNetworkPoints);
+                UpdatePoints(ref Points[0], maxPhysicalPoints);
                 break;
             case FacilityEffectTarget.FinancialPhysical:
-                UpdatePoints(ref financialPoints, maxFinacialPoints);
-                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
+                UpdatePoints(ref Points[2], maxFinacialPoints);
+                UpdatePoints(ref Points[0], maxPhysicalPoints);
                 break;
             case FacilityEffectTarget.FinancialNetwork:
-                UpdatePoints(ref financialPoints, maxFinacialPoints);
-                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                UpdatePoints(ref Points[2], maxFinacialPoints);
+                UpdatePoints(ref Points[1], maxNetworkPoints);
                 break;
             case FacilityEffectTarget.All:
-                UpdatePoints(ref physicalPoints, maxPhysicalPoints);
-                UpdatePoints(ref financialPoints, maxFinacialPoints);
-                UpdatePoints(ref networkPoints, maxNetworkPoints);
+                UpdatePoints(ref Points[0], maxPhysicalPoints);
+                UpdatePoints(ref Points[2], maxFinacialPoints);
+                UpdatePoints(ref Points[1], maxNetworkPoints);
                 break;
 
         }
 
-        Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {financialPoints} financial points, and {networkPoints} network points.");
+        Debug.Log($"Facility {facilityName} now has {Points[0]} physical points, {Points[2]} financial points, and {Points[1]} network points.");
 
         GameManager.Instance.CheckDownedFacilities();
         UpdateUI();
@@ -200,14 +203,14 @@ public class Facility : MonoBehaviour {
 
     public bool HasEffectOfType(FacilityEffectType type) {
         var hasEffect = effectManager.HasEffectOfType(type);
-       // Debug.Log($"Checking if facility {facilityName} has effect of type {type} : {hasEffect}");
+        // Debug.Log($"Checking if facility {facilityName} has effect of type {type} : {hasEffect}");
         return hasEffect;
     }
 
     public void SetupFacilityPoints(int physical, int finacial, int network) {
-        maxPhysicalPoints = physicalPoints = physical;
-        maxFinacialPoints = financialPoints = finacial;
-        maxNetworkPoints = networkPoints = network;
+        maxPhysicalPoints = Points[0] = physical;
+        maxFinacialPoints = Points[2] = finacial;
+        maxNetworkPoints = Points[1] = network;
 
         UpdateUI();
     }
@@ -245,9 +248,9 @@ public class Facility : MonoBehaviour {
     public void LogFacilityDebug() {
         StringBuilder facilityInfo = new StringBuilder();
         facilityInfo.Append($"Facility Name: {facilityName} ");
-        facilityInfo.Append($"Physical Points: {physicalPoints}/{maxPhysicalPoints} ");
-        facilityInfo.Append($"Financial Points: {financialPoints}/{maxFinacialPoints} ");
-        facilityInfo.Append($"Network Points: {networkPoints}/{maxNetworkPoints} ");
+        facilityInfo.Append($"Physical Points: {Points[0]}/{maxPhysicalPoints} ");
+        facilityInfo.Append($"Financial Points: {Points[2]}/{maxFinacialPoints} ");
+        facilityInfo.Append($"Network Points: {Points[1]}/{maxNetworkPoints} ");
 
         var effects = effectManager.GetEffects();
         if (effects.Count > 0) {
@@ -285,7 +288,7 @@ public class Facility : MonoBehaviour {
         sectorItsAPartOf.AddFacilityToSelection(this);
         hoverEffect.ActivateHover();
     }
-    
+
 
 
 }
