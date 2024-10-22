@@ -1106,6 +1106,7 @@ MonoBehaviour:
   - {fileID: 774510761691721052}
   - {fileID: 774510763029888669}
   overTimeCharges: 0
+  SectorIconImage: {fileID: 774510762365947177}
   numFacilitiesRequired: 0
   csvFileName: Sectors.csv
   outputAtlasName: sectorAtlas
@@ -3015,6 +3016,7 @@ MonoBehaviour:
   - {fileID: 774510762667765380}
   - {fileID: 774510762872127254}
   - {fileID: 774510763043177580}
+  Points: 000000000000000000000000
   pointsParent: {fileID: 774510762366990312}
   pointImages: []
   facilityNameText: {fileID: 774510763087040170}
@@ -3420,6 +3422,7 @@ MonoBehaviour:
   - {fileID: 774510762851571122}
   - {fileID: 774510761888802219}
   - {fileID: 774510762444097872}
+  Points: 000000000000000000000000
   pointsParent: {fileID: 774510761098632100}
   pointImages: []
   facilityNameText: {fileID: 774510761021310912}
@@ -9646,6 +9649,7 @@ MonoBehaviour:
   - {fileID: 774510761457206719}
   - {fileID: 774510762678075872}
   - {fileID: 774510761923493604}
+  Points: 000000000000000000000000
   pointsParent: {fileID: 774510762307960539}
   pointImages: []
   facilityNameText: {fileID: 774510762172371595}

@@ -23,8 +23,8 @@ public class Sector : MonoBehaviour {
     public HashSet<Facility> selectedFacilities;
     public Facility[] facilities;
     public int overTimeCharges; // Tracks how often a sector can mandate overtime
-
-
+    public Sprite SectorIcon { get; private set; }
+    public Image SectorIconImage;
 
     [Header("Facility Selection")]
     public int numFacilitiesRequired = 0;
@@ -258,8 +258,10 @@ public class Sector : MonoBehaviour {
         byte[] fileData = File.ReadAllBytes(filePath);
         iconAtlasTexture = new Texture2D(2, 2);
         iconAtlasTexture.LoadImage(fileData);
+
     }
     public void Initialize() {
+        SectorIcon = SectorIconImage.sprite;
         InitEffectSprites();
         //  sectorCanvas = this.gameObject;
         overTimeCharges = 3;
@@ -270,6 +272,7 @@ public class Sector : MonoBehaviour {
         }
         CSVRead();
         UpdateFacilityDependencyIcons();
+        
     }
     public void SetOwner(CardPlayer player) {
         Owner = player;

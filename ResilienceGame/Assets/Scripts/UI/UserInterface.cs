@@ -14,7 +14,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField]
     private Sprite[] infoBackgrounds;
     [SerializeField] private Sprite[] doomClockSprites;
-
+    [SerializeField] private GameObject playerMenuPrefab;
     [Header("UI Elements")]
     public Canvas gameCanvas;
     public GameObject startScreen;
@@ -45,6 +45,9 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Image infoBg;
     [SerializeField] private Image doomClockImage;
     [SerializeField] private GameObject doomClockBg;
+    [SerializeField] private RectTransform playerMenuContainer;
+    
+    [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
 
 
     [Header("Drag and Drop")]
@@ -60,6 +63,7 @@ public class UserInterface : MonoBehaviour {
         if (playerType != PlayerTeam.Red) {
             meepleButtons[3].gameObject.SetActive(false);
         }
+        playerMenuItems = new List<PlayerPopupMenuItem>();
     }
 
     private void Awake() {
@@ -193,6 +197,14 @@ public class UserInterface : MonoBehaviour {
             return;
         }
         doomClockImage.sprite = doomClockSprites[^turnsLeft];
+    }
+    public void SpawnPlayerMenuItem(CardPlayer player) {
+        var newPlayerMenu = Instantiate(playerMenuPrefab, playerMenuContainer).GetComponent<PlayerPopupMenuItem>();
+        newPlayerMenu.SetPlayer(player);
+        playerMenuItems.Add(newPlayerMenu);
+    }
+    public void TogglePlayerMenu(bool enable) {
+        playerMenuContainer.gameObject.SetActive(enable);
     }
 
 }

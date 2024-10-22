@@ -227,6 +227,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (playerDictionary.ContainsKey(playerIndex)) {
             assignedSectors++;
             var player = playerDictionary[playerIndex];
+            Debug.Log($"sector type int: {sectorType}");
+            Debug.Log($"Attempting to assign {AllSectors[(SectorType)sectorType]} to {playerDictionary[playerIndex].playerName}");
+            if (sectorType < 0 || sectorType >= AssignableSectors.Count) {
+                Debug.LogError($"Invalid sector index {sectorType} for player {playerIndex}");
+                return;
+            }
             var sector = AssignableSectors[sectorType];
             if (sector == null) {
                 Debug.LogError($"Missing sector when assigning to player");
@@ -252,6 +258,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     //temp assign in view sector to red player
                     actualPlayer.PlayerSector = activeSectors[0];
                 }
+                //create player menu items now that all players sectors assigned
+                playerDictionary.Values.ToList().ForEach(player => UserInterface.Instance.SpawnPlayerMenuItem(player));
             }
 
         }
@@ -369,9 +377,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 //temp assign in view sector to red player.
                 actualPlayer.PlayerSector = activeSectors[0];
             }
-
+            //create player menu items
+            playerDictionary.Values.ToList().ForEach(player => UserInterface.Instance.SpawnPlayerMenuItem(player));
 
         }
+
+        
 
         // in this game people go in parallel to each other
         // per phase
@@ -538,6 +549,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
             }
         }
+
+        //check for tab key to show player menu
+        if (Keyboard.current.tabKey.wasPressedThisFrame) {
+            UserInterface.Instance.TogglePlayerMenu(true);
+        }
+        else if (Keyboard.current.tabKey.wasReleasedThisFrame) {
+            UserInterface.Instance.TogglePlayerMenu(false);
+        }
+
+
 
     }
 
