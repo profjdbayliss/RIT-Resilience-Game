@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public readonly Dictionary<SectorType, Sector> AllSectors = new Dictionary<SectorType, Sector>();
     public List<Sector> AssignableSectors { get; private set; }
     private Dictionary<SectorType, Sector> SimulatedSectors = new Dictionary<SectorType, Sector>();
+    private List<SectorType> SimulatedSectorList = new List<SectorType>();
     public Sector sectorInView;
     int sectorIndex = -1;
 
@@ -220,17 +221,20 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             sector.SetOwner(player);
             player.AssignSector(sector);
-            AssignableSectors.Remove(sector);
+            //AssignableSectors.Remove(sector);
 
             //all sectors have been assigned
             if (assignedSectors >= numBluePlayers) {
                 Debug.Log($"Client {actualPlayer.playerName} has finished assigning all sectors to blue players");
                 //turn off leftover sectors
                 //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+                var unAssignedSectors = AssignableSectors.Where(sector => sector.Owner == null).ToList();
+                Debug.Log($"Unassigned sectors: {unAssignedSectors.Count}");
                 SimulatedSectors = new Dictionary<SectorType, Sector>();
-                SimulatedSectors = AssignableSectors.ToDictionary(sector => sector.sectorName, 
+                SimulatedSectors = unAssignedSectors.ToDictionary(sector => sector.sectorName,
                                                                   sector => sector);
-                activeSectors.RemoveAll(AssignableSectors.Contains);
+                SimulatedSectorList = SimulatedSectors.Keys.ToList();
+                activeSectors.RemoveAll(unAssignedSectors.Contains);
 
                 //blue player look at their sector
                 if (actualPlayer.playerTeam == PlayerTeam.Blue) {
@@ -324,7 +328,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 player.AssignSector(sector);
 
                 // Remove the sector from the list and activate it
-                AssignableSectors.Remove(sector);
+                // AssignableSectors.Remove(sector);
 
                 var sectorPayload = new List<int> { kvp.Key, sectorIndex }; // player id, sector index pairs
                 var sectorMsg = new Message(CardMessageType.SectorAssignment, sectorPayload);
@@ -332,8 +336,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             }
             //turn off leftover sectors
+            AssignableSectors.RemoveAll(sectorList.Contains);
             //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
             SimulatedSectors = AssignableSectors.ToDictionary(Sector => Sector.sectorName, Sector => Sector);
+            SimulatedSectorList = SimulatedSectors.Keys.ToList();
             activeSectors.RemoveAll(AssignableSectors.Contains);
 
 
@@ -351,7 +357,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
-        
+
 
         // in this game people go in parallel to each other
         // per phase
@@ -656,7 +662,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (numDoomClockTurnsLeft > 0) {
             UserInterface.Instance.UpdateDoomClockTurnsLeft(numDoomClockTurnsLeft);
         }
-        
+
     }
     public void AllowPlayerDiscard(CardPlayer player, int amount, List<Card> cardsAllowedToDiscard = null) {
         if (actualPlayer == player) {
@@ -791,7 +797,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                 if (phaseJustChanged) {
                     //reset player discard amounts
-                    
+
                     MIsDiscardAllowed = true;
                     // draw cards if necessary
                     if (IsActualPlayersTurn()) {
@@ -1091,8 +1097,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         turnTotal++;
         roundsLeft--;
 
-        if (IsBluffActive)
-        {
+        if (IsBluffActive) {
             bluffTurnCount++;
             BluffCountdown(bluffTurnCheck);
         }
@@ -1125,12 +1130,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.SetTurnText($"{roundsLeft}");
     }
 
-    public void HandleBluffStart(int bluffTurns)
-    {
+    public void HandleBluffStart(int bluffTurns) {
         //should the number the turns are divided by also not be hard coded?
         //only called at the start of the bluff
-        if (!IsBluffActive)
-        {
+        if (!IsBluffActive) {
             roundsLeft /= 2;
             UserInterface.Instance.SetTurnText($"{roundsLeft}");
             IsBluffActive = true;
@@ -1139,10 +1142,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
 
-    public void BluffCountdown(int bluffTurns)
-    {
-        if (bluffTurns <= bluffTurnCount)
-        {
+    public void BluffCountdown(int bluffTurns) {
+        if (bluffTurns <= bluffTurnCount) {
             IsBluffActive = false;
             roundsLeft *= 2;
             UserInterface.Instance.SetTurnText($"{roundsLeft}");
@@ -1188,11 +1189,34 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Sector Simulation
     public void SimulateSectors() {
+        if (!IsServer) return;
+        var sectorStatus = new List<(int sectorType, bool[] facilityStatus)>();
         if (MGamePhase == GamePhase.ActionBlue) {
-            SimulatedSectors.Values.ToList().ForEach(sector => sector.SimulateRestore());
+            Debug.Log($"Simulating restore on {SimulatedSectors.Count} sectors");
+            SimulatedSectors.Values.ToList().ForEach(sector => {
+                sector.SimulateRestore();
+                sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
+            });
         }
-        else if (MGamePhase == GamePhase.ActionBlue) {
-            SimulatedSectors.Values.ToList().ForEach(sector => sector.SimulateAttack());
+        else if (MGamePhase == GamePhase.ActionRed) {
+            Debug.Log($"Simulating attack on {SimulatedSectors.Count} sectors");
+            SimulatedSectors.Values.ToList().ForEach(sector => {
+                sector.SimulateAttack();
+                sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
+            });
+        }
+        RGNetworkPlayerList.instance.SendSectorDataMessage(0, sectorStatus);
+
+    }
+    public void GetSimulationStatusFromNetwork(SectorType sector, bool[] facilityStatus) {
+        if (IsServer) return;
+        Debug.Log($"Received simulation status for {sector}");
+        if (SimulatedSectors.TryGetValue(sector, out Sector simSector)) {
+            simSector.SetSimulatedFacilityStatus(facilityStatus);
+        }
+        else {
+            Debug.LogError($"Sector {sector} not found in simulation dict");
+            SimulatedSectors.Keys.ToList().ForEach(key => Debug.Log(key));
         }
     }
 

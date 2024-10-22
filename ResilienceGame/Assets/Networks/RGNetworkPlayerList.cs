@@ -29,7 +29,7 @@ public struct RGNetworkLongMessage : NetworkMessage {
 
 public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public static RGNetworkPlayerList instance;
-   // [SerializeField] private GameObject cardPlayerPrefab;
+    // [SerializeField] private GameObject cardPlayerPrefab;
 
     int nextCardUID = 0;
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
@@ -74,10 +74,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerNames.Add(name);
             if (id != 0) {
                 manager.networkPlayers.Add(cardPlayer);
-               // manager.playerDictionary.Add(id, cardPlayer);
+                // manager.playerDictionary.Add(id, cardPlayer);
                 //TODO remove
 
-               // manager.opponentPlayer = cardPlayer;
+                // manager.opponentPlayer = cardPlayer;
             }
 
         }
@@ -89,7 +89,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
-   
+
 
     public void SetPlayerType(PlayerTeam type) {
         if (isServer) {
@@ -180,7 +180,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     }
                 }
                 break;
-            
+
             case CardMessageType.EndPhase: {
                     // turn taking is handled here because the list of players on 
                     // the network happens here
@@ -366,7 +366,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
             // Send to all clients
             NetworkServer.SendToAll(netMsg);
-           // Debug.Log("SERVER SENT string message: " + stringMsg);
+            // Debug.Log("SERVER SENT string message: " + stringMsg);
         }
     }
     public void SendStringToServer(string stringMsg) {
@@ -379,7 +379,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
             };
             NetworkClient.Send(netMsg);
-          //  Debug.Log("CLIENT SENT string message: " + stringMsg);
+            //  Debug.Log("CLIENT SENT string message: " + stringMsg);
         }
     }
 
@@ -387,13 +387,41 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public void SendMessageToClient(int playerId, RGNetworkLongMessage msg) {
         if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn)) {
             conn.Send<RGNetworkLongMessage>(msg);
-        //    Debug.Log($"Server sent message to player ID {playerId}");
+            //    Debug.Log($"Server sent message to player ID {playerId}");
         }
         else {
             Debug.LogError($"No connection found for player ID {playerId}");
         }
     }
+    public void SendSectorDataMessage(int playerID, List<(int sectorType, bool[] sectorValues)> sectors) {
+        if (!isServer) return;
 
+        // Prepare a list of bytes to contain all the sector data
+        List<byte> sectorData = new List<byte>();
+
+        foreach (var sector in sectors) {
+            // Add the sector type as an int (4 bytes)
+            sectorData.AddRange(BitConverter.GetBytes(sector.sectorType));
+
+            // Add the 3 boolean values as bytes 
+            for (int i = 0; i < 3; i++) {
+                sectorData.Add(sector.sectorValues[i] ? (byte)1 : (byte)0);
+            }
+        }
+
+        // Create a new message with this data
+        Message msg = new Message(CardMessageType.SendSectorData, sectorData);
+        RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+            playerID = (uint)playerID,
+            type = (uint)msg.Type,
+            count = (uint)sectorData.Count,
+            payload = new ArraySegment<byte>(sectorData.ToArray())
+        };
+
+        // Send to all clients
+        NetworkServer.SendToAll(netMsg);
+        Debug.Log("SERVER SENT sector data message to clients");
+    }
 
     public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
         Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
@@ -409,7 +437,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 // nobody tells server to start a turn, so this shouldn't happen
                 Debug.Log("server start next phase message when it shouldn't!");
                 break;
-            
+
 
             case CardMessageType.EndPhase:
                 // end turn is handled here because the player list is kept
@@ -526,6 +554,26 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         // no start game
                         manager.RealGameStart();
 
+                    }
+                    break;
+                case CardMessageType.SendSectorData: {
+                        Debug.Log("Client received sector data message");
+                        int element = 0;
+                        while (element < msg.payload.Count) {
+                            // Read the sector type
+                            SectorType sectorType = (SectorType)GetIntFromByteArray(element, msg.payload);
+                            element += 4;
+
+                            // Read the 9 boolean values
+                            bool[] sectorValues = new bool[3];
+                            for (int i = 0; i < 3; i++) {
+                                sectorValues[i] = msg.payload.ElementAt(element++) == 1;
+                            }
+
+
+                            Debug.Log($"Received SectorType: {sectorType}, Values: {string.Join(", ", sectorValues)}");
+                            manager.GetSimulationStatusFromNetwork(sectorType, sectorValues);
+                        }
                     }
                     break;
                 case CardMessageType.LogAction: {
@@ -890,22 +938,22 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-               //case CardMessageType.ChangeCardID: {
-               //         int cardId = GetIntFromByteArray(0, msg.payload);
-               //         int newUID = DrawCardForPlayer((int)senderId); // Assign UID from server
+                //case CardMessageType.ChangeCardID: {
+                //         int cardId = GetIntFromByteArray(0, msg.payload);
+                //         int newUID = DrawCardForPlayer((int)senderId); // Assign UID from server
 
-               //         // Send the new UID back to the client
-               //         RGNetworkLongMessage assignUIDMessage = new RGNetworkLongMessage {
-               //             indexId = msg.indexId, //reuse the senderId to filter by client
-               //             type = (uint)CardMessageType.ChangeCardID,
-               //             count = 2, // cardID and UID
-               //             payload = BitConverter.GetBytes(cardId).Concat(BitConverter.GetBytes(newUID)).ToArray()
-               //         };
-               //         NetworkServer.SendToAll(assignUIDMessage);
+                //         // Send the new UID back to the client
+                //         RGNetworkLongMessage assignUIDMessage = new RGNetworkLongMessage {
+                //             indexId = msg.indexId, //reuse the senderId to filter by client
+                //             type = (uint)CardMessageType.ChangeCardID,
+                //             count = 2, // cardID and UID
+                //             payload = BitConverter.GetBytes(cardId).Concat(BitConverter.GetBytes(newUID)).ToArray()
+                //         };
+                //         NetworkServer.SendToAll(assignUIDMessage);
 
-               //         Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
-               //     }
-               //     break;
+                //         Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
+                //     }
+                //     break;
 
                 case CardMessageType.ReturnCardToDeck: {
                         int element = 0;

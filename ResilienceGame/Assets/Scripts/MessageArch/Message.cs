@@ -27,6 +27,7 @@ public enum CardMessageType
     DrawCard,
     LogAction,
     SectorAssignment,
+    SendSectorData,
     None
 }
 
