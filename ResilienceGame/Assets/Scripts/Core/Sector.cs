@@ -388,8 +388,11 @@ public class Sector : MonoBehaviour {
     #region Receiving Network Updates
     //TODO: add more effects that need to call the play function here
     public static bool DoesUpdateCallCardPlay(Card card) {
-        return card.ActionList.First() is ReduceTurnsLeftByBackdoor ||
-            card.ActionList.First() is TemporaryReductionOfTurnsLeft;
+        return card.ActionList.First() switch {
+            ReduceTurnsLeftByBackdoor => true,
+            TemporaryReductionOfTurnsLeft => true,
+            _ => false
+        };
     }
     public void AddUpdateFromPlayer(Update update, GamePhase phase, CardPlayer player) {
         Debug.Log($"Sector {sectorName} received update of type {update.Type} from {player.playerName}");
