@@ -276,6 +276,23 @@ public class TemporaryReductionOfTurnsLeft : ICardAction
     }
 }
 
+public class CancelTemporaryReductionOfTurns : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        if (GameManager.Instance.IsBluffActive)
+        {
+            GameManager.Instance.BluffCountdown(-1);
+        }
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
 public class ChangeMeepleAmount : ICardAction {
     //deprecated?
     //this action existed for like 3 cards all of which actually did different things

@@ -1461,6 +1461,11 @@ public class CardPlayer : MonoBehaviour {
 
         }
 
+        if(card.data.name == "Call Bluff" && !GameManager.Instance.IsBluffActive)
+        {
+            return ($"Cannot play {card.data.name} when the bluff isn't active", false);
+        }
+
         return ReadyState switch {
             PlayerReadyState.SelectFacilties => ($"Player must select facilities before playing cards", false),
             PlayerReadyState.DiscardCards => ValidateDiscardDuringActionPlay(card),
