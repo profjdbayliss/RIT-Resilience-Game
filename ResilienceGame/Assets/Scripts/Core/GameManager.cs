@@ -185,7 +185,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.Log("running start of game");
 
             AssignableSectors = new List<Sector>(activeSectors);
-            activeSectors.ForEach(sector => AllSectors.Add(sector.sectorName, sector)); 
+            activeSectors.ForEach(sector => AllSectors.Add(sector.sectorName, sector));
 
             // basic init of player
             SetPlayerType();
@@ -356,7 +356,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //turn off leftover sectors
             AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
             activeSectors.RemoveAll(AssignableSectors.Contains);
-            
+
 
             //blue player look at their sector
             if (actualPlayer.playerTeam == PlayerTeam.Blue) {
@@ -503,7 +503,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     kvp.Value.LogPlayerInfo();
                 }
             }
-            
+
 
 
 
@@ -563,7 +563,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (actualPlayer.playerTeam == PlayerTeam.Red) {
                 actualPlayer.PlayerSector = sectorInView;
             }
-            else{
+            else {
                 //change color based on if you are the owner
                 UserInterface.Instance.SetInfoBackground(sectorInView == actualPlayer.PlayerSector ? 1 : 2);
             }
@@ -572,13 +572,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void ViewPreviousSector() {
         sectorIndex = sectorIndex - 1 >= 0 ? sectorIndex - 1 : activeSectors.Count - 1;
         SetSectorInView(sectorIndex);
-        
+
     }
 
     public void ViewNextSector() {
         sectorIndex = sectorIndex + 1 < activeSectors.Count ? sectorIndex + 1 : 0;
         SetSectorInView(sectorIndex);
-        
+
     }
 
 
@@ -640,14 +640,31 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
+    public void CheckDownedFacilities() {
+        var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
+        if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
+
+            StartDoomClock();
+        }
+        else {
+            StopDoomClock();
+        }
+    }
     public void StartDoomClock() {
         IsDoomClockActive = true;
         numDoomClockTurnsLeft = 3;
         UserInterface.Instance.SetDoomClockActive(true);
     }
+    public void StopDoomClock() {
+        IsDoomClockActive = false;
+        UserInterface.Instance.SetDoomClockActive(false);
+    }
     public void ReduceDoomClockTurns() {
         numDoomClockTurnsLeft--;
-        UserInterface.Instance.UpdateDoomClockTurnsLeft(numDoomClockTurnsLeft);
+        if (numDoomClockTurnsLeft > 0) {
+            UserInterface.Instance.UpdateDoomClockTurnsLeft(numDoomClockTurnsLeft);
+        }
+        
     }
     public void AllowPlayerDiscard(CardPlayer player, int amount, List<Card> cardsAllowedToDiscard = null) {
         if (actualPlayer == player) {
@@ -1045,7 +1062,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             case CardMessageType.CardUpdate:
             case CardMessageType.CardUpdateWithExtraFacilityInfo:
                 if (AllSectors.TryGetValue(update.sectorPlayedOn, out Sector sector)) {
-                    sector.AddUpdateFromPlayer(update, phase, playerDictionary[(int)playerIndex]); 
+                    sector.AddUpdateFromPlayer(update, phase, playerDictionary[(int)playerIndex]);
                 }
                 else {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
@@ -1070,18 +1087,22 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Increments a turn. Note that turns consist of multiple phases.
     public void IncrementTurn() {
-        // OnRoundEnd?.Invoke(); //inform listeners that the round ended
-
-        //actualPlayer.ResetMeepleCount();
-        //opponentPlayer.ResetMeepleCount();
+        if (IsDoomClockActive) {
+            ReduceDoomClockTurns();
+            if (numDoomClockTurnsLeft == 0) {
+                MGamePhase = GamePhase.End;
+            }
+        }
         activeSectors.ForEach(sector => sector.InformFacilitiesOfNewTurn()); //update all facilities of turn end
         playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount());
         turnTotal++;
         roundsLeft--;
-        numTurnsTillWhiteCard--;
-        if (numTurnsTillWhiteCard == 0) {
-            playWhite = true;
-            numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+        if (IsServer) {
+            numTurnsTillWhiteCard--;
+            if (numTurnsTillWhiteCard == 0) {
+                playWhite = true;
+                numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+            }
         }
         // mTurnText.text = "" + GetTurnsLeft();
         UserInterface.Instance.SetTurnText(GetTurnsLeft() + "");
@@ -1096,8 +1117,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public void ChangeRoundsLeft(int change) {
-        if (roundsLeft + change < 0)
-        {
+        if (roundsLeft + change < 0) {
             roundsLeft = 0;
         }
         else roundsLeft += change;

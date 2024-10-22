@@ -43,6 +43,8 @@ public class Sector : MonoBehaviour {
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
 
+    public bool IsDown => facilities.Any(facility => facility.IsDown);
+
     [Header("Game State")]
     public Queue<(Update, GamePhase, CardPlayer)> playerCardPlayQueue = new Queue<(Update, GamePhase, CardPlayer)>();
     public bool IsAnimating { get; set; } = false;

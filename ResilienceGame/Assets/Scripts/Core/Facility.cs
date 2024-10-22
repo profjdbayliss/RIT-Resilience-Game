@@ -185,7 +185,7 @@ public class Facility : MonoBehaviour {
 
         Debug.Log($"Facility {facilityName} now has {physicalPoints} physical points, {financialPoints} financial points, and {networkPoints} network points.");
 
-        
+        GameManager.Instance.CheckDownedFacilities();
         UpdateUI();
     }
     public bool HasRemovableEffects(PlayerTeam opponentTeam, bool removePointsPerTurn = true) {

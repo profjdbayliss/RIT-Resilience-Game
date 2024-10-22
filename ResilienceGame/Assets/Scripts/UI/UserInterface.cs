@@ -187,6 +187,11 @@ public class UserInterface : MonoBehaviour {
         }
     }
     public void UpdateDoomClockTurnsLeft(int turnsLeft) {
+        if (turnsLeft <= 0 || turnsLeft >= doomClockSprites.Length) {
+            Debug.LogWarning("Invalid doom clock index: " + turnsLeft);
+            SetDoomClockActive(false);
+            return;
+        }
         doomClockImage.sprite = doomClockSprites[^turnsLeft];
     }
 
