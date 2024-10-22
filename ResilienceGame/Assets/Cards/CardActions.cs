@@ -264,6 +264,8 @@ public class TemporaryReductionOfTurnsLeft : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        GameManager.Instance.HandleBluffStart(card.data.facilityAmount);
+        GameManager.Instance.bluffTurnCheck = card.data.facilityAmount;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

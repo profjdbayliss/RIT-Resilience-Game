@@ -70,7 +70,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool mIsActionAllowed = false;
     public bool IsDoomClockActive { get; set; } = false;
     private int numDoomClockTurnsLeft = 3;
-
+    public bool IsBluffActive { get; set; } = false;
+    public int bluffTurnCount = 0;
+    public int bluffTurnCheck { get; set; } = 0;
 
     // UI Elements
     [Header("UI Elements")]
@@ -1097,6 +1099,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount());
         turnTotal++;
         roundsLeft--;
+
+        if (IsBluffActive)
+            bluffTurnCount++;
+        else bluffTurnCount = 0;
+        BluffCountdown(bluffTurnCheck);
+
         if (IsServer) {
             numTurnsTillWhiteCard--;
             if (numTurnsTillWhiteCard == 0) {
@@ -1122,6 +1130,28 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         else roundsLeft += change;
         UserInterface.Instance.SetTurnText($"{roundsLeft}");
+    }
+
+    public void HandleBluffStart(int bluffTurns)
+    {
+        //should the number the turns are divided by also not be hard coded?
+        //only called at the start of the bluff
+        if (!IsBluffActive)
+        {
+            roundsLeft /= 2;
+            IsBluffActive = true;
+        }
+        else BluffCountdown(bluffTurns);
+
+    }
+
+    public void BluffCountdown(int bluffTurns)
+    {
+        if (bluffTurns <= bluffTurnCount)
+        {
+            IsBluffActive = false;
+            roundsLeft *= 2;
+        }
     }
 
     #endregion
