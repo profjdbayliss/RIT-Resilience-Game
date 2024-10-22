@@ -564,7 +564,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             SectorType sectorType = (SectorType)GetIntFromByteArray(element, msg.payload);
                             element += 4;
 
-                            // Read the 9 boolean values
+                            // Read the 3 boolean values
                             bool[] sectorValues = new bool[3];
                             for (int i = 0; i < 3; i++) {
                                 sectorValues[i] = msg.payload.ElementAt(element++) == 1;

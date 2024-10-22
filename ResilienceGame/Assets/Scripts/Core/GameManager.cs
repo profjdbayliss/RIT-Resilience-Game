@@ -234,6 +234,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 SimulatedSectors = unAssignedSectors.ToDictionary(sector => sector.sectorName,
                                                                   sector => sector);
                 SimulatedSectorList = SimulatedSectors.Keys.ToList();
+                SimulatedSectors.Values.ToList().ForEach(sector => sector.IsSimulated = true);
                 activeSectors.RemoveAll(unAssignedSectors.Contains);
 
                 //blue player look at their sector
@@ -340,6 +341,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
             SimulatedSectors = AssignableSectors.ToDictionary(Sector => Sector.sectorName, Sector => Sector);
             SimulatedSectorList = SimulatedSectors.Keys.ToList();
+            SimulatedSectors.Values.ToList().ForEach(sector => sector.IsSimulated = true);
             activeSectors.RemoveAll(AssignableSectors.Contains);
 
 
@@ -639,7 +641,22 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Helpers
     public void CheckDownedFacilities() {
+        Debug.Log("Checking downed facilities for each sector");
+        Debug.Log(AllSectors.Count);
+        foreach (var kvp in AllSectors) {
+            if (kvp.Value.IsSimulated)
+                Debug.Log($"Simulated Sector {kvp.Value.sectorName}'s Facility status: [{kvp.Value.SimulatedFacilities[0]}," +
+                    $"{kvp.Value.SimulatedFacilities[1]}," +
+                    $"{kvp.Value.SimulatedFacilities[2]}]");
+            else
+                Debug.Log($"Actual Sector {kvp.Value.sectorName}'s Facility status: [{!kvp.Value.facilities[0].IsDown}," +
+                    $"{!kvp.Value.facilities[1].IsDown}," +
+                    $"{!kvp.Value.facilities[2].IsDown}]");
+            Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
+            UserInterface.Instance.ToggleDownedSectorInMenu((int)kvp.Key, kvp.Value.IsDown);
+        }
         var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
+        
         if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
 
             StartDoomClock();
@@ -1205,6 +1222,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
             });
         }
+        CheckDownedFacilities();
         RGNetworkPlayerList.instance.SendSectorDataMessage(0, sectorStatus);
 
     }
@@ -1213,10 +1231,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log($"Received simulation status for {sector}");
         if (SimulatedSectors.TryGetValue(sector, out Sector simSector)) {
             simSector.SetSimulatedFacilityStatus(facilityStatus);
+            CheckDownedFacilities();
         }
         else {
             Debug.LogError($"Sector {sector} not found in simulation dict");
             SimulatedSectors.Keys.ToList().ForEach(key => Debug.Log(key));
+            CheckDownedFacilities();
+
         }
     }
 

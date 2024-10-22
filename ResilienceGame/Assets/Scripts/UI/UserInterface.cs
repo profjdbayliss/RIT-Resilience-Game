@@ -46,8 +46,10 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Image doomClockImage;
     [SerializeField] private GameObject doomClockBg;
     [SerializeField] private RectTransform playerMenuContainer;
+    [SerializeField] private RectTransform playerMenuParent;
     
     [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
+    private List<Image> sectorXIcons = new List<Image>();
 
 
     [Header("Drag and Drop")]
@@ -64,6 +66,12 @@ public class UserInterface : MonoBehaviour {
             meepleButtons[3].gameObject.SetActive(false);
         }
         playerMenuItems = new List<PlayerPopupMenuItem>();
+        var sectorMenu = playerMenuContainer.GetChild(0);
+        if (sectorMenu.CompareTag("SectorMenu")) {
+            for (int i = 0; i < sectorMenu.childCount; i++) {
+                sectorXIcons.Add(sectorMenu.GetChild(i).GetChild(0).GetComponent<Image>());
+            }
+        }
     }
 
     private void Awake() {
@@ -204,7 +212,16 @@ public class UserInterface : MonoBehaviour {
         playerMenuItems.Add(newPlayerMenu);
     }
     public void TogglePlayerMenu(bool enable) {
-        playerMenuContainer.gameObject.SetActive(enable);
+        playerMenuParent.gameObject.SetActive(enable);
+    }
+    public void ToggleDownedSectorInMenu(int sectorIndex, bool enable) {
+        if (sectorIndex < 0 || sectorIndex >= sectorXIcons.Count) {
+            Debug.Log($"Invalid sector index: {sectorIndex}");
+            return;
+        }
+
+        sectorXIcons[sectorIndex].color = new Color(255, 255, 255, enable ? 1 : 0);
+
     }
 
 }

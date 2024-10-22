@@ -601,14 +601,14 @@ public class Sector : MonoBehaviour {
     public void SimulateAttack() {
         
         for (int i = 0; i < SimulatedFacilities.Length; i++) {
-            SimulatedFacilities[i] = UnityEngine.Random.value > facilityDownPercentage;
+            SimulatedFacilities[i] = (UnityEngine.Random.value > facilityDownPercentage) || !SimulatedFacilities[i];
         }
         int downedFacilities = SimulatedFacilities.Count(x => x == false);
         Debug.Log($"{sectorName} simulated red attack and lost {downedFacilities} facilities");
     }
     public void SimulateRestore() {
         for (int i = 0; i < SimulatedFacilities.Length; i++) {
-            SimulatedFacilities[i] = UnityEngine.Random.value > facilityUpPercentage;
+            SimulatedFacilities[i] = (UnityEngine.Random.value > facilityUpPercentage) || SimulatedFacilities[i];
         }
         int downedFacilities = SimulatedFacilities.Count(x => x == false);
         Debug.Log($"{sectorName} simulated blue restore and has {downedFacilities} facilities");
