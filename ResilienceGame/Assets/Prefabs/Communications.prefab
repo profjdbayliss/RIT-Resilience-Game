@@ -3025,6 +3025,7 @@ MonoBehaviour:
   effectManager: {fileID: 774510761536410493}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   downedOverlay: {fileID: 774510763012636948}
+  sectorPopoutMenu: {fileID: 774510761491713204}
 --- !u!114 &774510761536410495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3431,6 +3432,7 @@ MonoBehaviour:
   effectManager: {fileID: 774510761691721043}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   downedOverlay: {fileID: 774510761223617374}
+  sectorPopoutMenu: {fileID: 774510762403388001}
 --- !u!114 &774510761691721040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9658,6 +9660,7 @@ MonoBehaviour:
   effectManager: {fileID: 774510763029888668}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   downedOverlay: {fileID: 774510761117016015}
+  sectorPopoutMenu: {fileID: 774510761204077605}
 --- !u!114 &774510763029888657
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [SerializeField] List<Sector> activeSectors;
     public readonly Dictionary<SectorType, Sector> AllSectors = new Dictionary<SectorType, Sector>();
     public List<Sector> AssignableSectors { get; private set; }
+    private Dictionary<SectorType, Sector> SimulatedSectors = new Dictionary<SectorType, Sector>();
     public Sector sectorInView;
     int sectorIndex = -1;
 
@@ -223,6 +224,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         mStartGameRun = true;
         Debug.Log("start game set!");
     }
+    //called by the network server to assign the sectors to the players
     public void AssignSectorToPlayer(int playerIndex, int sectorType) {
         if (playerDictionary.ContainsKey(playerIndex)) {
             assignedSectors++;
@@ -246,7 +248,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (assignedSectors >= numBluePlayers) {
                 Debug.Log($"Client {actualPlayer.playerName} has finished assigning all sectors to blue players");
                 //turn off leftover sectors
-                AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+                //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+                SimulatedSectors = new Dictionary<SectorType, Sector>();
+                SimulatedSectors = AssignableSectors.ToDictionary(sector => sector.sectorName, 
+                                                                  sector => sector);
                 activeSectors.RemoveAll(AssignableSectors.Contains);
 
                 //blue player look at their sector
@@ -279,21 +284,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             AddMessage(msg);
         }
 
-        // if it's a network rejoin we already have our facility
-        /*if (actualPlayer.ActiveFacilities.Count==0 )
-        {
-            // draw our first 2 pt facility
-            Card card = actualPlayer.DrawFacility(false, 2);
-            // send message about what facility got drawn
-            if (card != null)
-            {
-                AddMessage(new Message(CardMessageType.SendPlayedFacility, card.UniqueID, card.data.cardID));
-            }
-            else
-            {
-                Debug.Log("problem in drawing first facility as it's null!");
-            }
-        }*/
 
 
         // make sure to show all our cards
@@ -364,7 +354,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             }
             //turn off leftover sectors
-            AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+            //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
+            SimulatedSectors = AssignableSectors.ToDictionary(Sector => Sector.sectorName, Sector => Sector);
             activeSectors.RemoveAll(AssignableSectors.Contains);
 
 

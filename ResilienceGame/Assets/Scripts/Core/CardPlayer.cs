@@ -11,7 +11,6 @@ using System.Linq;
 using static Facility;
 using System;
 using System.Text;
-using UnityEditor.ShaderGraph;
 #region enums
 // Enum to track player type
 public enum PlayerTeam {
@@ -567,10 +566,6 @@ public class CardPlayer : MonoBehaviour {
     public int GetMaxMeeples() {
         return (int)Mathf.Floor(maxMeeples.Aggregate((a, b) => a + b));
     }
-    //TODO: update for more than 2 players
-    //public Sector GetActiveSector() {
-    //    return PlayerSector == null ? GameManager.instance.opponentPlayer.PlayerSector : PlayerSector;
-    //}
     public void AssignSector(Sector sector) {
         PlayerSector = sector;
     }
@@ -581,13 +576,6 @@ public class CardPlayer : MonoBehaviour {
             _ => PlayerTeam.Any
         };
     }
-    //public void InformSectorOfNewTurn() {
-    //    if (PlayerSector != null)
-    //        PlayerSector.InformFacilitiesOfNewTurn();
-    //    else {
-    //        Debug.Log($"{playerName}'s sector is null");
-    //    }
-    //}
 
     //reset card state to in card drawn and return to the hand positioner by setting parent to hand drop zone
     public void ResetCardToInHand(Card card) {
@@ -627,17 +615,6 @@ public class CardPlayer : MonoBehaviour {
         }
         return facility;
     }
-    //private void OnAnimationComplete() {
-    //    Debug.Log("animation complete");
-    //    IsAnimating = false;
-
-    //    // Check if there are more cards in the queue
-    //    if (opponentCardPlays.Count > 0) {
-    //        var nextCardPlay = opponentCardPlays.Dequeue();
-    //        Debug.Log($"Playing next card update in queue: {nextCardPlay.Item1.Type}");
-    //        ProcessCardPlay(nextCardPlay.Item1, nextCardPlay.Item2, nextCardPlay.Item3);
-    //    }
-    //}
     void CalculateScore() {
         mFinalScore = 42;
     }
@@ -651,18 +628,6 @@ public class CardPlayer : MonoBehaviour {
         return (mUpdatesThisPhase.Count != 0);
     }
 
-    //private bool TryRemoveEffectFromPlayerFacilityByType(FacilityType facilityType, FacilityEffectType effectTypeToRemove) {
-    //    if (facilityType == FacilityType.None || effectTypeToRemove == FacilityEffectType.None) {
-    //        //Debug.Log("Invalid facility type or effect type (probably just didnt select 3 facilities)"); //actually expected if passing in 2/3 or 1/3 facilities
-    //        return false;
-    //    }
-    //    if (ActiveFacilities.TryGetValue((int)facilityType, out GameObject facilityObj)) {
-    //        Facility facility = facilityObj.GetComponent<Facility>();
-    //        return facility.TryRemoveEffectByType(effectTypeToRemove);
-    //    }
-    //    Debug.LogError("Facility type not found in active facilities");
-    //    return false;
-    //}
 
 
     #endregion
@@ -1720,21 +1685,7 @@ public class CardPlayer : MonoBehaviour {
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type} on sector {update.sectorPlayedOn}");
 
-        //if (update.Type == CardMessageType.CardUpdate || update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
-        //    IsAnimating = true;
-        //    //handle facility card play
-        //    if (update.FacilityPlayedOnType != FacilityType.None) {
-        //        HandleFacilityOpponentPlay(update, phase, opponent);
-        //    }
-        //    //handle non facility card
-        //    else if (update.FacilityPlayedOnType == FacilityType.None) {
-
-        //        HandleFreeOpponentPlay(update, phase, opponent);
-        //    }
-        //    else {
-        //        Debug.LogError($"Failed to find facility of type: {update.FacilityPlayedOnType}");
-        //    }
-        //}
+        
         if (update.Type == CardMessageType.DiscardCard) {
             if (opponent.TryDiscardFromHandByUID(update.UniqueID)) {
                 Debug.Log($"Successfully removed card with uid {update.UniqueID} from {opponent.playerName}'s hand");
@@ -1747,155 +1698,7 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityPlayedOnType}");
         }
     }
-    //handles when the shared logic of opponent card plays
-    //private void HandleOpponentCardPlay(Card card, GameObject dropZone, CardPlayer opponent, Facility facility = null, bool callPlay = true, Action<Update, Card> resolveCardAction = null, Update cUpdate = new Update()) {
-    //    Debug.Log($"Handling {opponent.playerName}'s card play of {card.data.name}");
-    //    if (card != null) {
-    //        if (opponent.HandCards.TryGetValue(card.UniqueID, out GameObject cardGameObject)) {
-    //            RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
-
-    //            // Set the card's parent to nothing, in order to position it in world space
-    //            cardRect.SetParent(null, true);
-    //            Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); // top middle just off the screen
-    //            cardRect.anchoredPosition = topMiddle;
-    //            card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
-    //            cardRect.SetParent(GameManager.instance.gameCanvas.transform, true); // set parent to game canvas and keep world position
-    //            cardGameObject.SetActive(true);
-    //            //Debug.Log($"Added card to screen, starting animation");
-    //            // Start the card animation
-    //            StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
-    //                card.SetCardState(CardState.CardInPlay);
-    //                opponent.HandCards.Remove(card.UniqueID); //remove the card from the opponent's hand
-    //                if (callPlay)
-    //                    card.Play(player: opponent, opponent: this, facilityActedUpon: facility);
-
-    //                //handle extra stuff from card actions
-    //                //many of them work very differently from the standard card.Play so those Play functions are not called
-    //                resolveCardAction?.Invoke(cUpdate, card);
-
-    //                GameManager.instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
-    //                // After the current animation is done, check if there's another card queued
-    //                OnAnimationComplete();
-    //            }));
-    //        }
-    //        else {
-    //            Debug.Log($"Card with uid {card.UniqueID} was not found in {opponent.playerName}'s Hand which has size {opponent.HandCards.Count}");
-    //        }
-
-
-    //    }
-    //}
-    //void RemoveFacilityEffectsFromCardUpdate(Update update) {
-    //    Debug.Log("looking to remove debuffs from selected facilities:");
-    //    var rm1 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedOne, update.FacilityEffectToRemoveType);
-    //    var rm2 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedTwo, update.FacilityEffectToRemoveType);
-    //    var rm3 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedThree, update.FacilityEffectToRemoveType);
-
-    //    if (rm1 || rm2 || rm3) {
-    //        Debug.Log($"Successfully removed {update.FacilityEffectToRemoveType} from facilities");
-    //    }
-    //    else {
-    //        Debug.Log($"Failed to remove {update.FacilityEffectToRemoveType} from facilities");
-    //    }
-    //}
-    //void AddFacilityEffectsFromCardUpdate(Update update, Card card) {
-    //    Debug.Log("looking to add debuffs to selected facilities:");
-    //    FacilityEffectType preReqEffect = card.data.preReqEffectType;
-    //    var facilities = new[]{update.AdditionalFacilitySelectedOne,
-    //                                    update.AdditionalFacilitySelectedTwo,
-    //                                    update.AdditionalFacilitySelectedThree };
-
-    //    List<Facility> facilitiesToAffect = new List<Facility>(3);
-    //    // Loop through the facilities tuple
-    //    foreach (var facilityType in facilities) {
-    //        // Check if the facility type is not None
-    //        if (facilityType != FacilityType.None) {
-    //            // Try to get the facility from the ActiveFacilities dictionary
-    //            if (ActiveFacilities.TryGetValue((int)facilityType, out GameObject facilityGO)) {
-    //                // Add the facility to the list of facilities to affect
-    //                if (facilityGO.TryGetComponent(out Facility facility)) {
-    //                    if (preReqEffect == FacilityEffectType.None || facility.HasEffectOfType(preReqEffect)) {
-    //                        facilitiesToAffect.Add(facility);
-    //                    }
-    //                }
-
-    //            }
-    //            else {
-    //                // Handle the case where the facility is not found in ActiveFacilities
-    //                Debug.LogError($"Facility of type {facilityType} not found in ActiveFacilities.");
-    //            }
-    //        }
-    //    }
-    //    //add the effects, already filtered for prereq effects
-    //    facilitiesToAffect.ForEach(facility => {
-    //        facility.AddRemoveEffectsByIdString(card.data.effectString, true, GetOpponentTeam());
-    //    });
-
-    //}
-    ////handles when the opponent plays a non facility/effect card
-    //void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
-    //    //Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
-    //    //    deckToDrawFrom: ref opponent.DeckIDs, dropZone: null,
-    //    //    allowSlippy: false, activeDeck: ref ActiveCards);
-    //    if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
-
-    //        Action<Update, Card> OnAnimationResolveCardAction = null;
-
-    //        Card tempCard = cardObject.GetComponent<Card>();
-    //        Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
-    //        Debug.Log($"Update is of type: {update.Type}");
-    //        //check for extra facility info
-    //        if (update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
-    //            Debug.Log("Extra facility info found in card update");
-    //            if (tempCard.data.effectString == "Remove") {
-    //                //remove the effect from the facilities
-    //                OnAnimationResolveCardAction = (update, card) => RemoveFacilityEffectsFromCardUpdate(update);
-    //            }
-    //            else {
-    //                //add the effect if possible
-    //                OnAnimationResolveCardAction = (update, card) => AddFacilityEffectsFromCardUpdate(update, tempCard);
-    //            }
-    //        }
-    //        //TODO: change the playersector call to the actual sector the card was played on somehow
-    //        HandleOpponentCardPlay(
-    //            tempCard,
-    //            PlayerSector.gameObject,
-    //            opponent,
-    //            callPlay: false,
-    //            resolveCardAction: OnAnimationResolveCardAction,
-    //            cUpdate: update);//dont actually call the play function of the card once its been passed in, the draw/discard messages are already sent elsewhere
-    //    }
-    //    else {
-    //        Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in {opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
-    //    }
-
-
-    //}
-    ////handles when the opponent plays a facility/effect card
-    //void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer opponent) {
-    //    Debug.Log($"Handling {opponent.playerName}'s facility card play with id {update.CardID} and name '{GetCardNameFromID(update.CardID)}'");
-
-    //    Dictionary<int, GameObject> facilityList = ActiveFacilities.Count > 0 ? ActiveFacilities : opponent.ActiveFacilities;
-    //    //get the facility played on and facility object
-    //    if (facilityList.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo) && facilityGo.TryGetComponent(out Facility facility)) {
-
-    //        Debug.Log($"{playerName} is creating card played on facility: {facility.facilityName}");
-
-    //        //pull the card out of the opponents hand by unique id
-    //        //not sure what will happen here when we add more players
-    //        if (opponent.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
-    //            Card tempCard = cardObject.GetComponent<Card>();
-
-    //            Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {opponent.playerTeam}'s hand");
-
-    //            HandleOpponentCardPlay(tempCard, facilityGo, opponent, facility);
-    //        }
-    //        else {
-    //            Debug.LogError($"{playerName} was looking for card with uid {update.UniqueID} but did not find it in " +
-    //                $"{opponent.playerName}'s hand which has size [{opponent.HandCards.Count}]");
-    //        }
-    //    }
-    //}
+    
     #endregion
     #region Network Helpers
 

@@ -49,6 +49,7 @@ public class Facility : MonoBehaviour {
     private HoverActivateObject hoverEffect;
     [SerializeField] private Material outlineMat;
     [SerializeField] private Image downedOverlay;
+    [SerializeField] private HoverMoveUI sectorPopoutMenu;
 
 
     // public FacilityEffect effect;
