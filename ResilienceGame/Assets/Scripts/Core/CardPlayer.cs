@@ -11,6 +11,7 @@ using System.Linq;
 using static Facility;
 using System;
 using System.Text;
+using UnityEditor.ShaderGraph;
 #region enums
 // Enum to track player type
 public enum PlayerTeam {
@@ -135,9 +136,10 @@ public class CardPlayer : MonoBehaviour {
     public float blueMeeples;
     public float blackMeeples;
     public float purpleMeeples;
+    public float colorlessMeeples;
 
     public const int STARTING_MEEPLES = 2;
-    private float[] maxMeeples = { 2, 2, 2 };
+    private float[] maxMeeples;
 
     //public TextMeshProUGUI[] meeplesAmountText;
     // [SerializeField] private Button[] meepleButtons;
@@ -168,23 +170,71 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Interface Updates + Meeple Spending
-    public bool CanAffordCardPlay(Card card) {
-        return card.data.blueCost <= blueMeeples &&
-            card.data.blackCost <= blackMeeples &&
-            card.data.purpleCost <= purpleMeeples;
+    public bool CanAffordCardPlay(Card card, ref bool spendColorless) {
+        float blueLeft = blueMeeples - card.data.blueCost;
+        float blackLeft = blackMeeples - card.data.blackCost;
+        float purpleLeft = purpleMeeples - card.data.purpleCost;
+
+        bool hasColorlessMeeple = colorlessMeeples > 0;
+
+        // Attempt to spend colorless meeple for blue cost if needed
+        if (blueLeft < 0 && hasColorlessMeeple) {
+            blueLeft++;
+            colorlessMeeples--;
+            spendColorless = true;
+            hasColorlessMeeple = false; // Only spend 1 colorless, so disable further spending
+        }
+        if (blueLeft < 0) {
+            return false;
+        }
+
+        // Attempt to spend colorless meeple for black cost if needed
+        if (blackLeft < 0 && hasColorlessMeeple) {
+            blackLeft++;
+            colorlessMeeples--;
+            spendColorless = true;
+            hasColorlessMeeple = false;
+        }
+        if (blackLeft < 0) {
+            return false;
+        }
+
+        // Attempt to spend colorless meeple for purple cost if needed
+        if (purpleLeft < 0 && hasColorlessMeeple) {
+            purpleLeft++;
+            colorlessMeeples--;
+            spendColorless = true;
+            hasColorlessMeeple = false;
+        }
+        if (purpleLeft < 0) {
+            return false;
+        }
+
+        // If all meeple costs are covered, return true
+        return true;
     }
+
     public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
-        if (CanAffordCardPlay(card)) {
+        bool spendColorless = false;
+
+        // Check if we can afford to play the card
+        if (CanAffordCardPlay(card, ref spendColorless)) {
             blueMeeples -= card.data.blueCost;
             blackMeeples -= card.data.blackCost;
             purpleMeeples -= card.data.purpleCost;
-            numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost); //incrememnt the reference variable to hold total meeples spent
+
+            // Total meeples spent including 1 colorless if applicable
+            numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost + (spendColorless ? 1 : 0));
             meeplesSpent += numMeeplesSpent;
+
+            // Update the UI with the new meeple amounts
             UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
             return true;
         }
+
         return false;
     }
+
     public void SpendMeepleWithButton(int index) {
         switch (index) {
             case 0:
@@ -333,6 +383,11 @@ public class CardPlayer : MonoBehaviour {
 
             }
         }
+        maxMeeples = new float[] { 2, 2, 2, playerTeam == PlayerTeam.Red ? 1 : 0 };
+        blackMeeples = maxMeeples[0];
+        blueMeeples = maxMeeples[1];
+        purpleMeeples = maxMeeples[2];
+        colorlessMeeples = maxMeeples[3];
 
     }
     //add the facilities to the player's active facilities
@@ -503,6 +558,7 @@ public class CardPlayer : MonoBehaviour {
         blackMeeples = maxMeeples[0];
         blueMeeples = maxMeeples[1];
         purpleMeeples = maxMeeples[2];
+        colorlessMeeples = maxMeeples[3];
         UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
     }
     public int GetTotalMeeples() {
@@ -873,10 +929,11 @@ public class CardPlayer : MonoBehaviour {
             }
         }
         if (Keyboard.current.tabKey.wasPressedThisFrame) {
-            maxMeeples = new float[] { 99, 99, 99 };
+            maxMeeples = new float[] { 99, 99, 99, 99 };
             blueMeeples = 99;
             blackMeeples = 99;
             purpleMeeples = 99;
+            colorlessMeeples = 99;
             UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
         }
     }
@@ -1433,9 +1490,9 @@ public class CardPlayer : MonoBehaviour {
                         return ($"Cannot play {card.data.name} on allied sectors", false);
                     }
                 }
-                
+
             }
-            
+
         }
 
         return ReadyState switch {
