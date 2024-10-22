@@ -1092,9 +1092,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
         roundsLeft--;
 
         if (IsBluffActive)
+        {
             bluffTurnCount++;
+            BluffCountdown(bluffTurnCheck);
+        }
         else bluffTurnCount = 0;
-        BluffCountdown(bluffTurnCheck);
 
         if (IsServer) {
             numTurnsTillWhiteCard--;
@@ -1130,6 +1132,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (!IsBluffActive)
         {
             roundsLeft /= 2;
+            UserInterface.Instance.SetTurnText($"{roundsLeft}");
             IsBluffActive = true;
         }
         else BluffCountdown(bluffTurns);
@@ -1142,6 +1145,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         {
             IsBluffActive = false;
             roundsLeft *= 2;
+            UserInterface.Instance.SetTurnText($"{roundsLeft}");
         }
     }
 
