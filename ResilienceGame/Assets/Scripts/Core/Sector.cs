@@ -13,8 +13,14 @@ using static Facility;
 
 public class Sector : MonoBehaviour {
     #region Fields
+    [Header("Simulation")]
+    [SerializeField] float facilityDownPercentage = 0.1f;   //10% chance of facility going down each red turn
+    [SerializeField] float facilityUpPercentage = 0.5f;     //50% chance of facility going up each blue turn
+    [SerializeField] bool[] simulatedFacilities = new bool[3] { true, true, true }; //simulated facility up/down status
+    public bool IsSimulated { get; set; } = false;
+
     [Header("Player and Sector Info")]
-    public SectorType sectorName; 
+    public SectorType sectorName;
     public CardPlayer Owner { get; private set; }
     [SerializeField] private TextMeshProUGUI sectorOwnerText;
     [SerializeField] private Canvas sectorCanvas;
@@ -43,7 +49,7 @@ public class Sector : MonoBehaviour {
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
 
-    public bool IsDown => facilities.Any(facility => facility.IsDown);
+    public bool IsDown => facilities.Any(facility => facility.IsDown) || (IsSimulated && simulatedFacilities.Any(x => x == false));
 
     [Header("Game State")]
     public Queue<(Update, GamePhase, CardPlayer)> playerCardPlayQueue = new Queue<(Update, GamePhase, CardPlayer)>();
@@ -272,7 +278,7 @@ public class Sector : MonoBehaviour {
         }
         CSVRead();
         UpdateFacilityDependencyIcons();
-        
+
     }
     public void SetOwner(CardPlayer player) {
         Owner = player;
@@ -550,7 +556,7 @@ public class Sector : MonoBehaviour {
         return false;
     }
     //handles 
-    private void CreateCardAnimation(Card card, GameObject dropZone, CardPlayer player, Facility facility = null, 
+    private void CreateCardAnimation(Card card, GameObject dropZone, CardPlayer player, Facility facility = null,
         bool callPlay = true, Action<Update, Card> resolveCardAction = null, Update cUpdate = new Update()) {
 
         Debug.Log($"Handling {player.playerName}'s card play of {card.data.name}");
@@ -587,6 +593,19 @@ public class Sector : MonoBehaviour {
             }
 
 
+        }
+    }
+    #endregion
+
+    #region Simulation
+    public void SimulateAttack() {
+        for (int i = 0; i < simulatedFacilities.Length; i++) {
+            simulatedFacilities[i] = UnityEngine.Random.value < facilityDownPercentage;
+        }
+    }
+    public void SimulateRestore() {
+        for (int i = 0; i < simulatedFacilities.Length; i++) {
+            simulatedFacilities[i] = UnityEngine.Random.value < facilityUpPercentage;
         }
     }
     #endregion

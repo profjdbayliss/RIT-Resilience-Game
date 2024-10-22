@@ -77,28 +77,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // UI Elements
     [Header("UI Elements")]
-    //public UserInterface userInterface;
-    //public GameObject gameCanvas;
-    //public GameObject startScreen;
-    //public GameObject alertScreenParent;
-    //public GameObject tiles;
-    //public TextMeshProUGUI StatusText;
-    //public TextMeshProUGUI mTurnText;
-    //public TextMeshProUGUI mPhaseText;
-    //public TextMeshProUGUI mPlayerName;
-    //public TextMeshProUGUI mPlayerDeckType;
-    //public TextMeshProUGUI mOpponentName;
-    //public TextMeshProUGUI mOpponentDeckType;
-    //public TextMeshProUGUI activePlayerText;
-    //public Color activePlayerColor;
-    //public GameObject mEndPhaseButton;
-    //public GameObject opponentPlayedZone;
-    //public Camera cam;
-    //public TextMeshProUGUI titlee;
-    //public AlertPanel mAlertPanel;
-    //public DeckSizeTracker deckSizeTracker;
-    //[SerializeField] private GameObject gameLogMessagePrefab;
-    //[SerializeField] private Transform gameLogParent;
 
 
     // End Game
@@ -813,7 +791,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                 if (phaseJustChanged) {
                     //reset player discard amounts
-
+                    
                     MIsDiscardAllowed = true;
                     // draw cards if necessary
                     if (IsActualPlayersTurn()) {
@@ -861,6 +839,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                 }
                 else if (phaseJustChanged) {
+                    SimulateSectors();
                     mIsActionAllowed = true;
                     //actualPlayer.InformSectorOfNewTurn();
                     if (IsActualPlayersTurn()) {
@@ -1199,6 +1178,18 @@ public class GameManager : MonoBehaviour, IRGObservable {
         skip = false;
         Debug.Log(MGamePhase.ToString());
         runner.StartDialogue(MGamePhase.ToString());
+    }
+
+    #endregion
+
+    #region Sector Simulation
+    public void SimulateSectors() {
+        if (MGamePhase == GamePhase.ActionBlue) {
+            SimulatedSectors.Values.ToList().ForEach(sector => sector.SimulateRestore());
+        }
+        else if (MGamePhase == GamePhase.ActionBlue) {
+            SimulatedSectors.Values.ToList().ForEach(sector => sector.SimulateAttack());
+        }
     }
 
     #endregion
