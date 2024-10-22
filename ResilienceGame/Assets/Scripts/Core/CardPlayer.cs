@@ -22,7 +22,6 @@ public enum PlayerTeam {
 };
 
 public enum SectorType {
-    // TODO: Randomly assign to blue players at the start of the game, starting with the core sectors
     Communications, //Core
     Energy, //Core
     Water, //Core
@@ -97,11 +96,6 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Prefabs and UI Elements")]
     public GameObject cardPrefab;
-    //public GameObject discardDropZone;
-    //public GameObject handDropZone;
-    //public GameObject opponentDropZone;
-    // public UserInterface userInterface;
-    //  public GameObject cardStackingCanvas;
 
     [Header("Card Positioning")]
     public readonly float ORIGINAL_SCALE = 0.2f;
@@ -290,11 +284,6 @@ public class CardPlayer : MonoBehaviour {
             AddSubtractMeepleAmount(index, reduceAmt);
         }
     }
-    //private void UpdateMeepleAmountUI() {
-    //    meeplesAmountText[0].text = blackMeeples.ToString();
-    //    meeplesAmountText[1].text = blueMeeples.ToString();
-    //    meeplesAmountText[2].text = purpleMeeples.ToString();
-    //}
     public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
         this.numMeeplesRequired = numMeeplesRequired;
         UserInterface.Instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this, onAlertFinish: onFinish);
@@ -302,58 +291,6 @@ public class CardPlayer : MonoBehaviour {
         OnMeeplesSelected = onFinish;
 
     }
-
-    //private void EnableMeepleButtons() {
-    //    foreach (Button button in meepleButtons) {
-    //        button.interactable = true;
-    //    }
-    //}
-    //private void DisableMeepleButtons() {
-    //    foreach (Button button in meepleButtons) {
-    //        button.interactable = false;
-    //    }
-    //}
-    ////called by the buttons in the sector canvas
-    //public void TryButtonSpendMeeple(int index) {
-    //    if (meepleButtons[index].interactable) {
-    //        switch (index) {
-    //            case 0:
-    //                blackMeeples--;
-    //                meeplesSpent++;
-    //                if (blackMeeples == 0) {
-    //                    meepleButtons[index].interactable = false;
-    //                }
-    //                break;
-    //            case 1:
-    //                blueMeeples--;
-    //                meeplesSpent++;
-    //                if (blueMeeples == 0) {
-    //                    meepleButtons[index].interactable = false;
-    //                }
-    //                break;
-    //            case 2:
-    //                purpleMeeples--;
-    //                meeplesSpent++;
-    //                if (purpleMeeples == 0) {
-    //                    meepleButtons[index].interactable = false;
-    //                }
-    //                break;
-    //        }
-    //        if (numMeeplesRequired > 0 && meeplesSpent > 0) {
-    //            numMeeplesRequired--;
-    //            if (numMeeplesRequired == 0) {
-    //                GameManager.instance.mAlertPanel.ResolveTextAlert();
-    //                OnMeeplesSelected?.Invoke();
-    //                DisableMeepleButtons();
-    //            }
-    //            else {
-    //                GameManager.instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this);
-
-    //            }
-    //        }
-    //        UpdateMeepleAmountUI();
-    //    }
-    //}
 
     #endregion
 

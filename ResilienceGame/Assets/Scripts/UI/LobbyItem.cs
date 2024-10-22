@@ -8,6 +8,7 @@ public class LobbyItem : MonoBehaviour
 {
     [SerializeField] private Color redColor;
     [SerializeField] private Color blueColor;
+    [SerializeField] private Color missingPlayerColor;
     [Header("UI Elements")]
     public TextMeshProUGUI PlayerName;
     public Image backgroundImage;
@@ -32,5 +33,9 @@ public class LobbyItem : MonoBehaviour
         else {
             backgroundImage.color = blueColor;
         }
+    }
+    public void SetMissingPlayer() {
+        PlayerName.enabled = false;
+        backgroundImage.color = missingPlayerColor;
     }
 }

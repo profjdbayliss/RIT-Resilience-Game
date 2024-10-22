@@ -77,9 +77,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int bluffTurnCount = 0;
     public int bluffTurnCheck { get; set; } = 0;
 
-    // UI Elements
-    [Header("UI Elements")]
-
+    //// UI Elements
+    //[Header("UI Elements")]
+    
 
     // End Game
     [Header("End Game")]
@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private int numBluePlayers = 0;
 
     public int UniqueCardIdCount = 0;
-
+    public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
 
 
@@ -174,17 +174,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
             SetPlayerType();
             SetupActors();
             UserInterface.Instance.StartGame(playerType);
+
             // init various objects to be used in the game
-            //gameCanvas.SetActive(true);
-            // alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
             roundsLeft = BASE_MAX_TURNS;
             turnTotal = 0;
             numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5 turns
-                                                                                                                    // mTurnText.text = "" + GetTurnsLeft();
-                                                                                                                    // mPhaseText.text = "Phase: " + MGamePhase.ToString();
-                                                                                                                    //   mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
+
+
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
-            //   mPlayerDeckType.text = "" + playerType;
+            
 
 
 

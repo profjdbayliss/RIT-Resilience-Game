@@ -271,8 +271,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c79f096da517be94588ae551ddbd04c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  redColor: {r: 0, g: 0, b: 0, a: 0}
-  blueColor: {r: 0, g: 0, b: 0, a: 0}
+  redColor: {r: 0.7058824, g: 0.35686275, b: 0.35686275, a: 1}
+  blueColor: {r: 0.3882353, g: 0.58431375, b: 0.7529412, a: 0}
+  missingPlayerColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   PlayerName: {fileID: 8619153982340501886}
   backgroundImage: {fileID: 7790799613682159410}
 --- !u!1 &8619153982340505216

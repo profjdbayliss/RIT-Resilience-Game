@@ -15,6 +15,8 @@ public class UserInterface : MonoBehaviour {
     private Sprite[] infoBackgrounds;
     [SerializeField] private Sprite[] doomClockSprites;
     [SerializeField] private GameObject playerMenuPrefab;
+    [SerializeField] private PlayerLobbyManager playerLobbyManager;
+
     [Header("UI Elements")]
     public Canvas gameCanvas;
     public GameObject startScreen;
@@ -56,6 +58,7 @@ public class UserInterface : MonoBehaviour {
     public GameObject hoveredDropLocation;
     // Start is called before the first frame update
     public void StartGame(PlayerTeam playerType) {
+        AddPlayerToLobby(name: RGNetworkPlayerList.instance.localPlayerName, team: playerType);
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
         mTurnText.text = "" + GameManager.Instance.GetTurnsLeft();
         mPhaseText.text = "Phase: " + GameManager.Instance.MGamePhase.ToString();
@@ -222,6 +225,12 @@ public class UserInterface : MonoBehaviour {
 
         sectorXIcons[sectorIndex].color = new Color(255, 255, 255, enable ? 1 : 0);
 
+    }
+    public void AddPlayerToLobby(string name, PlayerTeam team) {
+        playerLobbyManager.AddPlayer(name, team);
+    }
+    public void ChangePlayerTeam(string name, PlayerTeam team) {
+        playerLobbyManager.ChangePlayerTeam(name, team);
     }
 
 }
