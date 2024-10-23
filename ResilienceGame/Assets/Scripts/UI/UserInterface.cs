@@ -127,7 +127,7 @@ public class UserInterface : MonoBehaviour {
     public void ToggleGameCanvas(bool enable) {
         gameCanvas.enabled = enable;
     }
-    
+
     public void ToggleStartScreen(bool enable) {
         startScreen.SetActive(enable);
     }
@@ -150,7 +150,7 @@ public class UserInterface : MonoBehaviour {
     public void AddActionLogMessage(string message, bool fromNet, bool IsServer, ref List<string> messageLog) {
         if (fromNet || IsServer) {
             Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
-            Debug.Log($"Created log message: {message}");   
+            Debug.Log($"Created log message: {message}");
             messageLog.Add(message);
             if (IsServer) {
                 RGNetworkPlayerList.instance.SendStringToClients(message);
@@ -226,6 +226,16 @@ public class UserInterface : MonoBehaviour {
         newPlayerMenu.SetPlayer(player);
         playerMenuItems.Add(newPlayerMenu);
     }
+    public void UpdatePlayerMenuItems() {
+        playerMenuItems.ForEach(item => item.UpdatePopup());
+    }
+    public void UpdatePlayerMenuItem(CardPlayer player) {
+        var item = playerMenuItems.Find(item => item.Player == player);
+        if (item != null) {
+            item.UpdatePopup();
+        }
+    }
+
     public void TogglePlayerMenu(bool enable) {
         playerMenuParent.gameObject.SetActive(enable);
     }
@@ -248,7 +258,7 @@ public class UserInterface : MonoBehaviour {
         var max = GameManager.Instance.actualPlayer.otState == OverTimeState.Overtime ?
             GameManager.OVERTIME_DURATION : GameManager.EXHAUSTED_DURATION;
 
-        overTimeTurnsLeftText.text = $"{max-GameManager.Instance.actualPlayer.OverTimeCounter}";
+        overTimeTurnsLeftText.text = $"{max - GameManager.Instance.actualPlayer.OverTimeCounter}";
     }
     public void StartOvertime() {
         overTimeTurnsLabelText.text = "OT Turns Left";
@@ -257,7 +267,7 @@ public class UserInterface : MonoBehaviour {
     }
     public void StartExhaustion() {
         overTimeTurnsLabelText.text = "Exhausted Left";
-       // overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
+        // overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
         overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
     }
 

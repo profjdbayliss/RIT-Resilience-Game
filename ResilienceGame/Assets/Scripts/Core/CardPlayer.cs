@@ -789,7 +789,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         UserInterface.Instance.UpdateUISizeTrackers(); //update UI
-
+        UserInterface.Instance.UpdatePlayerMenuItem(this);
 
 
 
@@ -1607,6 +1607,7 @@ public class CardPlayer : MonoBehaviour {
                 HandleRemoveEffectUpdate(update, otherPlayer);
                 break;
         }
+        UserInterface.Instance.UpdatePlayerMenuItems();
     }
     //handles the update type meaning that the opponent player returned one of their cards to the deck
     void HandleReturnCardToHandUpdate(Update update, CardPlayer opponent) {
