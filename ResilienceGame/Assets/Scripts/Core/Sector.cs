@@ -374,6 +374,7 @@ public class Sector : MonoBehaviour {
             Debug.Log($"Playing next card update in queue: {nextCardPlay.Item1.Type}");
             ProcessCardPlay(nextCardPlay.Item1, nextCardPlay.Item2, nextCardPlay.Item3);
         }
+        GameManager.Instance.CheckIfCanEndPhase();
     }
     #endregion
 

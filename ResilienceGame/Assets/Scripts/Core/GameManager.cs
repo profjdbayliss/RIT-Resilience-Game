@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int UniqueCardIdCount = 0;
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
-
+    public bool WaitingForAnimations { get; private set; } = false; //flag to check if all sectors are ready to progress phase
 
     #endregion
 
@@ -659,6 +659,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
+    public void CheckIfCanEndPhase() {
+        if (WaitingForAnimations) {
+            if (!activeSectors.Any(sector => sector.HasOngoingUpdates || sector.IsAnimating)) {
+                Debug.Log("All sectors are ready progressing phase");
+                WaitingForAnimations = false;
+                EndPhase();
+            }
+        }
+    }
     public void EnableOvertime() {
         actualPlayer.StartOvertime();
     }
@@ -772,8 +781,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
         else {
-            EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
-            Debug.Log("Auto ending phase for " + actualPlayer.playerTeam);
+            if (activeSectors.Any(sector=>sector.HasOngoingUpdates || sector.IsAnimating)) {
+                Debug.Log($"A sector was not ready");
+                WaitingForAnimations = true;
+            }
+            else {
+                EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
+                Debug.Log("Auto ending phase for " + actualPlayer.playerTeam);
+            }
+            
         }
     }
     // Starts the next phase.
@@ -799,7 +815,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawRed => GamePhase.ActionRed,
             //GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
-            GamePhase.DiscardRed => playWhite ? GamePhase.DrawBlue : GamePhase.PlayWhite,
+            GamePhase.DiscardRed => playWhite ? GamePhase.PlayWhite : GamePhase.DrawBlue,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue =>  GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
