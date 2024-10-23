@@ -14534,6 +14534,8 @@ MonoBehaviour:
   colorlessMeeples: 0
   meeplesSpent: 0
   numMeeplesRequired: 0
+  otState: 0
+  overTimeCharges: 0
 --- !u!4 &680164117
 Transform:
   m_ObjectHideFlags: 0
@@ -20281,7 +20283,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2133546051}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: 
+        m_MethodName: EnableOvertime
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -21990,6 +21992,8 @@ MonoBehaviour:
   colorlessMeeples: 0
   meeplesSpent: 0
   numMeeplesRequired: 0
+  otState: 0
+  overTimeCharges: 0
 --- !u!4 &1125198115
 Transform:
   m_ObjectHideFlags: 0
@@ -35687,8 +35691,6 @@ MonoBehaviour:
   mPhaseText: {fileID: 388623893}
   mPlayerName: {fileID: 707375480}
   mPlayerDeckType: {fileID: 642437851}
-  mOpponentName: {fileID: 580009737}
-  mOpponentDeckType: {fileID: 1936131365}
   activePlayerText: {fileID: 0}
   activePlayerColor: {r: 0, g: 0, b: 0, a: 0}
   mEndPhaseButton: {fileID: 263109751}

@@ -67,6 +67,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [Header("Game Rules")]
     public readonly int MAX_DISCARDS = 3;
     public readonly int MAX_DEFENSE = 1;
+    public const int OVERTIME_DURATION = 2;
+    public const int EXHAUSTED_DURATION = 4;
     public int MNumberDiscarded { get; private set; } = 0;
     private int mNumberDefense = 0;
     public bool MIsDiscardAllowed { get; private set; } = false;
@@ -76,7 +78,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool IsBluffActive { get; set; } = false;
     public int bluffTurnCount = 0;
     public int bluffTurnCheck { get; set; } = 0;
-
+    
     //// UI Elements
     //[Header("UI Elements")]
     
@@ -657,6 +659,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
+    public void EnableOvertime() {
+        if (actualPlayer.otState == OverTimeState.None && actualPlayer.overTimeCharges > 0) {
+            actualPlayer.otState = OverTimeState.Overtime;
+            actualPlayer.overTimeCharges--;
+            UserInterface.Instance.ToggleOvertimeButton(false);
+            UserInterface.Instance.StartOvertime();
+        }
+    }
     public void CheckDownedFacilities() {
         Debug.Log("Checking downed facilities for each sector");
         Debug.Log(AllSectors.Count);
@@ -833,7 +843,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     //enable the overtime button if the doom clock is active
                     if (actualPlayer.playerTeam == PlayerTeam.Blue) {
                         if (IsDoomClockActive) {
-                            UserInterface.Instance.ToggleOvertimeButton(true);
+                            //TODO: didnt turn on overtime button??
+                            if (actualPlayer.otState == OverTimeState.None && actualPlayer.overTimeCharges > 0)
+                                UserInterface.Instance.ToggleOvertimeButton(true);
                         }
                     }
                     MIsDiscardAllowed = true;
@@ -1144,6 +1156,27 @@ public class GameManager : MonoBehaviour, IRGObservable {
         playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount());
         turnTotal++;
         roundsLeft--;
+        //update the overtime state
+        if (actualPlayer.otState == OverTimeState.Overtime) {
+            actualPlayer.OverTimeCounter++;
+            if (actualPlayer.OverTimeCounter > OVERTIME_DURATION) {
+                actualPlayer.otState = OverTimeState.Exhausted;
+                actualPlayer.OverTimeCounter = 0;
+                UserInterface.Instance.StartExhaustion();
+            }
+            else {
+                UserInterface.Instance.UpdateOTText();
+            }
+        }
+        else if (actualPlayer.otState == OverTimeState.Exhausted) {
+            actualPlayer.OverTimeCounter++;
+            if (actualPlayer.OverTimeCounter > EXHAUSTED_DURATION) {
+                actualPlayer.otState = OverTimeState.None;
+                actualPlayer.OverTimeCounter = 0;
+            } else {
+                UserInterface.Instance.UpdateOTText();
+            }
+        }
 
         if (IsBluffActive) {
             bluffTurnCount++;

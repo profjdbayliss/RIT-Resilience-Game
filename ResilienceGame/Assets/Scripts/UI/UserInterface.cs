@@ -242,5 +242,21 @@ public class UserInterface : MonoBehaviour {
     public void ChangePlayerTeam(string name, PlayerTeam team) {
         playerLobbyManager.ChangePlayerTeam(name, team);
     }
+    public void UpdateOTText() {
+        var max = GameManager.Instance.actualPlayer.otState == OverTimeState.Overtime ?
+            GameManager.OVERTIME_DURATION : GameManager.EXHAUSTED_DURATION;
+
+        overTimeTurnsLeftText.text = $"{max-GameManager.Instance.actualPlayer.OverTimeCounter}";
+    }
+    public void StartOvertime() {
+        overTimeTurnsLabelText.text = "OT Turns Left";
+        overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
+        overTimeTurnsLeftText.text = $"{GameManager.OVERTIME_DURATION}";
+    }
+    public void StartExhaustion() {
+        overTimeTurnsLabelText.text = "Exhausted Left";
+       // overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
+        overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
+    }
 
 }

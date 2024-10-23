@@ -20,6 +20,11 @@ public enum PlayerTeam {
     Any,
     None
 };
+public enum OverTimeState {
+    None,
+    Overtime,
+    Exhausted
+}
 
 public enum SectorType {
     Communications, //Core
@@ -143,13 +148,18 @@ public class CardPlayer : MonoBehaviour {
     public int numMeeplesRequired = 0;
     private int mMeeplesSpent = 0;
 
+    [Header("Overtime")]
+    public OverTimeState otState;
+    public int OverTimeCounter { get; set; } = 0;
+    public int overTimeCharges; // Tracks how often a sector can mandate overtime
+
     [Header("Scoring")]
     private int mFinalScore = 0;
 
     // Private fields
     //private static int sUniqueIDCount = 0;
     public Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
-    
+
 
     // Enum definition
     public enum PlayerReadyState {
@@ -492,9 +502,26 @@ public class CardPlayer : MonoBehaviour {
     #region Helpers
     public void ResetMeepleCount() {
         meeplesSpent = 0;
-        blackMeeples = maxMeeples[0];
-        blueMeeples = maxMeeples[1];
-        purpleMeeples = maxMeeples[2];
+        float[] adjustedMaxMeeples = (float[])maxMeeples.Clone();
+
+        switch (otState) {
+            case OverTimeState.Overtime:
+                adjustedMaxMeeples[0] *= 2;
+                adjustedMaxMeeples[1] *= 2;
+                adjustedMaxMeeples[2] *= 2;
+                break;
+            case OverTimeState.Exhausted:
+                adjustedMaxMeeples[0] /= 2;
+                adjustedMaxMeeples[1] /= 2;
+                adjustedMaxMeeples[2] /= 2;
+                break;
+        }
+
+
+
+        blackMeeples = adjustedMaxMeeples[0];
+        blueMeeples = adjustedMaxMeeples[1];
+        purpleMeeples = adjustedMaxMeeples[2];
         colorlessMeeples = maxMeeples[3];
         UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
     }
@@ -1307,7 +1334,7 @@ public class CardPlayer : MonoBehaviour {
                 (response, canPlay) = CanDiscardCard(card);
                 break;
             case GamePhase.BonusBlue:
-           
+
                 (response, canPlay) = ("Cannot play cards during bonus phase", false); //turn only happens during Doomclock? where you can allocate overtime
                 break;
             case GamePhase.ActionBlue:
@@ -1398,8 +1425,7 @@ public class CardPlayer : MonoBehaviour {
 
         }
 
-        if(card.data.name == "Call Bluff" && !GameManager.Instance.IsBluffActive)
-        {
+        if (card.data.name == "Call Bluff" && !GameManager.Instance.IsBluffActive) {
             return ($"Cannot play {card.data.name} when the bluff isn't active", false);
         }
 
@@ -1628,7 +1654,7 @@ public class CardPlayer : MonoBehaviour {
     void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
         Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type} on sector {update.sectorPlayedOn}");
 
-        
+
         if (update.Type == CardMessageType.DiscardCard) {
             if (opponent.TryDiscardFromHandByUID(update.UniqueID)) {
                 Debug.Log($"Successfully removed card with uid {update.UniqueID} from {opponent.playerName}'s hand");
@@ -1641,7 +1667,7 @@ public class CardPlayer : MonoBehaviour {
             Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityPlayedOnType}");
         }
     }
-    
+
     #endregion
     #region Network Helpers
 
