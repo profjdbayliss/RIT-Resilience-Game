@@ -859,7 +859,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     if (activeSectors.Any(sector => sector.HasOngoingUpdates))
                         return;
                     //enable the overtime button if the doom clock is active
-                    if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                    if (actualPlayer.playerTeam == PlayerTeam.Blue && IsActualPlayersTurn()) {
                         if (IsDoomClockActive) {
                             Debug.Log($"Looking at ot state to enable ot: {actualPlayer.otState} ot charge: {actualPlayer.overTimeCharges}");
                             if (actualPlayer.otState == OverTimeState.None && actualPlayer.overTimeCharges > 0)
