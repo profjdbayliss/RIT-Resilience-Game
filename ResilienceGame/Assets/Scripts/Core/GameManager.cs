@@ -78,10 +78,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool IsBluffActive { get; set; } = false;
     public int bluffTurnCount = 0;
     public int bluffTurnCheck { get; set; } = 0;
-
+    
     //// UI Elements
     //[Header("UI Elements")]
-
+    
 
     // End Game
     [Header("End Game")]
@@ -130,7 +130,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int UniqueCardIdCount = 0;
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
-    public bool IsWaitingForAnimationFinish { get; set; } = false;
 
 
     #endregion
@@ -185,7 +184,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
-
+            
 
 
 
@@ -296,13 +295,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
             cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
             cardPlayer.InitializeCards();
-            if (playerDictionary.ContainsKey(id)) {
-                playerDictionary[id] = cardPlayer;
-            }
-            else {
-                playerDictionary.Add(id, cardPlayer);
-            }
-            
+            playerDictionary.Add(id, cardPlayer);
             if (cardPlayer.playerTeam == PlayerTeam.Blue) {
                 numBluePlayers++;
             }
@@ -527,13 +520,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (isInit) {
             if (gameStarted) {
                 HandlePhases(MGamePhase);
-                if (IsWaitingForAnimationFinish) {
-                    if (!activeSectors.Any(sector => sector.IsAnimating || sector.HasOngoingUpdates)) {
-                        IsWaitingForAnimationFinish = false;
-                        Debug.Log("Finished waiting for animations, informing server of ready");
-                        InformNetworkOfReadyStatus(true);
-                    }
-                }
             }
 
             // always notify observers in case there's a message
@@ -680,15 +666,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log("Checking downed facilities for each sector");
         Debug.Log(AllSectors.Count);
         foreach (var kvp in AllSectors) {
-            //if (kvp.Value.IsSimulated)
-            //    Debug.Log($"Simulated Sector {kvp.Value.sectorName}'s Facility status: [{kvp.Value.SimulatedFacilities[0]}," +
-            //        $"{kvp.Value.SimulatedFacilities[1]}," +
-            //        $"{kvp.Value.SimulatedFacilities[2]}]");
-            //else
-            //    Debug.Log($"Actual Sector {kvp.Value.sectorName}'s Facility status: [{!kvp.Value.facilities[0].IsDown}," +
-            //        $"{!kvp.Value.facilities[1].IsDown}," +
-            //        $"{!kvp.Value.facilities[2].IsDown}]");
-            //Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
+            if (kvp.Value.IsSimulated)
+                Debug.Log($"Simulated Sector {kvp.Value.sectorName}'s Facility status: [{kvp.Value.SimulatedFacilities[0]}," +
+                    $"{kvp.Value.SimulatedFacilities[1]}," +
+                    $"{kvp.Value.SimulatedFacilities[2]}]");
+            else
+                Debug.Log($"Actual Sector {kvp.Value.sectorName}'s Facility status: [{!kvp.Value.facilities[0].IsDown}," +
+                    $"{!kvp.Value.facilities[1].IsDown}," +
+                    $"{!kvp.Value.facilities[2].IsDown}]");
+            Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
             UserInterface.Instance.ToggleDownedSectorInMenu((int)kvp.Key, kvp.Value.IsDown);
         }
         var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
@@ -743,7 +729,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public bool IsActualPlayersTurn() {
         if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.DiscardRed;
+            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed  || MGamePhase == GamePhase.DiscardRed;
         }
         else {
             return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue || MGamePhase == GamePhase.DiscardBlue;
@@ -778,13 +764,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         MGamePhase = GetNextPhase();
         Debug.Log($"Progressing phase {curPhase} to {MGamePhase}");
-        if (IsServer)
-            RGNetworkPlayerList.instance.ClearReadyFlags();
         if (IsActualPlayersTurn()) {
             if (!(MGamePhase == GamePhase.DiscardBlue || MGamePhase == GamePhase.DiscardRed)) {
                 //mEndPhaseButton.SetActive(true);
                 UserInterface.Instance.ToggleEndPhaseButton(true);
-                // Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
+               // Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
             }
         }
         else {
@@ -815,9 +799,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawRed => GamePhase.ActionRed,
             //GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
-            GamePhase.DiscardRed => playWhite ? GamePhase.PlayWhite : GamePhase.DrawBlue,
+            GamePhase.DiscardRed => playWhite ? GamePhase.DrawBlue : GamePhase.PlayWhite,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
-            GamePhase.DrawBlue => GamePhase.ActionBlue,
+            GamePhase.DrawBlue =>  GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
             GamePhase.DiscardBlue => IsDoomClockActive ? GamePhase.BonusBlue : GamePhase.DrawRed,
             GamePhase.BonusBlue => GamePhase.DrawRed,
@@ -827,6 +811,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Handle all the card game phases with
     // this simple state machine.
     public void HandlePhases(GamePhase phase) {
+        // TODO: Implement team turns
 
         // keep track of 
         bool phaseJustChanged = false;
@@ -847,15 +832,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
-
+                
 
                 if (phaseJustChanged) {
                     //do nothing until incoming card actions are resolved
                     //this should prevent the doom clock from turning on after this code was called
                     //which meant the OT button wouldnt get turned on when it should
-
-                    Debug.Log($"Running Start of Draw Phase");
-
+                    if (activeSectors.Any(sector => sector.HasOngoingUpdates))
+                        return;
                     //enable the overtime button if the doom clock is active
                     if (actualPlayer.playerTeam == PlayerTeam.Blue) {
                         if (IsDoomClockActive) {
@@ -891,7 +875,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                 }
                 break;
-
+            
             case GamePhase.BonusBlue:
                 break;
             case GamePhase.ActionBlue:
@@ -937,32 +921,21 @@ public class GameManager : MonoBehaviour, IRGObservable {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
                 if (phaseJustChanged) {
-                    //draw cards at the end of action phase
-                    if (IsActualPlayersTurn()) {
-                        actualPlayer.DrawCardsToFillHand();
+                    if (!actualPlayer.NeedsToDiscard()) {
+                        EndPhase(); //immediately end phase if no discards needed
+                        return;
                     }
-
-                    //set proper alerts and ui elements if the player needs to discard
-                    //we will still progress this phase if they do not need to discard as this phase is also used to resolve
-                    //any leftover card actions that were played during the action phase
-                    if (actualPlayer.NeedsToDiscard()) {
-                        MIsDiscardAllowed = true;
-                        Debug.Log($"setting discard drop active");
-                        // UserInterface.Instance.discardDropZone.SetActive(true);
-                        UserInterface.Instance.EnableDiscardDrop();
-                        MNumberDiscarded = 0;
-                        UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has " + actualPlayer.HandCards.Count + " cards in hand.");
-                        UserInterface.Instance.DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
-                    }
+                    //reset player discard amounts
+                    MIsDiscardAllowed = true;
+                    Debug.Log($"setting discard drop active");
+                    // UserInterface.Instance.discardDropZone.SetActive(true);
+                    UserInterface.Instance.EnableDiscardDrop();
+                    MNumberDiscarded = 0;
+                    UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has " + actualPlayer.HandCards.Count + " cards in hand.");
+                    UserInterface.Instance.DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
                 }
                 else {
 
-                    //most likely will end phase after waitig for animations
-                    if (!actualPlayer.NeedsToDiscard()) {
-                        EndPhase();
-                        return;
-                    }
-                    //but we still cap hand at 7
                     if (MIsDiscardAllowed) {
                         MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase);
 
@@ -1042,17 +1015,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Ends the phase.
     public void EndPhase() {
         UserInterface.Instance.ResolveTextAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
-
-        //check for ongoing animations
-        //wait here until all animations are done
-        var coreSector = activeSectors.Where(sector => sector.isCore).FirstOrDefault();
-        Debug.Log($"update count: {coreSector.playerCardPlayQueue.Count}\nIs anim: {coreSector.IsAnimating}");
-        foreach (var sector in activeSectors) {
-            if (sector.HasOngoingUpdates || sector.IsAnimating) {
-                Debug.Log($"Sector {sector.sectorName} has ongoing updates not ending discard phase yet");
-                IsWaitingForAnimationFinish = true;
-            }
-        }
+        
         switch (MGamePhase) {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
@@ -1095,6 +1058,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         if (myTurn) {
             Debug.Log("ending the game phase in gamemanager!");
+            //HidePlayUI();
+            //mEndPhaseButton.SetActive(false);
             UserInterface.Instance.ToggleEndPhaseButton(false);
             AddMessage(new Message(CardMessageType.EndPhase));
             myTurn = false;
@@ -1104,19 +1069,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Networking
-   
-    public void InformNetworkOfReadyStatus(bool isReady) {
-        int readyStatus = isReady ? 1 : 0;
-
-        // Create a new message with the ReadyForNextPhase type and add the ready status as an argument
-        Message readyMessage = new Message(CardMessageType.ReadyForNextPhase, readyStatus);
-
-        // Add the message to the queue
-        AddMessage(readyMessage);
-
-        // Notify all observers that there is a new message
-        NotifyObservers();
-    }
     // Adds a message to the message queue for the network.
     public void AddMessage(Message msg) {
         mMessageQueue.Enqueue(msg);
@@ -1143,7 +1095,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 Message m = mMessageQueue.Dequeue();
                 foreach (IRGObserver o in mObservers) {
                     o.UpdateObserver(m);
-                    
+                    //messageLog.Add(m.ToString()); not correct spot?
                 }
             }
         }
@@ -1218,8 +1170,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             actualPlayer.OverTimeCounter++;
             if (actualPlayer.OverTimeCounter > EXHAUSTED_DURATION) {
                 actualPlayer.EndExhaustion();
-            }
-            else {
+            } else {
                 UserInterface.Instance.UpdateOTText();
             }
         }
@@ -1233,7 +1184,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (IsServer) {
             numTurnsTillWhiteCard--;
             if (numTurnsTillWhiteCard == 0) {
-                //playWhite = true;
+                playWhite = true;
                 numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
             }
         }
