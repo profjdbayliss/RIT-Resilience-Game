@@ -7,8 +7,8 @@ using UnityEngine.UI;
 
 public class UserInterface : MonoBehaviour {
 
-    public CardPlayer actualPlayer;
-    public CardPlayer opponentPlayer; //TODO: remove this and replace with a list of players
+    //public CardPlayer actualPlayer;
+    //public CardPlayer opponentPlayer; //TODO: remove this and replace with a list of players
 
     public static UserInterface Instance;
     [SerializeField]
@@ -16,6 +16,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Sprite[] doomClockSprites;
     [SerializeField] private GameObject playerMenuPrefab;
     [SerializeField] private PlayerLobbyManager playerLobbyManager;
+    [SerializeField] private Sprite[] PhaseButtonSprites;
 
     [Header("UI Elements")]
     public Canvas gameCanvas;
@@ -27,8 +28,8 @@ public class UserInterface : MonoBehaviour {
     public TextMeshProUGUI mPhaseText;
     public TextMeshProUGUI mPlayerName;
     public TextMeshProUGUI mPlayerDeckType;
-    public TextMeshProUGUI mOpponentName;
-    public TextMeshProUGUI mOpponentDeckType;
+    //public TextMeshProUGUI mOpponentName;
+    //public TextMeshProUGUI mOpponentDeckType;
     public TextMeshProUGUI activePlayerText;
     public Color activePlayerColor;
     public GameObject mEndPhaseButton;
@@ -36,7 +37,7 @@ public class UserInterface : MonoBehaviour {
     public Camera cam;
     public TextMeshProUGUI titlee;
     public AlertPanel mAlertPanel;
-    public DeckSizeTracker deckSizeTracker;
+    //public DeckSizeTracker deckSizeTracker;
     public GameObject discardDropZone;
     public GameObject handDropZone;
     public GameObject opponentDropZone;
@@ -49,7 +50,13 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private GameObject doomClockBg;
     [SerializeField] private RectTransform playerMenuContainer;
     [SerializeField] private RectTransform playerMenuParent;
-    
+    [SerializeField] private GameObject overTimeButton;
+    [SerializeField] private TextMeshProUGUI overTimeChargesText;
+    [SerializeField] private TextMeshProUGUI overTimeTurnsLeftText;
+    [SerializeField] private TextMeshProUGUI overTimeTurnsLabelText;
+    [SerializeField] private TextMeshProUGUI playerDeckText;
+    [SerializeField] private TextMeshProUGUI playerHandText;
+
     [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
     private List<Image> sectorXIcons = new List<Image>();
 
@@ -100,7 +107,7 @@ public class UserInterface : MonoBehaviour {
     //called by the buttons in the sector canvas
     public void TryButtonSpendMeeple(int index) {
         if (meepleButtons[index].interactable) {
-            actualPlayer.SpendMeepleWithButton(index);
+            GameManager.Instance.actualPlayer.SpendMeepleWithButton(index);
         }
     }
     public void EnableDiscardDrop() {
@@ -118,15 +125,22 @@ public class UserInterface : MonoBehaviour {
     public void ToggleGameCanvas(bool enable) {
         gameCanvas.enabled = enable;
     }
-    public void SetOpponentNameAndDeckText(string name, string deckName) {
-        mOpponentName.text = name;
-        mOpponentDeckType.text = deckName;
-    }
+    
     public void ToggleStartScreen(bool enable) {
         startScreen.SetActive(enable);
     }
     public void ToggleEndPhaseButton(bool enable) {
-        mEndPhaseButton.SetActive(enable);
+        mEndPhaseButton.GetComponent<Button>().interactable = enable;
+        mEndPhaseButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
+        //mEndPhaseButton.SetActive(enable);
+    }
+    public void ToggleOvertimeButton(bool enable) {
+        if (!overTimeButton.activeSelf) return;
+        overTimeButton.GetComponent<Button>().interactable = enable;
+        overTimeButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
+    }
+    public void DisableOverTimeButtonForRed() {
+        overTimeButton.SetActive(false);
     }
     //adds the string message to the game log
     //if the message is from the network, or this is the server, it will be added to the game log
@@ -146,12 +160,8 @@ public class UserInterface : MonoBehaviour {
 
     }
     public void UpdateUISizeTrackers() {
-        //TODO: Add check for all red players
-        deckSizeTracker.UpdateAllTrackerTexts(
-            playerDeckSize: actualPlayer.DeckIDs.Count,
-            playerHandSize: actualPlayer.HandCards.Count,
-            opponentDeckSize: opponentPlayer.DeckIDs.Count,
-            opponentHandSize: opponentPlayer.HandCards.Count);
+        playerDeckText.text = GameManager.Instance.actualPlayer.DeckIDs.Count.ToString();
+        playerHandText.text = GameManager.Instance.actualPlayer.HandCards.Count.ToString();
     }
     // Show the cards and game UI for player.
     public void ShowPlayUI() {
@@ -169,7 +179,7 @@ public class UserInterface : MonoBehaviour {
         StatusText.text = message;
     }
     public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1, Action onAlertFinish = null) {
-        if (player == actualPlayer) {
+        if (player == GameManager.Instance.actualPlayer) {
             if (onAlertFinish == null)
                 mAlertPanel.ShowTextAlert(message, duration);
             else

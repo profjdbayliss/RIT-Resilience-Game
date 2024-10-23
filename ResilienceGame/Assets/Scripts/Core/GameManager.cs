@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool hasWhiteCardPlayed = true; //TODO change when implementing white cards
     private int assignedSectors = 0;
     private int numBluePlayers = 0;
-
+    private const int SECTOR_SIM_TURN_START = 2;
     public int UniqueCardIdCount = 0;
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
@@ -368,6 +368,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // go on to the next phase
         // MGamePhase = GamePhase.DrawRed;
         StartNextPhase();
+        UserInterface.Instance.ToggleOvertimeButton(false);
         UserInterface.Instance.ToggleStartScreen(false);
         //startScreen.SetActive(false);
 
@@ -829,8 +830,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
                 if (phaseJustChanged) {
-                    //reset player discard amounts
-
+                    //enable the overtime button if the doom clock is active
+                    if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                        if (IsDoomClockActive) {
+                            UserInterface.Instance.ToggleOvertimeButton(true);
+                        }
+                    }
                     MIsDiscardAllowed = true;
                     // draw cards if necessary
                     if (IsActualPlayersTurn()) {
@@ -878,7 +883,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                 }
                 else if (phaseJustChanged) {
-                    SimulateSectors();
+                    //disable the button since it would have been activated in the previous phase
+                    if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                        if (IsDoomClockActive) {
+                            UserInterface.Instance.ToggleOvertimeButton(false);
+                        }
+                    }
+
+                    //simulate the sectors getting attacked/restored 
+                    if (simulateSectors && turnTotal >= SECTOR_SIM_TURN_START)
+                        SimulateSectors();
+
                     mIsActionAllowed = true;
                     //actualPlayer.InformSectorOfNewTurn();
                     if (IsActualPlayersTurn()) {
@@ -988,7 +1003,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Ends the phase.
     public void EndPhase() {
         UserInterface.Instance.ResolveTextAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
-
+        
         switch (MGamePhase) {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
