@@ -1307,7 +1307,7 @@ public class CardPlayer : MonoBehaviour {
                 (response, canPlay) = CanDiscardCard(card);
                 break;
             case GamePhase.BonusBlue:
-            case GamePhase.BonusRed:
+           
                 (response, canPlay) = ("Cannot play cards during bonus phase", false); //turn only happens during Doomclock? where you can allocate overtime
                 break;
             case GamePhase.ActionBlue:

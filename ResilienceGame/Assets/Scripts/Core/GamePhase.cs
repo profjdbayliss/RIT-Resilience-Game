@@ -4,7 +4,7 @@ public enum GamePhase
     Start,
     DrawRed,
     DrawBlue,
-    BonusRed,
+   // BonusRed,
     BonusBlue,
     ActionRed,
     ActionBlue,

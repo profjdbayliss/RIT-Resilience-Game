@@ -723,7 +723,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public bool IsActualPlayersTurn() {
         if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.BonusRed || MGamePhase == GamePhase.DiscardRed;
+            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed  || MGamePhase == GamePhase.DiscardRed;
         }
         else {
             return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue || MGamePhase == GamePhase.DiscardBlue;
@@ -790,15 +790,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public GamePhase GetNextPhase() {
         return MGamePhase switch {
             GamePhase.Start => GamePhase.DrawRed,
-            GamePhase.DrawRed => IsDoomClockActive ? GamePhase.BonusRed : GamePhase.ActionRed,
-            GamePhase.BonusRed => GamePhase.ActionRed,
+            GamePhase.DrawRed => GamePhase.ActionRed,
+            //GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
             GamePhase.DiscardRed => playWhite ? GamePhase.DrawBlue : GamePhase.PlayWhite,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
-            GamePhase.DrawBlue => IsDoomClockActive ? GamePhase.BonusBlue : GamePhase.ActionBlue,
-            GamePhase.BonusBlue => GamePhase.ActionBlue,
+            GamePhase.DrawBlue =>  GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
-            GamePhase.DiscardBlue => (actualPlayer.DeckIDs.Count == 0 || actualPlayer.ActiveFacilities.Count == 0) ? GamePhase.End : GamePhase.DrawRed,
+            GamePhase.DiscardBlue => IsDoomClockActive ? GamePhase.BonusBlue : GamePhase.DrawRed,
+            GamePhase.BonusBlue => GamePhase.DrawRed,
             _ => GamePhase.End
         };
     }
@@ -858,7 +858,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                 }
                 break;
-            case GamePhase.BonusRed:
+            
             case GamePhase.BonusBlue:
                 break;
             case GamePhase.ActionBlue:
