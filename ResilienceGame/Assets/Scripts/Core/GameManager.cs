@@ -660,12 +660,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Helpers
     public void EnableOvertime() {
-        if (actualPlayer.otState == OverTimeState.None && actualPlayer.overTimeCharges > 0) {
-            actualPlayer.otState = OverTimeState.Overtime;
-            actualPlayer.overTimeCharges--;
-            UserInterface.Instance.ToggleOvertimeButton(false);
-            UserInterface.Instance.StartOvertime();
-        }
+        actualPlayer.StartOvertime();
     }
     public void CheckDownedFacilities() {
         Debug.Log("Checking downed facilities for each sector");
@@ -773,7 +768,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (!(MGamePhase == GamePhase.DiscardBlue || MGamePhase == GamePhase.DiscardRed)) {
                 //mEndPhaseButton.SetActive(true);
                 UserInterface.Instance.ToggleEndPhaseButton(true);
-                Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
+               // Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
             }
         }
         else {
@@ -837,13 +832,18 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
-
+                
 
                 if (phaseJustChanged) {
+                    //do nothing until incoming card actions are resolved
+                    //this should prevent the doom clock from turning on after this code was called
+                    //which meant the OT button wouldnt get turned on when it should
+                    if (activeSectors.Any(sector => sector.HasOngoingUpdates))
+                        return;
                     //enable the overtime button if the doom clock is active
                     if (actualPlayer.playerTeam == PlayerTeam.Blue) {
                         if (IsDoomClockActive) {
-                            //TODO: didnt turn on overtime button??
+                            Debug.Log($"Looking at ot state to enable ot: {actualPlayer.otState} ot charge: {actualPlayer.overTimeCharges}");
                             if (actualPlayer.otState == OverTimeState.None && actualPlayer.overTimeCharges > 0)
                                 UserInterface.Instance.ToggleOvertimeButton(true);
                         }
@@ -1153,16 +1153,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
         activeSectors.ForEach(sector => sector.InformFacilitiesOfNewTurn()); //update all facilities of turn end
-        playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount());
+        playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount()); //return meeples to max values
         turnTotal++;
         roundsLeft--;
         //update the overtime state
         if (actualPlayer.otState == OverTimeState.Overtime) {
             actualPlayer.OverTimeCounter++;
             if (actualPlayer.OverTimeCounter > OVERTIME_DURATION) {
-                actualPlayer.otState = OverTimeState.Exhausted;
-                actualPlayer.OverTimeCounter = 0;
-                UserInterface.Instance.StartExhaustion();
+                actualPlayer.EndOvertime();
             }
             else {
                 UserInterface.Instance.UpdateOTText();
@@ -1171,8 +1169,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         else if (actualPlayer.otState == OverTimeState.Exhausted) {
             actualPlayer.OverTimeCounter++;
             if (actualPlayer.OverTimeCounter > EXHAUSTED_DURATION) {
-                actualPlayer.otState = OverTimeState.None;
-                actualPlayer.OverTimeCounter = 0;
+                actualPlayer.EndExhaustion();
             } else {
                 UserInterface.Instance.UpdateOTText();
             }

@@ -89,10 +89,12 @@ public class UserInterface : MonoBehaviour {
     }
 
 
-    public void UpdateMeepleAmountUI(float blackMeeples, float blueMeeples, float purpleMeeples) {
+    public void UpdateMeepleAmountUI(float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples) {
         meeplesAmountText[0].text = blackMeeples.ToString();
         meeplesAmountText[1].text = blueMeeples.ToString();
         meeplesAmountText[2].text = purpleMeeples.ToString();
+        if (GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red)
+            meeplesAmountText[3].text = colorlessMeeples.ToString();
     }
     public void EnableMeepleButtons() {
         foreach (Button button in meepleButtons) {

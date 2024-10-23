@@ -152,7 +152,7 @@ public class CardPlayer : MonoBehaviour {
     public OverTimeState otState;
     public int OverTimeCounter { get; set; } = 0;
     public int overTimeCharges; // Tracks how often a sector can mandate overtime
-
+    public readonly int MAX_OVERTIME_CHARGES = 2;
     [Header("Scoring")]
     private int mFinalScore = 0;
 
@@ -232,7 +232,7 @@ public class CardPlayer : MonoBehaviour {
             meeplesSpent += numMeeplesSpent;
 
             // Update the UI with the new meeple amounts
-            UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+            UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples, colorlessMeeples);
             return true;
         }
 
@@ -275,25 +275,25 @@ public class CardPlayer : MonoBehaviour {
 
             }
         }
-        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples, colorlessMeeples);
     }
-    public void AddSubtractMeepleAmount(int index, float numMeeples) {
-        if (index < 0 || index >= 3) return;
-        maxMeeples[index] += numMeeples;
-        if (maxMeeples[index] < 0) maxMeeples[index] = 0;
+    //public void AddSubtractMeepleAmount(int index, float numMeeples) {
+    //    if (index < 0 || index >= 3) return;
+    //    maxMeeples[index] += numMeeples;
+    //    if (maxMeeples[index] < 0) maxMeeples[index] = 0;
 
-        if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
-        if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
-        if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
-        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
-    }
-    public void MultiplyMeepleAmount(int index, float multiplier) {
-        if (index < 0 || index >= 3) return;
-        var reduceAmt = (int)Mathf.Floor(maxMeeples[index] * multiplier);   //don't reduce by a half value...why were meeples floats ever
-        if (reduceAmt > 0) {
-            AddSubtractMeepleAmount(index, reduceAmt);
-        }
-    }
+    //    if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
+    //    if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
+    //    if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
+    //    UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+    //}
+    //public void MultiplyMeepleAmount(int index, float multiplier) {
+    //    if (index < 0 || index >= 3) return;
+    //    var reduceAmt = (int)Mathf.Floor(maxMeeples[index] * multiplier);   //don't reduce by a half value...why were meeples floats ever
+    //    if (reduceAmt > 0) {
+    //        AddSubtractMeepleAmount(index, reduceAmt);
+    //    }
+    //}
     public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
         this.numMeeplesRequired = numMeeplesRequired;
         UserInterface.Instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this, onAlertFinish: onFinish);
@@ -315,7 +315,7 @@ public class CardPlayer : MonoBehaviour {
 
         InitDropLocations();
         blackMeeples = blueMeeples = purpleMeeples = STARTING_MEEPLES;
-
+        overTimeCharges = MAX_OVERTIME_CHARGES;
     }
     public void InitializeCards() {
         DeckIDs.Clear();
@@ -502,28 +502,12 @@ public class CardPlayer : MonoBehaviour {
     #region Helpers
     public void ResetMeepleCount() {
         meeplesSpent = 0;
-        float[] adjustedMaxMeeples = (float[])maxMeeples.Clone();
-
-        switch (otState) {
-            case OverTimeState.Overtime:
-                adjustedMaxMeeples[0] *= 2;
-                adjustedMaxMeeples[1] *= 2;
-                adjustedMaxMeeples[2] *= 2;
-                break;
-            case OverTimeState.Exhausted:
-                adjustedMaxMeeples[0] /= 2;
-                adjustedMaxMeeples[1] /= 2;
-                adjustedMaxMeeples[2] /= 2;
-                break;
-        }
-
-
-
-        blackMeeples = adjustedMaxMeeples[0];
-        blueMeeples = adjustedMaxMeeples[1];
-        purpleMeeples = adjustedMaxMeeples[2];
+        
+        blackMeeples = maxMeeples[0];
+        blueMeeples = maxMeeples[1];
+        purpleMeeples = maxMeeples[2];
         colorlessMeeples = maxMeeples[3];
-        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+        UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples, colorlessMeeples);
     }
     public int GetTotalMeeples() {
         return (int)(blueMeeples + blackMeeples + purpleMeeples);
@@ -864,7 +848,7 @@ public class CardPlayer : MonoBehaviour {
             blackMeeples = 99;
             purpleMeeples = 99;
             colorlessMeeples = 99;
-            UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
+            UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples, colorlessMeeples);
         }
     }
     public void HandleMenuToggle() {
@@ -1829,6 +1813,38 @@ public class CardPlayer : MonoBehaviour {
 
         s += $"Active Facilities: {ActiveFacilities.Count}";
         Debug.Log(s);
+    }
+    #endregion
+
+    #region Overtime
+    public void StartOvertime() {
+        if (otState == OverTimeState.None && overTimeCharges > 0) {
+            otState = OverTimeState.Overtime;
+            overTimeCharges--;
+
+            UserInterface.Instance.ToggleOvertimeButton(false);
+            UserInterface.Instance.StartOvertime();
+        }
+        MultiplyMaxMeeples(2);
+    }
+    public void EndOvertime() {
+        otState = OverTimeState.Exhausted;
+        OverTimeCounter = 0;
+        MultiplyMaxMeeples(.25f);
+        UserInterface.Instance.StartExhaustion();
+    }
+    public void EndExhaustion() {
+        otState = OverTimeState.None;
+        OverTimeCounter = 0;
+        MultiplyMaxMeeples(2);
+    }
+    public void MultiplyMaxMeeples(float multi) {
+        maxMeeples = maxMeeples.Select(x => Mathf.Max((x * multi), 1)).ToArray();
+        blackMeeples = maxMeeples[0];
+        blueMeeples = maxMeeples[1];
+        purpleMeeples = maxMeeples[2];
+        colorlessMeeples = maxMeeples[3];
+        UserInterface.Instance.UpdateMeepleAmountUI(maxMeeples[0], maxMeeples[1], maxMeeples[2], colorlessMeeples);
     }
     #endregion
 }

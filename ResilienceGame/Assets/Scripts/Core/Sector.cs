@@ -28,7 +28,8 @@ public class Sector : MonoBehaviour {
     public bool isCore; // Indicates if this is the core sector
     public HashSet<Facility> selectedFacilities;
     public Facility[] facilities;
-    
+    public bool HasOngoingUpdates => playerCardPlayQueue.Any();
+
     public Sprite SectorIcon { get; private set; }
     public Image SectorIconImage;
 
