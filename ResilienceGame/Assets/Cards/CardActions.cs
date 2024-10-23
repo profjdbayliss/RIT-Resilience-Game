@@ -297,6 +297,18 @@ public class BackdoorCheckNetworkRestore : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        if(facilityActedUpon.HasEffectOfType(FacilityEffectType.Backdoor))
+        {
+            Debug.Log(card.front.title + " played. Turns removed: " + card.data.facilityAmount);
+            GameManager.Instance.ChangeRoundsLeft(-card.data.facilityAmount);
+            if (facilityActedUpon.TryRemoveEffectByType(FacilityEffectType.Backdoor))
+                Debug.Log($"Backdoor on {facilityActedUpon.facilityName} removed");
+            else Debug.Log($"Backdoor unable to be removed on {facilityActedUpon.facilityName} for some reason");
+        }
+        else
+        {
+            facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam, (card.data.duration != 0 ? card.data.duration : -1));
+        }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
