@@ -200,6 +200,9 @@ public class CardReader : MonoBehaviour {
                                 case "CancelTemporaryReductionOfTurns":
                                     tempCard.ActionList.Add(new CancelTemporaryReductionOfTurns());
                                     break;
+                                case "BackdoorCheckNetworkRestore":
+                                    tempCard.ActionList.Add(new BackdoorCheckNetworkRestore());
+                                    break;
                                 case "ChangeMeepleAmount":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ChangeMeepleAmount());
