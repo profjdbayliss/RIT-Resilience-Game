@@ -270,7 +270,7 @@ public class Sector : MonoBehaviour {
         SectorIcon = SectorIconImage.sprite;
         InitEffectSprites();
         //  sectorCanvas = this.gameObject;
-        overTimeCharges = 3;
+        //overTimeCharges = 3;
 
 
         foreach (Facility facility in facilities) {

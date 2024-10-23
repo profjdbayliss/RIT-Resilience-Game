@@ -311,7 +311,7 @@ public class ChangeMeepleAmount : ICardAction {
 
 public class IncreaseOvertimeAmount : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        facilityActedUpon.sectorItsAPartOf.overTimeCharges++;
+        facilityActedUpon.sectorItsAPartOf.Owner.overTimeCharges++;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
