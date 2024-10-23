@@ -364,6 +364,8 @@ public class Sector : MonoBehaviour {
     private void OnAnimationComplete() {
         Debug.Log("animation complete");
         IsAnimating = false;
+        if (GameManager.Instance.IsActualPlayersTurn()) 
+            UserInterface.Instance.ToggleEndPhaseButton(true);
 
         // Check if there are more cards in the queue
         if (playerCardPlayQueue.Count > 0) {
@@ -409,6 +411,9 @@ public class Sector : MonoBehaviour {
 
         if (update.Type == CardMessageType.CardUpdate || update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
             IsAnimating = true;
+            //disable the ability to end phase during opponent card plays
+            //I think this is necessary to stop potential issues
+            UserInterface.Instance.ToggleEndPhaseButton(false);
             //handle facility card play
             if (update.FacilityPlayedOnType != FacilityType.None) {
                 HandleFacilityOpponentPlay(update, phase, player);
