@@ -399,7 +399,8 @@ public class Sector : MonoBehaviour {
         return action is ReduceTurnsLeftByBackdoor ||
             action is TemporaryReductionOfTurnsLeft ||
             action is CancelTemporaryReductionOfTurns ||
-            action is BackdoorCheckNetworkRestore;
+            action is BackdoorCheckNetworkRestore ||
+            action is ConvertFortifyToBackdoor;
     }
     public void AddUpdateFromPlayer(Update update, GamePhase phase, CardPlayer player) {
         Debug.Log($"Sector {sectorName} received update of type {update.Type} from {player.playerName}");

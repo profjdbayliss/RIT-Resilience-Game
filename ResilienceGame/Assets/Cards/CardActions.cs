@@ -318,6 +318,31 @@ public class BackdoorCheckNetworkRestore : ICardAction
     }
 }
 
+public class ConvertFortifyToBackdoor : ICardAction
+{
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        Sector sectorActedUpon = facilityActedUpon.sectorItsAPartOf;
+        foreach(Facility facility in sectorActedUpon.facilities)
+        {
+            //if it has fortify then it removes it and returns true, which i can detect and add backdoor
+            if(facility.TryRemoveEffectByType(FacilityEffectType.Fortify))
+            {
+                facility.AddRemoveEffectsByIdString(card.data.effectString, 
+                                                    true, 
+                                                    player.playerTeam, 
+                                                    (card.data.duration != 0 ? card.data.duration : -1));
+            }
+        }
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
+    {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
 public class ChangeMeepleAmount : ICardAction {
     //deprecated?
     //this action existed for like 3 cards all of which actually did different things
