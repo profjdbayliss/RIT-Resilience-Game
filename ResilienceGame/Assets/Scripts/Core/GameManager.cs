@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
     public bool WaitingForAnimations { get; private set; } = false; //flag to check if all sectors are ready to progress phase
-
+    public bool CanEndPhase => !activeSectors.Any(sector => sector.HasOngoingUpdates || sector.IsAnimating);
     #endregion
 
     #region Initialization
@@ -661,13 +661,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #region Helpers
     public void CheckIfCanEndPhase() {
         if (WaitingForAnimations) {
-            if (!activeSectors.Any(sector => sector.HasOngoingUpdates || sector.IsAnimating)) {
+            if (CanEndPhase) {
                 Debug.Log("All sectors are ready progressing phase");
                 WaitingForAnimations = false;
                 EndPhase();
             }
         }
     }
+    
+    
     public void EnableOvertime() {
         actualPlayer.StartOvertime();
     }
@@ -938,7 +940,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
             case GamePhase.DiscardBlue:
                 if (phaseJustChanged) {
                     if (!actualPlayer.NeedsToDiscard()) {
-                        EndPhase(); //immediately end phase if no discards needed
+                        if (CanEndPhase) 
+                            EndPhase(); //immediately end phase if no discards needed
+                         else 
+                            WaitingForAnimations = true;
                         return;
                     }
                     //reset player discard amounts
@@ -956,11 +961,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         MNumberDiscarded += actualPlayer.HandlePlayCard(MGamePhase);
 
                         if (!actualPlayer.NeedsToDiscard()) {
-                            Debug.Log("Ending discard phase after finishing discarding");
-                            MIsDiscardAllowed = false;
-                            EndPhase(); //end phase when done discarding
-                        }
-                        //update alert when discarding
+                            if (CanEndPhase) {
+                                
+                                Debug.Log("Ending discard phase after finishing discarding");
+                                MIsDiscardAllowed = false;
+                                EndPhase(); //end phase when done discarding
+                            } 
+                            else
+                                WaitingForAnimations = true;
+                            
+                        }                           
+                        //update alert when discarding                              
                         if (MNumberDiscarded > 0) {
                             UserInterface.Instance.DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
                         }
