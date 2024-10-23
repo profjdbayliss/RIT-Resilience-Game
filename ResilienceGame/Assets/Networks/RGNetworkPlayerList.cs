@@ -51,8 +51,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
     public List<string> playerNames = new List<string>();
     private Dictionary<int, NetworkConnectionToClient> playerConnections = new Dictionary<int, NetworkConnectionToClient>();
+    public List<bool> playerReadyForNextPhase = new List<bool>();
 
-
+    public void ClearReadyFlags() {
+        for (int i = 0; i < playerIDs.Count; i++)
+            playerReadyForNextPhase[i] = false;
+    }
     private void Awake() {
         instance = this;
         DontDestroyOnLoad(this);
@@ -68,6 +72,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             Debug.Log("adding player to server : " + id);
             playerIDs.Add(id);
             playerNetworkReadyFlags.Add(true);
+            playerReadyForNextPhase.Add(false);
             playerTurnTakenFlags.Add(false);
             playerTypes.Add(PlayerTeam.Any);
             playerConnections[id] = conn; // Store the connection
@@ -331,7 +336,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     manager.StartNextPhase();
                     break;
                 case CardMessageType.EndPhase:
-                    // only the server should get and end turn message!
+                    // only the server should get an end turn message!
                     Debug.Log("client received end phase message and it shouldn't!");
                     break;
                 case CardMessageType.IncrementTurn:
@@ -423,6 +428,44 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         Debug.Log("SERVER SENT sector data message to clients");
     }
 
+    private void HandleEndingPhase(RGNetworkShortMessage msg) {
+        // find next player to ok to play and send them a message
+        int nextPlayerId = -1;
+        Debug.Log("handling ending phase");
+        Debug.Log($"Player ready flags:");
+        for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+            Debug.Log($"Player {playerNames[i]}: {playerReadyForNextPhase[i]}");
+        }
+        for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+            //TODO uncomment this
+            if (!playerTurnTakenFlags[i] /*&& playerReadyForNextPhase[i]*/) {//check to make sure all players are flagged as ready
+                nextPlayerId = playerIDs[i];
+                break;
+            }
+        }
+        //all players have taken their turns
+        if (nextPlayerId == -1) {
+            GamePhase nextPhase = manager.GetNextPhase();
+
+            // need to increment the turn and set all the players to ready again
+            for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+                playerTurnTakenFlags[i] = false;
+            }
+
+            // tell all the clients to go to the next phase
+            msg.playerID = (uint)localPlayerID;
+            msg.type = (uint)CardMessageType.StartNextPhase;
+            NetworkServer.SendToAll(msg);
+            // server needs to start next phase as well
+            manager.StartNextPhase();
+            if (nextPhase == GamePhase.DrawRed) {
+                manager.IncrementTurn();
+                Debug.Log("Turn is done - incrementing and starting again.");
+            }
+            //   Debug.Log("next phase stuff done");
+
+        }
+    }
     public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
         Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
         uint senderId = msg.playerID;
@@ -437,54 +480,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 // nobody tells server to start a turn, so this shouldn't happen
                 Debug.Log("server start next phase message when it shouldn't!");
                 break;
-
-
+            
             case CardMessageType.EndPhase:
                 // end turn is handled here because the player list is kept
                 // in this class
                 Debug.Log("server received end phase message from sender: " + senderId);
-                //   Debug.Log("player turn count : " + playerTurnTakenFlags.Count);
                 // note this player's turn has ended      
                 int playerIndex = (int)senderId;
-                // Debug.Log("player index : " + playerIndex);
                 playerTurnTakenFlags[playerIndex] = true;
-                // Debug.Log("got here");
-                // find next player to ok to play and send them a message
-                int nextPlayerId = -1;
-                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                    if (!playerTurnTakenFlags[i]) {
-                        nextPlayerId = playerIDs[i];
-                        break;
-                    }
-                }
-                //  Debug.Log("got here 2");
-                if (nextPlayerId == -1) {
-                    //   Debug.Log("got here 3");
-                    GamePhase nextPhase = manager.GetNextPhase();
-                    //  Debug.Log("getting next phase : " + nextPhase);
-
-                    // need to increment the turn and set all the players to ready again
-                    for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                        playerTurnTakenFlags[i] = false;
-                    }
-                    // 
-
-                    // Debug.Log("sending start next phase");
-                    // tell all the clients to go to the next phase
-                    msg.playerID = (uint)localPlayerID;
-                    msg.type = (uint)CardMessageType.StartNextPhase;
-                    NetworkServer.SendToAll(msg);
-                    //Debug.Log("doing the next phase");
-                    // server needs to start next phase as well
-                    manager.StartNextPhase();
-                    //  Debug.Log("checking to make sure it's not the next turn");
-                    if (nextPhase == GamePhase.DrawRed) {
-                        manager.IncrementTurn();
-                        Debug.Log("Turn is done - incrementing and starting again.");
-                    }
-                    //   Debug.Log("next phase stuff done");
-
-                }
+                HandleEndingPhase(msg);
                 break;
             case CardMessageType.IncrementTurn:
                 Debug.Log("Server received increment message and did nothing.");
@@ -853,6 +857,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
         if (msg.playerID != localPlayerID) {
             switch (type) {
+                case CardMessageType.ReadyForNextPhase: {
+                        Debug.Log($"Server received ready from {playerNames[(int)msg.playerID]}");
+                        int playerIndex = (int)msg.playerID;
+                        bool ready = BitConverter.ToBoolean(msg.payload);
+                        playerReadyForNextPhase[playerIndex] = ready;
+                        Debug.Log($"Marking {playerName} as {(ready ? "ready" : "not ready")}");
+                        //HandleEndingPhase(msg);
+                    }
+                    break;
                 case CardMessageType.SharePlayerType: {
                         uint count = msg.count;
 

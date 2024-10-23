@@ -365,14 +365,17 @@ public class Sector : MonoBehaviour {
     private void OnAnimationComplete() {
         Debug.Log("animation complete");
         IsAnimating = false;
-        if (GameManager.Instance.IsActualPlayersTurn()) 
-            UserInterface.Instance.ToggleEndPhaseButton(true);
+        
 
         // Check if there are more cards in the queue
         if (playerCardPlayQueue.Count > 0) {
             var nextCardPlay = playerCardPlayQueue.Dequeue();
             Debug.Log($"Playing next card update in queue: {nextCardPlay.Item1.Type}");
             ProcessCardPlay(nextCardPlay.Item1, nextCardPlay.Item2, nextCardPlay.Item3);
+        }
+        else {
+            if (GameManager.Instance.IsActualPlayersTurn())
+                UserInterface.Instance.ToggleEndPhaseButton(true);
         }
     }
     #endregion
