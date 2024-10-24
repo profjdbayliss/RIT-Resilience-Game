@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool IsBluffActive { get; set; } = false;
     public int bluffTurnCount = 0;
     public int bluffTurnCheck { get; set; } = 0;
+    public bool IsRedLayingLow { get; set; } = false;
     
     //// UI Elements
     //[Header("UI Elements")]
@@ -1182,7 +1183,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         activeSectors.ForEach(sector => sector.InformFacilitiesOfNewTurn()); //update all facilities of turn end
         playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount()); //return meeples to max values
         turnTotal++;
-        roundsLeft--;
+        if (IsRedLayingLow)
+            roundsLeft++;
+        else roundsLeft--;
+
         //update the overtime state
         if (actualPlayer.otState == OverTimeState.Overtime) {
             actualPlayer.OverTimeCounter++;

@@ -347,6 +347,7 @@ public class IncreaseTurnsDuringPeace : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        GameManager.Instance.IsRedLayingLow = true;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
