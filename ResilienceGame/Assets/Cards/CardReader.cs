@@ -206,6 +206,9 @@ public class CardReader : MonoBehaviour {
                                 case "ConvertFortifyToBackdoor":
                                     tempCard.ActionList.Add(new ConvertFortifyToBackdoor());
                                     break;
+                                case "IncreaseTurnsDuringPeace":
+                                    tempCard.ActionList.Add(new IncreaseTurnsDuringPeace());
+                                    break;
                                 case "ChangeMeepleAmount":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ChangeMeepleAmount());
