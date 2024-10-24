@@ -85,6 +85,8 @@ public class FacilityEffectManager : MonoBehaviour {
     private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
         // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? 0 : 1); //dont give points back when removing effects
+        if (effect.Magnitude < 0 && GameManager.Instance.IsRedLayingLow)
+            GameManager.Instance.IsRedLayingLow = false;
 
         FacilityEffect protectPointsEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.ProtectPoints);
         if (protectPointsEffect != null)

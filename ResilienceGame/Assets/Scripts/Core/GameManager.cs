@@ -1183,6 +1183,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         activeSectors.ForEach(sector => sector.InformFacilitiesOfNewTurn()); //update all facilities of turn end
         playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount()); //return meeples to max values
         turnTotal++;
+        Debug.Log("Red is laying low: " + IsRedLayingLow);
         if (IsRedLayingLow)
             roundsLeft++;
         else roundsLeft--;
