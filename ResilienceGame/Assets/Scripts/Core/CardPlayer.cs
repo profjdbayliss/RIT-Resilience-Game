@@ -516,14 +516,6 @@ public class CardPlayer : MonoBehaviour {
             
     }
 
-    public void MultiplyMaxMeeplesByValue(float value)
-    {
-        for(int i = 0; i < maxMeeples.Length; i++)
-        {
-            maxMeeples[i] *= value;
-        }
-    }
-
     public int GetTotalMeeples() {
         return (int)(BlueMeeples + BlackMeeples + PurpleMeeples);
     }
