@@ -36,6 +36,7 @@ public class Sector : MonoBehaviour {
     [SerializeField] float facilityDownPercentage = 0.05f;   //05% chance of facility going down each red turn
     [SerializeField] float facilityUpPercentage = 0.5f;     //50% chance of facility going up each blue turn
     [SerializeField] float coreFacilityMitigationAmount = .5f; //reduce the chance of core facilities going down by half
+    [SerializeField] float backdoorIncreaseDownPercent = 1;
     public bool[] SimulatedFacilities = new bool[3] { true, true, true }; //simulated facility up/down status
     public bool IsSimulated { get; set; } = false;
     public List<string> SimulationLog = new List<string>();
@@ -269,27 +270,6 @@ public class Sector : MonoBehaviour {
             Debug.LogError("Failed to load effect icon atlas");
         }
     }
-    //void UpdateFacilityDependencyIcons() {
-    //    //string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
-    //    //LoadIconAtlasTexture(filePath);
-
-    //    //Sprite[] sprites = SliceSpriteSheet(iconAtlasTexture, 256, 256, 4, 4); // Slices into 16 sprites
-
-    //    ////assign the sprites to the facilities
-    //    //foreach (Facility facility in facilities) {
-    //    //    for (int i = 0; i < facility.dependencies.Length; i++) {
-    //    //        facility.dependencyIcons[i].sprite = sprites[ICON_INDICIES[facility.dependencies[i]]];
-    //    //    }
-    //    //}
-
-
-    //}
-    //void LoadIconAtlasTexture(string filePath) {
-    //    byte[] fileData = File.ReadAllBytes(filePath);
-    //    iconAtlasTexture = new Texture2D(2, 2);
-    //    iconAtlasTexture.LoadImage(fileData);
-
-    //}
     public void Initialize() {
         SectorIcon = SectorIconImage.sprite;
         InitEffectSprites();
@@ -631,6 +611,9 @@ public class Sector : MonoBehaviour {
         for (int i = 0; i < SimulatedFacilities.Length; i++) {
             // Facility goes down if the random value is less than or equal to facilityDownPercentage
             var downPercent = isCore ? facilityDownPercentage * (1 - coreFacilityMitigationAmount) : facilityDownPercentage;
+            if (facilities[i].HasEffectOfType(FacilityEffectType.Backdoor)) {
+                downPercent = (1 + backdoorIncreaseDownPercent) * downPercent;
+            }
             if (SimulatedFacilities[i] && UnityEngine.Random.value <= downPercent) {
                 SimulatedFacilities[i] = false;
             }

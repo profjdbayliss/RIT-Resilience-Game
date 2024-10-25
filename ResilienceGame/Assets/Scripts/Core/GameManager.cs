@@ -7,7 +7,6 @@ using UnityEngine.InputSystem;
 using System.IO;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 public class GameManager : MonoBehaviour, IRGObservable {
 
@@ -125,12 +124,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private const int MIN_TURNS_TILL_WHITE_CARD = 2;
     private const int MAX_TURNS_TILL_WHITE_CARD = 5;
     private const float WHITE_CARD_POS_CHANCE = 0.5f;
-    private bool playWhite = false;
+    private bool playWhite = false;//TODO change when implementing white cards
     private bool playedPosWhiteCard = false;
-    private bool hasWhiteCardPlayed = true; //TODO change when implementing white cards
+    private bool hasWhiteCardPlayed = true; 
     private int assignedSectors = 0;
     private int numBluePlayers = 0;
-    private const int SECTOR_SIM_TURN_START = 0; //TODO: Change back to (2) when testing is done
+    private const int SECTOR_SIM_TURN_START = 2; 
     public int UniqueCardIdCount = 0;
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
