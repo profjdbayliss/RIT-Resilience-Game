@@ -1413,6 +1413,12 @@ public class CardPlayer : MonoBehaviour {
             return ($"Cannot play {card.data.name} when the bluff isn't active", false);
         }
 
+        if (card.data.name == "Aggression" && GameManager.Instance.IsRedAggressive)
+        {
+            return ($"Cannot play {card.data.name} as Red is already aggressive", false);
+        }
+
+
         return ReadyState switch {
             PlayerReadyState.SelectFacilties => ($"Player must select facilities before playing cards", false),
             PlayerReadyState.DiscardCards => ValidateDiscardDuringActionPlay(card),
