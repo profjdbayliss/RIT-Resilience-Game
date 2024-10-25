@@ -681,29 +681,29 @@ public class GameManager : MonoBehaviour, IRGObservable {
         actualPlayer.StartOvertime();
     }
     public void CheckDownedFacilities() {
-        Debug.Log("Checking downed facilities for each sector");
-        Debug.Log(AllSectors.Count);
+        //Debug.Log("Checking downed facilities for each sector");
+        //Debug.Log(AllSectors.Count);
         foreach (var kvp in AllSectors) {
             foreach (var fac in kvp.Value.facilities) {
                 fac.CheckDownedConnections();
             }
-            if (kvp.Value.IsSimulated)
-                Debug.Log($"Simulated Sector {kvp.Value.sectorName}'s Facility status: [{kvp.Value.SimulatedFacilities[0]}," +
-                    $"{kvp.Value.SimulatedFacilities[1]}," +
-                    $"{kvp.Value.SimulatedFacilities[2]}]");
-            else
-                Debug.Log($"Actual Sector {kvp.Value.sectorName}'s Facility status: [{!kvp.Value.facilities[0].IsDown}," +
-                    $"{!kvp.Value.facilities[1].IsDown}," +
-                    $"{!kvp.Value.facilities[2].IsDown}]");
-            Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
+            //if (kvp.Value.IsSimulated)
+            //    Debug.Log($"Simulated Sector {kvp.Value.sectorName}'s Facility status: [{kvp.Value.SimulatedFacilities[0]}," +
+            //        $"{kvp.Value.SimulatedFacilities[1]}," +
+            //        $"{kvp.Value.SimulatedFacilities[2]}]");
+            //else
+            //    Debug.Log($"Actual Sector {kvp.Value.sectorName}'s Facility status: [{!kvp.Value.facilities[0].IsDown}," +
+            //        $"{!kvp.Value.facilities[1].IsDown}," +
+            //        $"{!kvp.Value.facilities[2].IsDown}]");
+            //Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
             UserInterface.Instance.ToggleDownedSectorInMenu((int)kvp.Key, kvp.Value.IsDown);
             
         }
         var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
-        Debug.Log($"Found {downedSectors.Count} downed sectors");
-        foreach (var sector in downedSectors) {
-            Debug.Log($"Downed sector: {sector.sectorName}");
-        }
+        //Debug.Log($"Found {downedSectors.Count} downed sectors");
+        //foreach (var sector in downedSectors) {
+        //    Debug.Log($"Downed sector: {sector.sectorName}");
+        //}
         if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
 
             StartDoomClock();
