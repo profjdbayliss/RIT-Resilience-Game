@@ -100,6 +100,11 @@ public class Facility : MonoBehaviour {
             Debug.LogError(e);
         }
     }
+    public void AddEffectToConnectedSectors(string idString, PlayerTeam createdBy) {
+        foreach (var sector in connectedSectors) {
+            sector.AddEffectToFacilities(idString, createdBy);
+        }
+    }
     public void UpdateForNextActionPhase() {
         effectManager.UpdateForNextActionPhase();
     }

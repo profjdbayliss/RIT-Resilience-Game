@@ -121,12 +121,9 @@ public class RemoveEffect : ICardAction {
 
 public class SpreadEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        // TODO: Implement effect spreading to connected sectors
-        foreach (var dependency in facilityActedUpon.dependencies) {
-            // Placeholder: Apply the effect to all facilities in the connected sector
-            //foreach (var facility in dependency.facilities) {
-            //    facility.AddRemoveEffectsByIdString(card.data.effectIds, true, card.DeckName.ToLower().Trim() == "blue" ? FacilityTeam.Blue : FacilityTeam.Red);
-            //}
+        
+        if (facilityActedUpon != null) {
+            facilityActedUpon.AddEffectToConnectedSectors(card.data.effectString, player.playerTeam);
         }
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);

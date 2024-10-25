@@ -323,6 +323,12 @@ public class Sector : MonoBehaviour {
     #endregion
 
     #region Helpers
+    public void AddEffectToFacilities(string idString, PlayerTeam createdBy) {
+        foreach (var facility in facilities)
+        {
+            facility.AddRemoveEffectsByIdString(idString, true, createdBy);
+        }
+    }
     public Facility GetLocalFacilityByType(FacilityType type) {
         foreach (Facility facility in facilities) {
             if (facility.facilityType == type) {
