@@ -12,6 +12,8 @@ public class HoverMoveUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private Vector3 openPosition;
     private bool isHovered = false;
     private bool isLockedOpen = false;
+    public bool overrideMover = false;
+    private Coroutine currentMoveCoroutine;
 
     private void Start() {
         rectTransform = GetComponent<RectTransform>();
@@ -20,34 +22,46 @@ public class HoverMoveUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
+        if (overrideMover) return;
         if (!isLockedOpen) {
             isHovered = true;
-            StopAllCoroutines();
-            StartCoroutine(MoveToPosition(openPosition, openDuration));
+            StartMoveCoroutine(openPosition, openDuration);
         }
     }
 
     public void OnPointerExit(PointerEventData eventData) {
+        if (overrideMover) return;
         if (!isLockedOpen) {
             isHovered = false;
-            StopAllCoroutines();
-            StartCoroutine(MoveToPosition(closedPosition, closeDuration));
+            StartMoveCoroutine(closedPosition, closeDuration);
         }
     }
 
     public void OnPointerClick(PointerEventData eventData) {
+        if (overrideMover) return;
         isLockedOpen = !isLockedOpen;
 
         if (isLockedOpen) {
-            StopAllCoroutines();
-            StartCoroutine(MoveToPosition(openPosition, openDuration));
+            StartMoveCoroutine(openPosition, openDuration);
         }
         else if (!isHovered) {
-            StopAllCoroutines();
-            StartCoroutine(MoveToPosition(closedPosition, closeDuration));
+            StartMoveCoroutine(closedPosition, closeDuration);
         }
     }
-
+    public void SetLockedOpen() {
+        overrideMover = true;
+        StartMoveCoroutine(openPosition, openDuration);
+    }
+    public void DisableLockedOpen() {
+        overrideMover = false;
+        StartMoveCoroutine(closedPosition, closeDuration);
+    }
+    private void StartMoveCoroutine(Vector3 targetPosition, float duration) {
+        if (currentMoveCoroutine != null) {
+            StopCoroutine(currentMoveCoroutine);
+        }
+        currentMoveCoroutine = StartCoroutine(MoveToPosition(targetPosition, duration));
+    }
     private IEnumerator MoveToPosition(Vector3 targetPosition, float duration) {
         Vector3 startPosition = rectTransform.anchoredPosition;
         float elapsedTime = 0f;

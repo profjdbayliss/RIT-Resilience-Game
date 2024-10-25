@@ -26,26 +26,7 @@ public enum OverTimeState {
     Exhausted
 }
 
-public enum SectorType {
-    Communications, //Core
-    Energy, //Core
-    Water, //Core
-    Information, //Core
-    Chemical,
-    Commercial,
-    Manufacturing,
-    Dams,
-    Defense,
-    Emergency,
-    Financial,
-    Agriculture,
-    Government,
-    Healthcare,
-    Nuclear,
-    Transport,
-    Any,
-    All
-};
+
 
 //public enum AddOrRem {
 //    Add,
@@ -1705,7 +1686,7 @@ public class CardPlayer : MonoBehaviour {
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedTwo);
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedThree);
             }
-            Debug.Log(sb.ToString());
+           // Debug.Log(sb.ToString());
             return update.Type;
         }
         return CardMessageType.None;

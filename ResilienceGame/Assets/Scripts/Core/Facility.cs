@@ -26,10 +26,13 @@ public class Facility : MonoBehaviour {
     public FacilityType facilityType;
     public string facilityName;
     public SectorType[] dependencies;
+    public List<Sector> connectedSectors;
+    public int downedConnections = 0;
     //public GameObject facilityCanvas;
     public Sector sectorItsAPartOf;
 
     public Image[] dependencyIcons;
+    public Image[] dependencyXs;
 
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
@@ -58,7 +61,7 @@ public class Facility : MonoBehaviour {
     public bool IsDown =>
     (Points[0] == 0 ? 1 : 0) +
     (Points[2] == 0 ? 1 : 0) +
-    (Points[1] == 0 ? 1 : 0) == 2;
+    (Points[1] == 0 ? 1 : 0) >= 2 || downedConnections == 3;
 
 
 
@@ -76,8 +79,26 @@ public class Facility : MonoBehaviour {
         //{
         //    pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
         //}
+        
         SetupPointImages();
         UpdateUI();
+    }
+    //Init the facility with the connection icons and references
+    public void ProcessConnections(List<Sprite> icons) {
+        connectedSectors = new List<Sector>();
+        try {
+            for (int i = 0; i < dependencies.Length; i++) {
+                Debug.Log($"Facility {facilityName} has dependency {dependencies[i]}");
+                var sec = GameManager.Instance.AllSectors[dependencies[i]];
+                Debug.Log($"Found {sec.sectorName} from game manager AllSectors");
+                connectedSectors.Add(sec);
+                dependencyIcons[i].sprite = icons[(int)sec.sectorName];
+                dependencyXs[i].enabled = false;
+            }
+        }
+        catch (System.Exception e) {
+            Debug.LogError(e);
+        }
     }
     public void UpdateForNextActionPhase() {
         effectManager.UpdateForNextActionPhase();
@@ -122,6 +143,43 @@ public class Facility : MonoBehaviour {
         }
     }
 
+    public void CheckDownedConnections() {
+        //Debug.Log("Checking downed connections for " + facilityName);
+        downedConnections = 0;
+        bool isDown = IsDown;
+        for (int i = 0; i < connectedSectors.Count; i++) {
+            if (connectedSectors[i].IsDown) {
+                dependencyXs[i].enabled = true;
+                downedConnections++;
+            }
+            else {
+                dependencyXs[i].enabled = false;
+            }
+        }
+        //we arent down now but we will be going down based on lack of connections
+        if (!isDown) {
+            if (downedConnections == 3) {
+                Debug.Log($"Facility {facilityName} is being downed by lack of connections");
+                
+               // GameManager.Instance.CheckDownedFacilities();
+            }
+        }
+        else {
+            if (downedConnections != 3) {
+                Debug.Log($"Facility {facilityName} is being brought back up by restored connections");
+               // GameManager.Instance.CheckDownedFacilities();
+            }
+        }
+        
+        if (downedConnections > 0) {
+            sectorPopoutMenu.SetLockedOpen();
+        }
+        else {
+            sectorPopoutMenu.DisableLockedOpen();
+        }
+        UpdateUI();
+        //Debug.Log($"Found {downedConnections} downed connections");
+    }
 
 
 
@@ -238,7 +296,15 @@ public class Facility : MonoBehaviour {
         //pointsUI[1].text = finacialPoints.ToString();
         //pointsUI[2].text = networkPoints.ToString();
         UpdatePointsUI();
-        if (IsDown) {
+        bool isDown = false;
+        if (sectorItsAPartOf.IsSimulated) {
+            isDown = !sectorItsAPartOf.SimulatedFacilities[sectorItsAPartOf.facilities.ToList().IndexOf(this)];
+        }
+        else {
+            isDown = IsDown;
+        }
+
+        if (isDown) {
             downedOverlay.enabled = true;
         }
         else {
@@ -252,6 +318,11 @@ public class Facility : MonoBehaviour {
         facilityInfo.Append($"Physical Points: {Points[0]}/{maxPhysicalPoints} ");
         facilityInfo.Append($"Financial Points: {Points[2]}/{maxFinacialPoints} ");
         facilityInfo.Append($"Network Points: {Points[1]}/{maxNetworkPoints} ");
+        facilityInfo.Append($"Connected Sectors: ");
+        foreach (var sector in connectedSectors) {
+            facilityInfo.Append(sector.sectorName).Append(", ");
+        }
+        facilityInfo.AppendLine();
 
         var effects = effectManager.GetEffects();
         if (effects.Count > 0) {
@@ -262,6 +333,17 @@ public class Facility : MonoBehaviour {
         }
         else {
             facilityInfo.Append("No active effects.");
+        }
+
+        facilityInfo.AppendLine($"Facility is being {(sectorItsAPartOf.IsSimulated ? "simulated" : "played")} ");
+        facilityInfo.AppendLine($"Facility is down: " +
+            $"{(sectorItsAPartOf.IsSimulated ? sectorItsAPartOf.SimulatedFacilities[sectorItsAPartOf.facilities.ToList().IndexOf(this)] : IsDown)}");
+
+        if (downedConnections == 3) {
+            facilityInfo.AppendLine("Facility is down due to lack of connections");
+        }
+        else if (IsDown) {
+            facilityInfo.AppendLine("Facility is down due to lack of points");
         }
 
         Debug.Log(facilityInfo.ToString());

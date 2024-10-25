@@ -35,7 +35,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
 
     public int DrawCardForPlayer(int playerId) {
-        Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
+      //  Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
         int cardUID = nextCardUID++;
         drawnCardUIDs[playerId] = cardUID;
         return cardUID;
