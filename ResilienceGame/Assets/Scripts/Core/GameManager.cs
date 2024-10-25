@@ -1304,14 +1304,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         var sectorStatus = new List<(int sectorType, bool[] facilityStatus)>();
         if (MGamePhase == GamePhase.ActionBlue) {
-            Debug.Log($"Simulating restore on {SimulatedSectors.Count} sectors");
+            //Debug.Log($"Simulating restore on {SimulatedSectors.Count} sectors");
             SimulatedSectors.Values.ToList().ForEach(sector => {
                 sector.SimulateRestore();
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
             });
         }
         else if (MGamePhase == GamePhase.ActionRed) {
-            Debug.Log($"Simulating attack on {SimulatedSectors.Count} sectors");
+           // Debug.Log($"Simulating attack on {SimulatedSectors.Count} sectors");
             SimulatedSectors.Values.ToList().ForEach(sector => {
                 sector.SimulateAttack();
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
@@ -1323,7 +1323,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void GetSimulationStatusFromNetwork(SectorType sector, bool[] facilityStatus) {
         if (IsServer) return;
-        Debug.Log($"Received simulation status for {sector}");
+       // Debug.Log($"Received simulation status for {sector}");
         if (SimulatedSectors.TryGetValue(sector, out Sector simSector)) {
             simSector.SetSimulatedFacilityStatus(facilityStatus);
             CheckDownedFacilities();

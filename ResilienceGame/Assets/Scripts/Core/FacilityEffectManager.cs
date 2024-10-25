@@ -9,12 +9,14 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using static Facility;
 
+
 /// <summary>
 /// This class belongs to a facility and manages the effects that are applied to it
 /// </summary>
 public class FacilityEffectManager : MonoBehaviour {
     #region Fields
     private readonly List<FacilityEffect> activeEffects = new List<FacilityEffect>();
+    private List<FacilityEffectUIElement> uiElements = new List<FacilityEffectUIElement>();
     private Facility facility;
     private bool hasNegatedEffectThisRound = false;
     [SerializeField] private Transform effectParent;
@@ -27,6 +29,17 @@ public class FacilityEffectManager : MonoBehaviour {
     private float effectAnimationDuration = .75f;
     private float effectPopoutDistance = 120f;
     public Coroutine effectPopoutRoutine;
+    public enum EffectMenuState {
+        Opening,
+        Closing,
+        Open,
+        Closed
+    }
+    public EffectMenuState effectMenuState = EffectMenuState.Closed;
+    public EffectMenuState targetMenuState = EffectMenuState.Closed;
+    public Queue<Action> QueuedUIUpdates = new Queue<Action>();
+
+
     //[SerializeField] private Image effectIcon;
     //[SerializeField] private GameObject counterBackground;
     //  [SerializeField] private TextMeshProUGUI counterText;
@@ -35,7 +48,7 @@ public class FacilityEffectManager : MonoBehaviour {
     //  [SerializeField] private Transform uiElementParent;
 
     public static Sprite[] EffectSprites { get => Sector.EffectSprites; }
-   
+
 
     #endregion
 
@@ -89,8 +102,7 @@ public class FacilityEffectManager : MonoBehaviour {
             GameManager.Instance.IsRedLayingLow = false;
 
         FacilityEffect protectPointsEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.ProtectPoints);
-        if (protectPointsEffect != null)
-        {
+        if (protectPointsEffect != null) {
             if (effect.Magnitude < 0 && effect.Target == protectPointsEffect.Target)
                 return;
         }
@@ -257,8 +269,8 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The effect to add</param>
     private void AddEffect(FacilityEffect effect) {
 
-      
-        
+
+
         //special case of a remove type from a card effect
         if (effect.EffectType == FacilityEffectType.RemoveAll) {
             RemoveAllEffects();
@@ -329,56 +341,74 @@ public class FacilityEffectManager : MonoBehaviour {
 
     #region Interface Updates
     private void UpdateUI(FacilityEffect effect, bool add) {
-        Debug.Log($"Updating UI element for effect {effect.EffectType} and has ui: {effect.HasUIElement}");
         if (!effect.HasUIElement) return;
+        Debug.Log($"Updating UI element for effect {effect.EffectType}");
 
-
-        if (effectPopoutRoutine != null && !activeEffects.Any(effect => effect.HasUIElement)) {
-            StopCoroutine(effectPopoutRoutine);
-        }
+        Action action;
 
         if (add) {
-
-            var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
-            effect.UIElement = facilityEffectUI;
-            facilityEffectUI.Init(effect);
-            // effectBoxParent.anchoredPosition = effectHiddenPos - new Vector2(0, effectPopoutDistance);
-
-            if (effectPopoutRoutine == null) {
-                effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
-                    effectHiddenPos,
-                    effectHiddenPos - new Vector2(0, effectPopoutDistance),
-                    null));
-            }
-
-
+            Debug.Log($"Creating UI Element to Add");
+            action = () => {
+                Debug.Log("Adding effect ui element");
+                var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
+                effect.UIElement = facilityEffectUI;
+                facilityEffectUI.Init(effect);
+            };
         }
         else {
-            //if there are no other effects with a ui element, hide the effect box
-            if (!activeEffects.Any(effect => effect.HasUIElement)) {
-                //  effectBoxParent.anchoredPosition = effectHiddenPos;
-                effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
-                    effectHiddenPos - new Vector2(0, effectPopoutDistance),
-                    effectHiddenPos,
-                    effect.UIElement.gameObject));
-            }
-            //otherwise just remove the ui element
-            else {
+            Debug.Log($"Queueing destroy action");
+            action = () => {
                 Destroy(effect.UIElement.gameObject);
-            }
-
+            };
         }
-    }
-    public void ToggleEffectImageAlpha(Image effectIcon) {
-        Color color = effectIcon.color;
-        var newColor = color.a == 1 ? new Color(color.r, color.g, color.b, 0f) : new Color(color.r, color.g, color.b, 1);
-        effectIcon.color = newColor;
+        QueuedUIUpdates.Enqueue(action);
+        if (effectPopoutRoutine == null && effectMenuState == EffectMenuState.Open) {
+            Debug.Log($"Hiding menu to change effects");
+            //hide the effect box to prepare for the new effect
+            effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
+                        effectHiddenPos - new Vector2(0, effectPopoutDistance),
+                        effectHiddenPos));
+            effectMenuState = EffectMenuState.Closing;
+        }
+        else if (effectPopoutRoutine == null && effectMenuState == EffectMenuState.Closed) {
+            Debug.Log($"Showing effects menu");
+            ProcessQueuedUIUpdates();
+            if (add) {
+                effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
+                        effectHiddenPos,
+                        effectHiddenPos - new Vector2(0, effectPopoutDistance)));
+                effectMenuState = EffectMenuState.Opening;
+            }
+            else {
+                Debug.LogWarning($"Shouldn't get here, removing a UI component with menu hidden");
+            }
+        }
+        else if (effectPopoutRoutine != null && effectMenuState == EffectMenuState.Opening) {
+            Debug.Log($"Canceling menu opening to change effects");
+            //cancel menu opening and close it
+            StopCoroutine(effectPopoutRoutine);
+            effectPopoutRoutine = null;
+            effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
+                        effectBoxParent.position,
+                        effectHiddenPos));
+        }
+        else if (effectPopoutRoutine != null && effectMenuState == EffectMenuState.Closing) {
+            //queued updates will be precessed when the menu closes
+        }
 
-        //  Debug.Log($"Toggling effect icon alpha to {newColor.a}");
     }
-
+    private bool ProcessQueuedUIUpdates() {
+        bool didSomething = false;
+        Debug.Log($"Processing facility effect ui updates: {QueuedUIUpdates.Count} updates");
+        while (QueuedUIUpdates.Count > 0) {
+            QueuedUIUpdates.Dequeue()?.Invoke();
+            didSomething = true;
+        }
+        return didSomething;
+            
+    }
     #region Effect Menu
-    private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos, GameObject objectToDestroy) {
+    private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos) {
         float elapsedTime = 0f;
 
         while (elapsedTime < effectAnimationDuration) {
@@ -394,10 +424,31 @@ public class FacilityEffectManager : MonoBehaviour {
 
         // Ensure the final position is the target position
         rectTransform.anchoredPosition = endPos;
-        if (endPos == effectHiddenPos) {
-            Destroy(objectToDestroy);
-        }
 
+        if (endPos == effectHiddenPos) {
+            effectMenuState = EffectMenuState.Closed;
+            if (ProcessQueuedUIUpdates()) {
+                if (activeEffects.Any(effect => effect.HasUIElement)) {
+                    Debug.Log("Showing effects menu after processed changes");
+                    effectPopoutRoutine = null;
+                    effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
+                        effectHiddenPos,
+                        effectHiddenPos - new Vector2(0, effectPopoutDistance)));
+                    effectMenuState = EffectMenuState.Opening;
+                }
+                else {
+                    effectPopoutRoutine = null;
+                }
+            }
+            else {
+                effectPopoutRoutine = null;
+            }
+        }
+        else {
+            effectMenuState = EffectMenuState.Open;
+            effectPopoutRoutine = null;
+        }
+        
         Debug.Log("Finished moving effect menu");
     }
     private float CubicEaseInOut(float t) {
@@ -424,7 +475,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
 
         foreach (var effect in currentActiveEffects) {
-           
+
 
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
                 var effects = FacilityEffect.CreateEffectsFromID(effect.EffectCreatedOnRoundEndIdString);

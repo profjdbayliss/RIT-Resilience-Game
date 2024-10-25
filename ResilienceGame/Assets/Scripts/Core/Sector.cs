@@ -18,6 +18,7 @@ public class Sector : MonoBehaviour {
     [SerializeField] float facilityUpPercentage = 0.5f;     //50% chance of facility going up each blue turn
     public bool[] SimulatedFacilities = new bool[3] { true, true, true }; //simulated facility up/down status
     public bool IsSimulated { get; set; } = false;
+    public List<string> SimulationLog = new List<string>();
 
     [Header("Player and Sector Info")]
     public SectorType sectorName;
@@ -618,14 +619,14 @@ public class Sector : MonoBehaviour {
             SimulatedFacilities[i] = (UnityEngine.Random.value > facilityDownPercentage) || !SimulatedFacilities[i];
         }
         int downedFacilities = SimulatedFacilities.Count(x => x == false);
-        Debug.Log($"{sectorName} simulated red attack and lost {downedFacilities} facilities");
+        SimulationLog.Add($"{sectorName} simulated red attack and lost {downedFacilities} facilities");
     }
     public void SimulateRestore() {
         for (int i = 0; i < SimulatedFacilities.Length; i++) {
             SimulatedFacilities[i] = (UnityEngine.Random.value > facilityUpPercentage) || SimulatedFacilities[i];
         }
         int downedFacilities = SimulatedFacilities.Count(x => x == false);
-        Debug.Log($"{sectorName} simulated blue restore and has {downedFacilities} facilities");
+        SimulationLog.Add($"{sectorName} simulated blue restore and has {downedFacilities} facilities");
     }
     public void SetSimulatedFacilityStatus(bool[] status) {
         
