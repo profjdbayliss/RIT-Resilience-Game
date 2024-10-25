@@ -357,10 +357,13 @@ public class IncreaseTurnsDuringPeace : ICardAction
     }
 }
 
-public class DoubleMeeplesAndRoundReduction : ICardAction
+public class IncColorlessMeeplesRoundReduction : ICardAction
 {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
     {
+        GameManager.Instance.IsRedAggressive = true;
+        player.IncMaxColorlessMeeples(card.data.meepleAmount);
+        GameManager.Instance.aggressionTurnCheck = card.data.duration;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

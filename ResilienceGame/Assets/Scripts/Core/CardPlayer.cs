@@ -516,6 +516,18 @@ public class CardPlayer : MonoBehaviour {
             
     }
 
+    public void IncMaxColorlessMeeples(float value)
+    {
+        maxMeeples[3] += value;
+        ColorlessMeeples = maxMeeples[3];
+    }
+
+    public void ResetMaxColorlessMeeples()
+    {
+        maxMeeples[3] = 1;
+        ColorlessMeeples = maxMeeples[3];
+    }
+
     public int GetTotalMeeples() {
         return (int)(BlueMeeples + BlackMeeples + PurpleMeeples);
     }

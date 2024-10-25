@@ -209,6 +209,9 @@ public class CardReader : MonoBehaviour {
                                 case "IncreaseTurnsDuringPeace":
                                     tempCard.ActionList.Add(new IncreaseTurnsDuringPeace());
                                     break;
+                                case "IncColorlessMeeplesRoundReduction":
+                                    tempCard.ActionList.Add(new IncColorlessMeeplesRoundReduction());
+                                    break;
                                 case "ChangeMeepleAmount":
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ChangeMeepleAmount());

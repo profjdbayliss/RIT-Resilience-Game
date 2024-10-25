@@ -79,6 +79,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int bluffTurnCount = 0;
     public int bluffTurnCheck { get; set; } = 0;
     public bool IsRedLayingLow { get; set; } = false;
+    public bool IsRedAggressive { get; set; } = false;
+    public int aggressionTurnCount = 0;
+    public int aggressionTurnCheck { get; set; } = 0;
     
     //// UI Elements
     //[Header("UI Elements")]
@@ -1187,6 +1190,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (IsRedLayingLow)
             roundsLeft++;
         else roundsLeft--;
+
+        Debug.Log("Red is aggressive: " + IsRedAggressive);
+        if(IsRedAggressive)
+        {
+            roundsLeft--; //its already subtracting once in line 1191
+            aggressionTurnCount++;
+            if(aggressionTurnCount >= aggressionTurnCheck)
+            {
+                IsRedAggressive = false;
+                aggressionTurnCount = 0;
+                actualPlayer.ResetMaxColorlessMeeples(); //dont have to check for blue cause its colorless
+                foreach(CardPlayer player in networkPlayers)
+                {
+                    player.ResetMaxColorlessMeeples();
+                }
+            }
+        }
 
         //update the overtime state
         if (actualPlayer.otState == OverTimeState.Overtime) {
