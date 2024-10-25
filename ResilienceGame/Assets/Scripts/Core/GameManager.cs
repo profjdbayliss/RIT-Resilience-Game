@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool hasWhiteCardPlayed = true; //TODO change when implementing white cards
     private int assignedSectors = 0;
     private int numBluePlayers = 0;
-    private const int SECTOR_SIM_TURN_START = 2;
+    private const int SECTOR_SIM_TURN_START = 0; //TODO: Change back to (2) when testing is done
     public int UniqueCardIdCount = 0;
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
@@ -347,7 +347,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
             SimulatedSectors = AssignableSectors.ToDictionary(Sector => Sector.sectorName, Sector => Sector);
             SimulatedSectorList = SimulatedSectors.Keys.ToList();
             SimulatedSectors.Values.ToList().ForEach(sector => sector.IsSimulated = true);
-            activeSectors.RemoveAll(AssignableSectors.Contains);
+
+
+            //TODO: add next line back in when testing is done
+            // activeSectors.RemoveAll(AssignableSectors.Contains);
 
 
             //blue player look at their sector
@@ -681,6 +684,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log("Checking downed facilities for each sector");
         Debug.Log(AllSectors.Count);
         foreach (var kvp in AllSectors) {
+            foreach (var fac in kvp.Value.facilities) {
+                fac.CheckDownedConnections();
+            }
             if (kvp.Value.IsSimulated)
                 Debug.Log($"Simulated Sector {kvp.Value.sectorName}'s Facility status: [{kvp.Value.SimulatedFacilities[0]}," +
                     $"{kvp.Value.SimulatedFacilities[1]}," +
@@ -691,9 +697,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     $"{!kvp.Value.facilities[2].IsDown}]");
             Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
             UserInterface.Instance.ToggleDownedSectorInMenu((int)kvp.Key, kvp.Value.IsDown);
+            
         }
         var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
-
+        Debug.Log($"Found {downedSectors.Count} downed sectors");
+        foreach (var sector in downedSectors) {
+            Debug.Log($"Downed sector: {sector.sectorName}");
+        }
         if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
 
             StartDoomClock();
@@ -1321,24 +1331,26 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void SimulateSectors() {
         if (!simulateSectors) return;
         if (!IsServer) return;
-
+        string response = "";
         var sectorStatus = new List<(int sectorType, bool[] facilityStatus)>();
         if (MGamePhase == GamePhase.ActionBlue) {
             //Debug.Log($"Simulating restore on {SimulatedSectors.Count} sectors");
             SimulatedSectors.Values.ToList().ForEach(sector => {
-                sector.SimulateRestore();
+                response = sector.SimulateRestore();
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
             });
         }
         else if (MGamePhase == GamePhase.ActionRed) {
            // Debug.Log($"Simulating attack on {SimulatedSectors.Count} sectors");
             SimulatedSectors.Values.ToList().ForEach(sector => {
-                sector.SimulateAttack();
+                response = sector.SimulateAttack();
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
             });
         }
-        CheckDownedFacilities();
+        Debug.Log(response);
+        
         RGNetworkPlayerList.instance.SendSectorDataMessage(0, sectorStatus);
+        CheckDownedFacilities();
 
     }
     public void GetSimulationStatusFromNetwork(SectorType sector, bool[] facilityStatus) {

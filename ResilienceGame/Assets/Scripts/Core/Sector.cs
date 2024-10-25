@@ -10,12 +10,32 @@ using System.Security.Principal;
 using System.Runtime.InteropServices.ComTypes;
 using System.ComponentModel;
 using static Facility;
-
+public enum SectorType {
+    Communications, //Core
+    Energy, //Core
+    Water, //Core
+    Information, //Core
+    Chemical,
+    Commercial,
+    Manufacturing,
+    Dams,
+    Defense,
+    Emergency,
+    Financial,
+    Agriculture,
+    Government,
+    Healthcare,
+    Nuclear,
+    Transport,
+    Any,
+    All
+};
 public class Sector : MonoBehaviour {
     #region Fields
     [Header("Simulation")]
-    [SerializeField] float facilityDownPercentage = 0.1f;   //10% chance of facility going down each red turn
+    [SerializeField] float facilityDownPercentage = 0.05f;   //05% chance of facility going down each red turn
     [SerializeField] float facilityUpPercentage = 0.5f;     //50% chance of facility going up each blue turn
+    [SerializeField] float coreFacilityMitigationAmount = .5f; //reduce the chance of core facilities going down by half
     public bool[] SimulatedFacilities = new bool[3] { true, true, true }; //simulated facility up/down status
     public bool IsSimulated { get; set; } = false;
     public List<string> SimulationLog = new List<string>();
@@ -46,6 +66,7 @@ public class Sector : MonoBehaviour {
     // public RawImage icon;
     public string spriteSheetName = "sectorIconAtlas.png";
     public Texture2D iconAtlasTexture;
+    public List<Sprite> sectorIconList = new List<Sprite>();
 
     private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
@@ -248,26 +269,27 @@ public class Sector : MonoBehaviour {
             Debug.LogError("Failed to load effect icon atlas");
         }
     }
-    void UpdateFacilityDependencyIcons() {
-        string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
-        LoadIconAtlasTexture(filePath);
+    //void UpdateFacilityDependencyIcons() {
+    //    //string filePath = Path.Combine(Application.streamingAssetsPath, spriteSheetName);
+    //    //LoadIconAtlasTexture(filePath);
 
-        Sprite[] sprites = SliceSpriteSheet(iconAtlasTexture, 256, 256, 4, 4); // Slices into 16 sprites
+    //    //Sprite[] sprites = SliceSpriteSheet(iconAtlasTexture, 256, 256, 4, 4); // Slices into 16 sprites
 
-        //assign the sprites to the facilities
-        foreach (Facility facility in facilities) {
-            for (int i = 0; i < facility.dependencies.Length; i++) {
-                facility.dependencyIcons[i].sprite = sprites[ICON_INDICIES[facility.dependencies[i]]];
-            }
-        }
+    //    ////assign the sprites to the facilities
+    //    //foreach (Facility facility in facilities) {
+    //    //    for (int i = 0; i < facility.dependencies.Length; i++) {
+    //    //        facility.dependencyIcons[i].sprite = sprites[ICON_INDICIES[facility.dependencies[i]]];
+    //    //    }
+    //    //}
 
-    }
-    void LoadIconAtlasTexture(string filePath) {
-        byte[] fileData = File.ReadAllBytes(filePath);
-        iconAtlasTexture = new Texture2D(2, 2);
-        iconAtlasTexture.LoadImage(fileData);
 
-    }
+    //}
+    //void LoadIconAtlasTexture(string filePath) {
+    //    byte[] fileData = File.ReadAllBytes(filePath);
+    //    iconAtlasTexture = new Texture2D(2, 2);
+    //    iconAtlasTexture.LoadImage(fileData);
+
+    //}
     public void Initialize() {
         SectorIcon = SectorIconImage.sprite;
         InitEffectSprites();
@@ -279,8 +301,10 @@ public class Sector : MonoBehaviour {
             facility.Initialize();
         }
         CSVRead();
-        UpdateFacilityDependencyIcons();
-
+        //UpdateFacilityDependencyIcons();
+        foreach (Facility facility in facilities) {
+            facility.ProcessConnections(sectorIconList);
+        }
     }
     public void SetOwner(CardPlayer player) {
         Owner = player;
@@ -344,29 +368,12 @@ public class Sector : MonoBehaviour {
 
     #endregion
 
-    #region Facility Downing
-    public Facility[] CheckDownedFacilities() {
-        Facility[] facilitiesList = new Facility[3];
-        int downedFacilities = 0;
-        // TODO: check isDown;
-        //I think this should work? - Mukund
-        for (int i = 0; i < facilities.Length; i++) {
-            if (facilities[i].IsDown) {
-                facilitiesList[downedFacilities] = facilities[i];
-                downedFacilities++;
-            }
-        }
-
-        return facilitiesList;
-    }
-
-    #endregion
 
     #region Animation
     private void OnAnimationComplete() {
         Debug.Log("animation complete");
         IsAnimating = false;
-        if (GameManager.Instance.IsActualPlayersTurn()) 
+        if (GameManager.Instance.IsActualPlayersTurn())
             UserInterface.Instance.ToggleEndPhaseButton(true);
 
         // Check if there are more cards in the queue
@@ -614,23 +621,34 @@ public class Sector : MonoBehaviour {
     #endregion
 
     #region Simulation
-    public void SimulateAttack() {
-        
+    public string SimulateAttack() {
         for (int i = 0; i < SimulatedFacilities.Length; i++) {
-            SimulatedFacilities[i] = (UnityEngine.Random.value > facilityDownPercentage) || !SimulatedFacilities[i];
+            // Facility goes down if the random value is less than or equal to facilityDownPercentage
+            var downPercent = isCore ? facilityDownPercentage * (1 - coreFacilityMitigationAmount) : facilityDownPercentage;
+            if (SimulatedFacilities[i] && UnityEngine.Random.value <= downPercent) {
+                SimulatedFacilities[i] = false;
+            }
         }
         int downedFacilities = SimulatedFacilities.Count(x => x == false);
-        SimulationLog.Add($"{sectorName} simulated red attack and lost {downedFacilities} facilities");
+        GameManager.Instance.CheckDownedFacilities();
+        return $"{sectorName} simulated red attack and lost {downedFacilities} facilities";
     }
-    public void SimulateRestore() {
+
+    public string SimulateRestore() {
         for (int i = 0; i < SimulatedFacilities.Length; i++) {
-            SimulatedFacilities[i] = (UnityEngine.Random.value > facilityUpPercentage) || SimulatedFacilities[i];
+            var downPercent = (isCore && coreFacilityMitigationAmount != 0) ?
+                facilityDownPercentage * (1 / (1 - coreFacilityMitigationAmount)) : facilityDownPercentage;
+            // Facility goes up if the random value is less than or equal to facilityUpPercentage
+            if (!SimulatedFacilities[i] && UnityEngine.Random.value <= facilityUpPercentage) {
+                SimulatedFacilities[i] = true;
+            }
         }
         int downedFacilities = SimulatedFacilities.Count(x => x == false);
-        SimulationLog.Add($"{sectorName} simulated blue restore and has {downedFacilities} facilities");
+        GameManager.Instance.CheckDownedFacilities();
+        return $"{sectorName} simulated blue restore and has {downedFacilities} facilities remaining down";
     }
     public void SetSimulatedFacilityStatus(bool[] status) {
-        
+
         for (int i = 0; i < status.Length; i++) {
             SimulatedFacilities[i] = status[i];
         }
