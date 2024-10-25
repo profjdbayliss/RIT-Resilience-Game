@@ -1347,7 +1347,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
             });
         }
-        Debug.Log(response);
+       // Debug.Log(response);
         
         RGNetworkPlayerList.instance.SendSectorDataMessage(0, sectorStatus);
         CheckDownedFacilities();

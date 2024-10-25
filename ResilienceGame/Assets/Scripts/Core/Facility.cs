@@ -88,9 +88,9 @@ public class Facility : MonoBehaviour {
         connectedSectors = new List<Sector>();
         try {
             for (int i = 0; i < dependencies.Length; i++) {
-                Debug.Log($"Facility {facilityName} has dependency {dependencies[i]}");
+              //  Debug.Log($"Facility {facilityName} has dependency {dependencies[i]}");
                 var sec = GameManager.Instance.AllSectors[dependencies[i]];
-                Debug.Log($"Found {sec.sectorName} from game manager AllSectors");
+              //  Debug.Log($"Found {sec.sectorName} from game manager AllSectors");
                 connectedSectors.Add(sec);
                 dependencyIcons[i].sprite = icons[(int)sec.sectorName];
                 dependencyXs[i].enabled = false;
