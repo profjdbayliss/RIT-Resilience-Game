@@ -57,12 +57,17 @@ public class Facility : MonoBehaviour {
 
     // public FacilityEffect effect;
     //   public bool effectNegated;
-
+    private bool wasEverDowned = false;
     public bool IsDown =>
     (Points[0] == 0 ? 1 : 0) +
     (Points[2] == 0 ? 1 : 0) +
     (Points[1] == 0 ? 1 : 0) >= 2 || downedConnections == 3;
 
+
+    private void Update() {
+        if (IsDown && !wasEverDowned)
+            wasEverDowned = true;
+    }
 
 
     // Start is called before the first frame update

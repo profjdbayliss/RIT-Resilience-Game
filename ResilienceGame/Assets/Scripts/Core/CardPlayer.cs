@@ -59,7 +59,7 @@ public class CardPlayer : MonoBehaviour {
     [Header("Player Information")]
     public string playerName;
     public PlayerTeam playerTeam = PlayerTeam.Any;
-
+    public int NetID = -1;
     public Sector PlayerSector { get; set; }
     public string DeckName = "";
 

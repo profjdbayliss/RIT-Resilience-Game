@@ -289,13 +289,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
         var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
-
+        actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
         //create and populate the players using the network player list
         for (int i = 0; i < rgNetPlayers.Length; i++) {
             var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
             var id = rgNetPlayers[i].mPlayerID;
             cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
             cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
+            cardPlayer.NetID = id;
             cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
             cardPlayer.InitializeCards();
             playerDictionary.Add(id, cardPlayer);
@@ -656,15 +657,22 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // WORK: rewrite for this card game
     public void ShowEndGameCanvas() {
         MGamePhase = GamePhase.End;
+        ScoreManager.Instance.AddEndgameScore();
         endGameCanvas.SetActive(true);
+        
+
         //endGameText.text = actualPlayer.playerName + " ends the game with score " + actualPlayer.GetScore() +
         //    " and " + opponentPlayer.playerName + " ends the game with score " + opponentPlayer.GetScore();
 
         //WriteListToFile(Path.Combine(Application.streamingAssetsPath, "messages.log"), messageLog);
     }
     #endregion
+    #region Scoring
+    
+    #endregion
 
     #region Helpers
+
     public void CheckIfCanEndPhase() {
         if (WaitingForAnimations) {
             if (CanEndPhase) {
@@ -715,8 +723,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         IsDoomClockActive = true;
         numDoomClockTurnsLeft = 3;
         UserInterface.Instance.SetDoomClockActive(true);
+        ScoreManager.Instance.AddDoomClockActivation();
     }
     public void StopDoomClock() {
+        ScoreManager.Instance.AddDoomClockAvoidance();
         IsDoomClockActive = false;
         UserInterface.Instance.SetDoomClockActive(false);
     }

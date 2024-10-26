@@ -116,7 +116,7 @@ public class FacilityEffect {
         try {
             magnitude = int.Parse(effectParts[2]);
         }
-        catch (Exception e) {}
+        catch { }
 
         var effectTypes = effectTypeString.Split('&');
         //create an effect for each effect type
