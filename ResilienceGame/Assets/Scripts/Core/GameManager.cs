@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public readonly int MAX_DISCARDS = 3;
     public readonly int MAX_DEFENSE = 1;
     public const int OVERTIME_DURATION = 2;
-    public const int EXHAUSTED_DURATION = 4;
+    public const int EXHAUSTED_DURATION = 2;
     public int MNumberDiscarded { get; private set; } = 0;
     private int mNumberDefense = 0;
     public bool MIsDiscardAllowed { get; private set; } = false;
