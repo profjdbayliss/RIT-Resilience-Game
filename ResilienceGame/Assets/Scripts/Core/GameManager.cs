@@ -81,10 +81,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool IsRedAggressive { get; set; } = false;
     public int aggressionTurnCount = 0;
     public int aggressionTurnCheck { get; set; } = 0;
-    
+
     //// UI Elements
     //[Header("UI Elements")]
-    
+
 
     // End Game
     [Header("End Game")]
@@ -126,10 +126,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private const float WHITE_CARD_POS_CHANCE = 0.5f;
     private bool playWhite = false;//TODO change when implementing white cards
     private bool playedPosWhiteCard = false;
-    private bool hasWhiteCardPlayed = true; 
+    private bool hasWhiteCardPlayed = true;
     private int assignedSectors = 0;
     private int numBluePlayers = 0;
-    private const int SECTOR_SIM_TURN_START = 2; 
+    private const int SECTOR_SIM_TURN_START = 2;
     public int UniqueCardIdCount = 0;
     public bool IsInLobby { get; private set; } = false;
     public int UniqueFacilityEffectIdCount { get; set; }
@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
-            
+
 
 
 
@@ -349,8 +349,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             SimulatedSectors.Values.ToList().ForEach(sector => sector.IsSimulated = true);
 
 
-            //TODO: add next line back in when testing is done
-            // activeSectors.RemoveAll(AssignableSectors.Contains);
+            //remove assgined sectors from the sector pages
+            activeSectors.RemoveAll(AssignableSectors.Contains);
 
 
             //blue player look at their sector
@@ -475,9 +475,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             actualPlayer.playerTeam = PlayerTeam.Blue;
             actualPlayer.DeckName = "blue";
 
-            //// TODO: Set randomly
-            //actualPlayer.playerSector = gameCanvas.GetComponentInChildren<Sector>();
-            //actualPlayer.playerSector.Initialize(PlayerSector.Water);
         }
 
         // Initialize the deck info and set various
@@ -574,12 +571,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.AddActionLogMessage(message, fromNet, IsServer, ref messageLog);
     }
     public void SetSectorInView(Sector sector) {
-        Debug.Log("setting sector in view to " + sector?.sectorName);
+        // Debug.Log("setting sector in view to " + sector?.sectorName);
         if (sector != null)
             SetSectorInView(activeSectors.IndexOf(sector));
     }
     public void SetSectorInView(int index) {
-        Debug.Log("setting sector in view to " + index);
+        // Debug.Log("setting sector in view to " + index);
         if (index >= 0 && index < activeSectors.Count) {
             if (sectorInView != null)
                 sectorInView.ToggleSectorVisuals(false);
@@ -607,15 +604,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
 
-
-    //public void UpdateUISizeTrackers() {
-    //    //TODO: Add check for all red players
-    //    deckSizeTracker.UpdateAllTrackerTexts(
-    //        playerDeckSize: actualPlayer.DeckIDs.Count,
-    //        playerHandSize: actualPlayer.HandCards.Count,
-    //        opponentDeckSize: opponentPlayer.DeckIDs.Count,
-    //        opponentHandSize: opponentPlayer.HandCards.Count);
-    //}
     // WORK: there is no menu?????
     public void BackToMenu() {
 
@@ -659,7 +647,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         MGamePhase = GamePhase.End;
         ScoreManager.Instance.AddEndgameScore();
         endGameCanvas.SetActive(true);
-        
+
 
         //endGameText.text = actualPlayer.playerName + " ends the game with score " + actualPlayer.GetScore() +
         //    " and " + opponentPlayer.playerName + " ends the game with score " + opponentPlayer.GetScore();
@@ -668,7 +656,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     #endregion
     #region Scoring
-    
+
     #endregion
 
     #region Helpers
@@ -682,8 +670,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
     }
-    
-    
+
+
     public void EnableOvertime() {
         actualPlayer.StartOvertime();
     }
@@ -704,7 +692,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //        $"{!kvp.Value.facilities[2].IsDown}]");
             //Debug.Log($"Sector {kvp.Value.sectorName} thinks it is {(!kvp.Value.IsDown ? "up" : "down")}");
             UserInterface.Instance.ToggleDownedSectorInMenu((int)kvp.Key, kvp.Value.IsDown);
-            
+
         }
         var downedSectors = activeSectors.Where(sector => sector.IsDown).ToList();
         //Debug.Log($"Found {downedSectors.Count} downed sectors");
@@ -712,7 +700,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //    Debug.Log($"Downed sector: {sector.sectorName}");
         //}
         if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
-
+            Debug.Log($"Starting doom clock, downed sectors: {downedSectors.Count}");
             StartDoomClock();
         }
         else {
@@ -763,7 +751,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public bool IsActualPlayersTurn() {
         if (actualPlayer.playerTeam == PlayerTeam.Red) {
-            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed  || MGamePhase == GamePhase.DiscardRed;
+            return MGamePhase == GamePhase.DrawRed || MGamePhase == GamePhase.ActionRed || MGamePhase == GamePhase.DiscardRed;
         }
         else {
             return MGamePhase == GamePhase.DrawBlue || MGamePhase == GamePhase.ActionBlue || MGamePhase == GamePhase.BonusBlue || MGamePhase == GamePhase.DiscardBlue;
@@ -802,11 +790,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (!(MGamePhase == GamePhase.DiscardBlue || MGamePhase == GamePhase.DiscardRed)) {
                 //mEndPhaseButton.SetActive(true);
                 UserInterface.Instance.ToggleEndPhaseButton(true);
-               // Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
+                // Debug.Log($"{actualPlayer.playerTeam}'s end phase button set active");
             }
         }
         else {
-            if (activeSectors.Any(sector=>sector.HasOngoingUpdates || sector.IsAnimating)) {
+            if (activeSectors.Any(sector => sector.HasOngoingUpdates || sector.IsAnimating)) {
                 Debug.Log($"A sector was not ready");
                 WaitingForAnimations = true;
             }
@@ -814,7 +802,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 EndPhase(); // end the phase if it isn't your turn, to automatically go to the next phase, still requires the player who's turn it is to end their phase
                 Debug.Log("Auto ending phase for " + actualPlayer.playerTeam);
             }
-            
+
         }
     }
     // Starts the next phase.
@@ -842,7 +830,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
             GamePhase.DiscardRed => playWhite ? GamePhase.PlayWhite : GamePhase.DrawBlue,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
-            GamePhase.DrawBlue =>  GamePhase.ActionBlue,
+            GamePhase.DrawBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
             GamePhase.DiscardBlue => IsDoomClockActive ? GamePhase.BonusBlue : GamePhase.DrawRed,
             GamePhase.BonusBlue => GamePhase.DrawRed,
@@ -873,7 +861,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
-                
+
 
                 if (phaseJustChanged) {
                     //do nothing until incoming card actions are resolved
@@ -916,7 +904,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     }
                 }
                 break;
-            
+
             case GamePhase.BonusBlue:
                 break;
             case GamePhase.ActionBlue:
@@ -963,9 +951,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
             case GamePhase.DiscardBlue:
                 if (phaseJustChanged) {
                     if (!actualPlayer.NeedsToDiscard()) {
-                        if (CanEndPhase) 
+                        if (CanEndPhase)
                             EndPhase(); //immediately end phase if no discards needed
-                         else 
+                        else
                             WaitingForAnimations = true;
                         return;
                     }
@@ -985,15 +973,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                         if (!actualPlayer.NeedsToDiscard()) {
                             if (CanEndPhase) {
-                                
+
                                 Debug.Log("Ending discard phase after finishing discarding");
                                 MIsDiscardAllowed = false;
                                 EndPhase(); //end phase when done discarding
-                            } 
+                            }
                             else
                                 WaitingForAnimations = true;
-                            
-                        }                           
+
+                        }
                         //update alert when discarding                              
                         if (MNumberDiscarded > 0) {
                             UserInterface.Instance.DisplayAlertMessage($"You must discard {actualPlayer.HandCards.Count - CardPlayer.MAX_HAND_SIZE_AFTER_ACTION} cards before continuing", actualPlayer);
@@ -1065,7 +1053,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Ends the phase.
     public void EndPhase() {
         UserInterface.Instance.ResolveTextAlert(); //resolve any alerts, there currently should not be alerts that persist to the next phase so we can auto hide any leftover alerts here
-        
+
         switch (MGamePhase) {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
@@ -1211,17 +1199,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
         else roundsLeft--;
 
         Debug.Log("Red is aggressive: " + IsRedAggressive);
-        if(IsRedAggressive)
-        {
+        if (IsRedAggressive) {
             roundsLeft--; //its already subtracting once in line 1191
             aggressionTurnCount++;
-            if(aggressionTurnCount >= aggressionTurnCheck)
-            {
+            if (aggressionTurnCount >= aggressionTurnCheck) {
                 IsRedAggressive = false;
                 aggressionTurnCount = 0;
                 actualPlayer.ResetMaxColorlessMeeples(); //dont have to check for blue cause its colorless
-                foreach(CardPlayer player in networkPlayers)
-                {
+                foreach (CardPlayer player in networkPlayers) {
                     player.ResetMaxColorlessMeeples();
                 }
             }
@@ -1241,7 +1226,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             actualPlayer.OverTimeCounter++;
             if (actualPlayer.OverTimeCounter > EXHAUSTED_DURATION) {
                 actualPlayer.EndExhaustion();
-            } else {
+            }
+            else {
                 UserInterface.Instance.UpdateOTText();
             }
         }
@@ -1350,21 +1336,21 @@ public class GameManager : MonoBehaviour, IRGObservable {
             });
         }
         else if (MGamePhase == GamePhase.ActionRed) {
-           // Debug.Log($"Simulating attack on {SimulatedSectors.Count} sectors");
+            // Debug.Log($"Simulating attack on {SimulatedSectors.Count} sectors");
             SimulatedSectors.Values.ToList().ForEach(sector => {
                 response = sector.SimulateAttack();
                 sectorStatus.Add(((int)sector.sectorName, sector.SimulatedFacilities));
             });
         }
-       // Debug.Log(response);
-        
+        // Debug.Log(response);
+
         RGNetworkPlayerList.instance.SendSectorDataMessage(0, sectorStatus);
         CheckDownedFacilities();
 
     }
     public void GetSimulationStatusFromNetwork(SectorType sector, bool[] facilityStatus) {
         if (IsServer) return;
-       // Debug.Log($"Received simulation status for {sector}");
+        // Debug.Log($"Received simulation status for {sector}");
         if (SimulatedSectors.TryGetValue(sector, out Sector simSector)) {
             simSector.SetSimulatedFacilityStatus(facilityStatus);
             CheckDownedFacilities();
