@@ -58,13 +58,16 @@ public class Facility : MonoBehaviour {
     // public FacilityEffect effect;
     //   public bool effectNegated;
     public bool WasEverDowned = false;
-    public bool IsDown =>
-    Points[0] == 0 ||
-    Points[2] == 0 ||
-    Points[1] == 0 || 
-        downedConnections == 3;
-
-
+    public bool IsDown =>   Points[0] == 0 ||
+                            Points[2] == 0 ||
+                            Points[1] == 0 || 
+                            downedConnections == 3;
+    public bool IsDamaged => Points[0] < maxPhysicalPoints || 
+                            Points[1] < maxNetworkPoints || 
+                            Points[2] < maxFinacialPoints;
+    public bool HasMaxPhysicalPoints => Points[0] == maxPhysicalPoints;
+    public bool HasMaxNetworkPoints => Points[1] == maxNetworkPoints;
+    public bool HasMaxFinancialPoints => Points[2] == maxFinacialPoints;
     private void Update() {
         if (IsDown && !WasEverDowned)
             WasEverDowned = true;
@@ -261,6 +264,7 @@ public class Facility : MonoBehaviour {
         GameManager.Instance.CheckDownedFacilities();
         UpdateUI();
     }
+    //TODO update for new card effects
     public bool HasRemovableEffects(PlayerTeam opponentTeam, bool removePointsPerTurn = true) {
 
         return opponentTeam switch {

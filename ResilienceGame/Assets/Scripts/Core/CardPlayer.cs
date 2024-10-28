@@ -60,6 +60,7 @@ public class CardPlayer : MonoBehaviour {
     public string playerName;
     public PlayerTeam playerTeam = PlayerTeam.Any;
     public int NetID = -1;
+    public bool IsAI = false;
     public Sector PlayerSector { get; set; }
     public string DeckName = "";
 
@@ -290,9 +291,9 @@ public class CardPlayer : MonoBehaviour {
         else {
             Debug.LogError("Hand drop zone not found");
         }
-
+        
         InitDropLocations();
-       
+
         overTimeCharges = MAX_OVERTIME_CHARGES;
     }
     public void InitializeCards() {
@@ -313,6 +314,7 @@ public class CardPlayer : MonoBehaviour {
         BlueMeeples = maxMeeples[1];
         PurpleMeeples = maxMeeples[2];
         ColorlessMeeples = maxMeeples[3];
+        
 
     }
     //add the facilities to the player's active facilities
@@ -480,28 +482,26 @@ public class CardPlayer : MonoBehaviour {
     #region Helpers
     public void ResetMeepleCount() {
         meeplesSpent = 0;
-        
+
         BlackMeeples = maxMeeples[0];
         BlueMeeples = maxMeeples[1];
         PurpleMeeples = maxMeeples[2];
         ColorlessMeeples = maxMeeples[3];
         if (GameManager.Instance.actualPlayer == this) {
-           // Debug.Log($"Resetting to MaxMeeples: {maxMeeples[0]}, {maxMeeples[1]}, {maxMeeples[2]}, {maxMeeples[3]}");
-          //  Debug.Log($"Player {playerName} has {BlackMeeples} black, {BlueMeeples} blue, {PurpleMeeples} purple, and {ColorlessMeeples} colorless meeples");
+            // Debug.Log($"Resetting to MaxMeeples: {maxMeeples[0]}, {maxMeeples[1]}, {maxMeeples[2]}, {maxMeeples[3]}");
+            //  Debug.Log($"Player {playerName} has {BlackMeeples} black, {BlueMeeples} blue, {PurpleMeeples} purple, and {ColorlessMeeples} colorless meeples");
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
         }
-            
+
     }
 
-    public void IncMaxColorlessMeeples(float value)
-    {
+    public void IncMaxColorlessMeeples(float value) {
         maxMeeples[3] += value;
         ColorlessMeeples = maxMeeples[3];
         UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
     }
 
-    public void ResetMaxColorlessMeeples()
-    {
+    public void ResetMaxColorlessMeeples() {
         maxMeeples[3] = 1;
         ColorlessMeeples = maxMeeples[3];
         UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
@@ -925,7 +925,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
         if (IsDraggingCard) {
-            UpdateHoveredDropLocation();
+            UpdateHoveredDropLocation(Mouse.current.position.ReadValue());
             //if (hoveredDropLocation != null)
             //    Debug.Log(hoveredDropLocation.name);
         }
@@ -946,7 +946,7 @@ public class CardPlayer : MonoBehaviour {
 
 
     //updates the hoverDropLocation class field to hold the object the card is hovering over
-    void UpdateHoveredDropLocation() {
+    void UpdateHoveredDropLocation(Vector2 position, bool shouldHighlight = true, Card cardDragged = null) {
         GameObject currentHoveredFacility = null; // Reset at the beginning of each update
         bool isOverAnyDropLocation = false;
 
@@ -955,9 +955,9 @@ public class CardPlayer : MonoBehaviour {
         //    return;
         //}
 
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        //  Vector2 mousePosition = Mouse.current.position.ReadValue();
 
-        Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(mousePosition, LayerMask.GetMask("CardDrop"));
+        Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(position, LayerMask.GetMask("CardDrop"));
         //  Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
         if (hoveredColliders != null && hoveredColliders.Length > 0) {
             isOverAnyDropLocation = true;
@@ -985,11 +985,12 @@ public class CardPlayer : MonoBehaviour {
 
             // Process the hovered facility collider
             if (hoveredFacilityCollider != null) {
-                var cardBeingDragged = handPositioner.CardsBeingDragged.First();
+                
+                var cardBeingDragged = cardDragged == null ? handPositioner.CardsBeingDragged.First() : cardDragged;
                 // Debug.Log(cardDraggedTarget);
                 // Check if the card being dragged is a facility card
                 if (cardBeingDragged.target == CardTarget.Facility || cardBeingDragged.target == CardTarget.Effect) {
-                    if (GameManager.Instance.CanHighlight()) {
+                    if (GameManager.Instance.CanHighlight() && shouldHighlight) {
                         //effect card or facility with pre req effect hover
                         if (cardBeingDragged.target == CardTarget.Effect || cardBeingDragged.data.preReqEffectType != FacilityEffectType.None) {
                             if (hoveredFacilityCollider.TryGetComponent(out Facility facility)) {
@@ -1122,6 +1123,13 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Dropping
+    public Card AiDropCardOn(Card card, Vector2 position) {
+        Debug.Log($"{playerName}'s ai is playing {card.data.name} at {position}");
+        if (card == null || position == null) return null;
+        UpdateHoveredDropLocation(position, false, card);
+        return HandleCardDrop(card);
+    }
+
     //This function is called when a card is dropped from that card's slippy component (happens one time at drop)
     public Card HandleCardDrop(Card card) {
         if (UserInterface.Instance.hoveredDropLocation == null) {
@@ -1304,7 +1312,10 @@ public class CardPlayer : MonoBehaviour {
     private bool ValidateCardPlay(Card card) {
         string response = "";
         bool canPlay = false;
-
+        if (IsAI) {
+            Debug.LogWarning($"Can't play manually as AI player!!");
+            return false;
+        }
         if (AmountToReturnToDeck > 0) {
             Debug.Log($"Returning {card.front.title} to deck");
             return true;
@@ -1411,8 +1422,7 @@ public class CardPlayer : MonoBehaviour {
             return ($"Cannot play {card.data.name} when the bluff isn't active", false);
         }
 
-        if (card.data.name == "Aggression" && GameManager.Instance.IsRedAggressive)
-        {
+        if (card.data.name == "Aggression" && GameManager.Instance.IsRedAggressive) {
             return ($"Cannot play {card.data.name} as Red is already aggressive", false);
         }
 
@@ -1702,7 +1712,7 @@ public class CardPlayer : MonoBehaviour {
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedTwo);
                 playsForMessage.Add((int)update.AdditionalFacilitySelectedThree);
             }
-           // Debug.Log(sb.ToString());
+            // Debug.Log(sb.ToString());
             return update.Type;
         }
         return CardMessageType.None;

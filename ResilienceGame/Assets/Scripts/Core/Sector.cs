@@ -320,6 +320,10 @@ public class Sector : MonoBehaviour {
     public bool HasRemovableEffectsOnFacilities(PlayerTeam opponentTeam) {
         return facilities.Any(facility => facility.HasRemovableEffects(opponentTeam));
     }
+    public bool GetFacilityWithRemovableEffects(PlayerTeam opponentTeam, out Facility facility) {
+        facility = facilities.FirstOrDefault(facility => facility.HasRemovableEffects(opponentTeam));
+        return facility != null;
+    }
     Sprite[] SliceSpriteSheet(Texture2D texture, int spriteWidth, int spriteHeight, int columns, int rows) {
         Sprite[] sprites = new Sprite[columns * rows];
 

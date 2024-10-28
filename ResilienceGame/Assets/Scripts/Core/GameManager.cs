@@ -110,7 +110,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Logging
     public List<string> messageLog = new List<string>();
 
-
+    [Header("AI")]
+    public bool IsLocalPlayerAI = false;
     // Misc
     public bool mCreateEnergyAtlas = false;
     public bool mCreateWaterAtlas = false;
@@ -289,6 +290,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
         var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
+        
         actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
         //create and populate the players using the network player list
         for (int i = 0; i < rgNetPlayers.Length; i++) {
@@ -655,6 +657,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //WriteListToFile(Path.Combine(Application.streamingAssetsPath, "messages.log"), messageLog);
     }
     #endregion
+
     #region Scoring
 
     #endregion
