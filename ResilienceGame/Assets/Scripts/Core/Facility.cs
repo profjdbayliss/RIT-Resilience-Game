@@ -38,8 +38,8 @@ public class Facility : MonoBehaviour {
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
     public int[] Points = new int[3];
     //public int Points[0];
-  //  public int FinancialPoints;
-  //  public int NetworkPoints;
+    //  public int FinancialPoints;
+    //  public int NetworkPoints;
 
     // private TextMeshProUGUI[] pointsUI;
     [SerializeField] private Transform pointsParent;
@@ -57,16 +57,17 @@ public class Facility : MonoBehaviour {
 
     // public FacilityEffect effect;
     //   public bool effectNegated;
-    private bool wasEverDowned = false;
+    public bool WasEverDowned = false;
     public bool IsDown =>
-    (Points[0] == 0 ? 1 : 0) +
-    (Points[2] == 0 ? 1 : 0) +
-    (Points[1] == 0 ? 1 : 0) >= 2 || downedConnections == 3;
+    Points[0] == 0 ||
+    Points[2] == 0 ||
+    Points[1] == 0 || 
+        downedConnections == 3;
 
 
     private void Update() {
-        if (IsDown && !wasEverDowned)
-            wasEverDowned = true;
+        if (IsDown && !WasEverDowned)
+            WasEverDowned = true;
     }
 
 
