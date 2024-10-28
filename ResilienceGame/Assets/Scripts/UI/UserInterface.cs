@@ -56,6 +56,10 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI overTimeTurnsLabelText;
     [SerializeField] private TextMeshProUGUI playerDeckText;
     [SerializeField] private TextMeshProUGUI playerHandText;
+    [Header("Meeple Sharing")]
+    [SerializeField] private GameObject MeepleSharingPanel;
+    [SerializeField] private TextMeshProUGUI[] MeepleSharingTextCurrent = new TextMeshProUGUI[3];
+    [SerializeField] private TextMeshProUGUI[] MeepleSharingTextMax = new TextMeshProUGUI[3];
 
     [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
     private List<Image> sectorXIcons = new List<Image>();
@@ -269,6 +273,17 @@ public class UserInterface : MonoBehaviour {
         overTimeTurnsLabelText.text = "Exhausted Left";
         // overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
         overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
+    }
+    public void ToggleMeepleSharingMenu(bool enable) {
+        if (enable) {
+            for (int i = 0; i < 3; i++) {
+                MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.maxMeeples[i].ToString();
+            }
+            MeepleSharingTextCurrent[1].text = GameManager.Instance.actualPlayer.BlueMeeples.ToString();
+            MeepleSharingTextCurrent[0].text = GameManager.Instance.actualPlayer.BlackMeeples.ToString();
+            MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
+        }
+        MeepleSharingPanel.SetActive(enable);
     }
 
 }

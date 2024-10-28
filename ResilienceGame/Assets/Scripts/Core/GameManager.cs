@@ -290,7 +290,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
         var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
-        
+
         actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
         //create and populate the players using the network player list
         for (int i = 0; i < rgNetPlayers.Length; i++) {
@@ -835,7 +835,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
-            GamePhase.DiscardBlue => GamePhase.BonusBlue, 
+            GamePhase.DiscardBlue => GamePhase.BonusBlue,
             GamePhase.BonusBlue => GamePhase.DrawRed,
             _ => GamePhase.End
         };
@@ -867,6 +867,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
                 if (phaseJustChanged) {
+                    UserInterface.Instance.ToggleMeepleSharingMenu(false);
                     playerDictionary.Values.ToList().ForEach(player => player.UpdateMeepleSharing());
                     //do nothing until incoming card actions are resolved
                     //this should prevent the doom clock from turning on after this code was called
@@ -910,6 +911,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
 
             case GamePhase.BonusBlue:
+                if (phaseJustChanged) {
+                    if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                        UserInterface.Instance.ToggleMeepleSharingMenu(true);
+                    }
+                }
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
@@ -954,6 +960,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
                 if (phaseJustChanged) {
+                    UserInterface.Instance.ToggleMeepleSharingMenu(false);
                     if (!actualPlayer.NeedsToDiscard()) {
                         if (CanEndPhase)
                             EndPhase(); //immediately end phase if no discards needed

@@ -114,7 +114,7 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Meeple Info")]
     //public const int STARTING_MEEPLES = 2;
-    [SerializeField] private float[] maxMeeples;
+    public float[] maxMeeples;
     public float BlueMeeples { get; private set; }
     public float BlackMeeples { get; private set; }
     public float PurpleMeeples { get; private set; }
