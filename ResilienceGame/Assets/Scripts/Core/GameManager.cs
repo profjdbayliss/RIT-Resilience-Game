@@ -1219,10 +1219,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
             {
                 IsRedAggressive = false;
                 aggressionTurnCount = 0;
-                actualPlayer.ResetMaxColorlessMeeples(); //dont have to check for blue cause its colorless
+                if(actualPlayer.playerTeam == PlayerTeam.Red)
+                    actualPlayer.ResetMaxColorlessMeeples(); //dont have to check for blue cause its colorless
                 foreach(CardPlayer player in networkPlayers)
                 {
-                    player.ResetMaxColorlessMeeples();
+                    if(player.playerTeam == PlayerTeam.Red)
+                        player.ResetMaxColorlessMeeples();
                 }
             }
         }

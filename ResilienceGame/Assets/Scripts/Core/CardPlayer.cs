@@ -501,12 +501,14 @@ public class CardPlayer : MonoBehaviour {
     {
         maxMeeples[3] += value;
         ColorlessMeeples = maxMeeples[3];
+        UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
     }
 
     public void ResetMaxColorlessMeeples()
     {
         maxMeeples[3] = 1;
         ColorlessMeeples = maxMeeples[3];
+        UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
     }
 
     public int GetTotalMeeples() {
