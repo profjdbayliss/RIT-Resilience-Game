@@ -835,7 +835,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
-            GamePhase.DiscardBlue => IsDoomClockActive ? GamePhase.BonusBlue : GamePhase.DrawRed,
+            GamePhase.DiscardBlue => GamePhase.BonusBlue, 
             GamePhase.BonusBlue => GamePhase.DrawRed,
             _ => GamePhase.End
         };
@@ -867,6 +867,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
                 if (phaseJustChanged) {
+                    playerDictionary.Values.ToList().ForEach(player => player.UpdateMeepleSharing());
                     //do nothing until incoming card actions are resolved
                     //this should prevent the doom clock from turning on after this code was called
                     //which meant the OT button wouldnt get turned on when it should

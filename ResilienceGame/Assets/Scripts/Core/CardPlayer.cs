@@ -120,6 +120,13 @@ public class CardPlayer : MonoBehaviour {
     public float PurpleMeeples { get; private set; }
     public float ColorlessMeeples { get; private set; }
 
+    //(timer, type)
+    public List<(int, int)> sharedMeepleTypes = new List<(int, int)>();
+    public List<(int, int)> receivedMeepleTypes = new List<(int, int)>();
+    public int SharedMeepleAmount => sharedMeepleTypes.Count;
+    //public int sharedMeepleTimer = 0;
+    public readonly int MEEPLE_SHARE_DURATION = 2;
+
 
 
     //public TextMeshProUGUI[] meeplesAmountText;
@@ -291,7 +298,7 @@ public class CardPlayer : MonoBehaviour {
         else {
             Debug.LogError("Hand drop zone not found");
         }
-        
+
         InitDropLocations();
 
         overTimeCharges = MAX_OVERTIME_CHARGES;
@@ -314,7 +321,7 @@ public class CardPlayer : MonoBehaviour {
         BlueMeeples = maxMeeples[1];
         PurpleMeeples = maxMeeples[2];
         ColorlessMeeples = maxMeeples[3];
-        
+
 
     }
     //add the facilities to the player's active facilities
@@ -475,6 +482,86 @@ public class CardPlayer : MonoBehaviour {
             OnCardsReturnedToDeck = onCardsReturned;
             ReadyState = PlayerReadyState.ReturnCardsToDeck;
             UserInterface.Instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} cards to the deck\nby dragging them to the play area", this);
+        }
+    }
+    #endregion
+
+    #region Meeple Sharing
+    public void UpdateMeepleSharing() {
+        CheckReceivedMeeplesAndReturn();
+        CheckSharedMeeplesAndReturn();
+    }
+    public void IncrementMeepleByIndex(int index) {
+        if (index >= 0 && index < maxMeeples.Length) {
+            maxMeeples[index]++;
+            switch (index) {
+                case 0:
+                    BlackMeeples++;
+                    break;
+                case 1:
+                    BlueMeeples++;
+                    break;
+                case 2:
+                    PurpleMeeples++;
+                    break;
+                case 3:
+                    ColorlessMeeples++;
+                    break;
+            }
+            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+        }
+    }
+    public void DecrememntMeepleByIndex(int index) {
+        if (index >= 0 && index < maxMeeples.Length) {
+            maxMeeples[index]--;
+            switch (index) {
+                case 0:
+                    BlackMeeples--;
+                    break;
+                case 1:
+                    BlueMeeples--;
+                    break;
+                case 2:
+                    PurpleMeeples--;
+                    break;
+            }
+            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+        }
+    }
+    public void ShareMeeple(int index) {
+        if (index >= 0 && index < maxMeeples.Length) {
+            if (maxMeeples[index] > 0) {
+                DecrememntMeepleByIndex(index);
+                sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+            }
+        }
+    }
+    public void ReceiveSharedMeeple(int index) {
+        if (index >= 0 && index < maxMeeples.Length) {
+            receivedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+            IncrementMeepleByIndex(index);
+        }
+    }
+    public void CheckSharedMeeplesAndReturn() {
+        for (int i = 0; i < sharedMeepleTypes.Count; i++) {
+            if (sharedMeepleTypes[i].Item1 <= 0) {
+                IncrementMeepleByIndex(sharedMeepleTypes[i].Item2);
+                sharedMeepleTypes.RemoveAt(i);
+            }
+            else {
+                sharedMeepleTypes[i] = (sharedMeepleTypes[i].Item1 - 1, sharedMeepleTypes[i].Item2);
+            }
+        }
+    }
+    public void CheckReceivedMeeplesAndReturn() {
+        for (int i = 0; i < receivedMeepleTypes.Count; i++) {
+            if (receivedMeepleTypes[i].Item1 <= 0) {
+                IncrementMeepleByIndex(receivedMeepleTypes[i].Item2);
+                receivedMeepleTypes.RemoveAt(i);
+            }
+            else {
+                receivedMeepleTypes[i] = (receivedMeepleTypes[i].Item1 - 1, receivedMeepleTypes[i].Item2);
+            }
         }
     }
     #endregion
@@ -985,7 +1072,7 @@ public class CardPlayer : MonoBehaviour {
 
             // Process the hovered facility collider
             if (hoveredFacilityCollider != null) {
-                
+
                 var cardBeingDragged = cardDragged == null ? handPositioner.CardsBeingDragged.First() : cardDragged;
                 // Debug.Log(cardDraggedTarget);
                 // Check if the card being dragged is a facility card
