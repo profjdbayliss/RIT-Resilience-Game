@@ -81,7 +81,11 @@ public class ScoreManager {
         GameManager.Instance.AllSectors.Values
                             .Where(sector => sector.Owner != null).ToList().ForEach(
                             sector => {
-                                AddPlayerScore(sector.Owner.NetID, ScoreAmounts.FacilityPreservation);
+                                foreach (var facility in sector.facilities) {
+                                    if (facility.WasEverDowned) continue;
+                                    AddPlayerScore(sector.Owner.NetID, ScoreAmounts.FacilityPreservation);
+                                }
+                                
                             });     
 
 
@@ -91,6 +95,7 @@ public class ScoreManager {
         AddTeamScore(GameManager.Instance.GetTurnsLeft() == 0 ? PlayerTeam.Blue : PlayerTeam.Red,
             ScoreAmounts.VictoryBonus);
         CheckUpSectors();
+
 
     }
     #endregion
