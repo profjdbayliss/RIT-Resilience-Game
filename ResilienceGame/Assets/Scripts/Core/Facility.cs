@@ -157,7 +157,7 @@ public class Facility : MonoBehaviour {
     public void CheckDownedConnections() {
         //Debug.Log("Checking downed connections for " + facilityName);
         downedConnections = 0;
-        bool isDown = IsDown;
+       // bool isDown = IsDown;
         for (int i = 0; i < connectedSectors.Count; i++) {
             if (connectedSectors[i].IsDown) {
                 dependencyXs[i].enabled = true;
@@ -168,19 +168,19 @@ public class Facility : MonoBehaviour {
             }
         }
         //we arent down now but we will be going down based on lack of connections
-        if (!isDown) {
-            if (downedConnections == 3) {
-                Debug.Log($"Facility {facilityName} is being downed by lack of connections");
+        //if (!isDown) {
+        //    if (downedConnections == 3) {
+        //        Debug.Log($"Facility {facilityName} is being downed by lack of connections");
                 
-               // GameManager.Instance.CheckDownedFacilities();
-            }
-        }
-        else {
-            if (downedConnections != 3) {
-                Debug.Log($"Facility {facilityName} is being brought back up by restored connections");
-               // GameManager.Instance.CheckDownedFacilities();
-            }
-        }
+        //       // GameManager.Instance.CheckDownedFacilities();
+        //    }
+        //}
+        //else {
+        //    if (downedConnections != 3) {
+        //        Debug.Log($"Facility {facilityName} is being brought back up by restored connections");
+        //       // GameManager.Instance.CheckDownedFacilities();
+        //    }
+        //}
         
         if (downedConnections > 0) {
             sectorPopoutMenu.SetLockedOpen();

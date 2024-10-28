@@ -161,42 +161,21 @@ public class CardPlayer : MonoBehaviour {
         float blackLeft = BlackMeeples - card.data.blackCost;
         float purpleLeft = PurpleMeeples - card.data.purpleCost;
 
-        bool hasColorlessMeeple = ColorlessMeeples > 0;
+        float totalDeficit = 0;
+        spendColorless = false;
 
-        // Attempt to spend colorless meeple for blue cost if needed
-        if (blueLeft < 0 && hasColorlessMeeple) {
-            blueLeft++;
-            ColorlessMeeples--;
-            spendColorless = true;
-            hasColorlessMeeple = false; // Only spend 1 colorless, so disable further spending
-        }
-        if (blueLeft < 0) {
-            return false;
-        }
+        // Calculate total deficit across all meeples
+        if (blueLeft < 0) totalDeficit += -blueLeft;
+        if (blackLeft < 0) totalDeficit += -blackLeft;
+        if (purpleLeft < 0) totalDeficit += -purpleLeft;
 
-        // Attempt to spend colorless meeple for black cost if needed
-        if (blackLeft < 0 && hasColorlessMeeple) {
-            blackLeft++;
-            ColorlessMeeples--;
-            spendColorless = true;
-            hasColorlessMeeple = false;
-        }
-        if (blackLeft < 0) {
-            return false;
+        // Check if colorless meeples can cover the total deficit
+        if (totalDeficit > ColorlessMeeples) {
+            return false; // Not enough colorless meeples to cover the deficit
         }
 
-        // Attempt to spend colorless meeple for purple cost if needed
-        if (purpleLeft < 0 && hasColorlessMeeple) {
-            purpleLeft++;
-            ColorlessMeeples--;
-            spendColorless = true;
-            hasColorlessMeeple = false;
-        }
-        if (purpleLeft < 0) {
-            return false;
-        }
-
-        // If all meeple costs are covered, return true
+        // If we have enough colorless meeples, mark them for spending
+        spendColorless = totalDeficit > 0;
         return true;
     }
 
@@ -205,13 +184,29 @@ public class CardPlayer : MonoBehaviour {
 
         // Check if we can afford to play the card
         if (CanAffordCardPlay(card, ref spendColorless)) {
+            // Deduct required meeples from each pool
             BlueMeeples -= card.data.blueCost;
             BlackMeeples -= card.data.blackCost;
             PurpleMeeples -= card.data.purpleCost;
 
-            // Total meeples spent including 1 colorless if applicable
-            numMeeplesSpent += (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost + (spendColorless ? 1 : 0));
-            meeplesSpent += numMeeplesSpent;
+            // Calculate the total number of meeples used
+            numMeeplesSpent = (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost);
+
+            // Spend colorless meeples if needed to cover deficits
+            if (spendColorless) {
+                float blueDeficit = Math.Max(0, -BlueMeeples);
+                float blackDeficit = Math.Max(0, -BlackMeeples);
+                float purpleDeficit = Math.Max(0, -PurpleMeeples);
+                float totalDeficit = blueDeficit + blackDeficit + purpleDeficit;
+
+                // Deduct from colorless pool and zero out deficits
+                ColorlessMeeples -= (int)totalDeficit;
+                BlueMeeples = Math.Max(0, BlueMeeples);
+                BlackMeeples = Math.Max(0, BlackMeeples);
+                PurpleMeeples = Math.Max(0, PurpleMeeples);
+
+                numMeeplesSpent += (int)totalDeficit;
+            }
 
             // Update the UI with the new meeple amounts
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
@@ -220,6 +215,7 @@ public class CardPlayer : MonoBehaviour {
 
         return false;
     }
+
 
     public void SpendMeepleWithButton(int index) {
         switch (index) {
@@ -490,8 +486,8 @@ public class CardPlayer : MonoBehaviour {
         PurpleMeeples = maxMeeples[2];
         ColorlessMeeples = maxMeeples[3];
         if (GameManager.Instance.actualPlayer == this) {
-            Debug.Log($"Resetting to MaxMeeples: {maxMeeples[0]}, {maxMeeples[1]}, {maxMeeples[2]}, {maxMeeples[3]}");
-            Debug.Log($"Player {playerName} has {BlackMeeples} black, {BlueMeeples} blue, {PurpleMeeples} purple, and {ColorlessMeeples} colorless meeples");
+           // Debug.Log($"Resetting to MaxMeeples: {maxMeeples[0]}, {maxMeeples[1]}, {maxMeeples[2]}, {maxMeeples[3]}");
+          //  Debug.Log($"Player {playerName} has {BlackMeeples} black, {BlueMeeples} blue, {PurpleMeeples} purple, and {ColorlessMeeples} colorless meeples");
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
         }
             
