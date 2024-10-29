@@ -934,13 +934,13 @@ public class CardPlayer : MonoBehaviour {
         if (GameManager.Instance.actualPlayer == this) {
             if (Keyboard.current.digit9Key.wasPressedThisFrame) {
                 if (TryGetFacilityUnderMouse(out Facility facility)) {
-                    facility.AddRemoveEffectsByIdString("backdoor", true, PlayerTeam.Red);
+                    facility.AddRemoveEffectsByIdString("backdoor", true, PlayerTeam.Red, NetID);
                 }
 
             }
             else if (Keyboard.current.digit0Key.wasPressedThisFrame) {
                 if (TryGetFacilityUnderMouse(out Facility facility)) {
-                    facility.AddRemoveEffectsByIdString("fortify", true, PlayerTeam.Blue);
+                    facility.AddRemoveEffectsByIdString("fortify", true, PlayerTeam.Blue, NetID);
                 }
             }
 
@@ -1793,13 +1793,14 @@ public class CardPlayer : MonoBehaviour {
             Debug.LogError($"Failed to find card with uid {update.UniqueID} in {opponent.playerName}'s hand - did not pass messsage");
         }
     }
+    
     void HandleRemoveEffectUpdate(Update update, CardPlayer opponent) {
         if (update.FacilityPlayedOnType != FacilityType.None) {
             if (ActiveFacilities.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo)) {
                 if (facilityGo.TryGetComponent(out Facility facility)) {
                     Debug.Log($"Looking to remove effect with type {update.FacilityEffectToRemoveType} from {facility.facilityName}");
                     if (update.FacilityEffectToRemoveType != FacilityEffectType.None) {
-                        if (facility.effectManager.TryRemoveEffectByType(update.FacilityEffectToRemoveType)) {
+                        if (facility.effectManager.TryRemoveEffectByType(update.FacilityEffectToRemoveType, opponent.NetID)) {
                             Debug.Log($"Successfully removed {update.FacilityEffectToRemoveType} from {facility.name}");
                         }
                     }

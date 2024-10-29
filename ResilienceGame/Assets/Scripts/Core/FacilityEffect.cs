@@ -43,6 +43,8 @@ public class FacilityEffect {
                                        // public int Stack { get; private set; } = 1;
     public bool IsNegated { get; set; } = false;
 
+    public int CreatedByPlayerID { get; set; } = -1;
+
     public bool IsRemoveable => EffectType == FacilityEffectType.Backdoor || EffectType == FacilityEffectType.ModifyPointsPerTurn || EffectType == FacilityEffectType.Fortify;
 
     //private static int _uniqueID = 0;

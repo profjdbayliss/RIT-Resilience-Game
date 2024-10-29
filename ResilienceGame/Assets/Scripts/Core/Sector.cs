@@ -303,10 +303,10 @@ public class Sector : MonoBehaviour {
     #endregion
 
     #region Helpers
-    public void AddEffectToFacilities(string idString, PlayerTeam createdBy) {
+    public void AddEffectToFacilities(string idString, PlayerTeam createdBy, int createdById) {
         foreach (var facility in facilities)
         {
-            facility.AddRemoveEffectsByIdString(idString, true, createdBy);
+            facility.AddRemoveEffectsByIdString(idString, true, createdBy, createdById);
         }
     }
     public Facility GetLocalFacilityByType(FacilityType type) {
@@ -461,11 +461,11 @@ public class Sector : MonoBehaviour {
                 Debug.Log("Extra facility info found in card update");
                 if (tempCard.data.effectString == "Remove") {
                     //remove the effect from the facilities
-                    OnAnimationResolveCardAction = (update, card) => RemoveFacilityEffectsFromCardUpdate(update);
+                    OnAnimationResolveCardAction = (update, card) => RemoveFacilityEffectsFromCardUpdate(update, player.NetID);
                 }
                 else {
                     //add the effect if possible
-                    OnAnimationResolveCardAction = (update, card) => AddFacilityEffectsFromCardUpdate(update, tempCard, player.playerTeam);
+                    OnAnimationResolveCardAction = (update, card) => AddFacilityEffectsFromCardUpdate(update, tempCard, player.playerTeam, player.NetID);
                 }
             }
             //grab the first facility in the sector, this is fine because these card types are not for specific facilities
@@ -512,11 +512,11 @@ public class Sector : MonoBehaviour {
             }
         }
     }
-    void RemoveFacilityEffectsFromCardUpdate(Update update) {
+    void RemoveFacilityEffectsFromCardUpdate(Update update, int playerId) {
         Debug.Log("looking to remove debuffs from selected facilities:");
-        var rm1 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedOne, update.FacilityEffectToRemoveType);
-        var rm2 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedTwo, update.FacilityEffectToRemoveType);
-        var rm3 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedThree, update.FacilityEffectToRemoveType);
+        var rm1 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedOne, update.FacilityEffectToRemoveType, playerId);
+        var rm2 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedTwo, update.FacilityEffectToRemoveType, playerId);
+        var rm3 = TryRemoveEffectFromPlayerFacilityByType(update.AdditionalFacilitySelectedThree, update.FacilityEffectToRemoveType, playerId);
 
         if (rm1 || rm2 || rm3) {
             Debug.Log($"Successfully removed {update.FacilityEffectToRemoveType} from facilities");
@@ -525,7 +525,7 @@ public class Sector : MonoBehaviour {
             Debug.Log($"Failed to remove {update.FacilityEffectToRemoveType} from facilities");
         }
     }
-    void AddFacilityEffectsFromCardUpdate(Update update, Card card, PlayerTeam playerTeam) {
+    void AddFacilityEffectsFromCardUpdate(Update update, Card card, PlayerTeam playerTeam, int playerId) {
         Debug.Log("looking to add debuffs to selected facilities:");
         FacilityEffectType preReqEffect = card.data.preReqEffectType;
         var facilities = new[]{update.AdditionalFacilitySelectedOne,
@@ -552,18 +552,18 @@ public class Sector : MonoBehaviour {
         }
         //add the effects, already filtered for prereq effects
         facilitiesToAffect.ForEach(facility => {
-            facility.AddRemoveEffectsByIdString(card.data.effectString, true, playerTeam);
+            facility.AddRemoveEffectsByIdString(card.data.effectString, true, playerTeam, playerId);
         });
 
     }
-    private bool TryRemoveEffectFromPlayerFacilityByType(FacilityType facilityType, FacilityEffectType effectTypeToRemove) {
+    private bool TryRemoveEffectFromPlayerFacilityByType(FacilityType facilityType, FacilityEffectType effectTypeToRemove, int playerId) {
         if (facilityType == FacilityType.None || effectTypeToRemove == FacilityEffectType.None) {
             //Debug.Log("Invalid facility type or effect type (probably just didnt select 3 facilities)"); //actually expected if passing in 2/3 or 1/3 facilities
             return false;
         }
         var facility = GetLocalFacilityByType(facilityType);
         if (facility != null) {
-            return facility.TryRemoveEffectByType(effectTypeToRemove);
+            return facility.TryRemoveEffectByType(effectTypeToRemove, playerId);
         }
         Debug.LogError("Facility type not found in active facilities");
         return false;

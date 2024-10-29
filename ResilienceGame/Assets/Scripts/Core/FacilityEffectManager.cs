@@ -65,32 +65,32 @@ public class FacilityEffectManager : MonoBehaviour {
     #region Debug
 
     public void DebugAddEffect(string effectId = "") {
-        var allEffects = new List<string>() {
-            "modp;net;1",
-            "modp;phys;1",
-            "modp;fin;1",
-            "modp;all;1",
-            "modp;fin&net;1",
-            "modp;phys&net;1",
-            "fortify",
-            "backdoor",
-            "modp;net;-1",
-            "modp;phys;-1",
-            "modp;fin;-1",
-            "modp;all;-1",
-            "modp;phys&net;-1",
-            "modp;phys&fin;-1",
-            "modp;fin&net;-1",
-        };
-        //foreach (Sprite sprite in EffectSprites) {
-        //    AddRemoveEffect(FacilityEffect.CreateEffectsFromID($"modp;net;1")[0], true);
-        //}
+        //var allEffects = new List<string>() {
+        //    "modp;net;1",
+        //    "modp;phys;1",
+        //    "modp;fin;1",
+        //    "modp;all;1",
+        //    "modp;fin&net;1",
+        //    "modp;phys&net;1",
+        //    "fortify",
+        //    "backdoor",
+        //    "modp;net;-1",
+        //    "modp;phys;-1",
+        //    "modp;fin;-1",
+        //    "modp;all;-1",
+        //    "modp;phys&net;-1",
+        //    "modp;phys&fin;-1",
+        //    "modp;fin&net;-1",
+        //};
+        ////foreach (Sprite sprite in EffectSprites) {
+        ////    AddRemoveEffect(FacilityEffect.CreateEffectsFromID($"modp;net;1")[0], true);
+        ////}
 
-        Debug.Log($"DEBUG: Adding facility effect with id: {effectId}");
-        if (effectId == "")
-            AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[UnityEngine.Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
-        else
-            AddRemoveEffect(FacilityEffect.CreateEffectsFromID(effectId)[0], true);
+        //Debug.Log($"DEBUG: Adding facility effect with id: {effectId}");
+        //if (effectId == "")
+        //    AddRemoveEffect(FacilityEffect.CreateEffectsFromID(allEffects[UnityEngine.Random.Range(0, allEffects.Count)])[0], true); //add a random effect from the list
+        //else
+        //    AddRemoveEffect(FacilityEffect.CreateEffectsFromID(effectId)[0], true);
     }
     #endregion
 
@@ -175,27 +175,28 @@ public class FacilityEffectManager : MonoBehaviour {
     /// </summary>
     /// <param name="effect">The facility effect to add or remove from the facility</param>
     /// <param name="isAdding">True if the effect should be added, false otherwise</param>
-    public void AddRemoveEffect(FacilityEffect effect, bool isAdding) {
+    public void AddRemoveEffect(FacilityEffect effect, bool isAdding, int createdById) {
+
         if (isAdding) {
-            AddEffect(effect);
+            AddEffect(effect, createdById);
         }
         else {
-            RemoveEffect(effect);
+            RemoveEffect(effect, createdById);
         }
 
     }
 
     #region Remove Effects
-    void RemoveNegativeEffects() {
+    void RemoveNegativeEffects(int calledById) {
         var negativeEffects = activeEffects
             .Where(effect => effect.EffectType == FacilityEffectType.ModifyPoints ||
                              effect.EffectType == FacilityEffectType.Backdoor).ToList();
 
-        negativeEffects.ForEach(effect => RemoveEffect(effect, true));
+        negativeEffects.ForEach(effect => RemoveEffect(effect, calledById, true));
     }
-    private void RemoveAllEffects() {
+    private void RemoveAllEffects(int calledById) {
         while (activeEffects.Count > 0) {
-            AddRemoveEffect(activeEffects[0], false);
+            AddRemoveEffect(activeEffects[0], false, calledById);
         }
     }
     /// <summary>
@@ -222,7 +223,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Removes an effect from the facility
     /// </summary>
     /// <param name="effect">The effect to remove</param>
-    private void RemoveEffect(FacilityEffect effect, bool bypassFortified = false) {
+    private void RemoveEffect(FacilityEffect effect, int createdById, bool bypassFortified = false) {
         if (!bypassFortified) {
             if (facility.IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
                 hasNegatedEffectThisRound = true;
@@ -245,31 +246,31 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Forces a removal of an effect from the facility, meant to be called by Effect cards that remove effects from facility (assuming this bypasses fortification otherwise it seems kinda pointless)
     /// </summary>
     /// <param name="effect">The effect to remove from the facility</param>
-    public void ForceRemoveEffect(FacilityEffect effect) {
-        RemoveEffect(effect, true);
+    public void ForceRemoveEffect(FacilityEffect effect, int calledById) {
+        RemoveEffect(effect, calledById, true);
     }
-    public bool TryRemoveEffect(FacilityEffect effect) {
+    public bool TryRemoveEffect(FacilityEffect effect, int calledById) {
         if (activeEffects.Contains(effect)) {
-            ForceRemoveEffect(effect);
+            ForceRemoveEffect(effect, calledById);
             return true;
         }
         return false;
 
 
     }
-    public bool TryRemoveEffectByType(FacilityEffectType type) {
+    public bool TryRemoveEffectByType(FacilityEffectType type, int calledById) {
         var result = activeEffects.Find(e => e.EffectType == type);
         if (result != null) {
-            ForceRemoveEffect(result);
+            ForceRemoveEffect(result, calledById);
             return true;
         }
         Debug.LogWarning($"Did not find effect on {facility.facilityName} with type {type} to remove!");
         return false;
     }
-    public void RemoveEffectByUID(int uid) {
+    public void RemoveEffectByUID(int uid, int calledById) {
         var result = FindEffectByUID(uid);
         if (result != null && result.EffectType != FacilityEffectType.None) {
-            ForceRemoveEffect(result); //remove the effect bypassing any possible negation
+            ForceRemoveEffect(result, calledById); //remove the effect bypassing any possible negation
         }
         else {
             Debug.LogError($"Did not find effect on {facility.facilityName} with uid {uid} to remove!");
@@ -283,13 +284,13 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Adds an effect to the facility
     /// </summary>
     /// <param name="effect">The effect to add</param>
-    private void AddEffect(FacilityEffect effect) {
+    private void AddEffect(FacilityEffect effect, int createdById) {
 
 
 
         //special case of a remove type from a card effect
         if (effect.EffectType == FacilityEffectType.RemoveAll) {
-            RemoveAllEffects();
+            RemoveAllEffects(createdById);
             return;
         }
         else if (effect.EffectType == FacilityEffectType.RemoveOne) {
@@ -298,7 +299,7 @@ public class FacilityEffectManager : MonoBehaviour {
             var removeable = GetEffectsRemovableByTeam(team, false);
             Debug.Log($"Found {removeable.Count} effects to remove on facility {facility.facilityName}");
             if (removeable.Count > 0) {
-                RemoveEffect(removeable.First());
+                RemoveEffect(removeable.First(), createdById);
                 return;
             }
         }
@@ -329,13 +330,13 @@ public class FacilityEffectManager : MonoBehaviour {
 
         activeEffects.Add(effect);//add the effect to list
         //UpdateEffectUI(effect);
-        ApplyEffect(effect);
+        ApplyEffect(effect, createdById);
     }
     /// <summary>
     /// Applies the effect to the facility based on the facility effect type
     /// </summary>
     /// <param name="effect">The facility effect object that holds the facility effect type</param>
-    private void ApplyEffect(FacilityEffect effect) {
+    private void ApplyEffect(FacilityEffect effect, int createdById) {
         Debug.Log($"Applying effect {effect.EffectType} to {facility.facilityName}");
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
@@ -350,7 +351,7 @@ public class FacilityEffectManager : MonoBehaviour {
                 //if (IsBackdoored()) {
                 //    // ToggleEffectImageAlpha();
                 //}
-                RemoveNegativeEffects();
+                RemoveNegativeEffects(createdById);
 
                 break;
             default:
@@ -501,7 +502,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
             if (effect.EffectType == FacilityEffectType.ModifyPointsPerTurn) {
                 var effects = FacilityEffect.CreateEffectsFromID(effect.EffectCreatedOnRoundEndIdString);
-                effects.ForEach(_effect => AddEffect(_effect));
+                effects.ForEach(_effect => AddEffect(_effect, effect.CreatedByPlayerID));
             }
 
             if (effect.Duration > 0) {
@@ -513,7 +514,7 @@ public class FacilityEffectManager : MonoBehaviour {
                 // DecrementCounter();
 
                 if (effect.Duration == 0) {
-                    ForceRemoveEffect(effect);
+                    ForceRemoveEffect(effect, effect.CreatedByPlayerID);
                 }
             }
         }

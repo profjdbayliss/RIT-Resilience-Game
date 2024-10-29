@@ -21,8 +21,8 @@ public abstract class ICardAction
 
         Debug.Log($"Executing action {GetType()} from {player.playerName} {targetInfo}");
     }
-    protected void RemoveEffect(Facility facility, FacilityEffect effectToRemove) {
-        if (facility.TryRemoveEffect(effectToRemove)) {
+    protected void RemoveEffect(Facility facility, FacilityEffect effectToRemove, CardPlayer player) {
+        if (facility.TryRemoveEffect(effectToRemove, player.NetID)) {
             Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facility.facilityName}");
 
         }

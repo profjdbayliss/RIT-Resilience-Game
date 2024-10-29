@@ -55,7 +55,12 @@ public class ReturnHandToDeckAndDraw : ICardAction {
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         // PlayerTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
-        facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam, (card.data.duration != 0 ? card.data.duration : -1));
+        facilityActedUpon.AddRemoveEffectsByIdString(
+            card.data.effectString, 
+            true, 
+            player.playerTeam,
+            player.NetID,
+            (card.data.duration != 0 ? card.data.duration : -1));
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -99,12 +104,12 @@ public class RemoveEffect : ICardAction {
                 for (var i = 0; i < card.data.effectCount; i++) {
                     var effectToRemove = effectsToRemove[i];
                     if (effectToRemove != null) {
-                        RemoveEffect(facilityActedUpon, effectToRemove);
+                        RemoveEffect(facilityActedUpon, effectToRemove, player);
                     }
                 }
             }
             else { //1 element
-                RemoveEffect(facilityActedUpon, effectsToRemove[0]);
+                RemoveEffect(facilityActedUpon, effectsToRemove[0], player);
             }
         }
         else {
@@ -123,7 +128,7 @@ public class SpreadEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         
         if (facilityActedUpon != null) {
-            facilityActedUpon.AddEffectToConnectedSectors(card.data.effectString, player.playerTeam);
+            facilityActedUpon.AddEffectToConnectedSectors(card.data.effectString, player.playerTeam, player.NetID);
         }
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
@@ -174,7 +179,11 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                             var effectsToRemove = facility.effectManager.GetEffectsRemovableByTeam(player.playerTeam, removePointsPerTurnEffects: false);
                             effectTypeToRemove = effectsToRemove[0].EffectType;
                         }
-                        facility.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam);
+                        facility.AddRemoveEffectsByIdString(
+                            card.data.effectString, 
+                            true, 
+                            player.playerTeam,
+                            player.NetID);
 
                     });
 
@@ -298,13 +307,18 @@ public class BackdoorCheckNetworkRestore : ICardAction
         {
             Debug.Log(card.front.title + " played. Turns removed: " + card.data.facilityAmount);
             GameManager.Instance.ChangeRoundsLeft(-card.data.facilityAmount);
-            if (facilityActedUpon.TryRemoveEffectByType(FacilityEffectType.Backdoor))
+            if (facilityActedUpon.TryRemoveEffectByType(FacilityEffectType.Backdoor, player.NetID))
                 Debug.Log($"Backdoor on {facilityActedUpon.facilityName} removed");
             else Debug.Log($"Backdoor unable to be removed on {facilityActedUpon.facilityName} for some reason");
         }
         else
         {
-            facilityActedUpon.AddRemoveEffectsByIdString(card.data.effectString, true, player.playerTeam, (card.data.duration != 0 ? card.data.duration : -1));
+            facilityActedUpon.AddRemoveEffectsByIdString(
+                card.data.effectString, 
+                true, 
+                player.playerTeam,
+                player.NetID,
+                (card.data.duration != 0 ? card.data.duration : -1));
         }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
@@ -323,12 +337,13 @@ public class ConvertFortifyToBackdoor : ICardAction
         foreach(Facility facility in sectorActedUpon.facilities)
         {
             //if it has fortify then it removes it and returns true, which i can detect and add backdoor
-            if(facility.TryRemoveEffectByType(FacilityEffectType.Fortify))
+            if(facility.TryRemoveEffectByType(FacilityEffectType.Fortify, player.NetID))
             {
                 facility.AddRemoveEffectsByIdString(card.data.effectString, 
                                                     true, 
-                                                    player.playerTeam, 
-                                                    (card.data.duration != 0 ? card.data.duration : -1));
+                                                    player.playerTeam,
+                                                    player.NetID,
+                                                    duration: (card.data.duration != 0 ? card.data.duration : -1));
             }
         }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);

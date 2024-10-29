@@ -109,9 +109,9 @@ public class Facility : MonoBehaviour {
             Debug.LogError(e);
         }
     }
-    public void AddEffectToConnectedSectors(string idString, PlayerTeam createdBy) {
+    public void AddEffectToConnectedSectors(string idString, PlayerTeam createdBy, int playerId) {
         foreach (var sector in connectedSectors) {
-            sector.AddEffectToFacilities(idString, createdBy);
+            sector.AddEffectToFacilities(idString, createdBy, playerId);
         }
     }
     public void UpdateForNextActionPhase() {
@@ -290,21 +290,21 @@ public class Facility : MonoBehaviour {
     }
 
     //adds or remove effect by the string in the csv file 
-    public void AddRemoveEffectsByIdString(string idString, bool isAdding, PlayerTeam team, int duration = -1) {
+    public void AddRemoveEffectsByIdString(string idString, bool isAdding, PlayerTeam team, int createdById, int duration = -1) {
         var effects = FacilityEffect.CreateEffectsFromID(idString);
         effects.ForEach(effect => {
             effect.CreatedByTeam = team;
             if (duration != -1) {
                 effect.Duration = duration;
             }
-            effectManager.AddRemoveEffect(effect, isAdding);
+            effectManager.AddRemoveEffect(effect, isAdding, createdById);
         });
     }
-    public bool TryRemoveEffect(FacilityEffect effect) {
-        return effectManager.TryRemoveEffect(effect);
+    public bool TryRemoveEffect(FacilityEffect effect, int createdById) {
+        return effectManager.TryRemoveEffect(effect, createdById);
     }
-    public bool TryRemoveEffectByType(FacilityEffectType effect) {
-        return effectManager.TryRemoveEffectByType(effect);
+    public bool TryRemoveEffectByType(FacilityEffectType effect, int createdById) {
+        return effectManager.TryRemoveEffectByType(effect, createdById);
     }
     private void UpdateUI() {
         //pointsUI[0].text = physicalPoints.ToString();
