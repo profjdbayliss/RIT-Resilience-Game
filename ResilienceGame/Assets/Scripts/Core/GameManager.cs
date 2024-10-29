@@ -82,6 +82,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int aggressionTurnCount = 0;
     public int aggressionTurnCheck { get; set; } = 0;
 
+    public readonly int MAX_MEEPLE_SHARE = 2;
+
     //// UI Elements
     //[Header("UI Elements")]
 
@@ -942,7 +944,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         .FindAll(player => player.playerTeam == PlayerTeam.Blue)
                         .ForEach(player => player.UpdateMeepleSharing());
 
-                    if (actualPlayer.playerTeam == PlayerTeam.Blue) {
+                    if (actualPlayer.playerTeam == PlayerTeam.Blue && actualPlayer.LentMeepleAmount < MAX_MEEPLE_SHARE) {
                         UserInterface.Instance.ToggleMeepleSharingMenu(true);
                     }
                 }

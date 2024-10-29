@@ -286,26 +286,24 @@ public class UserInterface : MonoBehaviour {
         overTimeTurnsLeftText.text = $"{GameManager.OVERTIME_DURATION}";
     }
     public void StartExhaustion() {
-        overTimeTurnsLabelText.text = "Exhausted Left";
-        // overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
+        overTimeTurnsLabelText.text = "Exhausted";
         overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
     }
     public void ToggleMeepleSharingMenu(bool enable) {
+        
         if (enable) {
+            if (GameManager.Instance.actualPlayer.LentMeepleAmount >= GameManager.Instance.MAX_MEEPLE_SHARE) return;
             for (int i = 0; i < 3; i++) {
                 MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i).ToString();
                 MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.currentMeeples[i].ToString();
             }
-            //MeepleSharingTextCurrent[1].text = GameManager.Instance.actualPlayer.BlueMeeples.ToString();
-            //MeepleSharingTextCurrent[0].text = GameManager.Instance.actualPlayer.BlackMeeples.ToString();
-            //MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
         }
         MeepleSharingPanel.SetActive(enable);
     }
     public void ShowAllySelectionMenu(int meepleTypeIndex) {
         Debug.Log($"Enabling ally selection menu after pressing meeple button {meepleTypeIndex}");
         allySelectionButtons.ForEach(button => Destroy(button.gameObject));
-
+        allySelectionButtons.Clear();
         for (int i = 0; i < GameManager.Instance.playerDictionary.Count; i++) {
             var cardPlayer = GameManager.Instance.playerDictionary.ElementAt(i).Value;
             if (cardPlayer.playerTeam == PlayerTeam.Red) continue;
