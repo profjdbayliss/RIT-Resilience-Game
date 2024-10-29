@@ -107,6 +107,16 @@ public class FacilityEffectManager : MonoBehaviour {
                 return;
         }
 
+        FacilityEffect honeyPotEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.HoneyPot);
+        if(honeyPotEffect != null)
+        {
+            if(effect.Magnitude < 0 && effect.Target == honeyPotEffect.Target)
+            {
+                //hmm need to figure out a way to force discard here
+                return;
+            }
+        }
+
         facility.ChangeFacilityPoints(effect.Target, value);
     }
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
@@ -130,6 +140,12 @@ public class FacilityEffectManager : MonoBehaviour {
     public bool IsBackdoored() {
         return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.Backdoor);
     }
+
+    public bool IsHoneyPotted()
+    {
+        return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.HoneyPot);
+    }
+
     //returns a list of effects that can be removed,
     //these are effects marked with the correct type that are created by the opponent team
     public List<FacilityEffect> GetEffectsRemovableByTeam(PlayerTeam playerTeam, bool removePointsPerTurnEffects = false) {
@@ -288,6 +304,12 @@ public class FacilityEffectManager : MonoBehaviour {
         }
         if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
+            return;
+        }
+
+        if(IsHoneyPotted() && effect.EffectType == FacilityEffectType.Backdoor)
+        {
+            //need to figure out a way to force discard here too
             return;
         }
 
