@@ -45,7 +45,7 @@ public class PlayerPopupMenuItem : MonoBehaviour {
         if (Player == null) return;
         DeckSizeText.text = Player.DeckIDs.Count.ToString();
         if (Player.playerTeam == PlayerTeam.Red) return;
-        Debug.Log($"Updating player popup menu item for {Player.playerName}");
+        
 
         if (Player.PlayerSector == null) {
             Debug.LogError("Player sector is null");

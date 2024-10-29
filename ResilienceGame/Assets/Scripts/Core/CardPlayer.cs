@@ -470,7 +470,8 @@ public class CardPlayer : MonoBehaviour {
     public void UpdateMeepleSharing() {
         if (updatedMeeplesThisPhase) return;
         updatedMeeplesThisPhase = true;
-        Debug.Log($"{playerName} has {LentMeepleAmount} lent meeples, and {BorrowedMeepleAmount} borrowed meeples");
+        UserInterface.Instance.UpdateMeepleSharingMenu();
+        //Debug.Log($"{playerName} has {LentMeepleAmount} lent meeples, and {BorrowedMeepleAmount} borrowed meeples");
         CheckBorrowedMeeplesAndReturn();
         CheckLentMeeplesAndReturn();
     }
@@ -518,6 +519,17 @@ public class CardPlayer : MonoBehaviour {
     public void ChangeTempMeeples(int index, int amt) {
         if (index >= 0 && index < BaseMaxMeeples.Length) {
             tempMeeples[index] += amt;
+
+            // Adjust current meeples based on the temporary amount added or removed
+            currentMeeples[index] = Math.Min(currentMeeples[index] + amt, GetMaxMeepleAmount(index));
+
+            UserInterface.Instance.UpdateMeepleAmountUI();
+            UserInterface.Instance.UpdateMeepleSharingMenu();
+        }
+    }
+    public void SetTempMeeples(int index, int amt) {
+        if (index >= 0 && index < BaseMaxMeeples.Length) {
+            tempMeeples[index] = amt;
 
             // Adjust current meeples based on the temporary amount added or removed
             currentMeeples[index] = Math.Min(currentMeeples[index] + amt, GetMaxMeepleAmount(index));
@@ -584,14 +596,14 @@ public class CardPlayer : MonoBehaviour {
                                             CardID: index,
                                             Amount: 1);
     }
-    private void SetTempMeeplesForMultiplier(float multiplier) {
-        for (int i = 0; i < BaseMaxMeeples.Length; i++) {
-            int targetValue = Mathf.Max((int)(BaseMaxMeeples[i] * multiplier), 1);
-            tempMeeples[i] = targetValue - BaseMaxMeeples[i];
-        }
-        ResetMeepleCount();
+    //private void SetTempMeeplesForMultiplier(float multiplier) {
+    //    for (int i = 0; i < BaseMaxMeeples.Length; i++) {
+    //        int targetValue = Mathf.Max((int)(BaseMaxMeeples[i] * multiplier), 1);
+    //        tempMeeples[i] = targetValue - BaseMaxMeeples[i];
+    //    }
+    //    ResetMeepleCount();
 
-    }
+    //}
     public void ResetMeepleCount() {
         meeplesSpent = 0;
         for (int i = 0; i < BaseMaxMeeples.Length; i++) {
@@ -1987,7 +1999,9 @@ public class CardPlayer : MonoBehaviour {
             UserInterface.Instance.StartOvertime();
 
             // Double the meeples for overtime
-            SetTempMeeplesForMultiplier(2);
+            for (int i = 0; i < 3; i++) {
+                SetTempMeeples(i, 2);
+            }
         }
     }
 
@@ -1996,7 +2010,9 @@ public class CardPlayer : MonoBehaviour {
         OverTimeCounter = 0;
 
         // Halve the meeples for exhaustion
-        SetTempMeeplesForMultiplier(0.5f);
+        for (int i = 0; i < 3; i++) {
+            SetTempMeeples(i, -1);
+        }
 
         UserInterface.Instance.StartExhaustion();
     }
@@ -2006,7 +2022,9 @@ public class CardPlayer : MonoBehaviour {
         OverTimeCounter = 0;
 
         // Return to normal meeples count
-        SetTempMeeplesForMultiplier(1);
+        for (int i = 0; i < 3; i++) {
+            SetTempMeeples(i, 0);
+        }
     }
 
 

@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private int roundsLeft = 30;
     private int turnTotal = 0;
     private const int BASE_MAX_TURNS = 30;
-    
+
     private int assignedSectors = 0;
     private int numBluePlayers = 0;
     private const int SECTOR_SIM_TURN_START = 2;
@@ -721,26 +721,34 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //    Debug.Log($"Downed sector: {sector.sectorName}");
         //}
         if (downedSectors.Count > activeSectors.Count / 2 || downedSectors.Any(sector => sector.isCore)) {
-            Debug.Log($"Starting doom clock, downed sectors: {downedSectors.Count}");
-            StartDoomClock();
+            if (!IsDoomClockActive) {
+                Debug.Log($"Starting doom clock, downed sectors: {downedSectors.Count}");
+                StartDoomClock();
+            }
         }
         else {
-            StopDoomClock();
+            if (IsDoomClockActive) {
+                Debug.Log("Stopping doom clock");
+                StopDoomClock();
+            }
         }
     }
     public void StartDoomClock() {
+        
         IsDoomClockActive = true;
         numDoomClockTurnsLeft = 3;
         UserInterface.Instance.SetDoomClockActive(true);
         ScoreManager.Instance.AddDoomClockActivation();
     }
     public void StopDoomClock() {
+        
         ScoreManager.Instance.AddDoomClockAvoidance();
         IsDoomClockActive = false;
         UserInterface.Instance.SetDoomClockActive(false);
     }
     public void ReduceDoomClockTurns() {
         numDoomClockTurnsLeft--;
+        Debug.Log($"Reducing doom clock turns: {numDoomClockTurnsLeft} left");
         if (numDoomClockTurnsLeft > 0) {
             UserInterface.Instance.UpdateDoomClockTurnsLeft(numDoomClockTurnsLeft);
         }
@@ -1296,7 +1304,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
             }
         }
-        
+
         // mTurnText.text = "" + GetTurnsLeft();
         UserInterface.Instance.SetTurnText(GetTurnsLeft() + "");
         if (IsServer) {
