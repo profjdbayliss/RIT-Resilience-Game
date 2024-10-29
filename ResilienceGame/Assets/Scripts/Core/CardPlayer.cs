@@ -436,7 +436,7 @@ public class CardPlayer : MonoBehaviour {
     }
 
     public int GetMaxMeepleAmount(int index) {
-        return BaseMaxMeeples[index] + borrowedMeeples[index] - lentMeeples[index] + tempMeeples[index];
+        return Math.Max(BaseMaxMeeples[index] + borrowedMeeples[index] - lentMeeples[index] + tempMeeples[index], 0);
     }
 
     public void SpendMeepleWithButton(int index) {
