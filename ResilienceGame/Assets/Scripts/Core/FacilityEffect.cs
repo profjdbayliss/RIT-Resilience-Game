@@ -21,6 +21,7 @@ public enum FacilityEffectTarget {
 public enum FacilityEffectType {
     Backdoor,
     Fortify,
+    HoneyPot,
     ModifyPoints,
     ModifyPointsPerTurn,
     ProtectPoints,
@@ -163,6 +164,7 @@ public class FacilityEffect {
             "protp" => FacilityEffectType.ProtectPoints,
             "fortify" => FacilityEffectType.Fortify,
             "backdoor" => FacilityEffectType.Backdoor,
+            "honeypot" => FacilityEffectType.HoneyPot,
             "removeone" => FacilityEffectType.RemoveOne,
             "removeall" => FacilityEffectType.RemoveAll,
             _ => FacilityEffectType.None
@@ -175,6 +177,7 @@ public class FacilityEffect {
             FacilityEffectType.ProtectPoints => "protp",
             FacilityEffectType.Fortify => "fortify",
             FacilityEffectType.Backdoor => "backdoor",
+            FacilityEffectType.HoneyPot => "honeypot",
             FacilityEffectType.RemoveOne => "removeone",
             FacilityEffectType.RemoveAll => "removeall",
             _ => ""
