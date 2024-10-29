@@ -15285,6 +15285,7 @@ MonoBehaviour:
   lentMeeples: 
   currentMeeples: 
   tempMeeples: 
+  updatedMeeplesThisPhase: 0
   meeplesSpent: 0
   numMeeplesRequired: 0
   otState: 0
@@ -23149,6 +23150,7 @@ MonoBehaviour:
   lentMeeples: 
   currentMeeples: 
   tempMeeples: 
+  updatedMeeplesThisPhase: 0
   meeplesSpent: 0
   numMeeplesRequired: 0
   otState: 0

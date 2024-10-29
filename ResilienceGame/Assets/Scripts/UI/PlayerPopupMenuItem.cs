@@ -17,6 +17,7 @@ public class PlayerPopupMenuItem : MonoBehaviour {
     public List<GameObject> FacilityBoxes;
     public Sprite RedIcon;
     public Image SectorIcon;
+    public Image SectorXIcon;
     private Image popupBg;
     private bool initSprite = false;
 
@@ -44,6 +45,7 @@ public class PlayerPopupMenuItem : MonoBehaviour {
         if (Player == null) return;
         DeckSizeText.text = Player.DeckIDs.Count.ToString();
         if (Player.playerTeam == PlayerTeam.Red) return;
+        Debug.Log($"Updating player popup menu item for {Player.playerName}");
 
         if (Player.PlayerSector == null) {
             Debug.LogError("Player sector is null");
@@ -54,6 +56,8 @@ public class PlayerPopupMenuItem : MonoBehaviour {
             initSprite = true;
         }
 
+        SectorXIcon.enabled = Player.PlayerSector.IsDown;
+
         for (int i = 0; i < ProdPoints.Count; i++) {
             ProdPoints[i].text = Player.PlayerSector.facilities[0].Points[i].ToString();
         }
@@ -63,9 +67,8 @@ public class PlayerPopupMenuItem : MonoBehaviour {
         for (int i = 0; i < DistPoints.Count; i++) {
             DistPoints[i].text = Player.PlayerSector.facilities[2].Points[i].ToString();
         }
-
-
     }
+
 
 
 }

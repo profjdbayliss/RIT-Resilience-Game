@@ -256,6 +256,7 @@ public class UserInterface : MonoBehaviour {
     }
 
     public void TogglePlayerMenu(bool enable) {
+        if (enable) UpdatePlayerMenuItems();
         playerMenuParent.gameObject.SetActive(enable);
     }
     public void ToggleDownedSectorInMenu(int sectorIndex, bool enable) {
