@@ -61,7 +61,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private GameObject MeepleSharingPanel;
     [SerializeField] private TextMeshProUGUI[] MeepleSharingTextCurrent = new TextMeshProUGUI[3];
     [SerializeField] private TextMeshProUGUI[] MeepleSharingTextMax = new TextMeshProUGUI[3];
-    [SerializeField] private GameObject AllySelectionmenu;
+    [SerializeField] private GameObject allySelectionMenu;
     [SerializeField] private RectTransform leftSelectionparent;
     [SerializeField] private RectTransform rightSelectionparent;
     [SerializeField] private List<Button> allySelectionButtons;
@@ -306,10 +306,10 @@ public class UserInterface : MonoBehaviour {
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
             allySelectionButtons.Add(newButton);
         }
-        AllySelectionmenu.SetActive(true);
+        allySelectionMenu.SetActive(true);
     }
     public void DisableAllySelectionMenu() {
-        AllySelectionmenu.SetActive(false);
+        allySelectionMenu.SetActive(false);
         Debug.Log($"Disabling Ally Selection after {GameManager.Instance.actualPlayer.playerName} " +
             $"has shared {GameManager.Instance.actualPlayer.SharedMeepleAmount} meeples");
         if (GameManager.Instance.actualPlayer.SharedMeepleAmount < 2) {
@@ -318,6 +318,14 @@ public class UserInterface : MonoBehaviour {
         else {
             ToggleMeepleSharingMenu(false);
         }
+    }
+    public void UpdateMeepleSharingMenu() {
+        for (int i = 0; i < 3; i++) {
+            MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.maxMeeples[i].ToString();
+        }
+        MeepleSharingTextCurrent[1].text = GameManager.Instance.actualPlayer.BlueMeeples.ToString();
+        MeepleSharingTextCurrent[0].text = GameManager.Instance.actualPlayer.BlackMeeples.ToString();
+        MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
     }
 
 }

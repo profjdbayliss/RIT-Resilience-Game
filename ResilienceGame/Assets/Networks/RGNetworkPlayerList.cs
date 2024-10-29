@@ -596,7 +596,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("CLIENT RECEIVED sector assignment: Sector " + sectorIndex);
                     }
                     break;
-
                 case CardMessageType.ShareDiscardNumber: {
                         uint count = msg.count;
 
@@ -636,8 +635,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-
-
                 case CardMessageType.DrawCard: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -800,6 +797,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     }
                     break;
                 case CardMessageType.MeepleShare: {
+                        Debug.Log("Processing meeple share message in client received");
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1056,7 +1054,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-
                 case CardMessageType.RemoveEffect: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -1101,6 +1098,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     }
                     break;
                 case CardMessageType.MeepleShare: {
+                        Debug.Log("Processing meeple share message in server received");
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1119,6 +1117,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         };
                         Debug.Log("server received update message from opponent containing player to share with : " + playerToShareWith +
                             " and meeple color " + meepleColor + "for game phase " + gamePhase);
+
                         NetworkServer.SendToAll(msg); //relay to all clients
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }

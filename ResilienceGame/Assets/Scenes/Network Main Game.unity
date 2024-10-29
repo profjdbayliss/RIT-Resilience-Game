@@ -38539,7 +38539,7 @@ MonoBehaviour:
   - {fileID: 351895392}
   - {fileID: 826918076}
   - {fileID: 1770155847}
-  AllySelectionmenu: {fileID: 631160148}
+  allySelectionMenu: {fileID: 631160148}
   leftSelectionparent: {fileID: 1795995928}
   rightSelectionparent: {fileID: 1611116910}
   allySelectionButtons: []

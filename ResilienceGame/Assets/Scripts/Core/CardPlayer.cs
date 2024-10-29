@@ -124,6 +124,7 @@ public class CardPlayer : MonoBehaviour {
     public List<(int, int)> sharedMeepleTypes = new List<(int, int)>();
     public List<(int, int)> receivedMeepleTypes = new List<(int, int)>();
     public int SharedMeepleAmount => sharedMeepleTypes.Count;
+    public int ReceivedMeepleAmount => receivedMeepleTypes.Count;
     //public int sharedMeepleTimer = 0;
     public readonly int MEEPLE_SHARE_DURATION = 2;
 
@@ -489,6 +490,7 @@ public class CardPlayer : MonoBehaviour {
     #region Meeple Sharing
     //called at the end of each action phase to update the shared meeples
     public void UpdateMeepleSharing() {
+        Debug.Log($"{playerName} has {SharedMeepleAmount} lent meeples, and {receivedMeepleTypes} borrowed meeples");
         CheckReceivedMeeplesAndReturn();
         CheckSharedMeeplesAndReturn();
     }
@@ -511,6 +513,7 @@ public class CardPlayer : MonoBehaviour {
                     break;
             }
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+            UserInterface.Instance.UpdateMeepleSharingMenu();
         }
     }
     //decrease the meeple count by 1 (max and current) of the specified color
@@ -529,6 +532,7 @@ public class CardPlayer : MonoBehaviour {
                     break;
             }
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+            UserInterface.Instance.UpdateMeepleSharingMenu();
         }
     }
     //returns true if the player has a meeple of the specified color index
@@ -557,6 +561,7 @@ public class CardPlayer : MonoBehaviour {
     }
     //Handles receiving a shared meeple from another player
     public void ReceiveSharedMeeple(int index) {
+        Debug.Log($"{playerName} received a shared meeple of type {index}");
         if (index >= 0 && index < maxMeeples.Length) {
             receivedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
             IncrementMeepleByIndex(index);
@@ -587,6 +592,12 @@ public class CardPlayer : MonoBehaviour {
                 receivedMeepleTypes[i] = (receivedMeepleTypes[i].Item1 - 1, receivedMeepleTypes[i].Item2);
             }
         }
+    }
+    public void ShareMeepleWithPlayer(int index, CardPlayer player) {
+        EnqueueAndSendCardMessageUpdate(CardMessageType.MeepleShare,
+                                            UniqueID: player.NetID,
+                                            CardID: index,
+                                            Amount: 1);
     }
     #endregion
 

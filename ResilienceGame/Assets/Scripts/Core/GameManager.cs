@@ -1176,6 +1176,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
                 }
                 break;
+            case CardMessageType.MeepleShare: 
+                if (update.UniqueID != actualPlayer.NetID) {
+                    Debug.Log($"meeple share messaage with player target {update.UniqueID} was not for {actualPlayer.name}");
+                }
+                else {
+                    actualPlayer.ReceiveSharedMeeple(update.CardID);
+                }
+                break;
             //pass other updates to the card player
             //TODO: list of all players
             default:
@@ -1433,6 +1441,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId) {
         if (playerDictionary.TryGetValue(playerNetId, out CardPlayer player)) {
             Debug.Log($"{actualPlayer.playerName} is trying to share meeple index {meepleType} with {player.playerName}");
+            actualPlayer.ShareMeepleWithPlayer(meepleType, player);
         }
         else {
             Debug.LogError($"Player with net id {playerNetId} not found in player dictionary");
