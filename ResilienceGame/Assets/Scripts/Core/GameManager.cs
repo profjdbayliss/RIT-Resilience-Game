@@ -1420,4 +1420,25 @@ public class GameManager : MonoBehaviour, IRGObservable {
         RGNetworkPlayerList.instance.SetPlayerType(actualPlayer.playerTeam);
     }
     #endregion
+
+    #region Meeple Sharing
+    public void HandleShareMeepleButtonPress(int index) {
+        Debug.Log("HandleShareMeepleButtonPress in GameManager");
+        if (index < 0 || index >= actualPlayer.maxMeeples.Length) return;
+        if (actualPlayer.maxMeeples[index] == 0) return;
+        if (actualPlayer.ShareMeeple(index)) {
+            UserInterface.Instance.ShowAllySelectionMenu(index);
+        }
+    }
+    public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId) {
+        if (playerDictionary.TryGetValue(playerNetId, out CardPlayer player)) {
+            Debug.Log($"{actualPlayer.playerName} is trying to share meeple index {meepleType} with {player.playerName}");
+        }
+        else {
+            Debug.LogError($"Player with net id {playerNetId} not found in player dictionary");
+        }
+        UserInterface.Instance.DisableAllySelectionMenu();
+
+    }
+    #endregion
 }

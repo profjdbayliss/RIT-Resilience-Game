@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -60,7 +61,13 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private GameObject MeepleSharingPanel;
     [SerializeField] private TextMeshProUGUI[] MeepleSharingTextCurrent = new TextMeshProUGUI[3];
     [SerializeField] private TextMeshProUGUI[] MeepleSharingTextMax = new TextMeshProUGUI[3];
+    [SerializeField] private GameObject AllySelectionmenu;
+    [SerializeField] private RectTransform leftSelectionparent;
+    [SerializeField] private RectTransform rightSelectionparent;
+    [SerializeField] private List<Button> allySelectionButtons;
+    [SerializeField] private GameObject allySelectionButtonPrefab;
 
+    [Header("Player Info Menu")]
     [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
     private List<Image> sectorXIcons = new List<Image>();
 
@@ -284,6 +291,33 @@ public class UserInterface : MonoBehaviour {
             MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
         }
         MeepleSharingPanel.SetActive(enable);
+    }
+    public void ShowAllySelectionMenu(int meepleTypeIndex) {
+        Debug.Log($"Enabling ally selection menu after pressing meeple button {meepleTypeIndex}");
+        allySelectionButtons.ForEach(button => Destroy(button.gameObject));
+
+        for (int i = 0; i < GameManager.Instance.playerDictionary.Count; i++) {
+            var cardPlayer = GameManager.Instance.playerDictionary.ElementAt(i).Value;
+            if (cardPlayer.playerTeam == PlayerTeam.Red) continue;
+            if (cardPlayer.NetID == RGNetworkPlayerList.instance.localPlayerID) continue;
+            var parent = i < 8 ? leftSelectionparent : rightSelectionparent;
+            var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
+            newButton.onClick.AddListener(() => GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID));
+            newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
+            allySelectionButtons.Add(newButton);
+        }
+        AllySelectionmenu.SetActive(true);
+    }
+    public void DisableAllySelectionMenu() {
+        AllySelectionmenu.SetActive(false);
+        Debug.Log($"Disabling Ally Selection after {GameManager.Instance.actualPlayer.playerName} " +
+            $"has shared {GameManager.Instance.actualPlayer.SharedMeepleAmount} meeples");
+        if (GameManager.Instance.actualPlayer.SharedMeepleAmount < 2) {
+            ToggleMeepleSharingMenu(true);
+        }
+        else {
+            ToggleMeepleSharingMenu(false);
+        }
     }
 
 }

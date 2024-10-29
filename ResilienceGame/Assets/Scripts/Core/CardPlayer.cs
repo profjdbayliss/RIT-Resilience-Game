@@ -487,10 +487,12 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Meeple Sharing
+    //called at the end of each action phase to update the shared meeples
     public void UpdateMeepleSharing() {
         CheckReceivedMeeplesAndReturn();
         CheckSharedMeeplesAndReturn();
     }
+    //increase the meeple count by 1 (max and current) of the specified color
     public void IncrementMeepleByIndex(int index) {
         if (index >= 0 && index < maxMeeples.Length) {
             maxMeeples[index]++;
@@ -511,6 +513,7 @@ public class CardPlayer : MonoBehaviour {
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
         }
     }
+    //decrease the meeple count by 1 (max and current) of the specified color
     public void DecrememntMeepleByIndex(int index) {
         if (index >= 0 && index < maxMeeples.Length) {
             maxMeeples[index]--;
@@ -528,20 +531,39 @@ public class CardPlayer : MonoBehaviour {
             UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
         }
     }
-    public void ShareMeeple(int index) {
+    //returns true if the player has a meeple of the specified color index
+    private bool HasMeepleOfColor(int index) {
+        return index switch {
+            0 => BlackMeeples > 0,
+            1 => BlueMeeples > 0,
+            2 => PurpleMeeples > 0,
+            3 => ColorlessMeeples > 0,
+            _ => false
+        };
+    }
+    //reduces the meeple count of the specified color index by 1
+    //and adds it to the shared meeple tracker
+    public bool ShareMeeple(int index) {
         if (index >= 0 && index < maxMeeples.Length) {
             if (maxMeeples[index] > 0) {
-                DecrememntMeepleByIndex(index);
-                sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+                if (HasMeepleOfColor(index)) {
+                    DecrememntMeepleByIndex(index);
+                    sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+                    return true;
+                }
             }
         }
+        return false;
     }
+    //Handles receiving a shared meeple from another player
     public void ReceiveSharedMeeple(int index) {
         if (index >= 0 && index < maxMeeples.Length) {
             receivedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
             IncrementMeepleByIndex(index);
         }
     }
+    //Checks the shared meeples list at the end of the action phase
+    //to check if any shared meeples have expired and need to be returned
     public void CheckSharedMeeplesAndReturn() {
         for (int i = 0; i < sharedMeepleTypes.Count; i++) {
             if (sharedMeepleTypes[i].Item1 <= 0) {
@@ -553,6 +575,8 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
+    //Checks the received meeples list at the end of the action phase
+    //to check if any received meeples have expired and need to be returned
     public void CheckReceivedMeeplesAndReturn() {
         for (int i = 0; i < receivedMeepleTypes.Count; i++) {
             if (receivedMeepleTypes[i].Item1 <= 0) {
