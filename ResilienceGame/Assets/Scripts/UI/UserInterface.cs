@@ -93,6 +93,7 @@ public class UserInterface : MonoBehaviour {
                 sectorXIcons.Add(sectorMenu.GetChild(i).GetChild(0).GetComponent<Image>());
             }
         }
+        UpdateMeepleAmountUI();
     }
 
     private void Awake() {
@@ -100,12 +101,19 @@ public class UserInterface : MonoBehaviour {
     }
 
 
-    public void UpdateMeepleAmountUI(float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples) {
-        meeplesAmountText[0].text = blackMeeples.ToString();
-        meeplesAmountText[1].text = blueMeeples.ToString();
-        meeplesAmountText[2].text = purpleMeeples.ToString();
-        if (GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red)
-            meeplesAmountText[3].text = colorlessMeeples.ToString();
+    public void UpdateMeepleAmountUI(/*float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples*/) {
+        for (int i = 0; i < meeplesAmountText.Length; i++) {
+            if (i == 3 && GameManager.Instance.actualPlayer.playerTeam != PlayerTeam.Red) {
+                break;
+            }
+            meeplesAmountText[i].text = $"{GameManager.Instance.actualPlayer.currentMeeples[i]}/{GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i)}";
+
+        }
+        //meeplesAmountText[0].text = blackMeeples.ToString();
+        //meeplesAmountText[1].text = blueMeeples.ToString();
+        //meeplesAmountText[2].text = purpleMeeples.ToString();
+        //if (GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red)
+        //    meeplesAmountText[3].text = colorlessMeeples.ToString();
     }
     public void EnableMeepleButtons() {
         foreach (Button button in meepleButtons) {
@@ -284,11 +292,12 @@ public class UserInterface : MonoBehaviour {
     public void ToggleMeepleSharingMenu(bool enable) {
         if (enable) {
             for (int i = 0; i < 3; i++) {
-                MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.maxMeeples[i].ToString();
+                MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i).ToString();
+                MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.currentMeeples[i].ToString();
             }
-            MeepleSharingTextCurrent[1].text = GameManager.Instance.actualPlayer.BlueMeeples.ToString();
-            MeepleSharingTextCurrent[0].text = GameManager.Instance.actualPlayer.BlackMeeples.ToString();
-            MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
+            //MeepleSharingTextCurrent[1].text = GameManager.Instance.actualPlayer.BlueMeeples.ToString();
+            //MeepleSharingTextCurrent[0].text = GameManager.Instance.actualPlayer.BlackMeeples.ToString();
+            //MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
         }
         MeepleSharingPanel.SetActive(enable);
     }
@@ -311,8 +320,8 @@ public class UserInterface : MonoBehaviour {
     public void DisableAllySelectionMenu() {
         allySelectionMenu.SetActive(false);
         Debug.Log($"Disabling Ally Selection after {GameManager.Instance.actualPlayer.playerName} " +
-            $"has shared {GameManager.Instance.actualPlayer.SharedMeepleAmount} meeples");
-        if (GameManager.Instance.actualPlayer.SharedMeepleAmount < 2) {
+            $"has shared {GameManager.Instance.actualPlayer.LentMeepleAmount} meeples");
+        if (GameManager.Instance.actualPlayer.LentMeepleAmount < 2) {
             ToggleMeepleSharingMenu(true);
         }
         else {
@@ -321,11 +330,9 @@ public class UserInterface : MonoBehaviour {
     }
     public void UpdateMeepleSharingMenu() {
         for (int i = 0; i < 3; i++) {
-            MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.maxMeeples[i].ToString();
+            MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i).ToString();
+            MeepleSharingTextCurrent[i].text = GameManager.Instance.actualPlayer.currentMeeples[i].ToString();
         }
-        MeepleSharingTextCurrent[1].text = GameManager.Instance.actualPlayer.BlueMeeples.ToString();
-        MeepleSharingTextCurrent[0].text = GameManager.Instance.actualPlayer.BlackMeeples.ToString();
-        MeepleSharingTextCurrent[2].text = GameManager.Instance.actualPlayer.PurpleMeeples.ToString();
     }
 
 }

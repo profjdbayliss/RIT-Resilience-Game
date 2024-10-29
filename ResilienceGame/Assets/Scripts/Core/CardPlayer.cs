@@ -114,17 +114,23 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Meeple Info")]
     //public const int STARTING_MEEPLES = 2;
-    public float[] maxMeeples;
-    public float BlueMeeples { get; private set; }
-    public float BlackMeeples { get; private set; }
-    public float PurpleMeeples { get; private set; }
-    public float ColorlessMeeples { get; private set; }
+
+    public int[] borrowedMeeples;
+    public int[] lentMeeples;
+    public int[] currentMeeples;
+    public int[] tempMeeples;
+    public bool updatedMeeplesThisPhase = false;
+    public int[] BaseMaxMeeples { get; private set; }
+    //public float BlueMeeples { get; private set; }
+    //public float BlackMeeples { get; private set; }
+    //public float PurpleMeeples { get; private set; }
+    //public float ColorlessMeeples { get; private set; }
 
     //(timer, type)
-    public List<(int, int)> sharedMeepleTypes = new List<(int, int)>();
-    public List<(int, int)> receivedMeepleTypes = new List<(int, int)>();
-    public int SharedMeepleAmount => sharedMeepleTypes.Count;
-    public int ReceivedMeepleAmount => receivedMeepleTypes.Count;
+    public List<(int, int)> lentMeepleTypes = new List<(int, int)>();
+    public List<(int, int)> borrowedMeepleTypes = new List<(int, int)>();
+    public int LentMeepleAmount => lentMeepleTypes.Count;
+    public int BorrowedMeepleAmount => borrowedMeepleTypes.Count;
     //public int sharedMeepleTimer = 0;
     public readonly int MEEPLE_SHARE_DURATION = 2;
 
@@ -164,11 +170,11 @@ public class CardPlayer : MonoBehaviour {
     }
     #endregion
 
-    #region Interface Updates + Meeple Spending
+    #region Interface Updates
     public bool CanAffordCardPlay(Card card, ref bool spendColorless) {
-        float blueLeft = BlueMeeples - card.data.blueCost;
-        float blackLeft = BlackMeeples - card.data.blackCost;
-        float purpleLeft = PurpleMeeples - card.data.purpleCost;
+        int blueLeft = currentMeeples[1] - (int)card.data.blueCost;
+        int blackLeft = currentMeeples[0] - (int)card.data.blackCost;
+        int purpleLeft = currentMeeples[2] - (int)card.data.purpleCost;
 
         float totalDeficit = 0;
         spendColorless = false;
@@ -179,7 +185,7 @@ public class CardPlayer : MonoBehaviour {
         if (purpleLeft < 0) totalDeficit += -purpleLeft;
 
         // Check if colorless meeples can cover the total deficit
-        if (totalDeficit > ColorlessMeeples) {
+        if (totalDeficit > currentMeeples[3]) {
             return false; // Not enough colorless meeples to cover the deficit
         }
 
@@ -188,106 +194,7 @@ public class CardPlayer : MonoBehaviour {
         return true;
     }
 
-    public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
-        bool spendColorless = false;
-
-        // Check if we can afford to play the card
-        if (CanAffordCardPlay(card, ref spendColorless)) {
-            // Deduct required meeples from each pool
-            BlueMeeples -= card.data.blueCost;
-            BlackMeeples -= card.data.blackCost;
-            PurpleMeeples -= card.data.purpleCost;
-
-            // Calculate the total number of meeples used
-            numMeeplesSpent = (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost);
-
-            // Spend colorless meeples if needed to cover deficits
-            if (spendColorless) {
-                float blueDeficit = Math.Max(0, -BlueMeeples);
-                float blackDeficit = Math.Max(0, -BlackMeeples);
-                float purpleDeficit = Math.Max(0, -PurpleMeeples);
-                float totalDeficit = blueDeficit + blackDeficit + purpleDeficit;
-
-                // Deduct from colorless pool and zero out deficits
-                ColorlessMeeples -= (int)totalDeficit;
-                BlueMeeples = Math.Max(0, BlueMeeples);
-                BlackMeeples = Math.Max(0, BlackMeeples);
-                PurpleMeeples = Math.Max(0, PurpleMeeples);
-
-                numMeeplesSpent += (int)totalDeficit;
-            }
-
-            // Update the UI with the new meeple amounts
-            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
-            return true;
-        }
-
-        return false;
-    }
-
-
-    public void SpendMeepleWithButton(int index) {
-        switch (index) {
-            case 0:
-                BlackMeeples--;
-                meeplesSpent++;
-                if (BlackMeeples == 0) {
-                    UserInterface.Instance.DisableMeepleButtonByIndex(index);
-                }
-                break;
-            case 1:
-                BlueMeeples--;
-                meeplesSpent++;
-                if (BlueMeeples == 0) {
-                    UserInterface.Instance.DisableMeepleButtonByIndex(index);
-                }
-                break;
-            case 2:
-                PurpleMeeples--;
-                meeplesSpent++;
-                if (PurpleMeeples == 0) {
-                    UserInterface.Instance.DisableMeepleButtonByIndex(index);
-                }
-                break;
-        }
-        if (numMeeplesRequired > 0 && meeplesSpent > 0) {
-            numMeeplesRequired--;
-            if (numMeeplesRequired == 0) {
-                UserInterface.Instance.ResolveTextAlert();
-                OnMeeplesSelected?.Invoke();
-                UserInterface.Instance.DisableMeepleButtons();
-            }
-            else {
-                UserInterface.Instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this);
-
-            }
-        }
-        UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
-    }
-    //public void AddSubtractMeepleAmount(int index, float numMeeples) {
-    //    if (index < 0 || index >= 3) return;
-    //    maxMeeples[index] += numMeeples;
-    //    if (maxMeeples[index] < 0) maxMeeples[index] = 0;
-
-    //    if (blackMeeples > maxMeeples[0]) blackMeeples = maxMeeples[0];
-    //    if (blueMeeples > maxMeeples[1]) blueMeeples = maxMeeples[1];
-    //    if (purpleMeeples > maxMeeples[2]) purpleMeeples = maxMeeples[2];
-    //    UserInterface.Instance.UpdateMeepleAmountUI(blackMeeples, blueMeeples, purpleMeeples);
-    //}
-    //public void MultiplyMeepleAmount(int index, float multiplier) {
-    //    if (index < 0 || index >= 3) return;
-    //    var reduceAmt = (int)Mathf.Floor(maxMeeples[index] * multiplier);   //don't reduce by a half value...why were meeples floats ever
-    //    if (reduceAmt > 0) {
-    //        AddSubtractMeepleAmount(index, reduceAmt);
-    //    }
-    //}
-    public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
-        this.numMeeplesRequired = numMeeplesRequired;
-        UserInterface.Instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this, onAlertFinish: onFinish);
-        UserInterface.Instance.EnableMeepleButtons();
-        OnMeeplesSelected = onFinish;
-
-    }
+    
 
     #endregion
 
@@ -317,13 +224,15 @@ public class CardPlayer : MonoBehaviour {
 
             }
         }
-        maxMeeples = new float[] { 2, 2, 2, playerTeam == PlayerTeam.Red ? 1 : 0 };
-        BlackMeeples = maxMeeples[0];
-        BlueMeeples = maxMeeples[1];
-        PurpleMeeples = maxMeeples[2];
-        ColorlessMeeples = maxMeeples[3];
 
-
+        BaseMaxMeeples = new int[] { 2, 2, 2, playerTeam == PlayerTeam.Red ? 1 : 0 };
+        borrowedMeeples = new int[4];
+        lentMeeples = new int[4];
+        currentMeeples = new int[4];
+        tempMeeples = new int[4];
+        for (int i = 0; i < BaseMaxMeeples.Length; i++) {
+            currentMeeples[i] = BaseMaxMeeples[i];
+        }
     }
     //add the facilities to the player's active facilities
     public void RegisterFacilities() {
@@ -487,72 +396,150 @@ public class CardPlayer : MonoBehaviour {
     }
     #endregion
 
-    #region Meeple Sharing
+    #region Meeples
+    public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
+        bool spendColorless = false;
+
+        // Check if we can afford to play the card
+        if (CanAffordCardPlay(card, ref spendColorless)) {
+            // Deduct required meeples from each pool
+            currentMeeples[1] -= (int)card.data.blueCost;
+            currentMeeples[0] -= (int)card.data.blackCost;
+            currentMeeples[2] -= (int)card.data.purpleCost;
+
+            // Calculate the total number of meeples used
+            numMeeplesSpent = (int)(card.data.blueCost + card.data.blackCost + card.data.purpleCost);
+
+            // Spend colorless meeples if needed to cover deficits
+            if (spendColorless) {
+                int totalDeficit = currentMeeples.Where(val => val < 0).Sum(val => -val);
+
+                // Deduct from colorless pool
+                currentMeeples[3] -= (int)totalDeficit;
+
+                // Zero out any deficits in color-specific pools
+                for (int i = 0; i < 3; i++) {
+                    if (currentMeeples[i] < 0) {
+                        currentMeeples[i] = 0;
+                    }
+                }
+
+                numMeeplesSpent += (int)totalDeficit;
+            }
+
+            // Update the UI with the new meeple amounts
+            UserInterface.Instance.UpdateMeepleAmountUI();
+            return true;
+        }
+
+        return false;
+    }
+
+    public int GetMaxMeepleAmount(int index) {
+        return BaseMaxMeeples[index] + borrowedMeeples[index] - lentMeeples[index] + tempMeeples[index];
+    }
+
+    public void SpendMeepleWithButton(int index) {
+        currentMeeples[index]--;
+        meeplesSpent++;
+        if (currentMeeples[index] == 0) {
+            UserInterface.Instance.DisableMeepleButtonByIndex(index);
+        }
+        if (numMeeplesRequired > 0 && meeplesSpent > 0) {
+            numMeeplesRequired--;
+            if (numMeeplesRequired == 0) {
+                UserInterface.Instance.ResolveTextAlert();
+                OnMeeplesSelected?.Invoke();
+                UserInterface.Instance.DisableMeepleButtons();
+            }
+            else {
+                UserInterface.Instance.DisplayAlertMessage($"Spend {numMeeplesRequired} {(numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this);
+
+            }
+        }
+        UserInterface.Instance.UpdateMeepleAmountUI();
+    }
+    public void ForcePlayerToChoseMeeples(int numMeeplesRequired, Action onFinish) {
+        this.numMeeplesRequired = numMeeplesRequired;
+        UserInterface.Instance.DisplayAlertMessage($"Spend {this.numMeeplesRequired} {(this.numMeeplesRequired > 1 ? "meeples" : "meeple")} to continue", this, onAlertFinish: onFinish);
+        UserInterface.Instance.EnableMeepleButtons();
+        OnMeeplesSelected = onFinish;
+
+    }
     //called at the end of each action phase to update the shared meeples
     public void UpdateMeepleSharing() {
-        Debug.Log($"{playerName} has {SharedMeepleAmount} lent meeples, and {receivedMeepleTypes} borrowed meeples");
-        CheckReceivedMeeplesAndReturn();
-        CheckSharedMeeplesAndReturn();
+        if (updatedMeeplesThisPhase) return;
+        updatedMeeplesThisPhase = true;
+        Debug.Log($"{playerName} has {LentMeepleAmount} lent meeples, and {BorrowedMeepleAmount} borrowed meeples");
+        CheckBorrowedMeeplesAndReturn();
+        CheckLentMeeplesAndReturn();
     }
     //increase the meeple count by 1 (max and current) of the specified color
-    public void IncrementMeepleByIndex(int index) {
-        if (index >= 0 && index < maxMeeples.Length) {
-            maxMeeples[index]++;
-            switch (index) {
-                case 0:
-                    BlackMeeples++;
-                    break;
-                case 1:
-                    BlueMeeples++;
-                    break;
-                case 2:
-                    PurpleMeeples++;
-                    break;
-                case 3:
-                    ColorlessMeeples++;
-                    break;
+    public void ReceiveOneBorrowedMeeple(int index) => ChangeBorrowedMeeples(index, 1);
+    public void ReturnBorrowedMeeple(int index) => ChangeBorrowedMeeples(index, -1);
+    public void LendOneMeeple(int index) => ChangeLentMeeples(index, 1);
+    public void ReturnLentMeeple(int index) => ChangeLentMeeples(index, -1);
+    public void AddOneTempMeeple(int index) => ChangeTempMeeples(index, 1);
+    public void RemoveOneTempMeeple(int index) => ChangeTempMeeples(index, -1);
+    public void ChangeBorrowedMeeples(int index, int amt) {
+        if (index >= 0 && index < BaseMaxMeeples.Length) {
+            Debug.Log($"Changing borrowed meeple {index} by {amt}");
+            borrowedMeeples[index] += amt;
+            if (amt > 0) {
+                Debug.Log("Adding new meeple tracker to borrowed list");
+                borrowedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
             }
-            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+
+            // Adjust current meeples based on the borrowed amount
+            currentMeeples[index] = Math.Min(currentMeeples[index] + amt, GetMaxMeepleAmount(index));
+
+            UserInterface.Instance.UpdateMeepleAmountUI();
             UserInterface.Instance.UpdateMeepleSharingMenu();
         }
     }
-    //decrease the meeple count by 1 (max and current) of the specified color
-    public void DecrememntMeepleByIndex(int index) {
-        if (index >= 0 && index < maxMeeples.Length) {
-            maxMeeples[index]--;
-            switch (index) {
-                case 0:
-                    BlackMeeples--;
-                    break;
-                case 1:
-                    BlueMeeples--;
-                    break;
-                case 2:
-                    PurpleMeeples--;
-                    break;
+
+    public void ChangeLentMeeples(int index, int amt) {
+        if (index >= 0 && index < BaseMaxMeeples.Length) {
+            Debug.Log($"Changing lent meeple {index} by {amt}");
+            lentMeeples[index] += amt;
+            if (amt > 0) {
+                Debug.Log("Adding new meeple tracker to lent list");
+                lentMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
             }
-            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+
+            // Adjust current meeples based on the lent amount
+            currentMeeples[index] = Math.Min(currentMeeples[index] - amt, GetMaxMeepleAmount(index));
+
+            UserInterface.Instance.UpdateMeepleAmountUI();
             UserInterface.Instance.UpdateMeepleSharingMenu();
         }
     }
+
+    public void ChangeTempMeeples(int index, int amt) {
+        if (index >= 0 && index < BaseMaxMeeples.Length) {
+            tempMeeples[index] += amt;
+
+            // Adjust current meeples based on the temporary amount added or removed
+            currentMeeples[index] = Math.Min(currentMeeples[index] + amt, GetMaxMeepleAmount(index));
+
+            UserInterface.Instance.UpdateMeepleAmountUI();
+            UserInterface.Instance.UpdateMeepleSharingMenu();
+        }
+    }
+
     //returns true if the player has a meeple of the specified color index
-    private bool HasMeepleOfColor(int index) {
-        return index switch {
-            0 => BlackMeeples > 0,
-            1 => BlueMeeples > 0,
-            2 => PurpleMeeples > 0,
-            3 => ColorlessMeeples > 0,
-            _ => false
-        };
-    }
+    private bool HasMeepleOfColor(int index) => index >= 0 && index < currentMeeples.Length && currentMeeples[index] > 0;
+
+
     //reduces the meeple count of the specified color index by 1
     //and adds it to the shared meeple tracker
-    public bool ShareMeeple(int index) {
-        if (index >= 0 && index < maxMeeples.Length) {
-            if (maxMeeples[index] > 0) {
+    public bool LendMeeple(int index) {
+        if (index >= 0 && index < BaseMaxMeeples.Length) {
+            if (BaseMaxMeeples[index] > 0) {
                 if (HasMeepleOfColor(index)) {
-                    DecrememntMeepleByIndex(index);
-                    sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+                    // DecrememntMeepleByIndex(index);
+                    LendOneMeeple(index);
+                   // sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
                     return true;
                 }
             }
@@ -560,38 +547,36 @@ public class CardPlayer : MonoBehaviour {
         return false;
     }
     //Handles receiving a shared meeple from another player
-    public void ReceiveSharedMeeple(int index) {
+    public void ReceiveBorrowedMeeple(int index) {
         Debug.Log($"{playerName} received a shared meeple of type {index}");
-        if (index >= 0 && index < maxMeeples.Length) {
-            receivedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
-            IncrementMeepleByIndex(index);
+        if (index >= 0 && index < BaseMaxMeeples.Length) {
+          //  borrowedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+            //AddOneMaxMeepleByIndex(index);
+            ReceiveOneBorrowedMeeple(index);
         }
     }
     //Checks the shared meeples list at the end of the action phase
     //to check if any shared meeples have expired and need to be returned
-    public void CheckSharedMeeplesAndReturn() {
-        for (int i = 0; i < sharedMeepleTypes.Count; i++) {
-            if (sharedMeepleTypes[i].Item1 <= 0) {
-                IncrementMeepleByIndex(sharedMeepleTypes[i].Item2);
-                sharedMeepleTypes.RemoveAt(i);
-            }
-            else {
-                sharedMeepleTypes[i] = (sharedMeepleTypes[i].Item1 - 1, sharedMeepleTypes[i].Item2);
-            }
+    public void CheckLentMeeplesAndReturn() {
+        for (int i = 0; i < lentMeepleTypes.Count; i++) {
+            lentMeepleTypes[i] = (lentMeepleTypes[i].Item1 - 1, lentMeepleTypes[i].Item2);
+            
         }
+        var expiredMeeples = lentMeepleTypes.Where((tuple) => tuple.Item1 <= 0).ToList();
+        expiredMeeples.ForEach((tuple) => ReturnLentMeeple(tuple.Item2));
+        lentMeepleTypes.RemoveAll(expiredMeeples.Contains);
     }
     //Checks the received meeples list at the end of the action phase
     //to check if any received meeples have expired and need to be returned
-    public void CheckReceivedMeeplesAndReturn() {
-        for (int i = 0; i < receivedMeepleTypes.Count; i++) {
-            if (receivedMeepleTypes[i].Item1 <= 0) {
-                IncrementMeepleByIndex(receivedMeepleTypes[i].Item2);
-                receivedMeepleTypes.RemoveAt(i);
-            }
-            else {
-                receivedMeepleTypes[i] = (receivedMeepleTypes[i].Item1 - 1, receivedMeepleTypes[i].Item2);
-            }
+    public void CheckBorrowedMeeplesAndReturn() {
+        
+        for (int i = 0; i < borrowedMeepleTypes.Count; i++) {
+            borrowedMeepleTypes[i] = (borrowedMeepleTypes[i].Item1 - 1, borrowedMeepleTypes[i].Item2);
         }
+        var expiredMeeples = borrowedMeepleTypes.Where((tuple) => tuple.Item1 <= 0).ToList();
+        expiredMeeples.ForEach((tuple) => ReturnBorrowedMeeple(tuple.Item2));
+        borrowedMeepleTypes.RemoveAll(expiredMeeples.Contains);
+
     }
     public void ShareMeepleWithPlayer(int index, CardPlayer player) {
         EnqueueAndSendCardMessageUpdate(CardMessageType.MeepleShare,
@@ -599,42 +584,63 @@ public class CardPlayer : MonoBehaviour {
                                             CardID: index,
                                             Amount: 1);
     }
-    #endregion
+    private void SetTempMeeplesForMultiplier(float multiplier) {
+        for (int i = 0; i < BaseMaxMeeples.Length; i++) {
+            int targetValue = Mathf.Max((int)(BaseMaxMeeples[i] * multiplier), 1);
+            tempMeeples[i] = targetValue - BaseMaxMeeples[i];
+        }
+        ResetMeepleCount();
 
-    #region Helpers
+    }
     public void ResetMeepleCount() {
         meeplesSpent = 0;
+        for (int i = 0; i < BaseMaxMeeples.Length; i++) {
+            if (i == 3 && playerTeam != PlayerTeam.Red) break;
+            currentMeeples[i] = GetMaxMeepleAmount(i);
+        }
 
-        BlackMeeples = maxMeeples[0];
-        BlueMeeples = maxMeeples[1];
-        PurpleMeeples = maxMeeples[2];
-        ColorlessMeeples = maxMeeples[3];
+        //BlackMeeples = baseMaxMeeples[0];
+        //BlueMeeples = baseMaxMeeples[1];
+        //PurpleMeeples = baseMaxMeeples[2];
+        //ColorlessMeeples = baseMaxMeeples[3];
         if (GameManager.Instance.actualPlayer == this) {
             // Debug.Log($"Resetting to MaxMeeples: {maxMeeples[0]}, {maxMeeples[1]}, {maxMeeples[2]}, {maxMeeples[3]}");
             //  Debug.Log($"Player {playerName} has {BlackMeeples} black, {BlueMeeples} blue, {PurpleMeeples} purple, and {ColorlessMeeples} colorless meeples");
-            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+            UserInterface.Instance.UpdateMeepleAmountUI();
         }
 
     }
 
-    public void IncMaxColorlessMeeples(float value) {
-        maxMeeples[3] += value;
-        ColorlessMeeples = maxMeeples[3];
-        UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+    public void IncMaxColorlessMeeples(int value) {
+        //baseMaxMeeples[3] += value;
+        tempMeeples[3] += value;
+        currentMeeples[3] = GetMaxMeepleAmount(3);
+        UserInterface.Instance.UpdateMeepleAmountUI();
     }
 
     public void ResetMaxColorlessMeeples() {
-        maxMeeples[3] = 1;
-        ColorlessMeeples = maxMeeples[3];
-        UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+        tempMeeples[3] = 0;
+        currentMeeples[3] = GetMaxMeepleAmount(3);
+        UserInterface.Instance.UpdateMeepleAmountUI();
     }
 
-    public int GetTotalMeeples() {
-        return (int)(BlueMeeples + BlackMeeples + PurpleMeeples);
-    }
     public int GetMaxMeeples() {
-        return (int)Mathf.Floor(maxMeeples.Aggregate((a, b) => a + b));
+        int count = 0;
+        for (int i = 0; i < BaseMaxMeeples.Length; i++) {
+            count += GetMaxMeepleAmount(i);
+        }
+        return count;
     }
+    public int GetMeeplesSpent() {
+        return mMeeplesSpent;
+    }
+    public void ResetMeeplesSpent() {
+        mMeeplesSpent = 0;
+    }
+    #endregion
+
+    #region Helpers
+
     public void AssignSector(Sector sector) {
         PlayerSector = sector;
     }
@@ -655,16 +661,7 @@ public class CardPlayer : MonoBehaviour {
     public bool NeedsToDiscard() {
         return HandCards.Count > MAX_HAND_SIZE_AFTER_ACTION;
     }
-    public int GetMeeplesSpent() {
-        return mMeeplesSpent;
-    }
-    public void ResetMeeplesSpent() {
-        mMeeplesSpent = 0;
-    }
-    public int AddMeeplesSpent(int meeples) {
-        mMeeplesSpent += meeples;
-        return mMeeplesSpent;
-    }
+
     public string GetCardNameFromID(int cardID) {
         if (cards.TryGetValue(cardID, out Card card)) {
             return card.data.name;
@@ -963,12 +960,39 @@ public class CardPlayer : MonoBehaviour {
             }
         }
         if (Keyboard.current.f5Key.wasPressedThisFrame) {
-            maxMeeples = new float[] { 99, 99, 99, 99 };
-            BlueMeeples = 99;
-            BlackMeeples = 99;
-            PurpleMeeples = 99;
-            ColorlessMeeples = 99;
-            UserInterface.Instance.UpdateMeepleAmountUI(BlackMeeples, BlueMeeples, PurpleMeeples, ColorlessMeeples);
+            tempMeeples = new int[] { 99, 99, 99, 99 };
+            ResetMeepleCount();
+        }
+        if (Keyboard.current.f4Key.wasPressedThisFrame) {
+            if (this != GameManager.Instance.actualPlayer) return;
+
+            string s = $"{playerName} meeple info:";
+            s += $"\nCalculated Max: [{GetMaxMeepleAmount(0)}]," +
+                $"[{GetMaxMeepleAmount(1)}],[{GetMaxMeepleAmount(2)}],[{GetMaxMeepleAmount(3)}]\n";
+            s += $"Current Meeples: [{currentMeeples[0]}]," +
+                $"[{currentMeeples[1]}],[{currentMeeples[2]}],[{currentMeeples[3]}]\n";
+
+            s += $"Borrowed Meeples: [{borrowedMeeples[0]}]," +
+                $"[{borrowedMeeples[1]}],[{borrowedMeeples[2]}],[{borrowedMeeples[3]}]\n";
+
+            s += $"Lent Meeples: [{lentMeeples[0]}]," +
+                $"[{lentMeeples[1]}],[{lentMeeples[2]}],[{lentMeeples[3]}]\n";
+
+            s += $"Temp Meeples: [{tempMeeples[0]}]," +
+                $"[{tempMeeples[1]}],[{tempMeeples[2]}],[{tempMeeples[3]}]\n";
+
+            s += "Shared Meeple Tracker: ";
+            foreach (var (duration, index) in lentMeepleTypes) {
+                s += $"(turns left: {duration}, meeple type: {index}), ";
+            }
+            s += "\nReceived Meeple Tracker: ";
+            foreach (var (duration, index) in borrowedMeepleTypes) {
+                s += $"(turns left: {duration}, meeple type: {index}), ";
+            }
+            Debug.Log(s);
+
+
+
         }
     }
     public void HandleMenuToggle() {
@@ -1961,27 +1985,30 @@ public class CardPlayer : MonoBehaviour {
 
             UserInterface.Instance.ToggleOvertimeButton(false);
             UserInterface.Instance.StartOvertime();
+
+            // Double the meeples for overtime
+            SetTempMeeplesForMultiplier(2);
         }
-        MultiplyMaxMeeples(2);
     }
+
     public void EndOvertime() {
         otState = OverTimeState.Exhausted;
         OverTimeCounter = 0;
-        MultiplyMaxMeeples(.25f);
+
+        // Halve the meeples for exhaustion
+        SetTempMeeplesForMultiplier(0.5f);
+
         UserInterface.Instance.StartExhaustion();
     }
+
     public void EndExhaustion() {
         otState = OverTimeState.None;
         OverTimeCounter = 0;
-        MultiplyMaxMeeples(2);
+
+        // Return to normal meeples count
+        SetTempMeeplesForMultiplier(1);
     }
-    public void MultiplyMaxMeeples(float multi) {
-        maxMeeples = maxMeeples.Select(x => Mathf.Max((x * multi), 1)).ToArray();
-        BlackMeeples = maxMeeples[0];
-        BlueMeeples = maxMeeples[1];
-        PurpleMeeples = maxMeeples[2];
-        ColorlessMeeples = maxMeeples[3];
-        UserInterface.Instance.UpdateMeepleAmountUI(maxMeeples[0], maxMeeples[1], maxMeeples[2], ColorlessMeeples);
-    }
+
+
     #endregion
 }

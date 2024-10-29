@@ -17,9 +17,9 @@ public class AICardPlayer : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (Keyboard.current.numpad0Key.wasPressedThisFrame) {
-            PlayCard();
-        }
+        //if (Keyboard.current.numpad0Key.wasPressedThisFrame) {
+        //    PlayCard();
+        //}
     }
     public void PlayCard() {
         Debug.Log($"AI on player {cardPlayer.playerName} is playing a card");

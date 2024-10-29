@@ -112,22 +112,29 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     [Header("AI")]
     public bool IsLocalPlayerAI = false;
-    // Misc
-    public bool mCreateEnergyAtlas = false;
-    public bool mCreateWaterAtlas = false;
-    public bool mCreatePosWhiteAtlas = false;
-    public bool mCreateNegWhiteAtlas = false;
-    private int roundsLeft = 30;
-    private int turnTotal = 0;
-    private const int BASE_MAX_TURNS = 30;
+
+    [Header("White Cards")]
+    private const bool ENABLE_WHITE_CARDS = false;
     private int numTurnsTillWhiteCard = 0;
     private int numWhiteCardOfSameTypePlayed = 0;
     private const int MIN_TURNS_TILL_WHITE_CARD = 2;
     private const int MAX_TURNS_TILL_WHITE_CARD = 5;
     private const float WHITE_CARD_POS_CHANCE = 0.5f;
-    private bool playWhite = false;//TODO change when implementing white cards
+    private bool playWhite = false;
     private bool playedPosWhiteCard = false;
     private bool hasWhiteCardPlayed = true;
+
+    [Header("Altas Creation")]
+    public bool mCreateEnergyAtlas = false;
+    public bool mCreateWaterAtlas = false;
+    public bool mCreatePosWhiteAtlas = false;
+    public bool mCreateNegWhiteAtlas = false;
+
+    [Header("Turn Tracking")]
+    private int roundsLeft = 30;
+    private int turnTotal = 0;
+    private const int BASE_MAX_TURNS = 30;
+    
     private int assignedSectors = 0;
     private int numBluePlayers = 0;
     private const int SECTOR_SIM_TURN_START = 2;
@@ -489,39 +496,50 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #endregion
 
+    #region Debug Logging
+    private void HandleDebugLogInput() {
+        if (Keyboard.current.f1Key.wasPressedThisFrame) {
+            Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
+            //actualPlayer.LogPlayerInfo();
+            //opponentPlayer.LogPlayerInfo();
+            foreach (var kvp in playerDictionary) {
+                kvp.Value.LogPlayerInfo();
+            }
+        }
+        if (Keyboard.current.f9Key.wasPressedThisFrame) {
+            Debug.Log($"Player has {actualPlayer.mUpdatesThisPhase.Count} updates in queue:");
+            foreach (Update update in actualPlayer.mUpdatesThisPhase) {
+                Debug.Log(
+                          $"Type: {update.Type}\n" +
+                          $"Card ID: {update.CardID}\n" +
+                          $"Unique ID: {update.UniqueID}\n" +
+                          $"Amount: {update.Amount}\n" +
+                          $"Facility Played On Type: {update.FacilityPlayedOnType}\n" +
+                          $"Facility Effect to Remove Type: {update.FacilityEffectToRemoveType}\n" +
+                          $"Additional Facility Selected 1: {update.AdditionalFacilitySelectedOne}\n" +
+                          $"Additional Facility Selected 2: {update.AdditionalFacilitySelectedTwo}\n" +
+                          $"Additional Facility Selected 3: {update.AdditionalFacilitySelectedThree}\n" +
+                          $"Sector Played On: {update.sectorPlayedOn}\n" +
+                          $"==============================");
+            }
+        }
+        if (Keyboard.current.f2Key.wasPressedThisFrame) {
+            string s = "";
+            foreach (var sector in AllSectors.Values) {
+                s += $"Sector {sector.sectorName} is {(sector.IsDown ? "down" : "up")}\n";
+                s += $"Sector is {(sector.IsSimulated ? "simulated" : "human played\n\n")}";
+            }
+            Debug.Log(s);
+        }
+
+    }
+    #endregion
+
     #region Update
     // Update is called once per frame
     void Update() {
         if (DEBUG_ENABLED) {
-            if (Keyboard.current.f1Key.wasPressedThisFrame) {
-                Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
-                //actualPlayer.LogPlayerInfo();
-                //opponentPlayer.LogPlayerInfo();
-                foreach (var kvp in playerDictionary) {
-                    kvp.Value.LogPlayerInfo();
-                }
-            }
-            if (Keyboard.current.f9Key.wasPressedThisFrame) {
-                Debug.Log($"Player has {actualPlayer.mUpdatesThisPhase.Count} updates in queue:");
-                foreach (Update update in actualPlayer.mUpdatesThisPhase) {
-                    Debug.Log(
-                              $"Type: {update.Type}\n" +
-                              $"Card ID: {update.CardID}\n" +
-                              $"Unique ID: {update.UniqueID}\n" +
-                              $"Amount: {update.Amount}\n" +
-                              $"Facility Played On Type: {update.FacilityPlayedOnType}\n" +
-                              $"Facility Effect to Remove Type: {update.FacilityEffectToRemoveType}\n" +
-                              $"Additional Facility Selected 1: {update.AdditionalFacilitySelectedOne}\n" +
-                              $"Additional Facility Selected 2: {update.AdditionalFacilitySelectedTwo}\n" +
-                              $"Additional Facility Selected 3: {update.AdditionalFacilitySelectedThree}\n" +
-                              $"Sector Played On: {update.sectorPlayedOn}\n" +
-                              $"==============================");
-                }
-            }
-
-
-
-
+            HandleDebugLogInput();
         }
         if (isInit) {
             if (gameStarted) {
@@ -831,7 +849,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawRed => GamePhase.ActionRed,
             //GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
-            GamePhase.DiscardRed => playWhite ? GamePhase.PlayWhite : GamePhase.DrawBlue,
+            GamePhase.DiscardRed => (playWhite && ENABLE_WHITE_CARDS) ? GamePhase.PlayWhite : GamePhase.DrawBlue,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
@@ -868,7 +886,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                 if (phaseJustChanged) {
                     UserInterface.Instance.ToggleMeepleSharingMenu(false);
-                    playerDictionary.Values.ToList().ForEach(player => player.UpdateMeepleSharing());
+
                     //do nothing until incoming card actions are resolved
                     //this should prevent the doom clock from turning on after this code was called
                     //which meant the OT button wouldnt get turned on when it should
@@ -912,6 +930,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             case GamePhase.BonusBlue:
                 if (phaseJustChanged) {
+                    playerDictionary.Values.ToList()
+                        .FindAll(player => player.playerTeam == PlayerTeam.Blue)
+                        .ForEach(player => player.UpdateMeepleSharing());
+
                     if (actualPlayer.playerTeam == PlayerTeam.Blue) {
                         UserInterface.Instance.ToggleMeepleSharingMenu(true);
                     }
@@ -1001,6 +1023,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.PlayWhite:
+                if (!ENABLE_WHITE_CARDS) return;
+
                 void PlayPos() {
                     int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
                     Debug.Log("Playing positive white card on turn " + turnTotal);
@@ -1176,12 +1200,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
                 }
                 break;
-            case CardMessageType.MeepleShare: 
+            case CardMessageType.MeepleShare:
                 if (update.UniqueID != actualPlayer.NetID) {
-                    Debug.Log($"meeple share messaage with player target {update.UniqueID} was not for {actualPlayer.name}");
+                    Debug.Log($"meeple share messaage with player target {update.UniqueID} was not for {actualPlayer.playerName}");
                 }
                 else {
-                    actualPlayer.ReceiveSharedMeeple(update.CardID);
+                    actualPlayer.ReceiveBorrowedMeeple(update.CardID);
                 }
                 break;
             //pass other updates to the card player
@@ -1209,8 +1233,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 MGamePhase = GamePhase.End;
             }
         }
+
         activeSectors.ForEach(sector => sector.InformFacilitiesOfNewTurn()); //update all facilities of turn end
-        playerDictionary.Values.ToList().ForEach(player => player.ResetMeepleCount()); //return meeples to max values
+        playerDictionary.Values.ToList().ForEach(player => {
+            player.ResetMeepleCount();
+            player.updatedMeeplesThisPhase = false;
+        }); //return meeples to max values
         turnTotal++;
         Debug.Log("Red is laying low: " + IsRedLayingLow);
         if (IsRedLayingLow)
@@ -1259,13 +1287,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         else bluffTurnCount = 0;
 
-        if (IsServer) {
-            numTurnsTillWhiteCard--;
-            if (numTurnsTillWhiteCard == 0) {
-                playWhite = true;
-                numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+        if (ENABLE_WHITE_CARDS) {
+            if (IsServer) {
+                numTurnsTillWhiteCard--;
+                if (numTurnsTillWhiteCard == 0) {
+                    playWhite = true;
+                    numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+                }
             }
         }
+        
         // mTurnText.text = "" + GetTurnsLeft();
         UserInterface.Instance.SetTurnText(GetTurnsLeft() + "");
         if (IsServer) {
@@ -1429,14 +1460,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     #endregion
 
-    #region Meeple Sharing
+    #region Meeple Sharing UI Buttons
     public void HandleShareMeepleButtonPress(int index) {
         Debug.Log("HandleShareMeepleButtonPress in GameManager");
-        if (index < 0 || index >= actualPlayer.maxMeeples.Length) return;
-        if (actualPlayer.maxMeeples[index] == 0) return;
-        if (actualPlayer.ShareMeeple(index)) {
+        if (index < 0 || index >= actualPlayer.BaseMaxMeeples.Length) return;
+        if (actualPlayer.BaseMaxMeeples[index] == 0) return;
+        if (actualPlayer.LendMeeple(index)) {
             UserInterface.Instance.ShowAllySelectionMenu(index);
         }
+        //UserInterface.Instance.UpdateMeepleAmountUI();
     }
     public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId) {
         if (playerDictionary.TryGetValue(playerNetId, out CardPlayer player)) {
@@ -1447,7 +1479,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.LogError($"Player with net id {playerNetId} not found in player dictionary");
         }
         UserInterface.Instance.DisableAllySelectionMenu();
-
+        //  UserInterface.Instance.UpdateMeepleAmountUI();
     }
     #endregion
 }
