@@ -169,28 +169,13 @@ public class FacilityEffect {
                 effects[^1].HasTrap = true;
                 effects[^1].OnEffectRemoved += (id) => {
                     if (id != -1) {
-                        //if (GameManager.Instance.IsServer) {
-                        //    Message message = new Message(CardMessageType.ForceDiscard, id);
-                        //    Debug.Log($"Sending force discard to {GameManager.Instance.playerDictionary[id]}");
-                        //    GameManager.Instance.AddMessage(message);
-                        //}
-
-
                         if (GameManager.Instance.actualPlayer.NetID == id) {
-                          //  Debug.Log($"() => Forcing player {id} to discard a card");
                             GameManager.Instance.ForcePlayerDiscardOneCard(id);
                         }
-                        else {
-                           // Debug.LogWarning("Doing nothing with honeypot?");
-                        }
-
                     }
                     else if (id == -1) {
                         Debug.LogError("Honeypot effect was called with -1 id");
                     }
-                    //else {
-                    //    Debug.Log("Doing nothing with honeypot since we arent the server");
-                    //}
 
                 };
                 break;
