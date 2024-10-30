@@ -166,9 +166,11 @@ public class FacilityEffect {
             case FacilityEffectType.HoneyPot:
                 effects[^1].HasTrap = true;
                 effects[^1].OnEffectRemoved += (id) => {
-                    //TODO: send message to player to force them to discard a card
-                    //Message message = new Message(CardMessageType.ForceDiscard, id);
-                    //GameManager.Instance.AddMessage(message);
+                    if (GameManager.Instance.IsServer) {
+                        Message message = new Message(CardMessageType.ForceDiscard, id);
+                        GameManager.Instance.AddMessage(message);
+                    }
+                    
                 };
                 break;
             case FacilityEffectType.Backdoor:
