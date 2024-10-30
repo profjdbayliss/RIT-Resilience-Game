@@ -4,47 +4,45 @@ using System.Linq;
 public class ScoreManager {
 
     private class ScoreAmounts {
-        //blue team scores
-        public static readonly int VictoryBonus = 100;
-        public static readonly int OperationalSector = 10;
-        public static readonly int OperationalCoreSector = 20;
-        public static readonly int DoomClockAvoidance = 15;
 
-        //red team scores
-        public static readonly int DownedSector = 10;
+        public static readonly int VictoryBonus = 100;
+        // Blue team scores
+        public static readonly int OperationalCoreSector = 20;
+        public static readonly int OperationalSector = 10;
+        public static readonly int DoomClockPrevention = 15;
+
+        // Red team scores
         public static readonly int DownedCoreSector = 20;
+        public static readonly int DownedSector = 10;
         public static readonly int DoomClockActivation = 15;
 
-        //blue players
+        // Blue players
         public static readonly int FacilityPreservation = 5;
+        public static readonly int CoreFacilitySupport = 5;
         public static readonly int FacilityRestoration = 3;
-        public static readonly int CoreFacilityDefense = 5;
-        public static readonly int ResistancePointsRestored = 1;
+        public static readonly int ResistanceRestoration = 1;
 
         public static readonly int MeeplesSpent = 1;
         public static readonly int MeepleSharing = 2;
 
-        public static readonly int SuccessfulDefenseCards = 2;
         public static readonly int FacilityFortification = 2;
-        public static readonly int PreventingBackdoors = 3;
+        public static readonly int BackdoorRemoval = 3;
+        public static readonly int SuccessfulDefenseCards = 2;
 
-        public static readonly int FacilityLoss = -3;
-        public static readonly int CoreSectorBreach = -5;
-
-        //red players
+        // Red players
         public static readonly int FacilityTakeDown = 5;
         public static readonly int CoreFacilitySabotage = 7;
-        public static readonly int ResistancePointsReduced = 1;
+        public static readonly int ResistanceReduction = 1;
 
-        public static readonly int RedTeamMeeplesSpent = 1;
-        public static readonly int ColorlessMeepleUsage = 2;
         public static readonly int BackdoorInstallation = 3;
+        public static readonly int MeeplesSpentRed = 1;
+        public static readonly int ColorlessMeepleUsage = 2;
+
         public static readonly int PersistentEffects = 2;
         public static readonly int OvercomingFortifications = 2;
-        public static readonly int FailedAttacks = -2;
-        public static readonly int BackdoorRemoval = -3;
-        public static readonly int MeepleWaste = -1;
+        public static readonly int DoomClockManipulation = 5;
     }
+
 
 
 
@@ -86,10 +84,9 @@ public class ScoreManager {
                                     AddPlayerScore(sector.Owner.NetID, ScoreAmounts.FacilityPreservation);
                                 }
                                 
-                            });     
-
-
+                            }); 
     }
+
 
     public void AddEndgameScore() {
         AddTeamScore(GameManager.Instance.GetTurnsLeft() == 0 ? PlayerTeam.Blue : PlayerTeam.Red,
@@ -103,8 +100,8 @@ public class ScoreManager {
     // Team Scoring Methods
     #region Team Scoring
 
-    public void AddDoomClockAvoidance() {
-        AddTeamScore(PlayerTeam.Blue, ScoreAmounts.DoomClockAvoidance);
+    public void AddDoomClockPrevention() {
+        AddTeamScore(PlayerTeam.Blue, ScoreAmounts.DoomClockPrevention);
     }
 
     // Red Team Scoring
@@ -130,103 +127,27 @@ public class ScoreManager {
 
     // Individual Scoring Methods
     #region Individual Scoring
-
-    // Blue Team Players
-    // Facility Defense and Restoration
-    public void FacilityPreservation(int playerId, int count) {
-        AddPlayerScore(playerId, count * 5);
+    
+    public void AddCoreFacilitySupport(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.CoreFacilitySupport);
     }
-
-    public void FacilityRestoration(int playerId, int count) {
-        AddPlayerScore(playerId, count * 3);
+    public void AddFacilityRestoration(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.FacilityRestoration);
     }
-
-    public void CoreFacilityDefense(int playerId, int count) {
-        AddPlayerScore(playerId, count * 5);
+    public void AddResistancePointsRestored(int playerId, int points) {
+        AddPlayerScore(playerId, points * ScoreAmounts.ResistanceRestoration);
     }
-
-    public void ResistancePointsRestored(int playerId, int count) {
-        AddPlayerScore(playerId, count * 1);
+    public void AddMeeplesSpent(int playerId, int numSpent) {
+        AddPlayerScore(playerId, numSpent * ScoreAmounts.MeeplesSpent);
     }
-
-    // Meeple Management
-    public void MeeplesSpent(int playerId, int count) {
-        AddPlayerScore(playerId, count * 1);
+    public void AddMeepleShare(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.MeepleSharing);
     }
-
-    public void MeepleSharing(int playerId, int count) {
-        AddPlayerScore(playerId, count * 2);
+    public void AddFortification(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.FacilityFortification);
     }
-
-    // Card Play and Strategy
-    public void SuccessfulDefenseCards(int playerId, int count) {
-        AddPlayerScore(playerId, count * 2);
-    }
-
-    public void FacilityFortification(int playerId, int count) {
-        AddPlayerScore(playerId, count * 2);
-    }
-
-    public void PreventingBackdoors(int playerId, int count) {
-        AddPlayerScore(playerId, count * 3);
-    }
-
-    // Penalties
-    public void FacilityLoss(int playerId, int count) {
-        AddPlayerScore(playerId, count * -3);
-    }
-
-    public void CoreSectorBreach(int playerId, int count) {
-        AddPlayerScore(playerId, count * -5);
-    }
-
-    // Red Team Players
-    // Facility Sabotage
-    public void FacilityTakeDown(int playerId, int count) {
-        AddPlayerScore(playerId, count * 5);
-    }
-
-    public void CoreFacilitySabotage(int playerId, int count) {
-        AddPlayerScore(playerId, count * 7);
-    }
-
-    public void ResistancePointsReduced(int playerId, int count) {
-        AddPlayerScore(playerId, count * 1);
-    }
-
-    // Meeple Utilization
-    public void RedTeamMeeplesSpent(int playerId, int count) {
-        AddPlayerScore(playerId, count * 1);
-    }
-
-    public void ColorlessMeepleUsage(int playerId, int count) {
-        AddPlayerScore(playerId, count * 2);
-    }
-
-    // Card Play and Strategy
-    public void BackdoorInstallation(int playerId, int count) {
-        AddPlayerScore(playerId, count * 3);
-    }
-
-    public void PersistentEffects(int playerId, int count) {
-        AddPlayerScore(playerId, count * 2);
-    }
-
-    public void OvercomingFortifications(int playerId, int count) {
-        AddPlayerScore(playerId, count * 2);
-    }
-
-    // Penalties
-    public void FailedAttacks(int playerId, int count) {
-        AddPlayerScore(playerId, count * -2);
-    }
-
-    public void BackdoorRemoval(int playerId, int count) {
-        AddPlayerScore(playerId, count * -3);
-    }
-
-    public void MeepleWaste(int playerId, int count) {
-        AddPlayerScore(playerId, count * -1);
+    public void AddBackdoorRemoval(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.BackdoorRemoval);
     }
 
     private void AddPlayerScore(int playerId, int points) {

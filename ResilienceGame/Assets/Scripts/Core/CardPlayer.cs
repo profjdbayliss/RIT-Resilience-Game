@@ -399,7 +399,7 @@ public class CardPlayer : MonoBehaviour {
     #region Meeples
     public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
         bool spendColorless = false;
-
+        int numMeeplesSpentSoFar = numMeeplesSpent;
         // Check if we can afford to play the card
         if (CanAffordCardPlay(card, ref spendColorless)) {
             // Deduct required meeples from each pool
@@ -426,6 +426,9 @@ public class CardPlayer : MonoBehaviour {
 
                 numMeeplesSpent += (int)totalDeficit;
             }
+            //update score with meeples spent
+            if ((numMeeplesSpentSoFar - numMeeplesSpent) > 0)
+                ScoreManager.Instance.AddMeeplesSpent(NetID, numMeeplesSpent - numMeeplesSpentSoFar);
 
             // Update the UI with the new meeple amounts
             UserInterface.Instance.UpdateMeepleAmountUI();
@@ -550,6 +553,7 @@ public class CardPlayer : MonoBehaviour {
             if (BaseMaxMeeples[index] > 0) {
                 if (HasMeepleOfColor(index)) {
                     // DecrememntMeepleByIndex(index);
+                    ScoreManager.Instance.AddMeepleShare(NetID);
                     LendOneMeeple(index);
                    // sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
                     return true;

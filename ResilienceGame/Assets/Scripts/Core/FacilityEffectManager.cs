@@ -95,7 +95,7 @@ public class FacilityEffectManager : MonoBehaviour {
     #endregion
 
     #region Helpers
-    private void ChangeFacilityPoints(FacilityEffect effect, bool isRemoving = false) {
+    private void ChangeFacilityPoints(FacilityEffect effect, int createdById, bool isRemoving = false) {
         // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? 0 : 1); //dont give points back when removing effects
         if (effect.Magnitude < 0 && GameManager.Instance.IsRedLayingLow)
@@ -106,18 +106,9 @@ public class FacilityEffectManager : MonoBehaviour {
             if (effect.Magnitude < 0 && effect.Target == protectPointsEffect.Target)
                 return;
         }
-        //this check is too late down the method call chain
-        //FacilityEffect honeyPotEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.HoneyPot);
-        //if(honeyPotEffect != null)
-        //{
-        //    if(effect.Magnitude < 0 && effect.Target == honeyPotEffect.Target)
-        //    {
-        //        //hmm need to figure out a way to force discard here
-        //        return;
-        //    }
-        //}
+        
 
-        facility.ChangeFacilityPoints(effect.Target, value);
+        facility.ChangeFacilityPoints(effect.Target, createdById, value);
     }
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
         //Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
@@ -176,7 +167,45 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The facility effect to add or remove from the facility</param>
     /// <param name="isAdding">True if the effect should be added, false otherwise</param>
     public void AddRemoveEffect(FacilityEffect effect, bool isAdding, int createdById) {
+        CheckForTrapEffects(createdById);
+        CheckForScoring(effect, isAdding, createdById);
         //check for trap effects here
+        if (isAdding) {
+            AddEffect(effect, createdById);
+        }
+        else {
+            RemoveEffect(effect, createdById);
+        }
+
+    }
+    public void CheckForScoring(FacilityEffect effect, bool isAdding, int createdById) {
+        if (isAdding) {
+            if (effect.IsRestoreEffect) {
+                //restore points to a core sector
+                if (facility.sectorItsAPartOf.isCore) {
+                    ScoreManager.Instance.AddCoreFacilitySupport(createdById);
+                }
+                else {
+                    //bring a non-core sector back up
+                    if (facility.IsDown) {
+                        ScoreManager.Instance.AddFacilityRestoration(createdById);
+                    }
+                }
+            }
+            else {
+                switch (effect.EffectType) {
+                    case FacilityEffectType.Fortify: //fortify
+                        ScoreManager.Instance.AddFortification(createdById);
+                        break;
+                }
+
+            }
+
+
+        }
+    }
+
+    public void CheckForTrapEffects(int createdById) {
         List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
         List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
         if (trapEffectsFromOpposingTeam.Any()) {
@@ -185,13 +214,6 @@ public class FacilityEffectManager : MonoBehaviour {
                 RemoveEffect(trapEffect, trapEffect.CreatedByPlayerID); //remove the trap effect
             });
         }
-        if (isAdding) {
-            AddEffect(effect, createdById);
-        }
-        else {
-            RemoveEffect(effect, createdById);
-        }
-
     }
 
     #region Remove Effects
@@ -211,10 +233,10 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Removes the effect from the facility based on the facility effect type
     /// </summary>
     /// <param name="effect">The facility effect object that holds the facility effect type</param>
-    private void UnapplyEffect(FacilityEffect effect) {
+    private void UnapplyEffect(FacilityEffect effect, int createdById) {
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
-                ChangeFacilityPoints(effect, isRemoving: true);
+                ChangeFacilityPoints(effect, createdById, isRemoving: true);
                 break;
 
             case FacilityEffectType.ModifyPointsPerTurn:
@@ -246,8 +268,10 @@ public class FacilityEffectManager : MonoBehaviour {
         var effectToRemove = activeEffects[indexToRemove];
 
         if (effectToRemove != null) {
+            effectToRemove.OnEffectRemoved?.Invoke(createdById);
+
             activeEffects.RemoveAt(indexToRemove);
-            UnapplyEffect(effectToRemove);
+            UnapplyEffect(effectToRemove, createdById);
         }
     }
     /// <summary>
@@ -349,7 +373,7 @@ public class FacilityEffectManager : MonoBehaviour {
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
 
-                ChangeFacilityPoints(effect);
+                ChangeFacilityPoints(effect, createdById);
                 break;
             //case FacilityEffectType.Backdoor:
             //case FacilityEffectType.ModifyPointsPerTurn:

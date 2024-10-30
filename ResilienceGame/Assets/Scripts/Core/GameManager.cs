@@ -751,7 +751,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void StopDoomClock() {
 
-        ScoreManager.Instance.AddDoomClockAvoidance();
+        ScoreManager.Instance.AddDoomClockPrevention();
         IsDoomClockActive = false;
         UserInterface.Instance.SetDoomClockActive(false);
     }

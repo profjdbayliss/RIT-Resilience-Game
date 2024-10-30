@@ -58,12 +58,12 @@ public class Facility : MonoBehaviour {
     // public FacilityEffect effect;
     //   public bool effectNegated;
     public bool WasEverDowned = false;
-    public bool IsDown =>   Points[0] == 0 ||
+    public bool IsDown => Points[0] == 0 ||
                             Points[2] == 0 ||
-                            Points[1] == 0 || 
+                            Points[1] == 0 ||
                             downedConnections == 3;
-    public bool IsDamaged => Points[0] < maxPhysicalPoints || 
-                            Points[1] < maxNetworkPoints || 
+    public bool IsDamaged => Points[0] < maxPhysicalPoints ||
+                            Points[1] < maxNetworkPoints ||
                             Points[2] < maxFinacialPoints;
     public bool HasMaxPhysicalPoints => Points[0] == maxPhysicalPoints;
     public bool HasMaxNetworkPoints => Points[1] == maxNetworkPoints;
@@ -88,7 +88,7 @@ public class Facility : MonoBehaviour {
         //{
         //    pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
         //}
-        
+
         SetupPointImages();
         UpdateUI();
     }
@@ -97,9 +97,9 @@ public class Facility : MonoBehaviour {
         connectedSectors = new List<Sector>();
         try {
             for (int i = 0; i < dependencies.Length; i++) {
-              //  Debug.Log($"Facility {facilityName} has dependency {dependencies[i]}");
+                //  Debug.Log($"Facility {facilityName} has dependency {dependencies[i]}");
                 var sec = GameManager.Instance.AllSectors[dependencies[i]];
-              //  Debug.Log($"Found {sec.sectorName} from game manager AllSectors");
+                //  Debug.Log($"Found {sec.sectorName} from game manager AllSectors");
                 connectedSectors.Add(sec);
                 dependencyIcons[i].sprite = icons[(int)sec.sectorName];
                 dependencyXs[i].enabled = false;
@@ -160,7 +160,7 @@ public class Facility : MonoBehaviour {
     public void CheckDownedConnections() {
         //Debug.Log("Checking downed connections for " + facilityName);
         downedConnections = 0;
-       // bool isDown = IsDown;
+        // bool isDown = IsDown;
         for (int i = 0; i < connectedSectors.Count; i++) {
             if (connectedSectors[i].IsDown) {
                 dependencyXs[i].enabled = true;
@@ -174,7 +174,7 @@ public class Facility : MonoBehaviour {
         //if (!isDown) {
         //    if (downedConnections == 3) {
         //        Debug.Log($"Facility {facilityName} is being downed by lack of connections");
-                
+
         //       // GameManager.Instance.CheckDownedFacilities();
         //    }
         //}
@@ -184,7 +184,7 @@ public class Facility : MonoBehaviour {
         //       // GameManager.Instance.CheckDownedFacilities();
         //    }
         //}
-        
+
         if (downedConnections > 0) {
             sectorPopoutMenu.SetLockedOpen();
         }
@@ -223,8 +223,9 @@ public class Facility : MonoBehaviour {
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
     }
-    public void ChangeFacilityPoints(FacilityEffectTarget target, int value) {
+    public void ChangeFacilityPoints(FacilityEffectTarget target, int createdById, int value) {
         Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
+        List<int> currentPoints = new List<int>(Points);
 
         void UpdatePoints(ref int points, int maxPoints) {
             points = Mathf.Clamp(points + value, 0, maxPoints);
@@ -260,6 +261,15 @@ public class Facility : MonoBehaviour {
         }
 
         Debug.Log($"Facility {facilityName} now has {Points[0]} physical points, {Points[2]} financial points, and {Points[1]} network points.");
+        //add the number of changed points to the player score
+        int pointsChanged = currentPoints
+            .Select((oldValue, index) => Mathf.Abs(Points[index] - oldValue))
+            .Sum();
+
+
+
+        ScoreManager.Instance.AddResistancePointsRestored(createdById, pointsChanged);
+
 
         GameManager.Instance.CheckDownedFacilities();
         UpdateUI();
