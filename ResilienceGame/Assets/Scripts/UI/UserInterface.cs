@@ -66,6 +66,12 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private RectTransform rightSelectionparent;
     [SerializeField] private List<Button> allySelectionButtons;
     [SerializeField] private GameObject allySelectionButtonPrefab;
+    [Header("End Game")]
+    public GameObject endGameCanvas;
+    public TextMeshProUGUI endGameTitle;
+    [SerializeField] private GameObject playerScoreItemPrefab;
+    [SerializeField] private RectTransform rightParent;
+    [SerializeField] private RectTransform leftParent;
 
     [Header("Player Info Menu")]
     [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
@@ -290,7 +296,7 @@ public class UserInterface : MonoBehaviour {
         overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
     }
     public void ToggleMeepleSharingMenu(bool enable) {
-        
+
         if (enable) {
             if (GameManager.Instance.actualPlayer.LentMeepleAmount >= GameManager.Instance.MAX_MEEPLE_SHARE) return;
             for (int i = 0; i < 3; i++) {
@@ -332,6 +338,30 @@ public class UserInterface : MonoBehaviour {
             MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i).ToString();
             MeepleSharingTextCurrent[i].text = GameManager.Instance.actualPlayer.currentMeeples[i].ToString();
         }
+    }
+
+    public void ShowEndGameCanvas() {
+        endGameCanvas.SetActive(true);
+
+        bool blueWon = GameManager.Instance.GetTurnsLeft() == 0;
+        endGameTitle.text = blueWon ? "Blue Wins!" : "Red Wins!";
+        BuildEndgameScoreMenu();
+
+    }
+    private void BuildEndgameScoreMenu() {
+        int numPlayers = GameManager.Instance.playerDictionary.Count;
+
+        List<(int score, GameObject scoreItem)> scoreItems = new List<(int score, GameObject scoreItem)>();
+        int num = 0;
+        foreach (CardPlayer player in GameManager.Instance.playerDictionary.Values) {
+
+            int _score = ScoreManager.Instance.GetPlayerScore(player.NetID);
+            var scoreItem = Instantiate(playerScoreItemPrefab, num > numPlayers / 2 ? rightParent : leftParent);
+            num++;
+        }
+    }
+    public void HideEndGameCanvas() {
+        endGameCanvas.SetActive(false);
     }
 
 }

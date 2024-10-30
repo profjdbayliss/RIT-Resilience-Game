@@ -90,9 +90,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
     // End Game
-    [Header("End Game")]
-    public GameObject endGameCanvas;
-    public TMP_Text endGameText;
+    //[Header("End Game")]
+    //public GameObject endGameCanvas;
+    //public TMP_Text endGameText;
 
     // Tutorial
     [Header("Tutorial")]
@@ -1473,7 +1473,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.ToggleGameCanvas(false);
         // startScreen.SetActive(true);
         // gameCanvas.SetActive(false);
-        endGameCanvas.SetActive(false);
+        //endGameCanvas.SetActive(false);
+        UserInterface.Instance.HideEndGameCanvas();
 
         // set the network player ready to play again
         RGNetworkPlayerList.instance.ResetAllPlayersToNotReady();
@@ -1508,10 +1509,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void ShowEndGameCanvas() {
         MGamePhase = GamePhase.End;
         ScoreManager.Instance.AddEndgameScore();
-        endGameCanvas.SetActive(true);
-
-        bool blueWon = GetTurnsLeft() == 0;
-        endGameText.text = blueWon ? "Blue Wins!" : "Red Wins!";
+        UserInterface.Instance.ShowEndGameCanvas();
 
     }
     private bool CheckForEmptyDecks(out CardPlayer player) {
