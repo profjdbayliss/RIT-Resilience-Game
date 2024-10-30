@@ -121,6 +121,7 @@ public class FacilityEffect {
                 effects[^1].OnEffectRemoved += (id) => {
                     //TODO: send message to player to force them to discard a card
                     Message message = new Message(CardMessageType.ForceDiscard, id);
+                    GameManager.Instance.AddMessage(message);
                 };
             }
             return effects;

@@ -1678,6 +1678,15 @@ public class CardPlayer : MonoBehaviour {
         UserInterface.Instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
     }
 
+    public void TryDiscardRandomCard()
+    {
+        int positionOfCardToBeDiscarded = UnityEngine.Random.Range(0, HandCards.Count - 1);
+        int cardToBeDiscarded = HandCards.ElementAt(positionOfCardToBeDiscarded).Key;
+
+        bool didRandomCardDiscard = TryDiscardFromHandByUID(cardToBeDiscarded);
+        Debug.Log("Forced discard status: " + didRandomCardDiscard);
+    }
+
     #endregion
 
     #region Network

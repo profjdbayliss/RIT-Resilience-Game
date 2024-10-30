@@ -267,6 +267,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.ReduceCost:
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
+            case CardMessageType.ForceDiscard:
             case CardMessageType.DrawCard:
             case CardMessageType.ReturnCardToDeck:
             case CardMessageType.ChangeCardID:
@@ -794,6 +795,18 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("client received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
+                    }
+                    break;
+                case CardMessageType.ForceDiscard:
+                    {
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        int playerId = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        GameManager.Instance.ForcePlayerDiscardOneCard(playerId);
                     }
                     break;
                 case CardMessageType.MeepleShare: {

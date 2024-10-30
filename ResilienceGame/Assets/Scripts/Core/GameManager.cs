@@ -777,6 +777,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
             UserInterface.Instance.UpdateUISizeTrackers();
         }
     }
+
+    public void ForcePlayerDiscardOneCard(int playerID)
+    {
+        playerDictionary.TryGetValue(playerID, out CardPlayer player);
+        player.ForceDiscardRandomCard();
+    }
     public bool CanHighlight() {
         if (actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed) {
             return actualPlayer.ReadyState == CardPlayer.PlayerReadyState.ReadyToPlay;
