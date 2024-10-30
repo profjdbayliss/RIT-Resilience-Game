@@ -413,7 +413,7 @@ public class CardPlayer : MonoBehaviour {
             // Spend colorless meeples if needed to cover deficits
             if (spendColorless) {
                 int totalDeficit = currentMeeples.Where(val => val < 0).Sum(val => -val);
-
+                int numColorlessSpent = 0;
                 // Deduct from colorless pool
                 currentMeeples[3] -= (int)totalDeficit;
 
@@ -423,8 +423,10 @@ public class CardPlayer : MonoBehaviour {
                         currentMeeples[i] = 0;
                     }
                 }
-
+                numColorlessSpent = (int)totalDeficit;
                 numMeeplesSpent += (int)totalDeficit;
+                ScoreManager.Instance.AddColorlessMeepleSpent(NetID, numColorlessSpent);
+
             }
             //update score with meeples spent
             if ((numMeeplesSpentSoFar - numMeeplesSpent) > 0)

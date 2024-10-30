@@ -106,7 +106,7 @@ public class FacilityEffectManager : MonoBehaviour {
             if (effect.Magnitude < 0 && effect.Target == protectPointsEffect.Target)
                 return;
         }
-        
+
 
         facility.ChangeFacilityPoints(effect.Target, createdById, value);
     }
@@ -132,8 +132,7 @@ public class FacilityEffectManager : MonoBehaviour {
         return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.Backdoor);
     }
 
-    public bool IsHoneyPotted()
-    {
+    public bool IsHoneyPotted() {
         return activeEffects.Any(effect => effect.EffectType == FacilityEffectType.HoneyPot);
     }
 
@@ -197,13 +196,49 @@ public class FacilityEffectManager : MonoBehaviour {
                     case FacilityEffectType.Fortify: //fortify
                         ScoreManager.Instance.AddFortification(createdById);
                         break;
+                    case FacilityEffectType.ModifyPoints:
+                        if (WillEffectDownFacility(effect)) {
+                            if (facility.sectorItsAPartOf.isCore) {
+                                ScoreManager.Instance.AddCoreFacilityTakeDown(createdById);
+                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById);
+                            }
+                            ScoreManager.Instance.AddFacilityTakeDown(createdById);
+
+                            //check if this will start Doom clock
+                            if (GameManager.Instance.NumDownedSectors + 1 > GameManager.Instance.AllSectors.Count / 2) {
+                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById); 
+                            }
+                        }
+                        break;
+                    case FacilityEffectType.Backdoor:
+                        ScoreManager.Instance.AddBackdoorCreation(createdById);
+                        break;
                 }
 
             }
-
-
         }
     }
+    private bool WillEffectDownFacility(FacilityEffect effect) =>
+
+         
+            (effect.EffectType == FacilityEffectType.ModifyPoints) && effect.Target switch {
+                FacilityEffectTarget.Physical => facility.Points[0] + effect.Magnitude <= 0,
+                FacilityEffectTarget.Network => facility.Points[1] + effect.Magnitude <= 0,
+                FacilityEffectTarget.Financial => facility.Points[2] + effect.Magnitude <= 0,
+                FacilityEffectTarget.All => facility.Points[0] + effect.Magnitude <= 0 &&
+                                           facility.Points[1] + effect.Magnitude <= 0 &&
+                                           facility.Points[2] + effect.Magnitude <= 0,
+                FacilityEffectTarget.FinancialPhysical => facility.Points[0] + effect.Magnitude <= 0 &&
+                                                          facility.Points[2] + effect.Magnitude <= 0,
+                FacilityEffectTarget.NetworkPhysical => facility.Points[0] + effect.Magnitude <= 0 &&
+                                                         facility.Points[1] + effect.Magnitude <= 0,
+                FacilityEffectTarget.FinancialNetwork => facility.Points[1] + effect.Magnitude <= 0 &&
+                                                        facility.Points[2] + effect.Magnitude <= 0,
+                _ => false
+            };
+            
+        
+    
 
     public void CheckForTrapEffects(int createdById) {
         List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
@@ -255,10 +290,17 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The effect to remove</param>
     private void RemoveEffect(FacilityEffect effect, int createdById, bool bypassFortified = false) {
         if (!bypassFortified) {
-            if (facility.IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
+            if (facility.IsFortified() && GameManager.Instance.GetPlayerTeam(createdById) ==  PlayerTeam.Blue && !hasNegatedEffectThisRound) {
                 hasNegatedEffectThisRound = true;
+                ScoreManager.Instance.AddSuccessfulDefense(
+                    activeEffects.Find(e => e.EffectType == FacilityEffectType.Fortify).CreatedByPlayerID
+                    );
                 return;
             }
+        }
+        //bypass fortify on second effect played on this facility
+        if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Blue && hasNegatedEffectThisRound) {
+            ScoreManager.Instance.AddFortifyOvercome(createdById);
         }
         int indexToRemove = activeEffects.FindIndex(e => e.UniqueID == effect.UniqueID);
         if (indexToRemove == -1) {
@@ -337,14 +379,15 @@ public class FacilityEffectManager : MonoBehaviour {
         }
         if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && !hasNegatedEffectThisRound) {
             hasNegatedEffectThisRound = true;
+            ScoreManager.Instance.AddSuccessfulDefense(
+                activeEffects.Find(e => e.EffectType == FacilityEffectType.Fortify).CreatedByPlayerID
+                );
             return;
         }
-        //too far down 
-        //if(IsHoneyPotted() && effect.EffectType == FacilityEffectType.Backdoor)
-        //{
-        //    //need to figure out a way to force discard here too
-        //    return;
-        //}
+        //bypass fortify on second effect played on this facility
+        if (IsFortified() && effect.CreatedByTeam == PlayerTeam.Red && hasNegatedEffectThisRound) {
+            ScoreManager.Instance.AddFortifyOvercome(createdById);
+        }
 
         if (effect.EffectType == FacilityEffectType.Backdoor && IsBackdoored()) {
             var activeBackdoor = activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Backdoor);
@@ -460,7 +503,7 @@ public class FacilityEffectManager : MonoBehaviour {
             didSomething = true;
         }
         return didSomething;
-            
+
     }
     #region Effect Menu
     private IEnumerator MoveUI(RectTransform rectTransform, Vector2 startPos, Vector2 endPos) {
@@ -503,7 +546,7 @@ public class FacilityEffectManager : MonoBehaviour {
             effectMenuState = EffectMenuState.Open;
             effectPopoutRoutine = null;
         }
-        
+
         Debug.Log("Finished moving effect menu");
     }
     private float CubicEaseInOut(float t) {

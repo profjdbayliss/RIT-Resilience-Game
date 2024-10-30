@@ -128,7 +128,8 @@ public class ScoreManager {
 
     // Individual Scoring Methods
     #region Individual Scoring
-    
+
+    #region Blue Players
     public void AddCoreFacilitySupport(int playerId) {
         AddPlayerScore(playerId, ScoreAmounts.CoreFacilitySupport);
     }
@@ -150,12 +151,40 @@ public class ScoreManager {
     public void AddBackdoorRemoval(int playerId) {
         AddPlayerScore(playerId, ScoreAmounts.BackdoorRemoval);
     }
+    public void AddSuccessfulDefense(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.SuccessfulDefenseCards);
+    }
+    #endregion
+
+    #region Red Players
+    public void AddFacilityTakeDown(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.FacilityTakeDown);
+    }
+    public void AddCoreFacilityTakeDown(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.CoreFacilitySabotage);
+    }
+    public void AddBackdoorCreation(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.BackdoorInstallation);
+    }
+    public void AddColorlessMeepleSpent(int playerId, int amount) {
+        AddPlayerScore(playerId, amount * ScoreAmounts.ColorlessMeepleUsage);
+    }
+    public void AddEffectExpireScore(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.PersistentEffects);
+    }
+    public void AddFortifyOvercome(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.OvercomingFortifications);
+    }
+    public void AddDoomClockActivateionPersonal(int playerId) {
+        AddPlayerScore(playerId, ScoreAmounts.DoomClockManipulation);
+    }
+    #endregion
 
     private void AddPlayerScore(int playerId, int points) {
         if (!playerScores.ContainsKey(playerId)) {
             playerScores[playerId] = 0;
         }
-        Debug.Log($"_score_ Adding {points} to {GameManager.Instance.playerDictionary[playerId]}");
+        Debug.Log($"_score_ Adding {points} to {GameManager.Instance.playerDictionary[playerId].playerName}");
         playerScores[playerId] += points;
     }
 

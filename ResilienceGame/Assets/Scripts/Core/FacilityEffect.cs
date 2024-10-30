@@ -172,8 +172,14 @@ public class FacilityEffect {
                 };
                 break;
             case FacilityEffectType.Backdoor:
+                int effectCreatedBy = effects[^1].CreatedByPlayerID;
                 effects[^1].OnEffectRemoved += (id) => {
-                    ScoreManager.Instance.AddBackdoorRemoval(id);
+                    if (id != effectCreatedBy) {
+                        ScoreManager.Instance.AddBackdoorRemoval(id);
+                    } else {
+                        ScoreManager.Instance.AddEffectExpireScore(effectCreatedBy);
+                    }
+                        
                 };
                 break;
         }

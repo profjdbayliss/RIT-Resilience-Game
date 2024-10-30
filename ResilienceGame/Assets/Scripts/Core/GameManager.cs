@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private List<SectorType> SimulatedSectorList = new List<SectorType>();
     public Sector sectorInView;
     int sectorIndex = -1;
+    public int NumDownedSectors => AllSectors.Values.Where(sector => sector.IsDown).ToList().Count;
 
     // Decks and Cards
     [Header("Decks and Cards")]
