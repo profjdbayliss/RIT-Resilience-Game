@@ -165,18 +165,21 @@ public class FacilityEffectManager : MonoBehaviour {
     /// </summary>
     /// <param name="effect">The facility effect to add or remove from the facility</param>
     /// <param name="isAdding">True if the effect should be added, false otherwise</param>
-    public void AddRemoveEffect(FacilityEffect effect, bool isAdding, int createdById) {
+    public void AddRemoveEffect(List<FacilityEffect> effects, bool isAdding, int createdById) {
         if (CheckForTrapEffects(createdById)) {
             return;
         }
-        CheckForScoring(effect, isAdding, createdById);
-        //check for trap effects here
-        if (isAdding) {
-            AddEffect(effect, createdById);
-        }
-        else {
-            RemoveEffect(effect, createdById);
-        }
+        effects.ForEach(effect => {
+            CheckForScoring(effect, isAdding, createdById);
+            //check for trap effects here
+            if (isAdding) {
+                AddEffect(effect, createdById);
+            }
+            else {
+                RemoveEffect(effect, createdById);
+            }
+        });
+
 
     }
     public void CheckForScoring(FacilityEffect effect, bool isAdding, int createdById) {
@@ -208,7 +211,7 @@ public class FacilityEffectManager : MonoBehaviour {
 
                             //check if this will start Doom clock
                             if (GameManager.Instance.NumDownedSectors + 1 > GameManager.Instance.AllSectors.Count / 2) {
-                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById); 
+                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById);
                             }
                         }
                         break;
@@ -222,7 +225,7 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     private bool WillEffectDownFacility(FacilityEffect effect) =>
 
-         
+
             (effect.EffectType == FacilityEffectType.ModifyPoints) && effect.Target switch {
                 FacilityEffectTarget.Physical => facility.Points[0] + effect.Magnitude <= 0,
                 FacilityEffectTarget.Network => facility.Points[1] + effect.Magnitude <= 0,
@@ -238,9 +241,9 @@ public class FacilityEffectManager : MonoBehaviour {
                                                         facility.Points[2] + effect.Magnitude <= 0,
                 _ => false
             };
-            
-        
-    
+
+
+
 
     public bool CheckForTrapEffects(int createdById) {
         List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
@@ -264,9 +267,9 @@ public class FacilityEffectManager : MonoBehaviour {
         negativeEffects.ForEach(effect => RemoveEffect(effect, calledById, true));
     }
     private void RemoveAllEffects(int calledById) {
-        while (activeEffects.Count > 0) {
-            AddRemoveEffect(activeEffects[0], false, calledById);
-        }
+
+        AddRemoveEffect(activeEffects, false, calledById);
+
     }
     /// <summary>
     /// Removes the effect from the facility based on the facility effect type
@@ -294,7 +297,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The effect to remove</param>
     private void RemoveEffect(FacilityEffect effect, int createdById, bool bypassFortified = false) {
         if (!bypassFortified) {
-            if (facility.IsFortified() && GameManager.Instance.GetPlayerTeam(createdById) ==  PlayerTeam.Blue && !hasNegatedEffectThisRound) {
+            if (facility.IsFortified() && GameManager.Instance.GetPlayerTeam(createdById) == PlayerTeam.Blue && !hasNegatedEffectThisRound) {
                 hasNegatedEffectThisRound = true;
                 ScoreManager.Instance.AddSuccessfulDefense(
                     activeEffects.Find(e => e.EffectType == FacilityEffectType.Fortify).CreatedByPlayerID

@@ -167,8 +167,8 @@ public class FacilityEffect {
                 effects[^1].HasTrap = true;
                 effects[^1].OnEffectRemoved += (id) => {
                     //TODO: send message to player to force them to discard a card
-                    Message message = new Message(CardMessageType.ForceDiscard, id);
-                    GameManager.Instance.AddMessage(message);
+                    //Message message = new Message(CardMessageType.ForceDiscard, id);
+                    //GameManager.Instance.AddMessage(message);
                 };
                 break;
             case FacilityEffectType.Backdoor:

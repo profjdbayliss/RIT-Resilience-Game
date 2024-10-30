@@ -307,8 +307,9 @@ public class Facility : MonoBehaviour {
             if (duration != -1) {
                 effect.Duration = duration;
             }
-            effectManager.AddRemoveEffect(effect, isAdding, createdById);
+            
         });
+        effectManager.AddRemoveEffect(effects, isAdding, createdById);
     }
     public bool TryRemoveEffect(FacilityEffect effect, int createdById) {
         return effectManager.TryRemoveEffect(effect, createdById);
