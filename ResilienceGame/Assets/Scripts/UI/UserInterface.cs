@@ -358,7 +358,18 @@ public class UserInterface : MonoBehaviour {
             int _score = ScoreManager.Instance.GetPlayerScore(player.NetID);
             var scoreItem = Instantiate(playerScoreItemPrefab, num > numPlayers / 2 ? rightParent : leftParent);
             num++;
+            var bg = scoreItem.GetComponent<Image>();
+            //todo: set bg color based on team color
+            scoreItem.GetComponentInChildren<TextMeshProUGUI>().text = $"{player.playerName}:\t{_score}";
+            scoreItems.Add((_score, scoreItem));
+
         }
+        scoreItems.Sort((a, b) => b.score.CompareTo(a.score));
+
+        for (int i = 0; i < scoreItems.Count; i++) {
+            scoreItems[i].scoreItem.transform.SetSiblingIndex(i);
+        }
+
     }
     public void HideEndGameCanvas() {
         endGameCanvas.SetActive(false);

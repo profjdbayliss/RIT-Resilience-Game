@@ -360,7 +360,7 @@ public class Facility : MonoBehaviour {
             facilityInfo.Append("No active effects.");
         }
 
-        facilityInfo.AppendLine($"Facility is being {(sectorItsAPartOf.IsSimulated ? "simulated" : "played")} ");
+        facilityInfo.AppendLine($"\nFacility is being {(sectorItsAPartOf.IsSimulated ? "simulated" : "played")} ");
         facilityInfo.AppendLine($"Facility is down: " +
             $"{(sectorItsAPartOf.IsSimulated ? sectorItsAPartOf.SimulatedFacilities[sectorItsAPartOf.facilities.ToList().IndexOf(this)] : IsDown)}");
 
