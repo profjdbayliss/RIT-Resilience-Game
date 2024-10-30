@@ -108,11 +108,12 @@ public class FacilityEffect {
             effects.Add(new FacilityEffect(effectType, FacilityEffectTarget.None, "", 0, 3));
             //set the team created field
             if (effectType == FacilityEffectType.Backdoor || 
-                effectType == FacilityEffectType.ModifyPointsPerTurn ||
-                effectType == FacilityEffectType.HoneyPot) {
+                effectType == FacilityEffectType.ModifyPointsPerTurn) {
                 effects[^1].CreatedByTeam = PlayerTeam.Red;
             }
-            else if (effectType == FacilityEffectType.Fortify || effectType == FacilityEffectType.ProtectPoints)
+            else if (effectType == FacilityEffectType.Fortify || 
+                     effectType == FacilityEffectType.ProtectPoints ||
+                     effectType == FacilityEffectType.HoneyPot)
                 effects[^1].CreatedByTeam = PlayerTeam.Blue;
             effects[^1].EffectIdString = effectString;
             if (effectType == FacilityEffectType.HoneyPot) {
