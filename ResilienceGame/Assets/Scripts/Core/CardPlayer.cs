@@ -658,7 +658,7 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Helpers
-
+    public bool HasCardsInDeck => DeckIDs.Count > 0;
     public void AssignSector(Sector sector) {
         PlayerSector = sector;
     }

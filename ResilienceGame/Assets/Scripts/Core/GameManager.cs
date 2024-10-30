@@ -669,17 +669,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     //}
     // WORK: rewrite for this card game
-    public void ShowEndGameCanvas() {
-        MGamePhase = GamePhase.End;
-        ScoreManager.Instance.AddEndgameScore();
-        endGameCanvas.SetActive(true);
 
-
-        //endGameText.text = actualPlayer.playerName + " ends the game with score " + actualPlayer.GetScore() +
-        //    " and " + opponentPlayer.playerName + " ends the game with score " + opponentPlayer.GetScore();
-
-        //WriteListToFile(Path.Combine(Application.streamingAssetsPath, "messages.log"), messageLog);
-    }
     #endregion
 
     #region Scoring
@@ -782,15 +772,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
 
-    public void ForcePlayerDiscardOneCard(int playerID)
-    {
+    public void ForcePlayerDiscardOneCard(int playerID) {
         if (playerDictionary.TryGetValue(playerID, out CardPlayer player)) {
             player.TryDiscardRandomCard();
         }
         else {
             Debug.LogError($"Cannot find player to force discard");
         }
-        
+
     }
     public bool CanHighlight() {
         if (actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed) {
@@ -1512,6 +1501,31 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         UserInterface.Instance.DisableAllySelectionMenu();
         //  UserInterface.Instance.UpdateMeepleAmountUI();
+    }
+    #endregion
+
+    #region End Game
+    public void ShowEndGameCanvas() {
+        MGamePhase = GamePhase.End;
+        ScoreManager.Instance.AddEndgameScore();
+        endGameCanvas.SetActive(true);
+
+        bool blueWon = GetTurnsLeft() == 0;
+        endGameText.text = blueWon ? "Blue Wins!" : "Red Wins!";
+
+    }
+    private bool CheckForEmptyDecks(out CardPlayer player) {
+        foreach (var kvp in playerDictionary) {
+            if (!kvp.Value.HasCardsInDeck) {
+                player = kvp.Value;
+                return true;
+            }
+        }
+        player = null; 
+        return false;
+    }
+    public void Quit() {
+        Application.Quit();
     }
     #endregion
 }
