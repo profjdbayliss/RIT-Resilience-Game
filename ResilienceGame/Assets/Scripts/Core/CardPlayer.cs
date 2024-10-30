@@ -957,10 +957,6 @@ public class CardPlayer : MonoBehaviour {
         if (Mouse.current.rightButton.wasReleasedThisFrame) {
             TryLogFacilityInfo();
         }
-        //show effect selection menu
-        else if (Mouse.current.middleButton.wasReleasedThisFrame) {
-            //TryShowEffectSelectionMenu(); //not neede
-        }
         //log all of the facilities in the sector
         if (Keyboard.current.f3Key.wasPressedThisFrame) {
             if (GameManager.Instance.actualPlayer == this) {
@@ -975,7 +971,7 @@ public class CardPlayer : MonoBehaviour {
                 }
             }
         }
-        if (Keyboard.current.f5Key.wasPressedThisFrame) {
+        if (Keyboard.current.backslashKey.wasPressedThisFrame) {
             tempMeeples = new int[] { 99, 99, 99, 99 };
             ResetMeepleCount();
         }
@@ -1006,10 +1002,8 @@ public class CardPlayer : MonoBehaviour {
                 s += $"(turns left: {duration}, meeple type: {index}), ";
             }
             Debug.Log(s);
-
-
-
         }
+        
     }
     public void HandleMenuToggle() {
         if (this != GameManager.Instance.actualPlayer) {

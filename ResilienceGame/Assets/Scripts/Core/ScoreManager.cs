@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class ScoreManager {
 
@@ -154,6 +155,7 @@ public class ScoreManager {
         if (!playerScores.ContainsKey(playerId)) {
             playerScores[playerId] = 0;
         }
+        Debug.Log($"_score_ Adding {points} to {GameManager.Instance.playerDictionary[playerId]}");
         playerScores[playerId] += points;
     }
 
