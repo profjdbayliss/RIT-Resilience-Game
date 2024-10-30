@@ -166,7 +166,7 @@ public class FacilityEffect {
             case FacilityEffectType.HoneyPot:
                 effects[^1].HasTrap = true;
                 effects[^1].OnEffectRemoved += (id) => {
-                    if (GameManager.Instance.IsServer) {
+                    if (GameManager.Instance.IsServer && id != -1) {
                         Message message = new Message(CardMessageType.ForceDiscard, id);
                         GameManager.Instance.AddMessage(message);
                     }
