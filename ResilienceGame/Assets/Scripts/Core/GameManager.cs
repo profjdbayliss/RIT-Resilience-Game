@@ -684,6 +684,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Helpers
 
+    public PlayerTeam GetPlayerTeam(int id) {
+        try {
+            return playerDictionary[id].playerTeam;
+        }
+        catch { }
+        return PlayerTeam.Any;
+    }
     public void CheckIfCanEndPhase() {
         if (WaitingForAnimations) {
             if (CanEndPhase) {
@@ -736,14 +743,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
     public void StartDoomClock() {
-        
+
         IsDoomClockActive = true;
         numDoomClockTurnsLeft = 3;
         UserInterface.Instance.SetDoomClockActive(true);
         ScoreManager.Instance.AddDoomClockActivation();
     }
     public void StopDoomClock() {
-        
+
         ScoreManager.Instance.AddDoomClockAvoidance();
         IsDoomClockActive = false;
         UserInterface.Instance.SetDoomClockActive(false);

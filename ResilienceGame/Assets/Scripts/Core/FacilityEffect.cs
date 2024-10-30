@@ -44,9 +44,10 @@ public class FacilityEffect {
     public bool IsNegated { get; set; } = false;
 
     public int CreatedByPlayerID { get; set; } = -1;
-
+    public bool HasTrap { get; set; } = false;
     public bool IsRemoveable => EffectType == FacilityEffectType.Backdoor || EffectType == FacilityEffectType.ModifyPointsPerTurn || EffectType == FacilityEffectType.Fortify;
 
+    public Action<int> OnEffectRemoved;
     //private static int _uniqueID = 0;
     public int UniqueID { get; private set; }
 
@@ -106,11 +107,21 @@ public class FacilityEffect {
             FacilityEffectType effectType = ParseEffectType(effectParts[0]);
             effects.Add(new FacilityEffect(effectType, FacilityEffectTarget.None, "", 0, 3));
             //set the team created field
-            if (effectType == FacilityEffectType.Backdoor || effectType == FacilityEffectType.ModifyPointsPerTurn)
+            if (effectType == FacilityEffectType.Backdoor || 
+                effectType == FacilityEffectType.ModifyPointsPerTurn ||
+                effectType == FacilityEffectType.HoneyPot) {
                 effects[^1].CreatedByTeam = PlayerTeam.Red;
+            }
             else if (effectType == FacilityEffectType.Fortify || effectType == FacilityEffectType.ProtectPoints)
                 effects[^1].CreatedByTeam = PlayerTeam.Blue;
             effects[^1].EffectIdString = effectString;
+            if (effectType == FacilityEffectType.HoneyPot) {
+                effects[^1].HasTrap = true;
+                effects[^1].OnEffectRemoved += (id) => {
+                    //TODO: send message to player to force them to discard a card
+                    //
+                };
+            }
             return effects;
 
         }
@@ -150,6 +161,7 @@ public class FacilityEffect {
                 }
 
             }
+
         }
         return effects;
     }

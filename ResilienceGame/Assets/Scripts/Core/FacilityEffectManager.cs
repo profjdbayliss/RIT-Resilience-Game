@@ -106,16 +106,16 @@ public class FacilityEffectManager : MonoBehaviour {
             if (effect.Magnitude < 0 && effect.Target == protectPointsEffect.Target)
                 return;
         }
-
-        FacilityEffect honeyPotEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.HoneyPot);
-        if(honeyPotEffect != null)
-        {
-            if(effect.Magnitude < 0 && effect.Target == honeyPotEffect.Target)
-            {
-                //hmm need to figure out a way to force discard here
-                return;
-            }
-        }
+        //this check is too late down the method call chain
+        //FacilityEffect honeyPotEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.HoneyPot);
+        //if(honeyPotEffect != null)
+        //{
+        //    if(effect.Magnitude < 0 && effect.Target == honeyPotEffect.Target)
+        //    {
+        //        //hmm need to figure out a way to force discard here
+        //        return;
+        //    }
+        //}
 
         facility.ChangeFacilityPoints(effect.Target, value);
     }
@@ -176,7 +176,15 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The facility effect to add or remove from the facility</param>
     /// <param name="isAdding">True if the effect should be added, false otherwise</param>
     public void AddRemoveEffect(FacilityEffect effect, bool isAdding, int createdById) {
-
+        //check for trap effects here
+        List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
+        List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
+        if (trapEffectsFromOpposingTeam.Any()) {
+            trapEffectsFromOpposingTeam.ForEach(trapEffect => {
+                trapEffect.OnEffectRemoved?.Invoke(createdById); //trigger the trap effect
+                RemoveEffect(trapEffect, trapEffect.CreatedByPlayerID); //remove the trap effect
+            });
+        }
         if (isAdding) {
             AddEffect(effect, createdById);
         }
@@ -307,12 +315,12 @@ public class FacilityEffectManager : MonoBehaviour {
             hasNegatedEffectThisRound = true;
             return;
         }
-
-        if(IsHoneyPotted() && effect.EffectType == FacilityEffectType.Backdoor)
-        {
-            //need to figure out a way to force discard here too
-            return;
-        }
+        //too far down 
+        //if(IsHoneyPotted() && effect.EffectType == FacilityEffectType.Backdoor)
+        //{
+        //    //need to figure out a way to force discard here too
+        //    return;
+        //}
 
         if (effect.EffectType == FacilityEffectType.Backdoor && IsBackdoored()) {
             var activeBackdoor = activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Backdoor);
