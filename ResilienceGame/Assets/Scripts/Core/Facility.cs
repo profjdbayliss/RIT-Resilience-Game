@@ -309,6 +309,7 @@ public class Facility : MonoBehaviour {
             }
             
         });
+        Debug.Log($"Adding a new effect in Facility of type {effects[0].EffectType} created by player {createdById}");
         effectManager.AddRemoveEffect(effects, isAdding, createdById);
     }
     public bool TryRemoveEffect(FacilityEffect effect, int createdById) {

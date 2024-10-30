@@ -75,7 +75,7 @@ public class FacilityEffect {
         UniqueID = GameManager.Instance.UniqueFacilityEffectIdCount++;
         EffectCreatedOnRoundEndIdString = createdEffectID;
     }
-    
+
     public override string ToString() {
         string effectInfo = $"UID: {UniqueID}, Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
                             $"Negated: {IsNegated}";
@@ -107,11 +107,11 @@ public class FacilityEffect {
             FacilityEffectType effectType = ParseEffectType(effectParts[0]);
             effects.Add(new FacilityEffect(effectType, FacilityEffectTarget.None, "", 0, 3));
             //set the team created field
-            if (effectType == FacilityEffectType.Backdoor || 
+            if (effectType == FacilityEffectType.Backdoor ||
                 effectType == FacilityEffectType.ModifyPointsPerTurn) {
                 effects[^1].CreatedByTeam = PlayerTeam.Red;
             }
-            else if (effectType == FacilityEffectType.Fortify || 
+            else if (effectType == FacilityEffectType.Fortify ||
                      effectType == FacilityEffectType.ProtectPoints ||
                      effectType == FacilityEffectType.HoneyPot)
                 effects[^1].CreatedByTeam = PlayerTeam.Blue;
@@ -160,17 +160,38 @@ public class FacilityEffect {
         }
         return effects;
     }
+    //add more on effect removal actions here
+    //actions get passed the id of the player that caused them to occur
     private static void HandleOnEffectRemovalCreation(FacilityEffectType effectType, string effectString, ref List<FacilityEffect> effects) {
 
         switch (effectType) {
             case FacilityEffectType.HoneyPot:
                 effects[^1].HasTrap = true;
                 effects[^1].OnEffectRemoved += (id) => {
-                    if (GameManager.Instance.IsServer && id != -1) {
-                        Message message = new Message(CardMessageType.ForceDiscard, id);
-                        GameManager.Instance.AddMessage(message);
+                    if (id != -1) {
+                        //if (GameManager.Instance.IsServer) {
+                        //    Message message = new Message(CardMessageType.ForceDiscard, id);
+                        //    Debug.Log($"Sending force discard to {GameManager.Instance.playerDictionary[id]}");
+                        //    GameManager.Instance.AddMessage(message);
+                        //}
+
+
+                        if (GameManager.Instance.actualPlayer.NetID == id) {
+                          //  Debug.Log($"() => Forcing player {id} to discard a card");
+                            GameManager.Instance.ForcePlayerDiscardOneCard(id);
+                        }
+                        else {
+                           // Debug.LogWarning("Doing nothing with honeypot?");
+                        }
+
                     }
-                    
+                    else if (id == -1) {
+                        Debug.LogError("Honeypot effect was called with -1 id");
+                    }
+                    //else {
+                    //    Debug.Log("Doing nothing with honeypot since we arent the server");
+                    //}
+
                 };
                 break;
             case FacilityEffectType.Backdoor:
@@ -178,10 +199,11 @@ public class FacilityEffect {
                 effects[^1].OnEffectRemoved += (id) => {
                     if (id != effectCreatedBy) {
                         ScoreManager.Instance.AddBackdoorRemoval(id);
-                    } else {
+                    }
+                    else {
                         ScoreManager.Instance.AddEffectExpireScore(effectCreatedBy);
                     }
-                        
+
                 };
                 break;
         }
@@ -239,7 +261,7 @@ public class FacilityEffect {
         bool isPhysical = targetString.Contains("phys");
         bool isFinancial = targetString.Contains("fin");
         bool isNetwork = targetString.Contains("net");
-        
+
         if (isPhysical && isFinancial && isNetwork)
             return FacilityEffectTarget.All;
         else if (isPhysical && isFinancial)

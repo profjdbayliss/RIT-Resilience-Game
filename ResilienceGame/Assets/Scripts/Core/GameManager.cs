@@ -773,7 +773,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public void ForcePlayerDiscardOneCard(int playerID) {
+       // Debug.Log($"Forcing player {playerID} to discard one card");
         if (playerDictionary.TryGetValue(playerID, out CardPlayer player)) {
+          //  Debug.Log($"force {playerDictionary[playerID].playerName} to discard one card");
             player.TryDiscardRandomCard();
         }
         else {

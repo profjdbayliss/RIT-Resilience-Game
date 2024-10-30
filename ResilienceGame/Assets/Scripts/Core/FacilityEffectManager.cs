@@ -166,6 +166,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The facility effect to add or remove from the facility</param>
     /// <param name="isAdding">True if the effect should be added, false otherwise</param>
     public void AddRemoveEffect(List<FacilityEffect> effects, bool isAdding, int createdById) {
+        Debug.Log($"Adding or removing {effects.Count} effects to {facility.facilityName} from {createdById}");
         if (CheckForTrapEffects(createdById)) {
             return;
         }
@@ -246,12 +247,13 @@ public class FacilityEffectManager : MonoBehaviour {
 
 
     public bool CheckForTrapEffects(int createdById) {
+        Debug.Log($"Checking for trap effects that would trigger from {createdById}'s card play");
         List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
         List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
         if (trapEffectsFromOpposingTeam.Any()) {
             trapEffectsFromOpposingTeam.ForEach(trapEffect => {
-                trapEffect.OnEffectRemoved?.Invoke(createdById); //trigger the trap effect
-                RemoveEffect(trapEffect, trapEffect.CreatedByPlayerID); //remove the trap effect
+             //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
+                RemoveEffect(trapEffect, createdById, true); //remove the trap effect
             });
             return true;
         }
@@ -317,6 +319,8 @@ public class FacilityEffectManager : MonoBehaviour {
         var effectToRemove = activeEffects[indexToRemove];
 
         if (effectToRemove != null) {
+            Debug.Log($"Removing effect {effectToRemove.EffectType} from {facility.facilityName}");
+
             effectToRemove.OnEffectRemoved?.Invoke(createdById);
 
             activeEffects.RemoveAt(indexToRemove);

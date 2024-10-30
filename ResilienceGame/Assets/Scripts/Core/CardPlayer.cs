@@ -1625,15 +1625,20 @@ public class CardPlayer : MonoBehaviour {
 
     #region Discarding
     //attempts to discard the card with the given UID
-    public bool TryDiscardFromHandByUID(int uid) {
+    public bool TryDiscardFromHandByUID(int uid, bool addUpdate = false) {
         if (HandCards.TryGetValue(uid, out GameObject cardGameObject)) {
             if (cardGameObject.TryGetComponent(out Card card)) {
+               // Debug.Log($"Discarding {card.data.name}");
                 card.SetCardState(CardState.CardNeedsToBeDiscarded);
                 Discards.Add(uid, cardGameObject);
                 cardGameObject.transform.SetParent(UserInterface.Instance.discardDropZone.transform, false);
                 cardGameObject.transform.localPosition = new Vector3();
                 cardGameObject.SetActive(false);
                 HandCards.Remove(uid);
+                if (addUpdate) {
+                   // Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
+                    EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
+                }
                 UserInterface.Instance.UpdateUISizeTrackers();
                 return true;
             }
@@ -1684,8 +1689,8 @@ public class CardPlayer : MonoBehaviour {
         int positionOfCardToBeDiscarded = UnityEngine.Random.Range(0, HandCards.Count - 1);
         int cardToBeDiscarded = HandCards.ElementAt(positionOfCardToBeDiscarded).Key;
 
-        bool didRandomCardDiscard = TryDiscardFromHandByUID(cardToBeDiscarded);
-        Debug.Log("Forced discard status: " + didRandomCardDiscard);
+        bool didRandomCardDiscard = TryDiscardFromHandByUID(cardToBeDiscarded, true);
+      //  Debug.Log("Forced discard status: " + didRandomCardDiscard);
     }
 
     #endregion

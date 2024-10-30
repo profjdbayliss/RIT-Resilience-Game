@@ -21,7 +21,7 @@ public enum CardMessageType
     ReduceCost,
     RemoveEffect,
     DiscardCard,
-    ForceDiscard,
+    //ForceDiscard,
     MeepleShare,
     ChangeCardID,
     EndGame,

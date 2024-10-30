@@ -267,7 +267,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.ReduceCost:
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
-            case CardMessageType.ForceDiscard:
+            //case CardMessageType.ForceDiscard:
             case CardMessageType.DrawCard:
             case CardMessageType.ReturnCardToDeck:
             case CardMessageType.ChangeCardID:
@@ -797,19 +797,19 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.ForceDiscard:
-                    {
-                        Debug.Log("Client is processing force discard message");
-                        int element = 0;
-                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
-                        element += 4;
+                //case CardMessageType.ForceDiscard:
+                //    {
+                //        Debug.Log("Client is processing force discard message");
+                //        int element = 0;
+                //        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                //        element += 4;
 
-                        int playerId = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
+                //        int playerId = GetIntFromByteArray(element, msg.payload);
+                //        element += 4;
 
-                        GameManager.Instance.ForcePlayerDiscardOneCard(playerId);
-                    }
-                    break;
+                //        GameManager.Instance.ForcePlayerDiscardOneCard(playerId);
+                //    }
+                //    break;
                 case CardMessageType.MeepleShare: {
                         Debug.Log("Processing meeple share message in client received");
                         int element = 0;
@@ -966,19 +966,19 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 //         Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
                 //     }
                 //     break;
-                case CardMessageType.ForceDiscard: {
-                        Debug.Log("Client is processing force discard message");
-                        int element = 0;
-                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
-                        element += 4;
+                //case CardMessageType.ForceDiscard: {
+                //        Debug.Log("Client is processing force discard message");
+                //        int element = 0;
+                //        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                //        element += 4;
 
-                        int id = GetIntFromByteArray(element, msg.payload);
-                        element += 4;
+                //        int id = GetIntFromByteArray(element, msg.payload);
+                //        element += 4;
 
-                        GameManager.Instance.ForcePlayerDiscardOneCard(id);
-                        NetworkServer.SendToAll(msg);
-                    }
-                    break;
+                //        GameManager.Instance.ForcePlayerDiscardOneCard(id);
+                //        NetworkServer.SendToAll(msg);
+                //    }
+                //    break;
                 case CardMessageType.ReturnCardToDeck: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
