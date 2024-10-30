@@ -166,7 +166,9 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The facility effect to add or remove from the facility</param>
     /// <param name="isAdding">True if the effect should be added, false otherwise</param>
     public void AddRemoveEffect(FacilityEffect effect, bool isAdding, int createdById) {
-        CheckForTrapEffects(createdById);
+        if (CheckForTrapEffects(createdById)) {
+            return;
+        }
         CheckForScoring(effect, isAdding, createdById);
         //check for trap effects here
         if (isAdding) {
@@ -240,7 +242,7 @@ public class FacilityEffectManager : MonoBehaviour {
         
     
 
-    public void CheckForTrapEffects(int createdById) {
+    public bool CheckForTrapEffects(int createdById) {
         List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
         List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
         if (trapEffectsFromOpposingTeam.Any()) {
@@ -248,7 +250,9 @@ public class FacilityEffectManager : MonoBehaviour {
                 trapEffect.OnEffectRemoved?.Invoke(createdById); //trigger the trap effect
                 RemoveEffect(trapEffect, trapEffect.CreatedByPlayerID); //remove the trap effect
             });
+            return true;
         }
+        return false;
     }
 
     #region Remove Effects
