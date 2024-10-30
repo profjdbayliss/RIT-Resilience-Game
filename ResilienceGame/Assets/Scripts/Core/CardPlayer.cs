@@ -1028,50 +1028,50 @@ public class CardPlayer : MonoBehaviour {
             }
         }
     }
-    void HandleDebugEffectCreation() {
+    //void HandleDebugEffectCreation() {
 
-        if (PlayerSector == null || PlayerSector.facilities == null || PlayerSector.facilities.Length == 0) {
-            return;
-        }
+    //    if (PlayerSector == null || PlayerSector.facilities == null || PlayerSector.facilities.Length == 0) {
+    //        return;
+    //    }
 
-        if (Keyboard.current.digit1Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-        else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-        else if (Keyboard.current.digit3Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-        else if (Keyboard.current.digit4Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-        else if (Keyboard.current.digit5Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-        else if (Keyboard.current.digit6Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-        else if (Keyboard.current.digit7Key.wasPressedThisFrame) {
-            PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;all;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
-        }
-    }
+    //    if (Keyboard.current.digit1Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //    else if (Keyboard.current.digit2Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //    else if (Keyboard.current.digit3Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //    else if (Keyboard.current.digit4Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&phys;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //    else if (Keyboard.current.digit5Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;fin&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //    else if (Keyboard.current.digit6Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;phys&net;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //    else if (Keyboard.current.digit7Key.wasPressedThisFrame) {
+    //        PlayerSector.facilities[0].DebugAddSpecificEffect($"modp;all;{(Keyboard.current.shiftKey.isPressed ? "-1" : "1")}");
+    //    }
+    //}
     //These are for testing purposes to add/remove cards from the hand
-    public virtual void ForceDrawCard() {
-        if (DeckIDs.Count > 0) {
-            DrawCard(true, 0, -1, ref DeckIDs, UserInterface.Instance.handDropZone, true, ref HandCards);
-        }
-    }
-    public virtual void ForceDiscardRandomCard() {
-        Debug.Log($"Telling {playerName} to discard a card");
-        var num = UnityEngine.Random.Range(0, HandCards.Count);
-        var card = HandCards[num];
-        HandCards.Remove(num);
-        Discards.Add(num, card);
-        card.GetComponent<Card>().SetCardState(CardState.CardNeedsToBeDiscarded);
-        card.transform.SetParent(UserInterface.Instance.discardDropZone.transform, false);
-        card.transform.localPosition = new Vector3();
-    }
+    //public virtual void ForceDrawCard() {
+    //    if (DeckIDs.Count > 0) {
+    //        DrawCard(true, 0, -1, ref DeckIDs, UserInterface.Instance.handDropZone, true, ref HandCards);
+    //    }
+    //}
+    //public virtual void ForceDiscardRandomCard() {
+    //    Debug.Log($"Telling {playerName} to discard a card");
+    //    var num = UnityEngine.Random.Range(0, HandCards.Count);
+    //    var card = HandCards[num];
+    //    HandCards.Remove(num);
+    //    Discards.Add(num, card);
+    //    card.GetComponent<Card>().SetCardState(CardState.CardNeedsToBeDiscarded);
+    //    card.transform.SetParent(UserInterface.Instance.discardDropZone.transform, false);
+    //    card.transform.localPosition = new Vector3();
+    //}
     #endregion
 
     #region Update Functions
