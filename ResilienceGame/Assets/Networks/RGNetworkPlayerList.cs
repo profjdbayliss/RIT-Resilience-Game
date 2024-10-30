@@ -799,6 +799,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     break;
                 case CardMessageType.ForceDiscard:
                     {
+                        Debug.Log("Client is processing force discard message");
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -965,7 +966,19 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 //         Debug.Log($"Server assigned UID {newUID} for card {cardId} to player {senderId}");
                 //     }
                 //     break;
+                case CardMessageType.ForceDiscard: {
+                        Debug.Log("Client is processing force discard message");
+                        int element = 0;
+                        GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
 
+                        int id = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        GameManager.Instance.ForcePlayerDiscardOneCard(id);
+                        NetworkServer.SendToAll(msg);
+                    }
+                    break;
                 case CardMessageType.ReturnCardToDeck: {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);

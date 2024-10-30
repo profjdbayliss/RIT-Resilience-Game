@@ -780,8 +780,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void ForcePlayerDiscardOneCard(int playerID)
     {
-        playerDictionary.TryGetValue(playerID, out CardPlayer player);
-        player.ForceDiscardRandomCard();
+        if (playerDictionary.TryGetValue(playerID, out CardPlayer player)) {
+            player.ForceDiscardRandomCard();
+        }
+        else {
+            Debug.LogError($"Cannot find player to force discard");
+        }
+        
     }
     public bool CanHighlight() {
         if (actualPlayer.playerTeam == PlayerTeam.Red && MGamePhase == GamePhase.ActionRed) {

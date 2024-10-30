@@ -1063,6 +1063,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     public virtual void ForceDiscardRandomCard() {
+        Debug.Log($"Telling {playerName} to discard a card");
         var num = UnityEngine.Random.Range(0, HandCards.Count);
         var card = HandCards[num];
         HandCards.Remove(num);
