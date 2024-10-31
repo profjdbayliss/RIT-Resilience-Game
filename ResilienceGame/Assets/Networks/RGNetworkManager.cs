@@ -26,12 +26,6 @@ public class RGNetworkManager : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        //base.OnServerAddPlayer(conn);
-
-        //int playerID = conn.connectionId;
-        //RGNetworkPlayer player = (RGNetworkPlayer)conn.identity.GetComponent<RGNetworkPlayer>();
-        //string name = (string)player.mPlayerName;
-        //RGNetworkPlayerList.instance.AddPlayer(playerID, name);
         base.OnServerAddPlayer(conn);
 
         int playerID = conn.connectionId;
@@ -42,15 +36,6 @@ public class RGNetworkManager : NetworkManager
         // Add to network player list
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
 
-
-        // Instantiate CardPlayer for each player
-       // GameObject cardPlayerObj = Instantiate(cardPlayerPrefab);
-       // NetworkServer.Spawn(cardPlayerObj, conn);
-
-        // Optionally set up the card player to reference the network player
-      //  CardPlayer cardPlayer = cardPlayerObj.GetComponent<CardPlayer>();
-       // player.cardPlayerInstance = cardPlayer;
-        // cardPlayer.Setup(playerID, name);
     }
 
 

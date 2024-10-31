@@ -413,7 +413,7 @@ public class FacilityEffectManager : MonoBehaviour {
             return;
         }
 
-
+        effect.CreatedByPlayerID = createdById;
         activeEffects.Add(effect);//add the effect to list
         //UpdateEffectUI(effect);
         ApplyEffect(effect, createdById);
