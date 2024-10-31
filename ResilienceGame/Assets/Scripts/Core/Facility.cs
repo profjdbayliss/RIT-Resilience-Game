@@ -36,6 +36,7 @@ public class Facility : MonoBehaviour {
 
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
+    public int tempPhysPoints, tempFinPoints, tempNetPoints;
     public int[] Points = new int[3];
     //public int Points[0];
     //  public int FinancialPoints;
@@ -88,7 +89,7 @@ public class Facility : MonoBehaviour {
         //{
         //    pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
         //}
-
+        tempFinPoints = tempNetPoints = tempPhysPoints = 0;
         SetupPointImages();
         UpdateUI();
     }
