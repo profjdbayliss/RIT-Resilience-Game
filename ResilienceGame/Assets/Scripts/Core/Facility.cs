@@ -36,7 +36,7 @@ public class Facility : MonoBehaviour {
 
 
     private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
-    public int tempPhysPoints, tempFinPoints, tempNetPoints;
+    private int tempPhysPoints, tempFinPoints, tempNetPoints;
     public int[] Points = new int[3];
     //public int Points[0];
     //  public int FinancialPoints;
@@ -223,6 +223,39 @@ public class Facility : MonoBehaviour {
     }
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
+    }
+
+    public void ChangeTemporaryPoints(FacilityEffectTarget target, int value)
+    {
+        switch(target)
+        {
+            case FacilityEffectTarget.Physical:
+                tempPhysPoints += value;
+                break;
+            case FacilityEffectTarget.Financial:
+                tempFinPoints += value;
+                break;
+            case FacilityEffectTarget.Network:
+                tempNetPoints += value;
+                break;
+            case FacilityEffectTarget.NetworkPhysical:
+                tempNetPoints += value;
+                tempPhysPoints += value;
+                break;
+            case FacilityEffectTarget.FinancialNetwork:
+                tempFinPoints += value;
+                tempNetPoints += value;
+                break;
+            case FacilityEffectTarget.FinancialPhysical:
+                tempFinPoints += value;
+                tempPhysPoints += value;
+                break;
+            case FacilityEffectTarget.All:
+                tempPhysPoints += value;
+                tempFinPoints += value;
+                tempNetPoints += value;
+                break;
+        }
     }
     public void ChangeFacilityPoints(FacilityEffectTarget target, int createdById, int value) {
         Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
