@@ -78,7 +78,7 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Card Limits")]
     public int handSize;
-    private const int MAX_DRAW_AMOUNT = 5;
+    protected int MAX_DRAW_AMOUNT = 5;
     public const int MAX_HAND_SIZE_AFTER_ACTION = 7;
 
     [Header("Prefabs and UI Elements")]
@@ -86,14 +86,14 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Card Positioning")]
     public readonly float ORIGINAL_SCALE = 0.2f;
-    private HandPositioner handPositioner;
+    protected HandPositioner handPositioner;
 
     [Header("Drag and Drop")]
     //public GameObject hoveredDropLocation;
-    private GameObject previousHoveredFacility;
-    private GameObject cardDroppedOnObject;
+    protected GameObject previousHoveredFacility;
+    protected GameObject cardDroppedOnObject;
     public Dictionary<string, GameObject> cardDropLocations = new Dictionary<string, GameObject>();
-    public bool IsDraggingCard { get; private set; } = false;
+    public bool IsDraggingCard { get; protected set; } = false;
 
     [Header("Game State")]
     public List<Card> CardsAllowedToBeDiscard;
@@ -102,15 +102,15 @@ public class CardPlayer : MonoBehaviour {
     public PlayerReadyState ReadyState { get; set; } = PlayerReadyState.ReadyToPlay;
     public int AmountToDiscard { get; set; } = 0;
     public int AmountToSelect { get; set; } = 0;
-    public int AmountToReturnToDeck { get; private set; } = 0;
+    public int AmountToReturnToDeck { get; protected set; } = 0;
 
     public List<Card> CardsAllowedToBeSelected;
     public Action OnCardsReturnedToDeck { get; set; }
     public Action<List<Facility>> OnFacilitiesSelected { get; set; }
 
     [Header("Facilities")]
-    private int facilityCount = 0;
-    private bool registeredFacilities = false;
+    protected int facilityCount = 0;
+    protected bool registeredFacilities = false;
 
     [Header("Meeple Info")]
     //public const int STARTING_MEEPLES = 2;
@@ -120,11 +120,11 @@ public class CardPlayer : MonoBehaviour {
     public int[] currentMeeples;
     public int[] tempMeeples;
     public bool updatedMeeplesThisPhase = false;
-    public int[] BaseMaxMeeples { get; private set; }
-    //public float BlueMeeples { get; private set; }
-    //public float BlackMeeples { get; private set; }
-    //public float PurpleMeeples { get; private set; }
-    //public float ColorlessMeeples { get; private set; }
+    public int[] BaseMaxMeeples { get; protected set; }
+    //public float BlueMeeples { get; protected set; }
+    //public float BlackMeeples { get; protected set; }
+    //public float PurpleMeeples { get; protected set; }
+    //public float ColorlessMeeples { get; protected set; }
 
     //(timer, type)
     public List<(int, int)> lentMeepleTypes = new List<(int, int)>();
@@ -137,13 +137,13 @@ public class CardPlayer : MonoBehaviour {
 
 
     //public TextMeshProUGUI[] meeplesAmountText;
-    // [SerializeField] private Button[] meepleButtons;
-    //[SerializeField] private Image[] meepleImages;
-    private Action OnMeeplesSelected;
+    // [SerializeField] protected Button[] meepleButtons;
+    //[SerializeField] protected Image[] meepleImages;
+    protected Action OnMeeplesSelected;
 
     public int meeplesSpent = 0;
     public int numMeeplesRequired = 0;
-    private int mMeeplesSpent = 0;
+    protected int mMeeplesSpent = 0;
 
     [Header("Overtime")]
     public OverTimeState otState;
@@ -151,10 +151,10 @@ public class CardPlayer : MonoBehaviour {
     public int overTimeCharges; // Tracks how often a sector can mandate overtime
     public readonly int MAX_OVERTIME_CHARGES = 2;
     [Header("Scoring")]
-    private int mFinalScore = 0;
+    protected int mFinalScore = 0;
 
-    // Private fields
-    //private static int sUniqueIDCount = 0;
+    // protected fields
+    //protected static int sUniqueIDCount = 0;
     public Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
 
@@ -199,7 +199,7 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Initialization
-    public void Start() {
+    public virtual void Start() {
 
         if (UserInterface.Instance.handDropZone)
             handPositioner = UserInterface.Instance.handDropZone.GetComponent<HandPositioner>();
@@ -211,7 +211,8 @@ public class CardPlayer : MonoBehaviour {
 
         overTimeCharges = MAX_OVERTIME_CHARGES;
     }
-    public void InitializeCards() {
+    public virtual void InitializeCards() {
+        Debug.Log("Init white cards");
         DeckIDs.Clear();
         //manager = GameObject.FindObjectOfType<GameManager>();
         Debug.Log("card count is: " + cards.Count);
@@ -248,7 +249,7 @@ public class CardPlayer : MonoBehaviour {
             cards.Add(card.data.cardID, card);
         }
     }
-    void InitDropLocations() {
+    protected void InitDropLocations() {
 
         var dropZones = FindObjectsOfType<CardDropLocation>();
         foreach (var dropZone in dropZones) {
@@ -302,16 +303,16 @@ public class CardPlayer : MonoBehaviour {
     public void ChooseMeeplesThenReduceCardCost(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
         ChooseMeeples(amountOfMeeplesNeeded, player, card);
     }
-    private void ChooseMeeples(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
+    protected void ChooseMeeples(int amountOfMeeplesNeeded, CardPlayer player, Card card) {
         ReadyState = PlayerReadyState.SelectMeeplesWithUI;
         ForcePlayerToChoseMeeples(amountOfMeeplesNeeded, () => SelectCardsInHand(player, card));
         SelectMeeplesOnCards();
     }
-    private void SelectCardsInHand(CardPlayer player, Card card) {
+    protected void SelectCardsInHand(CardPlayer player, Card card) {
         UserInterface.Instance.DisplayAlertMessage($"Choose {card.data.targetAmount} cards to reduce meeple cost", player);
         AddSelectEvent(card.data.targetAmount);
     }
-    private void SelectMeeplesOnCards() {
+    protected void SelectMeeplesOnCards() {
         //Enable Meeple Interface
 
         //Store the chosen colours for each card
@@ -358,7 +359,7 @@ public class CardPlayer : MonoBehaviour {
         Debug.Log($"Disabling {playerName}'s discard");
     }
     //returns the card from the hand to the deck
-    private void ReturnCardToDeck(Card card, bool updateNetwork) {
+    protected void ReturnCardToDeck(Card card, bool updateNetwork) {
         Debug.Log($"{playerName} is returning card to deck");
         Debug.Log($"Does {playerName} have an update in queue: {mUpdatesThisPhase.Any()}");
 
@@ -546,7 +547,7 @@ public class CardPlayer : MonoBehaviour {
     }
 
     //returns true if the player has a meeple of the specified color index
-    private bool HasMeepleOfColor(int index) => index >= 0 && index < currentMeeples.Length && currentMeeples[index] > 0;
+    protected bool HasMeepleOfColor(int index) => index >= 0 && index < currentMeeples.Length && currentMeeples[index] > 0;
 
 
     //reduces the meeple count of the specified color index by 1
@@ -603,7 +604,7 @@ public class CardPlayer : MonoBehaviour {
                                             CardID: index,
                                             Amount: 1);
     }
-    //private void SetTempMeeplesForMultiplier(float multiplier) {
+    //protected void SetTempMeeplesForMultiplier(float multiplier) {
     //    for (int i = 0; i < BaseMaxMeeples.Length; i++) {
     //        int targetValue = Mathf.Max((int)(BaseMaxMeeples[i] * multiplier), 1);
     //        tempMeeples[i] = targetValue - BaseMaxMeeples[i];
@@ -687,13 +688,13 @@ public class CardPlayer : MonoBehaviour {
         }
         return "Card not found";
     }
-    private SectorType SectorPlayedOn() {
+    protected SectorType SectorPlayedOn() {
         if (cardDroppedOnObject != null) {
             return cardDroppedOnObject.GetComponentInParent<Sector>().sectorName;
         }
         return SectorType.Any;
     }
-    private Facility FacilityPlayedOn() {
+    protected Facility FacilityPlayedOn() {
         Facility facility = null;
         if (cardDroppedOnObject != null) {
             facility = cardDroppedOnObject.GetComponentInParent<Facility>();
@@ -1349,7 +1350,7 @@ public class CardPlayer : MonoBehaviour {
         return null;
     }
     //Called when a card is dropped onto the discard drop area
-    private void HandleDiscardDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
+    protected void HandleDiscardDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
         bool discard = false;
         switch (phase) {
             case GamePhase.DrawBlue:
@@ -1388,7 +1389,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //Called when a Facility/Effect target card is dropped in the play area
-    private void HandleFacilityDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
+    protected void HandleFacilityDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
 
         Facility facility = FacilityPlayedOn();
         Debug.Log($"Handling {card.front.title} played on {facility.facilityName}");
@@ -1424,7 +1425,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //Called when a non-Facility/Effect target card is dropped in the play area
-    private void HandleFreePlayDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
+    protected void HandleFreePlayDrop(Card card, GamePhase phase, ref int playCount, ref int playKey) {
         Debug.Log($"Handling non facility card - {card.front.title}");
         // Facility facility = FacilityPlayedOn(); //still need this for sector cards
         var sectorType = SectorPlayedOn();
@@ -1469,7 +1470,7 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Card Play Validation
-    private bool ValidateCardPlay(Card card) {
+    protected bool ValidateCardPlay(Card card) {
         string response = "";
         bool canPlay = false;
         if (IsAI) {
@@ -1504,13 +1505,13 @@ public class CardPlayer : MonoBehaviour {
 
         return canPlay;
     }
-    private (string, bool) ValidateDiscardPlay(Card card) {
+    protected (string, bool) ValidateDiscardPlay(Card card) {
         if (UserInterface.Instance.hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
             return ("Can discard during discard phase", true);
         }
         return ("Must discard on the discard drop zone", false);
     }
-    private (string, bool) ValidateDiscardDuringActionPlay(Card card) {
+    protected (string, bool) ValidateDiscardDuringActionPlay(Card card) {
         if (!GameManager.Instance.MIsDiscardAllowed)
             return ("Game manager says discard is not allowed", false);
         if (UserInterface.Instance.hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
@@ -1522,7 +1523,7 @@ public class CardPlayer : MonoBehaviour {
         }
         return ("Must discard cards first", false); //didn't drop on the discard drop zone
     }
-    private (string, bool) ValidateActionAndReadyPlay(Card card) {
+    protected (string, bool) ValidateActionAndReadyPlay(Card card) {
         //check prereq effects on cards for effect cards played on single facilities
         if (card.data.preReqEffectType != FacilityEffectType.None) {
 
@@ -1556,7 +1557,7 @@ public class CardPlayer : MonoBehaviour {
         }
         return ("Valid action play", true);
     }
-    private (string, bool) ValidateActionPlay(Card card) {
+    protected (string, bool) ValidateActionPlay(Card card) {
         Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.Instance.IsActualPlayersTurn())    //make sure its the player's turn
             return ($"It is not {playerTeam}'s turn", false);
@@ -1597,7 +1598,7 @@ public class CardPlayer : MonoBehaviour {
         };
     }
 
-    private (string, bool) CanDiscardCard(Card card) {
+    protected (string, bool) CanDiscardCard(Card card) {
         Debug.Log("Checking if card can be discarded");
         //check if it is the player's turn
         if (!GameManager.Instance.IsActualPlayersTurn())
@@ -1741,7 +1742,7 @@ public class CardPlayer : MonoBehaviour {
         }
 
     }
-    private void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
+    protected void EnqueueCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None, bool sendUpdateImmediately = false) {
         mUpdatesThisPhase.Enqueue(new Update {
             Type = cardMessageType,
@@ -1756,10 +1757,10 @@ public class CardPlayer : MonoBehaviour {
             GameManager.Instance.SendUpdatesToOpponent(GameManager.Instance.MGamePhase, this);
         }
     }
-    private void ForceSendAllUpdates() {
+    protected void ForceSendAllUpdates() {
         GameManager.Instance.SendUpdatesToOpponent(GameManager.Instance.MGamePhase, this);
     }
-    private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
+    protected void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None) {
         EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, sectorType, facilityType, facilityEffectToRemoveType, true);
     }

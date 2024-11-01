@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public PlayerTeam playerType = PlayerTeam.Any;
     public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
+    public CardPlayer whitePlayer;
     public List<CardPlayer> networkPlayers = new List<CardPlayer>();
     // public CardPlayer opponentPlayer;
     private bool myTurn = false;
@@ -316,6 +317,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 numBluePlayers++;
             }
         }
+       // playerDictionary.Add(whitePlayer.NetID, whitePlayer); //
         //assign sectors to all players
         if (IsServer) {
 
@@ -489,8 +491,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
+
         // Initialize the deck info and set various
         // player zones active
+        whitePlayer.InitializeCards();
         actualPlayer.InitializeCards();
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
@@ -825,6 +829,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region White Card Handling
+    private void HandleWhiteCardUpdate() {
+
+    }
     private void HandleWhiteTurn() {
         if (!ENABLE_WHITE_CARDS) return;
 
@@ -838,13 +845,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
         Debug.Log($"White turn {turnTotal}");
-        return;
-
-
+        if (playWhite) {
+            if (!hasWhiteCardPlayed)
+                PlayPos();
+        }
         void PlayPos() {
             int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
             Debug.Log("Playing positive white card on turn " + turnTotal);
             hasWhiteCardPlayed = true;
+
+            Update whiteCardPlay = new Update() {
+                Type = CardMessageType.CardUpdate,
+                CardID = positiveWhiteCards[randCard].data.cardID,
+                UniqueID = 0,
+            };
+
+            AddUpdateFromPlayer(whiteCardPlay, GamePhase.PlayWhite, -1);
+
             //TODO: Play the card
             //positiveWhiteCards[randCard].Play(null, null);
             //  positiveWhiteCards.RemoveAt(randCard);
@@ -858,6 +875,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //  negativeWhiteCards[randCard].Play(null, null);
             //  negativeWhiteCards.RemoveAt(randCard);
         }
+
+
 
         if (!hasWhiteCardPlayed) {
 
@@ -1230,15 +1249,19 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
     }
-
     public void AddUpdateFromPlayer(Update update, GamePhase phase, uint playerIndex) {
-
+        AddUpdateFromPlayer(update, phase, (int)playerIndex);
+    }
+    public void AddUpdateFromPlayer(Update update, GamePhase phase, int playerIndex) {
+        if (phase == GamePhase.PlayWhite) {
+            HandleWhiteCardUpdate();
+        }
         //send card updates to the sector the card was played on
         switch (update.Type) {
             case CardMessageType.CardUpdate:
             case CardMessageType.CardUpdateWithExtraFacilityInfo:
                 if (AllSectors.TryGetValue(update.sectorPlayedOn, out Sector sector)) {
-                    sector.AddUpdateFromPlayer(update, phase, playerDictionary[(int)playerIndex]);
+                    sector.AddUpdateFromPlayer(update, phase, playerDictionary[playerIndex]);
                 }
                 else {
                     Debug.LogWarning($"sector type not found in update not passing to sector");
@@ -1256,8 +1279,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //TODO: list of all players
             default:
                 try {
-                    Debug.Log($"{actualPlayer.playerName} is adding an update from player id {(int)playerIndex} who it thinks is: {playerDictionary[(int)playerIndex].playerName}");
-                    actualPlayer.AddUpdateFromPlayer(update, phase, playerDictionary[(int)playerIndex]);
+                    Debug.Log($"{actualPlayer.playerName} is adding an update from player id {playerIndex} who it thinks is: {playerDictionary[(int)playerIndex].playerName}");
+                    actualPlayer.AddUpdateFromPlayer(update, phase, playerDictionary[playerIndex]);
                 }
                 catch (Exception e) {
                     Debug.LogError("Error in adding update from opponent: " + e.Message);
@@ -1460,7 +1483,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         //opponentPlayer.ResetForNewGame();
 
         playerDictionary.Values.ToList().ForEach(player => player.ResetForNewGame());
-
+        playerDictionary.Clear();
         // where are we in game phases?
         MGamePhase = GamePhase.Start;
         mPreviousGamePhase = GamePhase.Start;

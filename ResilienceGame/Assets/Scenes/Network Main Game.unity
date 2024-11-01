@@ -23346,12 +23346,12 @@ GameObject:
   - component: {fileID: 1125198115}
   - component: {fileID: 1125198114}
   m_Layer: 5
-  m_Name: Base Player
+  m_Name: WhitePlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1125198114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23364,9 +23364,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f279711f1e71d3940932e3969666c8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: 
-  playerTeam: 3
-  NetID: -1
+  playerName: WhitePlayer
+  playerTeam: 2
+  NetID: 999
   IsAI: 0
   DeckName: 
   DeckIDs: 
@@ -26134,7 +26134,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1394912030
 Transform:
   m_ObjectHideFlags: 0
@@ -41884,7 +41884,8 @@ MonoBehaviour:
   gameStarted: 0
   playerType: 3
   opponentType: 3
-  actualPlayer: {fileID: 1125198114}
+  actualPlayer: {fileID: 0}
+  whitePlayer: {fileID: 1125198114}
   networkPlayers: []
   activePlayerNumber: 0
   activeSectors:
