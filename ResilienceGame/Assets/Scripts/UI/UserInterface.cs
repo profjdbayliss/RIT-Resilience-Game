@@ -18,6 +18,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private GameObject playerMenuPrefab;
     [SerializeField] private PlayerLobbyManager playerLobbyManager;
     [SerializeField] private Sprite[] PhaseButtonSprites;
+    public RectTransform discardPile;
 
     [Header("UI Elements")]
     public Canvas gameCanvas;

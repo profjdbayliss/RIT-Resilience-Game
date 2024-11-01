@@ -18483,6 +18483,42 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 834917990}
   m_CullTransparentMesh: 1
+--- !u!1 &837222628
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 837222629}
+  m_Layer: 5
+  m_Name: Discard
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &837222629
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 837222628}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1994761816}
+  m_RootOrder: 19
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1232, y: -195}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &839994435
 GameObject:
   m_ObjectHideFlags: 0
@@ -23344,7 +23380,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1125198115}
-  - component: {fileID: 1125198114}
+  - component: {fileID: 1125198116}
   m_Layer: 5
   m_Name: WhitePlayer
   m_TagString: Untagged
@@ -23352,37 +23388,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1125198114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1125198112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f279711f1e71d3940932e3969666c8c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerName: WhitePlayer
-  playerTeam: 2
-  NetID: 999
-  IsAI: 0
-  DeckName: 
-  DeckIDs: 
-  handSize: 0
-  cardPrefab: {fileID: 1938897582}
-  CardsAllowedToBeDiscard: []
-  CardsAllowedToBeSelected: []
-  borrowedMeeples: 
-  lentMeeples: 
-  currentMeeples: 
-  tempMeeples: 
-  updatedMeeplesThisPhase: 0
-  meeplesSpent: 0
-  numMeeplesRequired: 0
-  otState: 0
-  overTimeCharges: 0
 --- !u!4 &1125198115
 Transform:
   m_ObjectHideFlags: 0
@@ -23398,6 +23403,38 @@ Transform:
   m_Father: {fileID: 1394912030}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1125198116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1125198112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9c25d88336a31a4fb0718c2195197b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerName: WhitePlayer
+  playerTeam: 2
+  NetID: 999
+  IsAI: 0
+  DeckName: white
+  DeckIDs: 
+  handSize: 0
+  cardPrefab: {fileID: 1938897582}
+  CardsAllowedToBeDiscard: []
+  CardsAllowedToBeSelected: []
+  borrowedMeeples: 
+  lentMeeples: 
+  currentMeeples: 
+  tempMeeples: 
+  updatedMeeplesThisPhase: 0
+  meeplesSpent: 0
+  numMeeplesRequired: 0
+  otState: 0
+  overTimeCharges: 0
+  handParent: {fileID: 2123456275}
 --- !u!1 &1134896414
 GameObject:
   m_ObjectHideFlags: 0
@@ -39007,6 +39044,8 @@ RectTransform:
   - {fileID: 1694993088}
   - {fileID: 631160149}
   - {fileID: 146738567}
+  - {fileID: 2123456275}
+  - {fileID: 837222629}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -39040,6 +39079,7 @@ MonoBehaviour:
   PhaseButtonSprites:
   - {fileID: 21300000, guid: b597c61d346d388468c040c801b17de8, type: 3}
   - {fileID: 21300000, guid: b89c7df4c3957fd4c9bf685f5a7c97c9, type: 3}
+  discardPile: {fileID: 837222629}
   gameCanvas: {fileID: 1994761815}
   startScreen: {fileID: 1214050761}
   alertScreenParent: {fileID: 1349611814}
@@ -41849,6 +41889,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a6f9854109be8045af1189462fd494a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2123456274
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2123456275}
+  m_Layer: 5
+  m_Name: WhiteCardParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2123456275
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123456274}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1994761816}
+  m_RootOrder: 18
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1455, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2133546050
 GameObject:
   m_ObjectHideFlags: 0
@@ -41885,7 +41961,7 @@ MonoBehaviour:
   playerType: 3
   opponentType: 3
   actualPlayer: {fileID: 0}
-  whitePlayer: {fileID: 1125198114}
+  whitePlayer: {fileID: 1125198116}
   networkPlayers: []
   activePlayerNumber: 0
   activeSectors:

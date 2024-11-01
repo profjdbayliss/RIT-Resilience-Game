@@ -212,7 +212,7 @@ public class CardPlayer : MonoBehaviour {
         overTimeCharges = MAX_OVERTIME_CHARGES;
     }
     public virtual void InitializeCards() {
-        Debug.Log("Init white cards");
+        
         DeckIDs.Clear();
         //manager = GameObject.FindObjectOfType<GameManager>();
         Debug.Log("card count is: " + cards.Count);
@@ -714,17 +714,18 @@ public class CardPlayer : MonoBehaviour {
         return (mUpdatesThisPhase.Count != 0);
     }
 
+    
 
 
     #endregion
 
     #region Card Drawing Functions
-    public virtual void DrawCardsToFillHand() {
+    public virtual void DrawCardsToFillHand(bool updateNetwork = true) {
         int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
         if (numCards <= 0) {
             return;
         }
-        DrawNumberOfCards(numCards, updateNetwork: true);
+        DrawNumberOfCards(numCards, updateNetwork: updateNetwork);
     }
     //add the number of cards from deck to player hand
     public virtual void DrawNumberOfCards(int num, List<Card> cardsDrawn = null, bool highlight = false, bool updateNetwork = false) {
@@ -732,6 +733,9 @@ public class CardPlayer : MonoBehaviour {
         Card cardDrawn = null;
         if (DeckIDs.Count > 0) {
             for (int i = 0; i < num; i++) {
+                if (DeckIDs.Count <= 0) {
+                    return;
+                }
                 cardDrawn = DrawCard(
                     random: true,
                     cardId: 0,
@@ -763,7 +767,7 @@ public class CardPlayer : MonoBehaviour {
         int rng = -1;
         Card actualCard;
         int indexForCard = -1;
-
+       // Debug.Log($"Trying to draw card for {playerName} with decksize: {deckToDrawFrom.Count}");
         if (random) {
             rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
             if (cards.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
@@ -797,7 +801,7 @@ public class CardPlayer : MonoBehaviour {
         tempCard.data = actualCard.data;
         tempCard.ActionList = new List<ICardAction>(actualCard.ActionList); // Copy action list
         tempCard.target = actualCard.target; // Copy the target type
-
+        tempCard.DeckName = actualCard.DeckName;    
 
         if (uniqueId != -1) {
             tempCard.UniqueID = uniqueId;
@@ -1411,7 +1415,8 @@ public class CardPlayer : MonoBehaviour {
 
                 // Start the animation
 
-                StartCoroutine(card.AnimateCardToPosition(facility.transform.position, .6f, () => card.Play(this, null, facility)));
+                StartCoroutine(card.AnimateAndShrinkCard(facility.transform.position, .6f,
+                    () => card.Play(this, null, facility)));
 
                 break;
 
@@ -1453,7 +1458,7 @@ public class CardPlayer : MonoBehaviour {
                 GameManager.Instance.AddActionLogMessage($"{playerName} played {card.front.title} on sector {sector.sectorName}");
 
                 //start shrink animation
-                StartCoroutine(card.AnimateCardToPosition(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f,
+                StartCoroutine(card.AnimateAndShrinkCard(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f,
                     () => card.Play(this, null, sector.facilities[0]))); //pass the first facility in the sector, we just use it to get the sector later
 
                 break;

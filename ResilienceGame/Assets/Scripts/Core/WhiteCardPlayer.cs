@@ -1,63 +1,159 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class WhiteCardPlayer : CardPlayer
-{
+public class WhiteCardPlayer : CardPlayer {
+
+    [SerializeField] private RectTransform handParent;
+
     // Start is called before the first frame update
-    public override void Start()
-    {
+    public override void Start() {
         InitDropLocations();
         MAX_DRAW_AMOUNT = 1000;
         NetID = 999;
         playerName = "WhitePlayer";
         playerTeam = PlayerTeam.White;
         DeckName = "white";
-        
+
     }
-    
+
     public override void InitializeCards() {
+        // Debug.Log("Init white cards");
         DeckIDs.Clear();
         //manager = GameObject.FindObjectOfType<GameManager>();
-        Debug.Log("card count is: " + cards.Count);
+        //  Debug.Log("card count is: " + cards.Count);
         foreach (Card card in cards.Values) {
-            if (card != null && card.DeckName.Equals(DeckName)) {
+            if (card != null && card.DeckName.Contains("white")) {
                 //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
                 for (int j = 0; j < card.data.numberInDeck; j++) {
                     DeckIDs.Add(card.data.cardID);
                 }
             }
         }
-        Debug.Log("white deck count is: " + DeckIDs.Count);
-        DrawCardsToFillHand();
+        //  Debug.Log("white deck count is: " + DeckIDs.Count);
+        DrawCardsToFillHand(false);
     }
 
     public void PlayCard() {
         Debug.Log($"White player is playing a card");
-        
+
         var card = GetRandomPlayableCard(positive: true);
+        HandCards.Remove(card.UniqueID);
         if (card) {
-            Debug.Log("White player is playing card: " + card.data.name);   
+            Debug.Log("White player is playing card: " + card.data.name);
+            card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
+
+            EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, 
+                card.data.cardID,
+                card.UniqueID);
+
+            StartCoroutine(
+                moveToPositionAndScale(
+                    card: card.GetComponent<RectTransform>(),
+                    targetPos: new Vector2(0, 0),
+                    onComplete: () => {
+                        StartCoroutine(
+                            moveToPositionAndScale(
+                                card: card.GetComponent<RectTransform>(),
+                                targetPos: UserInterface.Instance.discardPile.anchoredPosition,
+                                onComplete: () => {
+                                    card.Play(this);
+                                    Destroy(card.gameObject);
+                                },
+                                duration: 1f,
+                                scaleUpAmt: .01f));
+
+                    },
+                    duration: 1f,
+                    scaleUpAmt: 2f));
+
         }
 
     }
-    public Card GetRandomPlayableCard(bool positive) {
-        var index = Random.Range(0, HandCards.Count);
-        if (HandCards.Any()) {
-            return HandCards.ElementAt(index).Value.GetComponent<Card>();
+    private IEnumerator moveToPositionAndScale(RectTransform card, Vector2 targetPos, Action onComplete, float duration, float scaleUpAmt) {
+
+        var startingPos = card.anchoredPosition;
+        var endingPos = targetPos;
+        var time = 0f;
+        var currentScale = card.localScale;
+        var endScale = new Vector3(card.localScale.x * scaleUpAmt,
+                                card.localScale.y * scaleUpAmt,
+                                card.localScale.z * scaleUpAmt);
+
+        while (time < duration) {
+            time += Time.deltaTime;
+            var t = time / duration;
+            t = CubicEaseInOut(t);
+            card.anchoredPosition = Vector2.Lerp(startingPos, endingPos, t);
+            card.localScale = Vector3.Lerp(currentScale, endScale, t);
+            yield return null;
         }
+        
+        card.anchoredPosition = endingPos;
+        card.localScale = endScale;
+
+        yield return new WaitForSeconds(duration);
+        onComplete?.Invoke();
+
+
+    }
+    private float CubicEaseInOut(float t) {
+        if (t < 0.5f)
+            return 4f * t * t * t;
+        else {
+            float f = (2f * t) - 2f;
+            return 0.5f * f * f * f + 1f;
+        }
+    }
+
+
+    public Card GetRandomPlayableCard(bool positive) {
+        var cardPlays = HandCards.Values
+            .Select(x => x.GetComponent<Card>())
+            .Where(x => x.DeckName == (positive ? "positive" : "negative")).ToList();
+
+        if (cardPlays.Count > 0) {
+            return cardPlays[UnityEngine.Random.Range(0, cardPlays.Count)];
+        }
+
         Debug.LogError($"Couldnt find any cards in white player hand");
         return null;
-       
 
+    }
+    public override void DrawNumberOfCards(int num, List<Card> cardsDrawn = null, bool highlight = false, bool updateNetwork = false) {
+
+        Card cardDrawn = null;
+        if (DeckIDs.Count > 0) {
+            for (int i = 0; i < num; i++) {
+                if (DeckIDs.Count <= 0) {
+                    return;
+                }
+                cardDrawn = DrawCard(
+                    random: true,
+                    cardId: 0,
+                    uniqueId: i,
+                    deckToDrawFrom: ref DeckIDs,
+                    dropZone: handParent.gameObject,
+                    allowSlippy: false,
+                    activeDeck: ref HandCards,
+                    sendUpdate: false);
+                cardsDrawn?.Add(cardDrawn);
+            }
+        }
+    }
+    protected override Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
+        GameObject dropZone, bool allowSlippy, ref Dictionary<int, GameObject> activeDeck, bool sendUpdate = false) {
+        var card = base.DrawCard(random, cardId, uniqueId, ref deckToDrawFrom, dropZone, false, ref activeDeck, sendUpdate);
+        card.DeckName = card.DeckName.Replace("white;", "").Trim();
+        return card;
     }
 
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (Keyboard.current.spaceKey.wasPressedThisFrame) {
             PlayCard();
         }

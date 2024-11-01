@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public PlayerTeam playerType = PlayerTeam.Any;
     public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
-    public CardPlayer whitePlayer;
+    public WhiteCardPlayer whitePlayer;
     public List<CardPlayer> networkPlayers = new List<CardPlayer>();
     // public CardPlayer opponentPlayer;
     private bool myTurn = false;
