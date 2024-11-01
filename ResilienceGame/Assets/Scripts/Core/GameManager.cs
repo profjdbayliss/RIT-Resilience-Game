@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public bool IsLocalPlayerAI = false;
 
     [Header("White Cards")]
-    private const bool ENABLE_WHITE_CARDS = false;
+    private const bool ENABLE_WHITE_CARDS = true;
     private int numTurnsTillWhiteCard = 0;
     private int numWhiteCardOfSameTypePlayed = 0;
     private const int MIN_TURNS_TILL_WHITE_CARD = 2;
@@ -773,9 +773,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     public void ForcePlayerDiscardOneCard(int playerID) {
-       // Debug.Log($"Forcing player {playerID} to discard one card");
+        // Debug.Log($"Forcing player {playerID} to discard one card");
         if (playerDictionary.TryGetValue(playerID, out CardPlayer player)) {
-          //  Debug.Log($"force {playerDictionary[playerID].playerName} to discard one card");
+            //  Debug.Log($"force {playerDictionary[playerID].playerName} to discard one card");
             player.TryDiscardRandomCard();
         }
         else {
@@ -821,6 +821,73 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void SetReceivedEndGame(bool value) {
         mReceivedEndGame = value;
+    }
+    #endregion
+
+    #region White Card Handling
+    private void HandleWhiteTurn() {
+        if (!ENABLE_WHITE_CARDS) return;
+
+        if (IsServer) {
+            numTurnsTillWhiteCard--;
+            if (numTurnsTillWhiteCard == 0) {
+                Debug.Log($"Server wants to play a white card");
+                playWhite = true;
+                numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+            }
+        }
+
+        Debug.Log($"White turn {turnTotal}");
+        return;
+
+
+        void PlayPos() {
+            int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
+            Debug.Log("Playing positive white card on turn " + turnTotal);
+            hasWhiteCardPlayed = true;
+            //TODO: Play the card
+            //positiveWhiteCards[randCard].Play(null, null);
+            //  positiveWhiteCards.RemoveAt(randCard);
+        }
+
+        void PlayNeg() {
+            Debug.Log("Playing negative white card on turn " + turnTotal);
+            int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
+            hasWhiteCardPlayed = true;
+            //TODO: Play the card
+            //  negativeWhiteCards[randCard].Play(null, null);
+            //  negativeWhiteCards.RemoveAt(randCard);
+        }
+
+        if (!hasWhiteCardPlayed) {
+
+
+            if (UnityEngine.Random.Range(0f, 1f) > WHITE_CARD_POS_CHANCE) {
+
+                if (numWhiteCardOfSameTypePlayed >= 2) {
+                    PlayNeg();
+                    playedPosWhiteCard = false;
+                    numWhiteCardOfSameTypePlayed = 0;
+                }
+                if (playedPosWhiteCard)
+                    numWhiteCardOfSameTypePlayed++;
+
+                playedPosWhiteCard = true;
+                PlayPos();
+            }
+            else {
+                if (numWhiteCardOfSameTypePlayed >= 2) {
+                    PlayPos();
+                    playedPosWhiteCard = true;
+                    numWhiteCardOfSameTypePlayed = 0;
+                }
+                if (!playedPosWhiteCard)
+                    numWhiteCardOfSameTypePlayed++;
+
+                playedPosWhiteCard = false;
+                PlayNeg();
+            }
+        }
     }
     #endregion
 
@@ -872,7 +939,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawRed => GamePhase.ActionRed,
             //GamePhase.BonusRed => GamePhase.ActionRed,
             GamePhase.ActionRed => (roundsLeft == 0 ? GamePhase.End : GamePhase.DiscardRed), //end game after red action if turn counter is 0
-            GamePhase.DiscardRed => (playWhite && ENABLE_WHITE_CARDS) ? GamePhase.PlayWhite : GamePhase.DrawBlue,
+            GamePhase.DiscardRed => ENABLE_WHITE_CARDS ? GamePhase.PlayWhite : GamePhase.DrawBlue,
             GamePhase.PlayWhite => GamePhase.DrawBlue,
             GamePhase.DrawBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
@@ -1046,54 +1113,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.PlayWhite:
-                if (!ENABLE_WHITE_CARDS) return;
-
-                void PlayPos() {
-                    int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
-                    Debug.Log("Playing positive white card on turn " + turnTotal);
-                    hasWhiteCardPlayed = true;
-                    //TODO: Play the card
-                    //positiveWhiteCards[randCard].Play(null, null);
-                    //  positiveWhiteCards.RemoveAt(randCard);
-                }
-
-                void PlayNeg() {
-                    Debug.Log("Playing negative white card on turn " + turnTotal);
-                    int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
-                    hasWhiteCardPlayed = true;
-                    //TODO: Play the card
-                    //  negativeWhiteCards[randCard].Play(null, null);
-                    //  negativeWhiteCards.RemoveAt(randCard);
-                }
-
-                if (!hasWhiteCardPlayed) {
-
-
-                    if (UnityEngine.Random.Range(0f, 1f) > WHITE_CARD_POS_CHANCE) {
-
-                        if (numWhiteCardOfSameTypePlayed >= 2) {
-                            PlayNeg();
-                            playedPosWhiteCard = false;
-                            numWhiteCardOfSameTypePlayed = 0;
-                        }
-                        if (playedPosWhiteCard)
-                            numWhiteCardOfSameTypePlayed++;
-
-                        playedPosWhiteCard = true;
-                        PlayPos();
-                    }
-                    else {
-                        if (numWhiteCardOfSameTypePlayed >= 2) {
-                            PlayPos();
-                            playedPosWhiteCard = true;
-                            numWhiteCardOfSameTypePlayed = 0;
-                        }
-                        if (!playedPosWhiteCard)
-                            numWhiteCardOfSameTypePlayed++;
-
-                        playedPosWhiteCard = false;
-                        PlayNeg();
-                    }
+                if (phaseJustChanged) {
+                    HandleWhiteTurn();
                 }
                 break;
             case GamePhase.End:
@@ -1310,15 +1331,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         else bluffTurnCount = 0;
 
-        if (ENABLE_WHITE_CARDS) {
-            if (IsServer) {
-                numTurnsTillWhiteCard--;
-                if (numTurnsTillWhiteCard == 0) {
-                    playWhite = true;
-                    numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
-                }
-            }
-        }
+
 
         // mTurnText.text = "" + GetTurnsLeft();
         UserInterface.Instance.SetTurnText(GetTurnsLeft() + "");
@@ -1521,7 +1534,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 return true;
             }
         }
-        player = null; 
+        player = null;
         return false;
     }
     public void Quit() {
