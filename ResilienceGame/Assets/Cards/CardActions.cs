@@ -180,10 +180,10 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                             effectTypeToRemove = effectsToRemove[0].EffectType;
                         }
                         facility.AddRemoveEffectsByIdString(
-                            card.data.effectString, 
-                            true, 
-                            player.playerTeam,
-                            player.NetID);
+                            idString: card.data.effectString, 
+                            isAdding: true, 
+                            team: player.playerTeam,
+                            createdById: player.NetID);
 
                     });
 

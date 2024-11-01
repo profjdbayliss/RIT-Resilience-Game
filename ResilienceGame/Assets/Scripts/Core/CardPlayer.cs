@@ -284,7 +284,8 @@ public class CardPlayer : MonoBehaviour {
             Debug.LogError("No facilities available to select");
             return;
         }
-        UserInterface.Instance.DisplayAlertMessage($"Select {numAvail} facilities to apply the card effect", this);
+        if (numFacilitiesToSelect != 3)
+            UserInterface.Instance.DisplayAlertMessage($"Select {numAvail} facilities to apply the card effect", this);
         OnFacilitiesSelected = onFacilitySelect;
     }
     public void ResolveFacilitySelection() {
@@ -1732,7 +1733,7 @@ public class CardPlayer : MonoBehaviour {
 
             mUpdatesThisPhase.Enqueue(update);
             if (sendUpdate) {
-                GameManager.Instance.SendUpdatesToOpponent(GameManager.Instance.MGamePhase, this);
+                ForceSendAllUpdates();
             }
         }
         else {
@@ -1751,9 +1752,12 @@ public class CardPlayer : MonoBehaviour {
             FacilityPlayedOnType = facilityType,
             FacilityEffectToRemoveType = facilityEffectToRemoveType
         });
-        if (sendUpdateImmediately) {
+        if (sendUpdateImmediately && mUpdatesThisPhase.Count == 1) { //only send the update if its the only one in the queue
             GameManager.Instance.SendUpdatesToOpponent(GameManager.Instance.MGamePhase, this);
         }
+    }
+    private void ForceSendAllUpdates() {
+        GameManager.Instance.SendUpdatesToOpponent(GameManager.Instance.MGamePhase, this);
     }
     private void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None) {

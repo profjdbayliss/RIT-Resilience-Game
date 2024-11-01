@@ -170,6 +170,7 @@ public class FacilityEffectManager : MonoBehaviour {
         if (CheckForTrapEffects(createdById)) {
             return;
         }
+
         effects.ForEach(effect => {
             CheckForScoring(effect, isAdding, createdById);
             //check for trap effects here
@@ -252,7 +253,8 @@ public class FacilityEffectManager : MonoBehaviour {
         List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
         if (trapEffectsFromOpposingTeam.Any()) {
             trapEffectsFromOpposingTeam.ForEach(trapEffect => {
-             //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
+                //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
+                Debug.Log($"Triggering trap effect: {trapEffect.EffectType}");
                 RemoveEffect(trapEffect, createdById, true); //remove the trap effect
             });
             return true;
@@ -371,7 +373,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// <param name="effect">The effect to add</param>
     private void AddEffect(FacilityEffect effect, int createdById) {
 
-
+        Debug.Log($"Adding {effect.EffectType} to {facility.facilityName} from {createdById}");
 
         //special case of a remove type from a card effect
         if (effect.EffectType == FacilityEffectType.RemoveAll) {
@@ -400,6 +402,7 @@ public class FacilityEffectManager : MonoBehaviour {
             ScoreManager.Instance.AddFortifyOvercome(createdById);
         }
 
+        //TODO: update this for all effects that have a duration
         if (effect.EffectType == FacilityEffectType.Backdoor && IsBackdoored()) {
             var activeBackdoor = activeEffects.Find(activeEffects => activeEffects.EffectType == FacilityEffectType.Backdoor);
             activeBackdoor.Duration = effect.Duration;

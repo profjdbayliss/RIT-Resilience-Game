@@ -169,6 +169,7 @@ public class FacilityEffect {
                 effects[^1].HasTrap = true;
                 effects[^1].OnEffectRemoved += (id) => {
                     if (id != -1) {
+                        //TODO: update if we add AI players
                         if (GameManager.Instance.actualPlayer.NetID == id) {
                             GameManager.Instance.ForcePlayerDiscardOneCard(id);
                         }
