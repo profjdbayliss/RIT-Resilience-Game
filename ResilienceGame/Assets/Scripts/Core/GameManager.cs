@@ -208,7 +208,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 Message msg;
                 List<int> tmpList = new List<int>(1);
                 tmpList.Add((int)playerType);
-                msg = new Message(CardMessageType.SharePlayerType, tmpList);
+                msg = new Message(CardMessageType.SharePlayerType, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
                 AddMessage(msg);
             }
             else {
@@ -351,7 +351,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 // AssignableSectors.Remove(sector);
 
                 var sectorPayload = new List<int> { kvp.Key, sectorIndex }; // player id, sector index pairs
-                var sectorMsg = new Message(CardMessageType.SectorAssignment, sectorPayload);
+                var sectorMsg = new Message(CardMessageType.SectorAssignment, (uint)RGNetworkPlayerList.instance.localPlayerID, sectorPayload);
                 AddMessage(sectorMsg);
 
             }
@@ -1141,7 +1141,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 if (phaseJustChanged) {
                     Debug.Log("end game has happened. Sending message to other player.");
                     int playerScore = actualPlayer.GetScore();
-                    AddMessage(new Message(CardMessageType.EndGame));
+                    AddMessage(new Message(CardMessageType.EndGame, (uint)RGNetworkPlayerList.instance.localPlayerID));
                 }
                 break;
             default:
@@ -1173,7 +1173,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     Message msg;
                     List<int> tmpList = new List<int>(1);
                     tmpList.Add(MNumberDiscarded);
-                    msg = new Message(CardMessageType.ShareDiscardNumber, tmpList);
+                    msg = new Message(CardMessageType.ShareDiscardNumber, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
                     AddMessage(msg);
                 }
                 break;
@@ -1197,7 +1197,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //HidePlayUI();
             //mEndPhaseButton.SetActive(false);
             UserInterface.Instance.ToggleEndPhaseButton(false);
-            AddMessage(new Message(CardMessageType.EndPhase));
+            AddMessage(new Message(CardMessageType.EndPhase, (uint)RGNetworkPlayerList.instance.localPlayerID));
             myTurn = false;
             actualPlayer.ReadyState = CardPlayer.PlayerReadyState.EndedPhase;
         }
@@ -1236,14 +1236,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
     }
-    public void SendUpdatesToOpponent(GamePhase phase, CardPlayer player) {
-        while (player.HasUpdates()) {
+    public void SendUpdatesToOpponent(GamePhase phase, CardPlayer sender) {
+        while (sender.HasUpdates()) {
             // Debug.Log("Checking for updates to send to opponent");
             Message msg;
             List<int> tmpList = new List<int>(4);
-            CardMessageType messageType = player.GetNextUpdateInMessageFormat(ref tmpList, phase);
+            CardMessageType messageType = sender.GetNextUpdateInMessageFormat(ref tmpList, phase);
             if (messageType != CardMessageType.None) {
-                msg = new Message(messageType, tmpList);
+                msg = new Message(messageType, (uint)sender.NetID, tmpList);
                 AddMessage(msg);
             }
         }
@@ -1253,9 +1253,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         AddUpdateFromPlayer(update, phase, (int)playerIndex);
     }
     public void AddUpdateFromPlayer(Update update, GamePhase phase, int playerIndex) {
+        Debug.Log($"Adding update from player {playerIndex} in phase {phase}");
         if (phase == GamePhase.PlayWhite) {
             HandleWhiteCardUpdate();
         }
+        Debug.Log($"Update type: {update.Type}\n" +
+            $"card id: {update.CardID}");
         //send card updates to the sector the card was played on
         switch (update.Type) {
             case CardMessageType.CardUpdate:
@@ -1264,7 +1267,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     sector.AddUpdateFromPlayer(update, phase, playerDictionary[playerIndex]);
                 }
                 else {
-                    Debug.LogWarning($"sector type not found in update not passing to sector");
+                    //no sector played on so its a white card
+                    whitePlayer.HandleNetworkUpdate(update, phase);
                 }
                 break;
             case CardMessageType.MeepleShare:
@@ -1360,7 +1364,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.SetTurnText(GetTurnsLeft() + "");
         if (IsServer) {
             Debug.Log("server adding increment turn message");
-            AddMessage(new Message(CardMessageType.IncrementTurn));
+            AddMessage(new Message(CardMessageType.IncrementTurn, (uint) RGNetworkPlayerList.instance.localPlayerID));
         }
     }
     // Gets which turn it is.

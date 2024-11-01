@@ -37,6 +37,7 @@ public enum CardMessageType
 /// </summary>
 public class Message
 {
+    public uint senderID;
     private bool isBytes = false;
     public bool IsBytes
     {
@@ -75,8 +76,9 @@ public class Message
     /// A constructor that sets message info for short messages without args.
     /// </summary>
     /// <param name="t">The type of the message</param>
-    public Message(CardMessageType t)
+    public Message(CardMessageType t, uint senderID)
     {
+        this.senderID = senderID;
         type = t;
         hasArgs = false;
         isBytes = false;
@@ -87,8 +89,9 @@ public class Message
     /// </summary>
     /// <param name="t">The type of the message</param>
     /// <param name="args">A list of the arguments for the message.</param>
-    public Message(CardMessageType t, List<int> args)
+    public Message(CardMessageType t, uint senderID, List<int> args)
     {
+        this.senderID = senderID;
         type = t;
         hasArgs = true;
         isBytes = false;
@@ -100,8 +103,9 @@ public class Message
     /// </summary>
     /// <param name="t">The type of the message</param>
     /// <param name="args">A list of the arguments for the message.</param>
-    public Message(CardMessageType t, List<byte> args)
+    public Message(CardMessageType t, uint senderID, List<byte> args)
     {
+        this.senderID = senderID;
         type = t;
         hasArgs = true;
         isBytes = true;
@@ -115,8 +119,9 @@ public class Message
     /// </summary>
     /// <param name="t">The type of the message</param>
     /// <param name="arg">single argument</param>
-    public Message(CardMessageType t, int singleArg)
+    public Message(CardMessageType t, uint senderID, int singleArg)
     {
+        this.senderID = senderID;
         type = t;
         hasArgs = true;
         isBytes = false;
@@ -131,8 +136,9 @@ public class Message
     /// <param name="t">The type of the message</param>
     /// <param name="uniqueID">card's unique id</param>
     /// <param name="cardID">A unique card id.</param>
-    public Message(CardMessageType t, int uniqueID, int cardID)
+    public Message(CardMessageType t, uint senderID, int uniqueID, int cardID)
     {
+        this.senderID = senderID;
         type = t;
         hasArgs = true;
         isBytes = false;
@@ -141,7 +147,8 @@ public class Message
         arguments.Add(cardID);
     }
 
-    public Message(CardMessageType t, string messageString) {
+    public Message(CardMessageType t, uint senderID, string messageString) {
+        this.senderID = senderID;
         type = t;
         hasArgs = true;
         isBytes = true;

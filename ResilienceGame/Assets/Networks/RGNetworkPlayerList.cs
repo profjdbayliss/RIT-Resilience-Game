@@ -123,7 +123,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             data.AddRange(nameSizeBytes);
             data.AddRange(name);
         }
-        msg = new Message(CardMessageType.StartGame, data);
+        msg = new Message(CardMessageType.StartGame, (uint)localPlayerID, data);
         return (msg);
     }
 
@@ -157,7 +157,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     if (isServer) {
                         // only servers start the game!
                         RGNetworkLongMessage msg = new RGNetworkLongMessage {
-                            playerID = (uint)localPlayerID,
+                            playerID = data.senderID,
                             type = (uint)data.Type,
                             count = (uint)playerIDs.Count,
                             payload = data.byteArguments.ToArray()
@@ -170,7 +170,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.SectorAssignment: {
                     if (isServer) {
                         RGNetworkLongMessage sectorMsg = new RGNetworkLongMessage {
-                            playerID = (uint)localPlayerID,
+                            playerID = data.senderID,
                             type = (uint)data.Type,
                             count = (uint)data.arguments.Count,
                             payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
@@ -185,7 +185,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     // turn taking is handled here because the list of players on 
                     // the network happens here
                     RGNetworkShortMessage msg = new RGNetworkShortMessage {
-                        playerID = (uint)localPlayerID,
+                        playerID = data.senderID,
                         type = (uint)data.Type
                     };
                     Debug.Log("update observer called end phase! ");
@@ -236,7 +236,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     Debug.Log("update observer called increment turn! ");
                     if (isServer) {
                         RGNetworkShortMessage msg = new RGNetworkShortMessage {
-                            playerID = (uint)localPlayerID,
+                            playerID = data.senderID,
                             type = (uint)data.Type
                         };
                         NetworkServer.SendToAll(msg);
@@ -249,7 +249,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     // servers only receive types in separate messages
                     if (!isServer) {
                         RGNetworkLongMessage msg = new RGNetworkLongMessage {
-                            playerID = (uint)localPlayerID,
+                            playerID = data.senderID,
                             type = (uint)data.Type,
                             count = (uint)data.arguments.Count,
                             payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
@@ -273,7 +273,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.ChangeCardID:
             case CardMessageType.MeepleShare: {
                     RGNetworkLongMessage msg = new RGNetworkLongMessage {
-                        playerID = (uint)localPlayerID,
+                        playerID = data.senderID,
                         type = (uint)data.Type,
                         count = (uint)data.arguments.Count,
                         payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
@@ -281,7 +281,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     // Log the message details before sending
                     string argString = string.Join(", ", data.arguments);
                     Debug.Log($"Sending {data.Type} message:" +
-                        $"\nPlayer ID: {localPlayerID}" +
+                        $"\nPlayer ID: {data.senderID}" +
                         $"\nArgument Count: {data.arguments.Count}" +
                         $"\nArguments: {argString}" +
                         $"\nPayload size: {msg.payload.Count} bytes");
@@ -300,7 +300,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 break;
             case CardMessageType.EndGame: {
                     RGNetworkShortMessage msg = new RGNetworkShortMessage {
-                        playerID = (uint)localPlayerID,
+                        playerID = data.senderID,
                         type = (uint)data.Type
                     };
                     if (isServer) {
@@ -342,7 +342,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 case CardMessageType.EndGame: {
                         if (!manager.HasReceivedEndGame()) {
                             manager.SetReceivedEndGame(true);
-                            manager.AddMessage(new Message(CardMessageType.EndGame));
+                            manager.AddMessage(new Message(CardMessageType.EndGame, (uint)localPlayerID));
                             manager.ShowEndGameCanvas();
                             Debug.Log("received end game message and will now end game on server");
                         }
@@ -357,7 +357,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
     public void SendStringToClients(string stringMsg) {
         if (isServer) {
-            Message msg = new Message(CardMessageType.LogAction, stringMsg);
+            Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
             RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
                 playerID = (uint)localPlayerID,
                 type = (uint)msg.Type,
@@ -372,7 +372,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
     public void SendStringToServer(string stringMsg) {
         if (!isServer) {
-            Message msg = new Message(CardMessageType.LogAction, stringMsg);
+            Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
             RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
                 playerID = (uint)localPlayerID,
                 type = (uint)msg.Type,
@@ -411,7 +411,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
 
         // Create a new message with this data
-        Message msg = new Message(CardMessageType.SendSectorData, sectorData);
+        Message msg = new Message(CardMessageType.SendSectorData, (uint)localPlayerID, sectorData);
         RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
             playerID = (uint)playerID,
             type = (uint)msg.Type,
@@ -493,7 +493,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.EndGame: {
                     if (!manager.HasReceivedEndGame()) {
                         manager.SetReceivedEndGame(true);
-                        manager.AddMessage(new Message(CardMessageType.EndGame));
+                        manager.AddMessage(new Message(CardMessageType.EndGame, (uint)localPlayerID));
                         manager.ShowEndGameCanvas();
                         Debug.Log("received end game message and will now end game on server");
                     }
@@ -650,7 +650,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             UniqueID = uniqueId,
                             CardID = cardId,
                         };
-                        Debug.Log("client received draw card message from opponent containing playerID : " + uniqueId + " and card uid: " + uniqueId + " for game phase " + gamePhase);
+                        Debug.Log("client received draw card message from opponent containing playerID : " + msg.playerID + " and card uid: " + uniqueId + " for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
@@ -692,7 +692,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             sectorPlayedOn = (SectorType)sectorType,
                             FacilityPlayedOnType = (FacilityType)facilityType,
                         };
-                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
@@ -728,7 +728,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
                         };
-                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
@@ -749,7 +749,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             CardID = cardId,
                             Amount = amount,
                         };
-                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }

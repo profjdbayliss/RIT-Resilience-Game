@@ -37,31 +37,31 @@ public class WhiteCardPlayer : CardPlayer {
         DrawCardsToFillHand(false);
     }
 
-    public void PlayCard() {
+    public void PlayCard(Card card = null) {
         Debug.Log($"White player is playing a card");
 
-        var card = GetRandomPlayableCard(positive: true);
-        HandCards.Remove(card.UniqueID);
-        if (card) {
-            Debug.Log("White player is playing card: " + card.data.name);
-            card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
+        var _card = card != null ? card : GetRandomPlayableCard(positive: true);
+        HandCards.Remove(_card.UniqueID);
+        if (_card) {
+            Debug.Log("White player is playing card: " + _card.data.name);
+            _card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
 
             EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, 
-                card.data.cardID,
-                card.UniqueID);
+                _card.data.cardID,
+                _card.UniqueID);
 
             StartCoroutine(
-                moveToPositionAndScale(
-                    card: card.GetComponent<RectTransform>(),
+                MoveToPositionAndScale(
+                    card: _card.GetComponent<RectTransform>(),
                     targetPos: new Vector2(0, 0),
                     onComplete: () => {
                         StartCoroutine(
-                            moveToPositionAndScale(
-                                card: card.GetComponent<RectTransform>(),
+                            MoveToPositionAndScale(
+                                card: _card.GetComponent<RectTransform>(),
                                 targetPos: UserInterface.Instance.discardPile.anchoredPosition,
                                 onComplete: () => {
-                                    card.Play(this);
-                                    Destroy(card.gameObject);
+                                    _card.Play(this);
+                                    Destroy(_card.gameObject);
                                 },
                                 duration: 1f,
                                 scaleUpAmt: .01f));
@@ -73,7 +73,7 @@ public class WhiteCardPlayer : CardPlayer {
         }
 
     }
-    private IEnumerator moveToPositionAndScale(RectTransform card, Vector2 targetPos, Action onComplete, float duration, float scaleUpAmt) {
+    private IEnumerator MoveToPositionAndScale(RectTransform card, Vector2 targetPos, Action onComplete, float duration, float scaleUpAmt) {
 
         var startingPos = card.anchoredPosition;
         var endingPos = targetPos;
@@ -106,6 +106,12 @@ public class WhiteCardPlayer : CardPlayer {
         else {
             float f = (2f * t) - 2f;
             return 0.5f * f * f * f + 1f;
+        }
+    }
+    public void HandleNetworkUpdate(Update update, GamePhase phase) {
+        if (HandCards.TryGetValue(update.UniqueID, out GameObject cardgo)) {
+            Card card  = cardgo.GetComponent<Card>();
+            PlayCard(card);
         }
     }
 
