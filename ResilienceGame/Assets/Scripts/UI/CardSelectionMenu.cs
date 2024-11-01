@@ -30,23 +30,26 @@ public class CardSelectionMenu : MonoBehaviour {
             TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
             //buttonText.text = card.front.title;
             buttonText.text = card.data.name;
-            switch(card.DeckName.ToLower().Trim())
+            var button = newButton.GetComponent<Button>();
+            switch (card.DeckName.ToLower().Trim())
             {
                 case "blue":
                     newButton.GetComponent<Image>().color = blueButtonColor;
+                    // Assign the card to be drawn when the button is clicked
+                    button.onClick.AddListener(() => OnCardButtonPressed(card));
                     break;
                 case "red":
                     newButton.GetComponent<Image>().color = redButtonColor;
+                    button.onClick.AddListener(() => OnCardButtonPressed(card));
                     break;
                 case "white;positive":
                 case "white;negative":
+                    button.onClick.AddListener(() => GameManager.Instance.DebugHandleWhiteCardPress(card));
                     newButton.GetComponent<Image>().color = Color.white;
                     break;
             }
             //newButton.GetComponent<Image>().color = card.DeckName.ToLower().Trim() == "blue" ? blueButtonColor : redButtonColor;
-            // Assign the card to be drawn when the button is clicked
-            var button = newButton.GetComponent<Button>();
-            button.onClick.AddListener(() => OnCardButtonPressed(card));
+            
         }
     }
 

@@ -504,6 +504,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Debug Logging
+    public void DebugHandleWhiteCardPress(Card card) {
+        whitePlayer.DebugPlayCard(card);
+    }
     private void HandleDebugLogInput() {
         if (Keyboard.current.f1Key.wasPressedThisFrame) {
             Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
@@ -512,6 +515,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             foreach (var kvp in playerDictionary) {
                 kvp.Value.LogPlayerInfo();
             }
+            whitePlayer.LogPlayerInfo();
         }
         if (Keyboard.current.f9Key.wasPressedThisFrame) {
             Debug.Log($"Player has {actualPlayer.mUpdatesThisPhase.Count} updates in queue:");

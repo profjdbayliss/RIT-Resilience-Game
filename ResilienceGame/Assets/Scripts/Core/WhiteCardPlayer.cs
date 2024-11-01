@@ -28,16 +28,32 @@ public class WhiteCardPlayer : CardPlayer {
         foreach (Card card in cards.Values) {
             if (card != null && card.DeckName.Contains("white")) {
                 //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
-                for (int j = 0; j < card.data.numberInDeck; j++) {
+                //for (int j = 0; j < card.data.numberInDeck; j++) {
                     DeckIDs.Add(card.data.cardID);
-                }
+               // }
             }
         }
+
+        
         //  Debug.Log("white deck count is: " + DeckIDs.Count);
         DrawCardsToFillHand(false);
+
+
+        //no idea why the cards were in a different order??
+
+        var cardList = HandCards.Values.Select(x => x.GetComponent<Card>()).ToList();
+        cardList.Sort((card1, card2) => card1.data.name.CompareTo(card2.data.name));
+
+        HandCards.Clear();
+        for (int i = 0; i < cardList.Count; i++) {
+            cardList[i].UniqueID = i;
+            HandCards.Add(i, cardList[i].gameObject);
+        }
+
+
     }
 
-    public void PlayCard(Card card = null) {
+    public void PlayCard(Card card = null, bool sendUpdate = true) {
         Debug.Log($"White player is playing a card");
 
         var _card = card != null ? card : GetRandomPlayableCard(positive: true);
@@ -46,9 +62,13 @@ public class WhiteCardPlayer : CardPlayer {
             Debug.Log("White player is playing card: " + _card.data.name);
             _card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
 
-            EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, 
+
+            if (sendUpdate) {
+                EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate,
                 _card.data.cardID,
                 _card.UniqueID);
+            }
+
 
             StartCoroutine(
                 MoveToPositionAndScale(
@@ -73,6 +93,13 @@ public class WhiteCardPlayer : CardPlayer {
         }
 
     }
+    public void DebugPlayCard(Card card) {
+        PlayCard(
+            HandCards.Values
+            .Select(c => c.GetComponent<Card>())
+            .FirstOrDefault(c => c.data.cardID == card.data.cardID),
+            true);
+    }
     private IEnumerator MoveToPositionAndScale(RectTransform card, Vector2 targetPos, Action onComplete, float duration, float scaleUpAmt) {
 
         var startingPos = card.anchoredPosition;
@@ -91,7 +118,7 @@ public class WhiteCardPlayer : CardPlayer {
             card.localScale = Vector3.Lerp(currentScale, endScale, t);
             yield return null;
         }
-        
+
         card.anchoredPosition = endingPos;
         card.localScale = endScale;
 
@@ -110,8 +137,8 @@ public class WhiteCardPlayer : CardPlayer {
     }
     public void HandleNetworkUpdate(Update update, GamePhase phase) {
         if (HandCards.TryGetValue(update.UniqueID, out GameObject cardgo)) {
-            Card card  = cardgo.GetComponent<Card>();
-            PlayCard(card);
+            Card card = cardgo.GetComponent<Card>();
+            PlayCard(card, false);
         }
     }
 
@@ -140,7 +167,7 @@ public class WhiteCardPlayer : CardPlayer {
                 cardDrawn = DrawCard(
                     random: true,
                     cardId: 0,
-                    uniqueId: i,
+                    uniqueId: -1,
                     deckToDrawFrom: ref DeckIDs,
                     dropZone: handParent.gameObject,
                     allowSlippy: false,
@@ -149,6 +176,9 @@ public class WhiteCardPlayer : CardPlayer {
                 cardsDrawn?.Add(cardDrawn);
             }
         }
+        
+        
+        
     }
     protected override Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy, ref Dictionary<int, GameObject> activeDeck, bool sendUpdate = false) {
