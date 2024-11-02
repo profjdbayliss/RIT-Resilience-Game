@@ -69,7 +69,7 @@ public class WhiteCardPlayer : CardPlayer {
                 _card.UniqueID);
             }
 
-
+            card.transform.localScale = new Vector3(.5f, .5f, .5f);
             StartCoroutine(
                 MoveToPositionAndScale(
                     card: _card.GetComponent<RectTransform>(),
