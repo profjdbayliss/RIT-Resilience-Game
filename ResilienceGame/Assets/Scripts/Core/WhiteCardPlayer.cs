@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 public class WhiteCardPlayer : CardPlayer {
 
     [SerializeField] private RectTransform handParent;
+    public int DiceRoll { get; private set; }
 
     // Start is called before the first frame update
     public override void Start() {
@@ -62,12 +63,15 @@ public class WhiteCardPlayer : CardPlayer {
             Debug.Log("White player is playing card: " + _card.data.name);
             _card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
 
+            DiceRoll = UnityEngine.Random.Range(1, 7);
 
             if (sendUpdate) {
                 EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate,
                 _card.data.cardID,
-                _card.UniqueID);
+                _card.UniqueID,
+                Amount: DiceRoll);
             }
+            
 
             card.transform.localScale = new Vector3(.5f, .5f, .5f);
             StartCoroutine(
@@ -138,6 +142,9 @@ public class WhiteCardPlayer : CardPlayer {
     public void HandleNetworkUpdate(Update update, GamePhase phase) {
         if (HandCards.TryGetValue(update.UniqueID, out GameObject cardgo)) {
             Card card = cardgo.GetComponent<Card>();
+            if (update.Amount > 0) {
+                DiceRoll = update.Amount;
+            }
             PlayCard(card, false);
         }
     }

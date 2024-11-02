@@ -403,38 +403,31 @@ public class UserInterface : MonoBehaviour {
     }
     private IEnumerator RollingAnimation(int finalFace) {
         float elapsedTime = 0f;
-        int previousFace = -1; // Track the previous face to avoid repeats
+        int previousFace = -1;
 
-        yield return new WaitForSeconds(0.2f); // Slight pause before starting roll
+        yield return new WaitForSeconds(0.2f);
 
         while (elapsedTime < rollDuration) {
-            // Calculate the eased wait time for faster rolling
-            float progress = elapsedTime / rollDuration; // Normalized time (0 to 1)
-            float easedProgress = EasingFunction(progress); // Apply easing function
+            float progress = elapsedTime / rollDuration;
+            float easedProgress = EasingFunction(progress);
 
-            // Control the speed of the face change more aggressively
-            float waitTime = Mathf.Lerp(0.005f, 0.001f, easedProgress); // Faster at mid-roll
+            float waitTime = Mathf.Lerp(0.005f, 0.001f, easedProgress);
 
-            // Get a random face, ensuring it's not the same as the previous one
             int randomFace;
             do {
                 randomFace = UnityEngine.Random.Range(1, 7);
             } while (randomFace == previousFace);
             previousFace = randomFace;
 
-            // Set the random face on the dice
             diceAnimator.SetInteger("FaceIndex", randomFace);
 
-            // Wait based on the dynamically calculated timing
             yield return new WaitForSeconds(waitTime);
 
-            // Increment elapsed time
             elapsedTime += waitTime;
         }
 
-        // Set the final face to settle on
         diceAnimator.SetInteger("FaceIndex", finalFace);
-        yield return new WaitForSeconds(5f); // Pause on the final face
+        yield return new WaitForSeconds(5f);
         HideDiceRollingPanel();
     }
 

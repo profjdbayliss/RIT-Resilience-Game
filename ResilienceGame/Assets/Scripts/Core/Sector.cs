@@ -608,6 +608,9 @@ public class Sector : MonoBehaviour {
 
         }
     }
+    public void SectorRollDie() {
+
+    }
     #endregion
 
     #region Simulation

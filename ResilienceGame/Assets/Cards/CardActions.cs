@@ -56,8 +56,8 @@ public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         // PlayerTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
         facilityActedUpon.AddRemoveEffectsByIdString(
-            card.data.effectString, 
-            true, 
+            card.data.effectString,
+            true,
             player.playerTeam,
             player.NetID,
             (card.data.duration != 0 ? card.data.duration : -1));
@@ -126,7 +126,7 @@ public class RemoveEffect : ICardAction {
 
 public class SpreadEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        
+
         if (facilityActedUpon != null) {
             facilityActedUpon.AddEffectToConnectedSectors(card.data.effectString, player.playerTeam, player.NetID);
         }
@@ -180,8 +180,8 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                             effectTypeToRemove = effectsToRemove[0].EffectType;
                         }
                         facility.AddRemoveEffectsByIdString(
-                            idString: card.data.effectString, 
-                            isAdding: true, 
+                            idString: card.data.effectString,
+                            isAdding: true,
                             team: player.playerTeam,
                             createdById: player.NetID);
 
@@ -266,56 +266,45 @@ public class ReduceTurnsLeftByBackdoor : ICardAction {
     }
 }
 
-public class TemporaryReductionOfTurnsLeft : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+public class TemporaryReductionOfTurnsLeft : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         GameManager.Instance.bluffTurnCheck = card.data.duration;
         GameManager.Instance.HandleBluffStart(card.data.duration);
         Debug.Log("Played Hard Bluff");
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
 
-public class CancelTemporaryReductionOfTurns : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
-        if (GameManager.Instance.IsBluffActive)
-        {
+public class CancelTemporaryReductionOfTurns : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        if (GameManager.Instance.IsBluffActive) {
             GameManager.Instance.BluffCountdown(-1);
         }
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
 
-public class BackdoorCheckNetworkRestore : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
-        if(facilityActedUpon.HasEffectOfType(FacilityEffectType.Backdoor))
-        {
+public class BackdoorCheckNetworkRestore : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        if (facilityActedUpon.HasEffectOfType(FacilityEffectType.Backdoor)) {
             Debug.Log(card.front.title + " played. Turns removed: " + card.data.facilityAmount);
             GameManager.Instance.ChangeRoundsLeft(-card.data.facilityAmount);
             if (facilityActedUpon.TryRemoveEffectByType(FacilityEffectType.Backdoor, player.NetID))
                 Debug.Log($"Backdoor on {facilityActedUpon.facilityName} removed");
             else Debug.Log($"Backdoor unable to be removed on {facilityActedUpon.facilityName} for some reason");
         }
-        else
-        {
+        else {
             facilityActedUpon.AddRemoveEffectsByIdString(
-                card.data.effectString, 
-                true, 
+                card.data.effectString,
+                true,
                 player.playerTeam,
                 player.NetID,
                 (card.data.duration != 0 ? card.data.duration : -1));
@@ -323,24 +312,19 @@ public class BackdoorCheckNetworkRestore : ICardAction
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
 
-public class ConvertFortifyToBackdoor : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+public class ConvertFortifyToBackdoor : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Sector sectorActedUpon = facilityActedUpon.sectorItsAPartOf;
-        foreach(Facility facility in sectorActedUpon.facilities)
-        {
+        foreach (Facility facility in sectorActedUpon.facilities) {
             //if it has fortify then it removes it and returns true, which i can detect and add backdoor
-            if(facility.TryRemoveEffectByType(FacilityEffectType.Fortify, player.NetID))
-            {
-                facility.AddRemoveEffectsByIdString(card.data.effectString, 
-                                                    true, 
+            if (facility.TryRemoveEffectByType(FacilityEffectType.Fortify, player.NetID)) {
+                facility.AddRemoveEffectsByIdString(card.data.effectString,
+                                                    true,
                                                     player.playerTeam,
                                                     player.NetID,
                                                     duration: (card.data.duration != 0 ? card.data.duration : -1));
@@ -349,38 +333,31 @@ public class ConvertFortifyToBackdoor : ICardAction
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
 
-public class IncreaseTurnsDuringPeace : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+public class IncreaseTurnsDuringPeace : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         GameManager.Instance.IsRedLayingLow = true;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
 
-public class IncColorlessMeeplesRoundReduction : ICardAction
-{
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+public class IncColorlessMeeplesRoundReduction : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         GameManager.Instance.IsRedAggressive = true;
         player.IncMaxColorlessMeeples((int)card.data.meepleAmount);
         GameManager.Instance.aggressionTurnCheck = card.data.duration;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
-    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card)
-    {
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
@@ -564,27 +541,31 @@ public class NWShuffleFromDiscard : ICardAction {
 /// Changes physical points across all sectors if they fail a dice roll
 /// </summary>
 public class NWChangePhysPointsDice : ICardAction {
-    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    CardPlayer playerInstance;
-    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
-    //        playerInstance = GameManager.Instance.actualPlayer;
-    //    else playerInstance = GameManager.Instance.opponentPlayer;
-    //    int diceRoll = UnityEngine.Random.Range(1, 6);
-    //    if (diceRoll < card.data.minDiceRoll) {
-    //        Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-    //        foreach (Facility facility in playerInstance.PlayerSector.facilities) {
-    //            facility.ChangeFacilityPoints(FacilityEffectTarget.Physical, card.data.facilityAmount);
-    //        }
-    //    }
-    //    else {
-    //        Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-    //    }
-    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
+        Debug.Log("Sector rolled a " + diceRoll);
+        if (diceRoll < card.data.minDiceRoll) {
 
-    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
+            var sector1 = GameManager.Instance.AllSectors[SectorType.Water];
+            var sector2 = GameManager.Instance.AllSectors[SectorType.Healthcare];
+
+            if (!sector1.IsSimulated)
+                sector1.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+
+            if (!sector2.IsSimulated)
+                sector2.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+
+            
+        }
+        else {
+            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+        }
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
 }
 
 /// <summary>
@@ -664,7 +645,7 @@ public class NWChangeMeepleAmtDice : ICardAction {
     //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     //}
 }
-    
+
 
 
 
