@@ -78,6 +78,11 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private List<PlayerPopupMenuItem> playerMenuItems;
     private List<Image> sectorXIcons = new List<Image>();
 
+    [Header("Dice Rolling")]
+    [SerializeField] private GameObject diceRollingPanel;
+    [SerializeField] private TextMeshProUGUI diceCardEffectText;
+    [SerializeField] private Animator diceAnimator;
+    public float rollDuration = 4f;
 
     [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
@@ -375,5 +380,69 @@ public class UserInterface : MonoBehaviour {
     public void HideEndGameCanvas() {
         endGameCanvas.SetActive(false);
     }
+    public void DebugToggleDiceRollPanel() {
+        if (diceRollingPanel.activeSelf) {
+            HideDiceRollingPanel();
+        }
+        else {
+            ShowDiceRollingPanel("Test Effect", UnityEngine.Random.Range(1, 7));
+        }
+    }
+
+
+    public void ShowDiceRollingPanel(string effect, int roll) {
+        diceCardEffectText.text = effect;
+        diceRollingPanel.SetActive(true);
+        RollDie(roll);
+    }
+    public void HideDiceRollingPanel() {
+        diceRollingPanel.SetActive(false);
+    }
+    private void RollDie(int roll) {
+        StartCoroutine(RollingAnimation(roll));
+    }
+    private IEnumerator RollingAnimation(int finalFace) {
+        float elapsedTime = 0f;
+        int previousFace = -1; // Track the previous face to avoid repeats
+
+        yield return new WaitForSeconds(0.2f); // Slight pause before starting roll
+
+        while (elapsedTime < rollDuration) {
+            // Calculate the eased wait time for faster rolling
+            float progress = elapsedTime / rollDuration; // Normalized time (0 to 1)
+            float easedProgress = EasingFunction(progress); // Apply easing function
+
+            // Control the speed of the face change more aggressively
+            float waitTime = Mathf.Lerp(0.005f, 0.001f, easedProgress); // Faster at mid-roll
+
+            // Get a random face, ensuring it's not the same as the previous one
+            int randomFace;
+            do {
+                randomFace = UnityEngine.Random.Range(1, 7);
+            } while (randomFace == previousFace);
+            previousFace = randomFace;
+
+            // Set the random face on the dice
+            diceAnimator.SetInteger("FaceIndex", randomFace);
+
+            // Wait based on the dynamically calculated timing
+            yield return new WaitForSeconds(waitTime);
+
+            // Increment elapsed time
+            elapsedTime += waitTime;
+        }
+
+        // Set the final face to settle on
+        diceAnimator.SetInteger("FaceIndex", finalFace);
+        yield return new WaitForSeconds(5f); // Pause on the final face
+        HideDiceRollingPanel();
+    }
+
+    // Easing function to create acceleration and deceleration
+    private float EasingFunction(float t) {
+        // Ease in-out cubic
+        return t < 0.5f ? 8 * t * t * t : 1 - Mathf.Pow(-2 * t + 2, 3) / 2;
+    }
+
 
 }
