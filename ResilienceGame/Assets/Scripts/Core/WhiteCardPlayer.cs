@@ -54,6 +54,7 @@ public class WhiteCardPlayer : CardPlayer {
 
     }
 
+    //handles the playing of a card both on the network and locally
     public void PlayCard(Card card = null, bool sendUpdate = true) {
         Debug.Log($"White player is playing a card");
 
@@ -63,14 +64,16 @@ public class WhiteCardPlayer : CardPlayer {
             Debug.Log("White player is playing card: " + _card.data.name);
             _card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
 
-            DiceRoll = UnityEngine.Random.Range(1, 7);
-
+            //if we are sending an update, include a dice roll with the update to be used everywhere
             if (sendUpdate) {
+                DiceRoll = UnityEngine.Random.Range(1, 7);
+                Debug.Log($"$$Creating White Card play with DiceRoll: {DiceRoll}");
                 EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate,
                 _card.data.cardID,
                 _card.UniqueID,
                 Amount: DiceRoll);
             }
+           
             
 
             card.transform.localScale = new Vector3(.5f, .5f, .5f);
@@ -144,6 +147,11 @@ public class WhiteCardPlayer : CardPlayer {
             Card card = cardgo.GetComponent<Card>();
             if (update.Amount > 0) {
                 DiceRoll = update.Amount;
+                Debug.Log($"$$Setting Dice Roll to {DiceRoll} from network update");
+                
+            }
+            else {
+                Debug.LogWarning($"$$No dice roll found in network update");
             }
             PlayCard(card, false);
         }

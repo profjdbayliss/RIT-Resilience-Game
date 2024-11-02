@@ -81,8 +81,12 @@ public class UserInterface : MonoBehaviour {
     [Header("Dice Rolling")]
     [SerializeField] private GameObject diceRollingPanel;
     [SerializeField] private TextMeshProUGUI diceCardEffectText;
-    [SerializeField] private Animator diceAnimator;
-    public float rollDuration = 4f;
+    [SerializeField] private TextMeshProUGUI dicePassFailText;
+    [SerializeField] private Sprite[] dieFaces;
+    [SerializeField] private Image die;
+    [SerializeField] private float rollDuration = 4.5f;
+    [SerializeField] private float minRollTime = 0.1f;
+    [SerializeField] private float maxRollTime = 0.5f;
 
     [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
@@ -385,57 +389,83 @@ public class UserInterface : MonoBehaviour {
             HideDiceRollingPanel();
         }
         else {
-            ShowDiceRollingPanel("Test Effect", UnityEngine.Random.Range(1, 7));
+            var roll = UnityEngine.Random.Range(1, 7);
+            Debug.Log($"Debug Rolling Die with roll: {3}");
+            ShowDiceRollingPanel("Test Effect", 3, 0, () => Debug.Log($"DEBUG On Dice Roll Complete"));
         }
     }
 
 
-    public void ShowDiceRollingPanel(string effect, int roll) {
+    public void ShowDiceRollingPanel(string effect, int roll, int rollReq, Action onDiceRolled) {
+        DisplayPassFailText(false);
         diceCardEffectText.text = effect;
         diceRollingPanel.SetActive(true);
-        RollDie(roll);
+        RollDie(roll, onDiceRolled, rollReq);
     }
     public void HideDiceRollingPanel() {
         diceRollingPanel.SetActive(false);
     }
-    private void RollDie(int roll) {
-        StartCoroutine(RollingAnimation(roll));
+    private void RollDie(int roll, Action onDiceRolled, int rollReq) {
+        StartCoroutine(RollingAnimation(roll, onDiceRolled, rollReq));
     }
-    private IEnumerator RollingAnimation(int finalFace) {
+    private IEnumerator RollingAnimation(int finalFace, Action onDiceRolled, int rollReq) {
         float elapsedTime = 0f;
         int previousFace = -1;
 
         yield return new WaitForSeconds(0.2f);
 
+        // Randomized face changes to simulate rolling
         while (elapsedTime < rollDuration) {
             float progress = elapsedTime / rollDuration;
             float easedProgress = EasingFunction(progress);
-
-            float waitTime = Mathf.Lerp(0.005f, 0.001f, easedProgress);
+            float waitTime = Mathf.Lerp(maxRollTime, minRollTime, easedProgress);
 
             int randomFace;
             do {
                 randomFace = UnityEngine.Random.Range(1, 7);
-            } while (randomFace == previousFace);
+            } while (randomFace == previousFace); // Ensure it's different from the previous face
             previousFace = randomFace;
 
-            diceAnimator.SetInteger("FaceIndex", randomFace);
+            // Set the sprite to the random face
+            die.sprite = dieFaces[randomFace - 1]; // Subtract 1 because array is 0-indexed
 
             yield return new WaitForSeconds(waitTime);
 
             elapsedTime += waitTime;
         }
 
-        diceAnimator.SetInteger("FaceIndex", finalFace);
-        yield return new WaitForSeconds(5f);
+        // Set the final face
+        Debug.Log($"Set final face to {finalFace}");
+        die.sprite = dieFaces[finalFace - 1]; // Set to the final face
+        DisplayPassFailText(true, finalFace, rollReq);
+        yield return new WaitForSeconds(3f);
+        onDiceRolled?.Invoke();
+        
         HideDiceRollingPanel();
     }
 
+
     // Easing function to create acceleration and deceleration
     private float EasingFunction(float t) {
-        // Ease in-out cubic
-        return t < 0.5f ? 8 * t * t * t : 1 - Mathf.Pow(-2 * t + 2, 3) / 2;
+        return 1 - Mathf.Pow(1 - t, 5);
     }
+    public void DisplayPassFailText(bool enable = true, int roll = 0, int req = 0) {
+        if (enable) {
+            if (roll >= req) {
+                dicePassFailText.text = "Saved";
+                dicePassFailText.color = Color.green;
+            }
+            else {
+                dicePassFailText.text = "Fail";
+                dicePassFailText.color = Color.red;
+            }
+        }
+        else {
+            dicePassFailText.text = "";
+        }
+        
+    }
+
 
 
 }

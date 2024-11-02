@@ -685,12 +685,16 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int facilityType = GetIntFromByteArray(element, msg.payload);
                         element += 4;
+                        int facilityEffectToRemoveType = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int amount = GetIntFromByteArray(element, msg.payload);
                         Update update = new Update {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
                             CardID = cardId,
                             sectorPlayedOn = (SectorType)sectorType,
                             FacilityPlayedOnType = (FacilityType)facilityType,
+                            Amount = amount,
                         };
                         Debug.Log("client received update message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + "for game phase " + gamePhase);
 

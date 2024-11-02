@@ -185,6 +185,8 @@ public class FacilityEffectManager : MonoBehaviour {
 
     }
     public void CheckForScoring(FacilityEffect effect, bool isAdding, int createdById) {
+        if (!GameManager.Instance.playerDictionary.ContainsKey(createdById)) return;
+
         if (isAdding) {
             if (effect.IsRestoreEffect) {
                 //restore points to a core sector
@@ -248,6 +250,8 @@ public class FacilityEffectManager : MonoBehaviour {
 
 
     public bool CheckForTrapEffects(int createdById) {
+        if (!GameManager.Instance.playerDictionary.ContainsKey(createdById)) return false;
+
         Debug.Log($"Checking for trap effects that would trigger from {createdById}'s card play");
         List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
         List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();

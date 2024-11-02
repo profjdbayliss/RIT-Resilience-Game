@@ -543,23 +543,36 @@ public class NWShuffleFromDiscard : ICardAction {
 public class NWChangePhysPointsDice : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
-        Debug.Log("Sector rolled a " + diceRoll);
-        if (diceRoll < card.data.minDiceRoll) {
+        Debug.Log("$$Sector rolled a " + diceRoll);
 
-            var sector1 = GameManager.Instance.AllSectors[SectorType.Water];
-            var sector2 = GameManager.Instance.AllSectors[SectorType.Healthcare];
+        UserInterface.Instance.ShowDiceRollingPanel(
+            card.front.description,
+            diceRoll,
+            card.data.minDiceRoll,
+            () => {
+                if (diceRoll < card.data.minDiceRoll) {
 
-            if (!sector1.IsSimulated)
-                sector1.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                    var sector1 = GameManager.Instance.AllSectors[SectorType.Water];
+                    var sector2 = GameManager.Instance.AllSectors[SectorType.Healthcare];
 
-            if (!sector2.IsSimulated)
-                sector2.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                    if (!sector1.IsSimulated)
+                        sector1.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
 
-            
-        }
-        else {
-            Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-        }
+                    if (!sector2.IsSimulated)
+                        sector2.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                    //GameManager.Instance.AllSectors.Values.ToList().ForEach(
+                    //    sector => {
+                    //        if (!sector.IsSimulated)
+                    //            sector.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                    //    });
+
+
+                }
+                else {
+                    Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
+                }
+            });
+        
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

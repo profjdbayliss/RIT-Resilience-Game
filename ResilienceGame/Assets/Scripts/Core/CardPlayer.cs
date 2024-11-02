@@ -1871,6 +1871,9 @@ public class CardPlayer : MonoBehaviour {
             playsForMessage.Add((int)update.sectorPlayedOn);
             playsForMessage.Add((int)update.FacilityPlayedOnType);
             playsForMessage.Add((int)update.FacilityEffectToRemoveType);
+            if (update.Type == CardMessageType.CardUpdate) {
+                playsForMessage.Add(update.Amount);
+            }
             if (update.Type == CardMessageType.ReduceCost) {
                 playsForMessage.Add(update.Amount);
                 sb.AppendLine($"Amount:{update.Amount}");

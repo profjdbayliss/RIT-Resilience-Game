@@ -181,9 +181,13 @@ public class ScoreManager {
     #endregion
 
     private void AddPlayerScore(int playerId, int points) {
+        if (!GameManager.Instance.playerDictionary.ContainsKey(playerId)) {
+            return;
+        }
         if (!playerScores.ContainsKey(playerId)) {
             playerScores[playerId] = 0;
         }
+
         Debug.Log($"_score_ Adding {points} to {GameManager.Instance.playerDictionary[playerId].playerName}");
         playerScores[playerId] += points;
     }
