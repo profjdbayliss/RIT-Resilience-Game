@@ -29,9 +29,9 @@ public class WhiteCardPlayer : CardPlayer {
         foreach (Card card in cards.Values) {
             if (card != null && card.DeckName.Contains("white")) {
                 //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
-                //for (int j = 0; j < card.data.numberInDeck; j++) {
+                for (int j = 0; j < card.data.numberInDeck; j++) {
                     DeckIDs.Add(card.data.cardID);
-               // }
+                }
             }
         }
 

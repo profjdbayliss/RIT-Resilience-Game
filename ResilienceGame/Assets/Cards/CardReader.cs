@@ -236,8 +236,8 @@ public class CardReader : MonoBehaviour {
                                 case "NWShuffleFromDiscard":
                                     tempCard.ActionList.Add(new NWShuffleFromDiscard());
                                     break;
-                                case "NWChangePhysPointsDice":
-                                    tempCard.ActionList.Add(new NWChangePhysPointsDice());
+                                case "ChangeAllFacPointsBySectorType":
+                                    tempCard.ActionList.Add(new ChangeAllFacPointsBySectorType());
                                     break;
                                 case "NWChangeFinPointsDice":
                                     tempCard.ActionList.Add(new NWChangeFinPointsDice());
@@ -278,10 +278,12 @@ public class CardReader : MonoBehaviour {
 
                         // 4: is this card only played on a specific player type?
                         string[] onlyPlayedOn = individualCSVObjects[4].Trim().Split(';');
-                        tempCard.data.onlyPlayedOn = new SectorType[4];
+                        tempCard.data.onlyPlayedOn = new List<SectorType>();
                         for (int j = 0; j < onlyPlayedOn.Length; j++) {
                             // TODO: Better to do string[] then TryParse when checking sector being played on?
-                            if (Enum.TryParse(onlyPlayedOn[j], out SectorType sector)) { tempCard.data.onlyPlayedOn[j] = sector; }
+                            if (Enum.TryParse(onlyPlayedOn[j], out SectorType sector)) { 
+                                tempCard.data.onlyPlayedOn.Add(sector); 
+                            }
                             else { Debug.Log("Parse failed"); }
                         }
 

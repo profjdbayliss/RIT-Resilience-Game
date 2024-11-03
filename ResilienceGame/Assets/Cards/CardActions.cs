@@ -540,10 +540,10 @@ public class NWShuffleFromDiscard : ICardAction {
 /// <summary>
 /// Changes physical points across all sectors if they fail a dice roll
 /// </summary>
-public class NWChangePhysPointsDice : ICardAction {
+public class ChangeAllFacPointsBySectorType : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
-        Debug.Log("$$Sector rolled a " + diceRoll);
+       // Debug.Log("$$Sector rolled a " + diceRoll);
 
         UserInterface.Instance.ShowDiceRollingPanel(
             card.front.description,
@@ -551,20 +551,32 @@ public class NWChangePhysPointsDice : ICardAction {
             card.data.minDiceRoll,
             () => {
                 if (diceRoll < card.data.minDiceRoll) {
+                    
+                    foreach (var sectorType in card.data.onlyPlayedOn) {
+                       // Debug.Log($"sector type: {sectorType}");
+                        if (GameManager.Instance.AllSectors.TryGetValue(sectorType, out Sector sector)) {
+                          //  Debug.Log($"Looking at sector: {sector.sectorName} for {card.data.name}");
+                            if (!sector.IsSimulated)
+                                sector.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                        }
 
-                    var sector1 = GameManager.Instance.AllSectors[SectorType.Water];
-                    var sector2 = GameManager.Instance.AllSectors[SectorType.Healthcare];
+                    }
 
-                    if (!sector1.IsSimulated)
-                        sector1.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
 
-                    if (!sector2.IsSimulated)
-                        sector2.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
-                    //GameManager.Instance.AllSectors.Values.ToList().ForEach(
-                    //    sector => {
-                    //        if (!sector.IsSimulated)
-                    //            sector.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
-                    //    });
+
+                    //var sector1 = GameManager.Instance.AllSectors[SectorType.Water];
+                    //var sector2 = GameManager.Instance.AllSectors[SectorType.Healthcare];
+
+                    //if (!sector1.IsSimulated)
+                    //    sector1.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+
+                    //if (!sector2.IsSimulated)
+                    //    sector2.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                    ////GameManager.Instance.AllSectors.Values.ToList().ForEach(
+                    ////    sector => {
+                    ////        if (!sector.IsSimulated)
+                    ////            sector.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
+                    ////    });
 
 
                 }
@@ -572,7 +584,7 @@ public class NWChangePhysPointsDice : ICardAction {
                     Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
                 }
             });
-        
+
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
