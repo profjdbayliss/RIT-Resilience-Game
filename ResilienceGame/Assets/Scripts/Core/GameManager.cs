@@ -726,6 +726,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Helpers
 
+    public List<CardPlayer> GetPlayerByTeam(PlayerTeam team) {
+        return playerDictionary.Values.Where(player => player.playerTeam == team).ToList();
+    }
     public PlayerTeam GetPlayerTeam(int id) {
         try {
             return playerDictionary[id].playerTeam;

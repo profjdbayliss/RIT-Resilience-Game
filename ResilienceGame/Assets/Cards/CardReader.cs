@@ -224,11 +224,11 @@ public class CardReader : MonoBehaviour {
                                     //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                     tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
                                     break;
-                                case "NWMeepleChangeEach":
-                                    tempCard.ActionList.Add(new NWMeepleChangeEach());
+                                case "IncreaseBaseMaxMeeplesRandom":
+                                    tempCard.ActionList.Add(new IncreaseBaseMaxMeeplesRandom());
                                     break;
-                                case "NWMeepleChangeChoice":
-                                    tempCard.ActionList.Add(new NWMeepleChangeChoice());
+                                case "IncreaseBaseMaxMeeples":
+                                    tempCard.ActionList.Add(new IncreaseBaseMaxMeeples());
                                     break;
                                 case "NWIncOvertimeAmount":
                                     tempCard.ActionList.Add(new NWIncOvertimeAmount());

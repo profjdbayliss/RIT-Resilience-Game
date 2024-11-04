@@ -432,71 +432,66 @@ public class ReduceCardCost : ICardAction {
     }
 }
 
+///// <summary>
+///// NW stands for nation wide as this will affect all the sectors. This method intends to
+///// give each sector a give number of meeples of each type
+///// </summary>
+//public class NWMeepleChangeEach : ICardAction {
+//    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+//    //    CardPlayer playerInstance;
+//    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
+//    //        playerInstance = GameManager.Instance.actualPlayer;
+//    //    else playerInstance = GameManager.Instance.opponentPlayer;
+//    //    //at the moment this method doesnt actually handle multiple sectors because
+//    //    //we dont know how to implement multiple sectors yet. that being said this doesnt 
+//    //    //use stuff like facilityactedupon and relies directly upon the game manager singleton
+//    //    foreach (string meepleType in card.data.meepleType) {
+//    //        playerInstance.AddSubtractMeepleAmount(
+//    //            meepleType switch {
+//    //                "Blue" => 0,
+//    //                "Black" => 1,
+//    //                "Purple" => 2,
+//    //                _ => -1
+//    //            },
+//    //        card.data.meepleAmount);
+
+//    //    }
+//    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+//    //}
+
+//    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+//    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+//    //}
+//}
+
+///// <summary>
+///// NW stands for nation wide as this will affect all the sectors. This method intends to
+///// give each sector their choice of a give number of meeples of any given type.
+///// </summary>
+//public class NWMeepleChangeChoice : ICardAction {
+//    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+//        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+//    }
+
+//    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+//        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+//    }
+//}
+
 /// <summary>
-/// NW stands for nation wide as this will affect all the sectors. This method intends to
-/// give each sector a give number of meeples of each type
+/// Nation-wide increase overtime amount
 /// </summary>
-public class NWMeepleChangeEach : ICardAction {
-    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    CardPlayer playerInstance;
-    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
-    //        playerInstance = GameManager.Instance.actualPlayer;
-    //    else playerInstance = GameManager.Instance.opponentPlayer;
-    //    //at the moment this method doesnt actually handle multiple sectors because
-    //    //we dont know how to implement multiple sectors yet. that being said this doesnt 
-    //    //use stuff like facilityactedupon and relies directly upon the game manager singleton
-    //    foreach (string meepleType in card.data.meepleType) {
-    //        playerInstance.AddSubtractMeepleAmount(
-    //            meepleType switch {
-    //                "Blue" => 0,
-    //                "Black" => 1,
-    //                "Purple" => 2,
-    //                _ => -1
-    //            },
-    //        card.data.meepleAmount);
-
-    //    }
-    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
-
-    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
-}
-
-/// <summary>
-/// NW stands for nation wide as this will affect all the sectors. This method intends to
-/// give each sector their choice of a give number of meeples of any given type.
-/// </summary>
-public class NWMeepleChangeChoice : ICardAction {
+public class NWIncOvertimeAmount : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        GameManager.Instance.playerDictionary.Values.ToList().ForEach(player =>
+            player.AddOvertimeCharge()
+        );
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
-}
-
-/// <summary>
-/// Nation-wide increase overtime amount
-/// </summary>
-public class NWIncOvertimeAmount : ICardAction {
-    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    CardPlayer playerInstance;
-    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
-    //        playerInstance = GameManager.Instance.actualPlayer;
-    //    else playerInstance = GameManager.Instance.opponentPlayer;
-    //    //at the moment this method doesnt actually handle multiple sectors because
-    //    //we dont know how to implement multiple sectors yet. that being said this doesnt 
-    //    //use stuff like facilityactedupon and relies directly upon the game manager singleton
-    //    playerInstance.PlayerSector.overTimeCharges++;
-    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
-
-    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
 }
 
 /// <summary>
@@ -656,6 +651,30 @@ public class CheckAllSectorsChangeMeepleAmtMulti : ICardAction {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
+public class IncreaseBaseMaxMeeples : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        Debug.Log("Handling Meeple Change Amount on Dice Roll");
+        GameManager.Instance.GetPlayerByTeam(PlayerTeam.Blue).ForEach(player => player.PermaIncAllMeeplesByOne());
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+//TODO: needs a network update to keep blue players counts updated, cut for now
+public class IncreaseBaseMaxMeeplesRandom : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        Debug.Log("Handling Meeple Change Amount on Dice Roll");
+        GameManager.Instance.GetPlayerByTeam(PlayerTeam.Blue).ForEach(player => player.PermaIncRandomMeepleByFlatAmt((int)card.data.meepleAmtMulti));
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
+
 
 
 

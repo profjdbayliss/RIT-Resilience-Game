@@ -39415,7 +39415,7 @@ MonoBehaviour:
   playerMenuContainer: {fileID: 1600888429}
   playerMenuParent: {fileID: 1325913957}
   overTimeButton: {fileID: 971169862}
-  overTimeChargesText: {fileID: 1498323779}
+  overTimeChargesText: {fileID: 942294319}
   overTimeTurnsLeftText: {fileID: 1498323779}
   overTimeTurnsLabelText: {fileID: 428437793}
   playerDeckText: {fileID: 432820158}

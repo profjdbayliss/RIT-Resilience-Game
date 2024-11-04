@@ -402,6 +402,19 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Meeples
+    public void PermaIncAllMeeplesByOne() {
+        BaseMaxMeeples[0]++;
+        BaseMaxMeeples[1]++;
+        BaseMaxMeeples[2]++;
+        ResetMeepleCount();
+        
+    }
+    public void PermaIncRandomMeepleByFlatAmt(int amt) {
+        int index = UnityEngine.Random.Range(0, 3);
+        BaseMaxMeeples[index] += amt;
+        ResetMeepleCount();
+        
+    }
     public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
         bool spendColorless = false;
         int numMeeplesSpentSoFar = numMeeplesSpent;
@@ -2072,6 +2085,10 @@ public class CardPlayer : MonoBehaviour {
         for (int i = 0; i < 3; i++) {
             SetTempMeeples(i, 0);
         }
+    }
+    public void AddOvertimeCharge() {
+        overTimeCharges++;
+        UserInterface.Instance.UpdateOTChargesText();
     }
 
 
