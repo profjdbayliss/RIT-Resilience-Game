@@ -242,11 +242,8 @@ public class CardReader : MonoBehaviour {
                                 case "ChangeTransFacPointsAllSectors":
                                     tempCard.ActionList.Add(new ChangeTransFacPointsAllSectors());
                                     break;
-                                case "NWChangeFinPointsDice":
-                                    tempCard.ActionList.Add(new NWChangeFinPointsDice());
-                                    break;
                                 case "NWChangeMeepleAmtDice":
-                                    tempCard.ActionList.Add(new NWChangeMeepleAmtDice());
+                                    tempCard.ActionList.Add(new CheckAllSectorsChangeMeepleAmtMulti());
                                     break;
                                 default:
                                     tempCard.data.cardType = CardType.None;
@@ -345,10 +342,10 @@ public class CardReader : MonoBehaviour {
 
                         // 11:  Meeple type changed
                         // TODO: May need enum implemented
-                        tempCard.data.meepleType = individualCSVObjects[11].Trim().Split(';');
+                        tempCard.data.meeplesChanged = individualCSVObjects[11].Trim().Split(';');
 
                         // 12:  Number of Meeples changed
-                        if (individualCSVObjects[12] != "") { tempCard.data.meepleAmount = float.Parse(individualCSVObjects[12].Trim()); }
+                        if (individualCSVObjects[12] != "") { tempCard.data.meepleAmtMulti = float.Parse(individualCSVObjects[12].Trim()); }
 
                         // 13:  Blue cost
                         tempCard.data.blueCost = int.Parse(individualCSVObjects[13].Trim());

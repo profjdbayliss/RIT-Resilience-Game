@@ -121,6 +121,9 @@ public class CardPlayer : MonoBehaviour {
     public int[] tempMeeples;
     public bool updatedMeeplesThisPhase = false;
     public int[] BaseMaxMeeples { get; protected set; }
+
+    public List<(int timer, Action onTurnEndCallback)> temporaryEffectCallbacks = new List<(int, Action)>();
+
     //public float BlueMeeples { get; protected set; }
     //public float BlackMeeples { get; protected set; }
     //public float PurpleMeeples { get; protected set; }
@@ -194,7 +197,7 @@ public class CardPlayer : MonoBehaviour {
         return true;
     }
 
-    
+
 
     #endregion
 
@@ -212,7 +215,7 @@ public class CardPlayer : MonoBehaviour {
         overTimeCharges = MAX_OVERTIME_CHARGES;
     }
     public virtual void InitializeCards() {
-        
+
         DeckIDs.Clear();
         //manager = GameObject.FindObjectOfType<GameManager>();
         Debug.Log("card count is: " + cards.Count);
@@ -489,7 +492,7 @@ public class CardPlayer : MonoBehaviour {
     public void ReturnLentMeeple(int index) => ChangeLentMeeples(index, -1);
     public void AddOneTempMeeple(int index) => ChangeTempMeeples(index, 1);
     public void RemoveOneTempMeeple(int index) => ChangeTempMeeples(index, -1);
-    public void ChangeBorrowedMeeples(int index, int amt) {
+    protected void ChangeBorrowedMeeples(int index, int amt) {
         if (index >= 0 && index < BaseMaxMeeples.Length) {
             Debug.Log($"Changing borrowed meeple {index} by {amt}");
             borrowedMeeples[index] += amt;
@@ -506,7 +509,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
 
-    public void ChangeLentMeeples(int index, int amt) {
+    protected void ChangeLentMeeples(int index, int amt) {
         if (index >= 0 && index < BaseMaxMeeples.Length) {
             Debug.Log($"Changing lent meeple {index} by {amt}");
             lentMeeples[index] += amt;
@@ -523,7 +526,7 @@ public class CardPlayer : MonoBehaviour {
         }
     }
 
-    public void ChangeTempMeeples(int index, int amt) {
+    protected void ChangeTempMeeples(int index, int amt) {
         if (index >= 0 && index < BaseMaxMeeples.Length) {
             tempMeeples[index] += amt;
 
@@ -559,7 +562,7 @@ public class CardPlayer : MonoBehaviour {
                     // DecrememntMeepleByIndex(index);
                     ScoreManager.Instance.AddMeepleShare(NetID);
                     LendOneMeeple(index);
-                   // sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+                    // sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
                     return true;
                 }
             }
@@ -570,7 +573,7 @@ public class CardPlayer : MonoBehaviour {
     public void ReceiveBorrowedMeeple(int index) {
         Debug.Log($"{playerName} received a shared meeple of type {index}");
         if (index >= 0 && index < BaseMaxMeeples.Length) {
-          //  borrowedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
+            //  borrowedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
             //AddOneMaxMeepleByIndex(index);
             ReceiveOneBorrowedMeeple(index);
         }
@@ -580,7 +583,7 @@ public class CardPlayer : MonoBehaviour {
     public void CheckLentMeeplesAndReturn() {
         for (int i = 0; i < lentMeepleTypes.Count; i++) {
             lentMeepleTypes[i] = (lentMeepleTypes[i].Item1 - 1, lentMeepleTypes[i].Item2);
-            
+
         }
         var expiredMeeples = lentMeepleTypes.Where((tuple) => tuple.Item1 <= 0).ToList();
         expiredMeeples.ForEach((tuple) => ReturnLentMeeple(tuple.Item2));
@@ -589,7 +592,7 @@ public class CardPlayer : MonoBehaviour {
     //Checks the received meeples list at the end of the action phase
     //to check if any received meeples have expired and need to be returned
     public void CheckBorrowedMeeplesAndReturn() {
-        
+
         for (int i = 0; i < borrowedMeepleTypes.Count; i++) {
             borrowedMeepleTypes[i] = (borrowedMeepleTypes[i].Item1 - 1, borrowedMeepleTypes[i].Item2);
         }
@@ -659,7 +662,23 @@ public class CardPlayer : MonoBehaviour {
     }
     #endregion
 
+    #region Turn Handling
+    //handle checking for temprary effects on the player (such as meeple changes from white cards)
+    public void CheckOnTurnEffects() {
+        for (int i = 0; i < temporaryEffectCallbacks.Count; i++) {
+            temporaryEffectCallbacks[i] = (temporaryEffectCallbacks[i].timer - 1, temporaryEffectCallbacks[i].onTurnEndCallback);
+        }
+        var expiredEffects = temporaryEffectCallbacks.Where((tuple) => tuple.timer <= 0).ToList();
+        expiredEffects.ForEach((tuple) => tuple.onTurnEndCallback?.Invoke());
+        temporaryEffectCallbacks.RemoveAll(expiredEffects.Contains);
+
+    }
+    #endregion
+
     #region Helpers
+    public void AddActionToCallAfterTurns(int turns, Action action) {
+        temporaryEffectCallbacks.Add((turns, action));
+    }
     public bool HasCardsInDeck => DeckIDs.Count > 0;
     public void AssignSector(Sector sector) {
         PlayerSector = sector;
@@ -714,7 +733,7 @@ public class CardPlayer : MonoBehaviour {
         return (mUpdatesThisPhase.Count != 0);
     }
 
-    
+
 
 
     #endregion
@@ -767,7 +786,7 @@ public class CardPlayer : MonoBehaviour {
         int rng = -1;
         Card actualCard;
         int indexForCard = -1;
-       // Debug.Log($"Trying to draw card for {playerName} with decksize: {deckToDrawFrom.Count}");
+        // Debug.Log($"Trying to draw card for {playerName} with decksize: {deckToDrawFrom.Count}");
         if (random) {
             rng = UnityEngine.Random.Range(0, deckToDrawFrom.Count);
             if (cards.TryGetValue(deckToDrawFrom[rng], out actualCard)) {
@@ -801,7 +820,7 @@ public class CardPlayer : MonoBehaviour {
         tempCard.data = actualCard.data;
         tempCard.ActionList = new List<ICardAction>(actualCard.ActionList); // Copy action list
         tempCard.target = actualCard.target; // Copy the target type
-        tempCard.DeckName = actualCard.DeckName;    
+        tempCard.DeckName = actualCard.DeckName;
 
         if (uniqueId != -1) {
             tempCard.UniqueID = uniqueId;
@@ -1011,7 +1030,7 @@ public class CardPlayer : MonoBehaviour {
             }
             Debug.Log(s);
         }
-        
+
     }
     public void HandleMenuToggle() {
         if (this != GameManager.Instance.actualPlayer) {
@@ -1635,7 +1654,7 @@ public class CardPlayer : MonoBehaviour {
     public bool TryDiscardFromHandByUID(int uid, bool addUpdate = false) {
         if (HandCards.TryGetValue(uid, out GameObject cardGameObject)) {
             if (cardGameObject.TryGetComponent(out Card card)) {
-               // Debug.Log($"Discarding {card.data.name}");
+                // Debug.Log($"Discarding {card.data.name}");
                 card.SetCardState(CardState.CardNeedsToBeDiscarded);
                 Discards.Add(uid, cardGameObject);
                 cardGameObject.transform.SetParent(UserInterface.Instance.discardDropZone.transform, false);
@@ -1643,7 +1662,7 @@ public class CardPlayer : MonoBehaviour {
                 cardGameObject.SetActive(false);
                 HandCards.Remove(uid);
                 if (addUpdate) {
-                   // Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
+                    // Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
                     EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
                 }
                 UserInterface.Instance.UpdateUISizeTrackers();
@@ -1691,13 +1710,12 @@ public class CardPlayer : MonoBehaviour {
         UserInterface.Instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
     }
 
-    public void TryDiscardRandomCard()
-    {
+    public void TryDiscardRandomCard() {
         int positionOfCardToBeDiscarded = UnityEngine.Random.Range(0, HandCards.Count - 1);
         int cardToBeDiscarded = HandCards.ElementAt(positionOfCardToBeDiscarded).Key;
 
         bool didRandomCardDiscard = TryDiscardFromHandByUID(cardToBeDiscarded, true);
-      //  Debug.Log("Forced discard status: " + didRandomCardDiscard);
+        //  Debug.Log("Forced discard status: " + didRandomCardDiscard);
     }
 
     #endregion
@@ -1818,7 +1836,7 @@ public class CardPlayer : MonoBehaviour {
             Debug.LogError($"Failed to find card with uid {update.UniqueID} in {opponent.playerName}'s hand - did not pass messsage");
         }
     }
-    
+
     void HandleRemoveEffectUpdate(Update update, CardPlayer opponent) {
         if (update.FacilityPlayedOnType != FacilityType.None) {
             if (ActiveFacilities.TryGetValue((int)update.FacilityPlayedOnType, out GameObject facilityGo)) {
@@ -2058,4 +2076,6 @@ public class CardPlayer : MonoBehaviour {
 
 
     #endregion
+
+
 }

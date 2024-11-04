@@ -461,7 +461,7 @@ public class UserInterface : MonoBehaviour {
         }
 
         // Set the final face
-        Debug.Log($"Set final face to {finalFace}");
+      //  Debug.Log($"Set final face to {finalFace}");
         die.sprite = dieFaces[finalFace - 1]; // Set to the final face
         DisplayPassFailText(index, true, finalFace, rollReq);
         yield return new WaitForSeconds(3f);

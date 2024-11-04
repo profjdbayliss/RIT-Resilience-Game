@@ -517,6 +517,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
             3);
 
     }
+    public void DebugChangeMeepleAmountDiceRoll() {
+        DebugRollSectorDice();
+        foreach (var sector in AllSectors.Values) {
+            if (sector.IsSimulated) continue;
+            sector.AddOnDiceRollChangeMeepleAmtMulti(
+                    minRoll: 6,
+                    meepleType: new string[] {"Black", "Purple"},
+                    removalTime: 2,
+                    amount: 2);
+
+        }
+        //show the UI dice roll panel to everyone
+        UserInterface.Instance.ShowDiceRollingPanel(
+            AllSectors.Values.Select(x => x.sectorName).ToList(),
+            "Test Meeple change on roll",
+            6);
+    }
 
     public void DebugHandleWhiteCardPress(Card card) {
         whitePlayer.DebugPlayCard(card);
@@ -564,6 +581,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         if (Keyboard.current.f7Key.wasPressedThisFrame) {
             DebugRollSectorDice();
+        }
+        if (Keyboard.current.f8Key.wasPressedThisFrame) {
+            DebugChangeMeepleAmountDiceRoll();
         }
 
     }
@@ -1095,6 +1115,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                             UserInterface.Instance.ToggleOvertimeButton(false);
                         }
                     }
+                    
 
                     //simulate the sectors getting attacked/restored 
                     if (simulateSectors && turnTotal >= SECTOR_SIM_TURN_START)
@@ -1104,6 +1125,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                     //actualPlayer.InformSectorOfNewTurn();
                     if (IsActualPlayersTurn()) {
                         actualPlayer.ResetMeeplesSpent();
+                        actualPlayer.CheckOnTurnEffects();
                     }
                     //else {
                     //    opponentPlayer.ResetMeeplesSpent();

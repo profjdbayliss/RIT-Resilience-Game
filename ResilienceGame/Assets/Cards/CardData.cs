@@ -38,7 +38,7 @@ public struct CardData
     public int duration;
     public bool hasDoomEffect;
     public int minDiceRoll;
-    public string[] meepleType;
-    public float meepleAmount;
+    public string[] meeplesChanged;
+    public float meepleAmtMulti;
     public List<SectorType> onlyPlayedOn;
 }

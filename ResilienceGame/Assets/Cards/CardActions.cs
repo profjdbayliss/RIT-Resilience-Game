@@ -352,7 +352,7 @@ public class IncreaseTurnsDuringPeace : ICardAction {
 public class IncColorlessMeeplesRoundReduction : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         GameManager.Instance.IsRedAggressive = true;
-        player.IncMaxColorlessMeeples((int)card.data.meepleAmount);
+        player.IncMaxColorlessMeeples((int)card.data.meepleAmtMulti);
         GameManager.Instance.aggressionTurnCheck = card.data.duration;
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
@@ -423,7 +423,7 @@ public class ShuffleCardsFromDiscard : ICardAction {
 
 public class ReduceCardCost : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        player.ChooseMeeplesThenReduceCardCost((int)card.data.meepleAmount, player, card);
+        player.ChooseMeeplesThenReduceCardCost((int)card.data.meepleAmtMulti, player, card);
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -545,13 +545,16 @@ public class ChangeAllFacPointsBySectorType : ICardAction {
         // int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
         // Debug.Log("$$Sector rolled a " + diceRoll);
 
+        //get all the sectors by type
         var sectors = card.data.onlyPlayedOn.Contains(SectorType.All) ?
             GameManager.Instance.AllSectors.Values.ToList().Select(sector => sector.sectorName).ToList() :
             card.data.onlyPlayedOn;
 
+        //get a list of played sectors (not simulated)
         var playedSectors = GameManager.Instance.AllSectors.Values.Where(
             sector => !sector.IsSimulated && sectors.Contains(sector.sectorName)).ToList();
 
+        //Add the on dice roll effect to each sector
         foreach (var sector in playedSectors) {
             sector.AddOnDiceRollEffect(
                     minRoll: card.data.minDiceRoll,
@@ -560,7 +563,7 @@ public class ChangeAllFacPointsBySectorType : ICardAction {
                     playerId: player.NetID);
 
         }
-
+        //show the UI dice roll panel to everyone
         UserInterface.Instance.ShowDiceRollingPanel(
             playedSectors.Select(x => x.sectorName).ToList(),
             card.front.description,
@@ -614,31 +617,6 @@ public class ChangeTransFacPointsAllSectors : ICardAction {
     }
 }
 
-/// <summary>
-/// Changes financial points across all sectors if they fail a dice roll
-/// </summary>
-public class NWChangeFinPointsDice : ICardAction {
-    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    CardPlayer playerInstance;
-    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
-    //        playerInstance = GameManager.Instance.actualPlayer;
-    //    else playerInstance = GameManager.Instance.opponentPlayer;
-    //    int diceRoll = UnityEngine.Random.Range(1, 6);
-    //    if (diceRoll < card.data.minDiceRoll) {
-    //        Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-    //        foreach (Facility facility in playerInstance.PlayerSector.facilities) {
-    //            facility.ChangeFacilityPoints(FacilityEffectTarget.Financial, card.data.facilityAmount);
-    //        }
-    //    }
-    //    else {
-    //        Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-    //    }
-    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
-    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
-}
 
 /// <summary>
 /// Changes meeple amounts across all sectors if they fail a dice roll
@@ -646,50 +624,37 @@ public class NWChangeFinPointsDice : ICardAction {
 /// Also todo: its reduced by half for two turns but we haven't quite implemented the turn
 /// stuff yet to my knowledge
 /// </summary>
-public class NWChangeMeepleAmtDice : ICardAction {
-    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    int diceRoll = UnityEngine.Random.Range(1, 6);
-    //    if (diceRoll < card.data.minDiceRoll) {
-    //        CardPlayer playerInstance;
-    //        if (GameManager.Instance.playerType == PlayerTeam.Blue)
-    //            playerInstance = GameManager.Instance.actualPlayer;
-    //        else playerInstance = GameManager.Instance.opponentPlayer;
-    //        Debug.Log("Sector rolled a " + diceRoll + ", roll failed.");
-    //        if (card.data.meepleAmount == 0.5) //For some reason there's exactly one time this happens
-    //        {
-    //            foreach (string meepleType in card.data.meepleType) {
-    //                playerInstance.MultiplyMeepleAmount(
-    //                    meepleType switch {
-    //                        "Blue" => 0,
-    //                        "Black" => 1,
-    //                        "Purple" => 2,
-    //                        _ => -1
-    //                    },
-    //                    card.data.meepleAmount);
-    //            }
-    //        }
-    //        else {
-    //            foreach (string meepleType in card.data.meepleType) {
-    //                playerInstance.AddSubtractMeepleAmount(
-    //                    meepleType switch {
-    //                        "Blue" => 0,
-    //                        "Black" => 1,
-    //                        "Purple" => 2,
-    //                        _ => -1
-    //                    },
-    //                    card.data.meepleAmount);
-    //            }
-    //        }
-    //    }
-    //    else {
-    //        Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-    //    }
-    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
+public class CheckAllSectorsChangeMeepleAmtMulti : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        Debug.Log("Handling Meeple Change Amount on Dice Roll");
+        var sectors = card.data.onlyPlayedOn.Contains(SectorType.All) ?
+            GameManager.Instance.AllSectors.Values.ToList().Select(sector => sector.sectorName).ToList() :
+            card.data.onlyPlayedOn;
 
-    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-    //}
+        var playedSectors = GameManager.Instance.AllSectors.Values.Where(
+            sector => !sector.IsSimulated && sectors.Contains(sector.sectorName)).ToList();
+
+        //Add the on dice roll effect to each sector
+        foreach (var sector in playedSectors) {
+            sector.AddOnDiceRollChangeMeepleAmtMulti(
+                    minRoll: card.data.minDiceRoll,
+                    meepleType: card.data.meeplesChanged,
+                    removalTime: card.data.duration,
+                    amount: card.data.meepleAmtMulti);
+
+        }
+        //show the UI dice roll panel to everyone
+        UserInterface.Instance.ShowDiceRollingPanel(
+            playedSectors.Select(x => x.sectorName).ToList(),
+            card.front.description,
+            card.data.minDiceRoll);
+
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
 }
 
 

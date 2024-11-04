@@ -620,6 +620,8 @@ public class Sector : MonoBehaviour {
 
     #region Die Rolling
 
+    //Sets the action to be taken when the die roll is complete
+    //This is used to add effects to all facilities based on the die roll
     public void AddOnDiceRollEffect(int minRoll, string effectString, PlayerTeam playerTeam, int playerId) {
         OnDiceRollComplete = null;
         OnDiceRollComplete += () => {
@@ -627,6 +629,8 @@ public class Sector : MonoBehaviour {
                 AddEffectToFacilities(effectString, playerTeam, playerId);
         };
     }
+    //Sets the action to be taken when the die roll is complete
+    //This is used to add effects to one facility based on the die roll
     public void AddOnDiceRollEffect(int minRoll, string effectString, PlayerTeam playerTeam, int playerId, FacilityType facilityType) {
         OnDiceRollComplete = null;
         OnDiceRollComplete += () => {
@@ -635,17 +639,57 @@ public class Sector : MonoBehaviour {
                 .FirstOrDefault(facility => facility.facilityType == facilityType)
                 .AddRemoveEffectsByIdString(effectString, true, playerTeam, playerId);
             }
-                
+
+        };
+    }
+    //Sets the action to be taken when the die roll is complete
+    //This will change the meeple amount by the 'amount' float for all meeples
+    //also sets up the action tracker to remove the effect later on
+    public void AddOnDiceRollChangeMeepleAmtMulti(int minRoll, string[] meepleType, int removalTime, float amount) {
+        OnDiceRollComplete = null;
+        if (Owner == null) return;
+        OnDiceRollComplete += () => {
+
+            if (DieRoll < minRoll) {
+                int[] playerMeepls = Owner.currentMeeples;
+                int[] meeplesChanged = new int[playerMeepls.Length];
+                //setup the multipliers
+                for (int i = 0; i < playerMeepls.Length; i++) {
+                    var meepleString = i switch {
+                        0 => "Black",
+                        1 => "Blue",
+                        2 => "Purple",
+                        3 => "Colorless",
+                        _ => ""
+                    };
+                    meeplesChanged[i] = meepleType.Contains(meepleString) ?
+                        (int)(playerMeepls[i] * (amount < 1 ? amount : -amount)) : 0;
+                }
+                //add them as temporary meeples
+              //  Debug.Log($"Adding meeple change to sector owner: {Owner.playerName}");
+                for (int i = 0; i < playerMeepls.Length; i++) {
+                    Owner.SetTempMeeples(i, meeplesChanged[i]);
+                }
+
+                //add the action to remove the meeples later
+                //TODO: this will mean that these white card meeple multiplier
+                //will overwrite/be overwritten by Overtime
+                Owner.AddActionToCallAfterTurns(removalTime,
+                    () => {
+                       // Debug.Log($"Remove meeple change");
+                        for (int i = 0; i < playerMeepls.Length; i++) {
+                            Owner.SetTempMeeples(i, 0);
+                        }
+                    });
+
+            }
         };
     }
 
-    public void HandleDieCardPlayToAddEffects(Card card, CardPlayer player) {
-        if (IsSimulated || Owner == null) return;
-
-
-
-    }
-
+    //Rolls the die for the sector
+    //if this is the server, the die roll is sent to the clients
+    //if this is the client, an empty die roll message is sent to the server
+    //which will call this function and respond with the die roll
     public int SectorRollDie() {
         if (GameManager.Instance.IsServer) {
             DieRoll = UnityEngine.Random.Range(1, 7);
