@@ -10,7 +10,7 @@ using UnityEngine.PlayerLoop;
 using System.Xml;
 using UnityEngine.XR;
 
-// many messages actually have no arguments
+#region Network Message Structs
 public struct RGNetworkShortMessage : NetworkMessage {
     public uint playerID;
     public uint type;
@@ -26,6 +26,9 @@ public struct RGNetworkLongMessage : NetworkMessage {
     // -> ArraySegment to avoid unnecessary allocations
     public ArraySegment<byte> payload;
 }
+#endregion
+// many messages actually have no arguments
+
 
 public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public static RGNetworkPlayerList instance;
@@ -34,34 +37,54 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     int nextCardUID = 0;
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
 
-    public int DrawCardForPlayer(int playerId) {
-        //  Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
-        int cardUID = nextCardUID++;
-        drawnCardUIDs[playerId] = cardUID;
-        return cardUID;
-    }
-
+    #region Local Player Fields
     public int localPlayerID;
     public string localPlayerName;
     public List<int> playerIDs = new List<int>();
     private GameManager manager;
 
+    #endregion
+
+    #region Player Lists
     private List<bool> playerNetworkReadyFlags = new List<bool>();
     private List<bool> playerTurnTakenFlags = new List<bool>();
     public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
     public List<string> playerNames = new List<string>();
     private Dictionary<int, NetworkConnectionToClient> playerConnections = new Dictionary<int, NetworkConnectionToClient>();
+    #endregion
 
-
+    #region Start/Initialization
     private void Awake() {
         instance = this;
         DontDestroyOnLoad(this);
         SetupHandlers();
+
     }
 
     public void Start() {
         manager = GameManager.Instance;// GameObject.FindObjectOfType<GameManager>();
+        AddWhitePlayer();
         Debug.Log("start run on RGNetworkPlayerList.cs");
+
+    }
+    public bool CheckReadyToStart() {
+        bool readyToStart = true;
+        for (int i = 0; i < playerIDs.Count; i++) {
+            if (playerTypes[i] == PlayerTeam.Any) {
+                readyToStart = false;
+                break;
+            }
+        }
+        return readyToStart;
+    }
+    public void AddWhitePlayer() {
+        Debug.Log("adding white ai player to server : 999");
+        playerIDs.Add(999);
+        playerNetworkReadyFlags.Add(true); // AI is always ready
+        playerTurnTakenFlags.Add(false);
+        playerTypes.Add(PlayerTeam.White); // Define PlayerTeam.AI in your enum if not done
+        playerNames.Add("White_Player");
+        // No need to add a NetworkConnection for the AI
     }
     public void AddPlayer(int id, string name, CardPlayer cardPlayer, NetworkConnectionToClient conn) {
         if (isServer) {
@@ -82,10 +105,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
         }
     }
-
-    public void ResetAllPlayersToNotReady() {
-        for (int i = 0; i < playerIDs.Count; i++) {
-            playerTypes[i] = PlayerTeam.Any;
+    public void SetAiPlayerAsReadyToStartGame() {
+        int aiPlayerIndex = playerIDs.IndexOf(999);
+        if (aiPlayerIndex != -1) {
+            playerNetworkReadyFlags[aiPlayerIndex] = true;
+            playerTurnTakenFlags[aiPlayerIndex] = false; // reset for new game start
+            Debug.Log("AI player automatically marked as ready by server.");
         }
     }
 
@@ -126,7 +151,27 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         msg = new Message(CardMessageType.StartGame, (uint)localPlayerID, data);
         return (msg);
     }
+    public void SetupHandlers() {
+        NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessage);
+        NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessage);
+        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessage);
+        NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessage);
+    }
+    #endregion
 
+    #region Helpers
+
+    public int DrawCardForPlayer(int playerId) {
+        //  Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
+        int cardUID = nextCardUID++;
+        drawnCardUIDs[playerId] = cardUID;
+        return cardUID;
+    }
+    public void ResetAllPlayersToNotReady() {
+        for (int i = 0; i < playerIDs.Count; i++) {
+            playerTypes[i] = PlayerTeam.Any;
+        }
+    }
     public void RemovePlayer(int id) {
         if (!isServer) return;
 
@@ -149,7 +194,80 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         returnValue = first | (second << 8) | (third << 16) | (fourth << 24);
         return returnValue;
     }
+    #endregion
 
+    #region Direct Message Sending
+    public void SendStringToClients(string stringMsg) {
+        if (isServer) {
+            Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
+            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+                playerID = (uint)localPlayerID,
+                type = (uint)msg.Type,
+                count = (uint)msg.byteArguments.Count,
+                payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
+            };
+
+            // Send to all clients
+            NetworkServer.SendToAll(netMsg);
+            // Debug.Log("SERVER SENT string message: " + stringMsg);
+        }
+    }
+    public void SendStringToServer(string stringMsg) {
+        if (!isServer) {
+            Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
+            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+                playerID = (uint)localPlayerID,
+                type = (uint)msg.Type,
+                count = (uint)msg.byteArguments.Count,
+                payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
+            };
+            NetworkClient.Send(netMsg);
+            //  Debug.Log("CLIENT SENT string message: " + stringMsg);
+        }
+    }
+
+    //send message to specific client via net ID
+    public void SendMessageToClient(int playerId, RGNetworkLongMessage msg) {
+        if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn)) {
+            conn.Send<RGNetworkLongMessage>(msg);
+            //    Debug.Log($"Server sent message to player ID {playerId}");
+        }
+        else {
+            Debug.LogError($"No connection found for player ID {playerId}");
+        }
+    }
+    public void SendSectorDataMessage(int playerID, List<(int sectorType, bool[] sectorValues)> sectors) {
+        if (!isServer) return;
+
+        // Prepare a list of bytes to contain all the sector data
+        List<byte> sectorData = new List<byte>();
+
+        foreach (var sector in sectors) {
+            // Add the sector type as an int (4 bytes)
+            sectorData.AddRange(BitConverter.GetBytes(sector.sectorType));
+
+            // Add the 3 boolean values as bytes 
+            for (int i = 0; i < 3; i++) {
+                sectorData.Add(sector.sectorValues[i] ? (byte)1 : (byte)0);
+            }
+        }
+
+        // Create a new message with this data
+        Message msg = new Message(CardMessageType.SendSectorData, (uint)localPlayerID, sectorData);
+        RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+            playerID = (uint)playerID,
+            type = (uint)msg.Type,
+            count = (uint)sectorData.Count,
+            payload = new ArraySegment<byte>(sectorData.ToArray())
+        };
+
+        // Send to all clients
+        NetworkServer.SendToAll(netMsg);
+        Debug.Log("SERVER SENT sector data message to clients");
+    }
+    #endregion
+
+    #region Update Observer
     public void UpdateObserver(Message data) {
         // send messages here over network to appropriate place(s)
         switch (data.Type) {
@@ -319,7 +437,9 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
 
     }
+    #endregion
 
+    #region Client Receive Messages
     public void OnClientReceiveShortMessage(RGNetworkShortMessage msg) {
         Debug.Log("CLIENT RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
         uint senderId = msg.playerID;
@@ -355,157 +475,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
         }
     }
-
-    public void SendStringToClients(string stringMsg) {
-        if (isServer) {
-            Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
-            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
-                playerID = (uint)localPlayerID,
-                type = (uint)msg.Type,
-                count = (uint)msg.byteArguments.Count,
-                payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
-            };
-
-            // Send to all clients
-            NetworkServer.SendToAll(netMsg);
-            // Debug.Log("SERVER SENT string message: " + stringMsg);
-        }
-    }
-    public void SendStringToServer(string stringMsg) {
-        if (!isServer) {
-            Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
-            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
-                playerID = (uint)localPlayerID,
-                type = (uint)msg.Type,
-                count = (uint)msg.byteArguments.Count,
-                payload = new ArraySegment<byte>(msg.byteArguments.ToArray())
-            };
-            NetworkClient.Send(netMsg);
-            //  Debug.Log("CLIENT SENT string message: " + stringMsg);
-        }
-    }
-
-    //send message to specific client via net ID
-    public void SendMessageToClient(int playerId, RGNetworkLongMessage msg) {
-        if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn)) {
-            conn.Send<RGNetworkLongMessage>(msg);
-            //    Debug.Log($"Server sent message to player ID {playerId}");
-        }
-        else {
-            Debug.LogError($"No connection found for player ID {playerId}");
-        }
-    }
-    public void SendSectorDataMessage(int playerID, List<(int sectorType, bool[] sectorValues)> sectors) {
-        if (!isServer) return;
-
-        // Prepare a list of bytes to contain all the sector data
-        List<byte> sectorData = new List<byte>();
-
-        foreach (var sector in sectors) {
-            // Add the sector type as an int (4 bytes)
-            sectorData.AddRange(BitConverter.GetBytes(sector.sectorType));
-
-            // Add the 3 boolean values as bytes 
-            for (int i = 0; i < 3; i++) {
-                sectorData.Add(sector.sectorValues[i] ? (byte)1 : (byte)0);
-            }
-        }
-
-        // Create a new message with this data
-        Message msg = new Message(CardMessageType.SendSectorData, (uint)localPlayerID, sectorData);
-        RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
-            playerID = (uint)playerID,
-            type = (uint)msg.Type,
-            count = (uint)sectorData.Count,
-            payload = new ArraySegment<byte>(sectorData.ToArray())
-        };
-
-        // Send to all clients
-        NetworkServer.SendToAll(netMsg);
-        Debug.Log("SERVER SENT sector data message to clients");
-    }
-
-    public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
-        Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
-        uint senderId = msg.playerID;
-        CardMessageType type = (CardMessageType)msg.type;
-        // Update the connection mapping
-        int playerId = (int)msg.playerID;
-        if (!playerConnections.ContainsKey(playerId)) {
-            playerConnections[playerId] = client;
-        }
-        switch (type) {
-            case CardMessageType.StartNextPhase:
-                // nobody tells server to start a turn, so this shouldn't happen
-                Debug.Log("server start next phase message when it shouldn't!");
-                break;
-
-
-            case CardMessageType.EndPhase:
-                // end turn is handled here because the player list is kept
-                // in this class
-                Debug.Log("server received end phase message from sender: " + senderId);
-                //   Debug.Log("player turn count : " + playerTurnTakenFlags.Count);
-                // note this player's turn has ended      
-                int playerIndex = (int)senderId;
-                // Debug.Log("player index : " + playerIndex);
-                playerTurnTakenFlags[playerIndex] = true;
-                // Debug.Log("got here");
-                // find next player to ok to play and send them a message
-                int nextPlayerId = -1;
-                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                    if (!playerTurnTakenFlags[i]) {
-                        nextPlayerId = playerIDs[i];
-                        break;
-                    }
-                }
-                //  Debug.Log("got here 2");
-                if (nextPlayerId == -1) {
-                    //   Debug.Log("got here 3");
-                    GamePhase nextPhase = manager.GetNextPhase();
-                    //  Debug.Log("getting next phase : " + nextPhase);
-
-                    // need to increment the turn and set all the players to ready again
-                    for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                        playerTurnTakenFlags[i] = false;
-                    }
-                    // 
-
-                    // Debug.Log("sending start next phase");
-                    // tell all the clients to go to the next phase
-                    msg.playerID = (uint)localPlayerID;
-                    msg.type = (uint)CardMessageType.StartNextPhase;
-                    NetworkServer.SendToAll(msg);
-                    //Debug.Log("doing the next phase");
-                    // server needs to start next phase as well
-                    manager.StartNextPhase();
-                    //  Debug.Log("checking to make sure it's not the next turn");
-                    if (nextPhase == GamePhase.DrawRed) {
-                        manager.IncrementTurn();
-                        Debug.Log("Turn is done - incrementing and starting again.");
-                    }
-                    //   Debug.Log("next phase stuff done");
-
-                }
-                break;
-            case CardMessageType.IncrementTurn:
-                Debug.Log("Server received increment message and did nothing.");
-                break;
-            case CardMessageType.EndGame: {
-                    if (!manager.HasReceivedEndGame()) {
-                        manager.SetReceivedEndGame(true);
-                        manager.AddMessage(new Message(CardMessageType.EndGame, (uint)localPlayerID));
-                        manager.ShowEndGameCanvas();
-                        Debug.Log("received end game message and will now end game on server");
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-
-    }
-
     public void OnClientReceiveLongMessage(RGNetworkLongMessage msg) {
         var playerName = msg.playerID + "";
         if (manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player)) {
@@ -859,16 +828,88 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
         }
     }
+    #endregion
 
-    public bool CheckReadyToStart() {
-        bool readyToStart = true;
-        for (int i = 0; i < playerIDs.Count; i++) {
-            if (playerTypes[i] == PlayerTeam.Any) {
-                readyToStart = false;
-                break;
-            }
+    #region Server Receive Messages
+    public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
+        Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
+        uint senderId = msg.playerID;
+        CardMessageType type = (CardMessageType)msg.type;
+        // Update the connection mapping
+        int playerId = (int)msg.playerID;
+        if (!playerConnections.ContainsKey(playerId)) {
+            playerConnections[playerId] = client;
         }
-        return readyToStart;
+        switch (type) {
+            case CardMessageType.StartNextPhase:
+                // nobody tells server to start a turn, so this shouldn't happen
+                Debug.Log("server start next phase message when it shouldn't!");
+                break;
+
+
+            case CardMessageType.EndPhase:
+                // end turn is handled here because the player list is kept
+                // in this class
+                Debug.Log("server received end phase message from sender: " + senderId);
+                //   Debug.Log("player turn count : " + playerTurnTakenFlags.Count);
+                // note this player's turn has ended      
+                int playerIndex = (int)senderId;
+                // Debug.Log("player index : " + playerIndex);
+                playerTurnTakenFlags[playerIndex] = true;
+                // Debug.Log("got here");
+                // find next player to ok to play and send them a message
+                int nextPlayerId = -1;
+                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+                    if (!playerTurnTakenFlags[i]) {
+                        nextPlayerId = playerIDs[i];
+                        break;
+                    }
+                }
+                //  Debug.Log("got here 2");
+                if (nextPlayerId == -1) {
+                    //   Debug.Log("got here 3");
+                    GamePhase nextPhase = manager.GetNextPhase();
+                    //  Debug.Log("getting next phase : " + nextPhase);
+
+                    // need to increment the turn and set all the players to ready again
+                    for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+                        playerTurnTakenFlags[i] = false;
+                    }
+                    // 
+
+                    // Debug.Log("sending start next phase");
+                    // tell all the clients to go to the next phase
+                    msg.playerID = (uint)localPlayerID;
+                    msg.type = (uint)CardMessageType.StartNextPhase;
+                    NetworkServer.SendToAll(msg);
+                    //Debug.Log("doing the next phase");
+                    // server needs to start next phase as well
+                    manager.StartNextPhase();
+                    //  Debug.Log("checking to make sure it's not the next turn");
+                    if (nextPhase == GamePhase.DrawRed) {
+                        manager.IncrementTurn();
+                        Debug.Log("Turn is done - incrementing and starting again.");
+                    }
+                    //   Debug.Log("next phase stuff done");
+
+                }
+                break;
+            case CardMessageType.IncrementTurn:
+                Debug.Log("Server received increment message and did nothing.");
+                break;
+            case CardMessageType.EndGame: {
+                    if (!manager.HasReceivedEndGame()) {
+                        manager.SetReceivedEndGame(true);
+                        manager.AddMessage(new Message(CardMessageType.EndGame, (uint)localPlayerID));
+                        manager.ShowEndGameCanvas();
+                        Debug.Log("received end game message and will now end game on server");
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
     }
     public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg) {
         var playerName = msg.playerID + "";
@@ -1188,11 +1229,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
         }
     }
+    #endregion
 
-    public void SetupHandlers() {
-        NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessage);
-        NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessage);
-        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessage);
-        NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessage);
-    }
+    
 }

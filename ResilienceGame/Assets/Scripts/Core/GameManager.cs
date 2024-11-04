@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     // Players and Teams
     [Header("Players and Teams")]
-    public PlayerTeam playerType = PlayerTeam.Any;
+    public PlayerTeam playerTeam = PlayerTeam.Any;
     public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
     public WhiteCardPlayer whitePlayer;
@@ -163,17 +163,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // set this player's type
             switch (playerDeckChoice.value) {
                 case 0:
-                    playerType = PlayerTeam.Red;
+                    playerTeam = PlayerTeam.Red;
                     break;
                 case 1:
-                    playerType = PlayerTeam.Blue;
+                    playerTeam = PlayerTeam.Blue;
                     break;
                 default:
                     break;
             }
 
             // display player type on view???
-            Debug.Log("player type set to be " + playerType);
+            Debug.Log("player type set to be " + playerTeam);
         }
 
     }
@@ -190,7 +190,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // basic init of player
             SetPlayerType();
             SetupActors();
-            UserInterface.Instance.StartGame(playerType);
+            UserInterface.Instance.StartGame(playerTeam);
 
             // init various objects to be used in the game
             roundsLeft = BASE_MAX_TURNS;
@@ -206,13 +206,18 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // tell everybody else of this player's type
             if (!IsServer) {
                 Message msg;
-                List<int> tmpList = new List<int>(1);
-                tmpList.Add((int)playerType);
+                List<int> tmpList = new List<int>() {
+                    (int)playerTeam
+                };
                 msg = new Message(CardMessageType.SharePlayerType, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
                 AddMessage(msg);
+                
+
             }
             else {
-                RGNetworkPlayerList.instance.SetPlayerType(playerType);
+                // Automatically set the AI player as ready (server only)
+                RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
+                RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
             }
 
         }
@@ -478,13 +483,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // appropriate values
 
         // TODO: Change PlayerType
-        if (playerType == PlayerTeam.Red) {
+        if (playerTeam == PlayerTeam.Red) {
             //actualPlayer = energyPlayer;
             actualPlayer.playerTeam = PlayerTeam.Red;
             actualPlayer.DeckName = "red";
 
         }
-        else if (playerType == PlayerTeam.Blue) {
+        else if (playerTeam == PlayerTeam.Blue) {
             //actualPlayer = waterPlayer;
             actualPlayer.playerTeam = PlayerTeam.Blue;
             actualPlayer.DeckName = "blue";
@@ -1017,7 +1022,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Handle all the card game phases with
     // this simple state machine.
     public void HandlePhases(GamePhase phase) {
-        // TODO: Implement team turns
+        
 
         // keep track of 
         bool phaseJustChanged = false;
@@ -1218,12 +1223,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
                     // Debug.Log("ending draw and discard game phase!");
 
-                    // send a message with number of discards of the player
-                    Message msg;
-                    List<int> tmpList = new List<int>(1);
-                    tmpList.Add(MNumberDiscarded);
-                    msg = new Message(CardMessageType.ShareDiscardNumber, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
-                    AddMessage(msg);
+                    // send a message with number of discards of the player'
+                    //TODO pretty sure this can be removed
+                    //Message msg;
+                    //List<int> tmpList = new List<int>(1);
+                    //tmpList.Add(MNumberDiscarded);
+                    //msg = new Message(CardMessageType.ShareDiscardNumber, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
+                    //AddMessage(msg);
                 }
                 break;
             case GamePhase.ActionBlue:
