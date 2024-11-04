@@ -436,9 +436,9 @@ public class UserInterface : MonoBehaviour {
             if (GameManager.Instance.AllSectors.TryGetValue(sectors[i], out Sector sector)) {
                 RollDie(i, sector.DieRoll, sector.OnDiceRollComplete, rollReq);
             }
-            
+
         }
-        
+
     }
     public void HideDiceRollingPanel() {
         diceRollingPanel.SetActive(false);
@@ -473,7 +473,7 @@ public class UserInterface : MonoBehaviour {
         }
 
         // Set the final face
-      //  Debug.Log($"Set final face to {finalFace}");
+        //  Debug.Log($"Set final face to {finalFace}");
         die.sprite = dieFaces[finalFace - 1]; // Set to the final face
         DisplayPassFailText(index, true, finalFace, rollReq);
         yield return new WaitForSeconds(3f);
@@ -506,7 +506,7 @@ public class UserInterface : MonoBehaviour {
     }
     public void ToggleAllUIVisuals() {
         isGameBoardActive = !isGameBoardActive;
-        gameBoard.SetActive(isGameBoardActive);
+        gameCanvas.GetComponent<GraphicRaycaster>().enabled = isGameBoardActive;
         mapParent.SetActive(!isGameBoardActive);
 
     }
