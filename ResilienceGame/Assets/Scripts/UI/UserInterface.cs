@@ -20,6 +20,11 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Sprite[] PhaseButtonSprites;
     public RectTransform discardPile;
 
+    [Header("GUI Parents")]
+    public GameObject gameBoard;
+    public GameObject mapParent;
+    public bool isGameBoardActive = true;
+
     [Header("UI Elements")]
     public Canvas gameCanvas;
     public GameObject startScreen;
@@ -497,6 +502,12 @@ public class UserInterface : MonoBehaviour {
         else {
             successText.ForEach(x => x.text = "");
         }
+
+    }
+    public void ToggleAllUIVisuals() {
+        isGameBoardActive = !isGameBoardActive;
+        gameBoard.SetActive(isGameBoardActive);
+        mapParent.SetActive(!isGameBoardActive);
 
     }
 
