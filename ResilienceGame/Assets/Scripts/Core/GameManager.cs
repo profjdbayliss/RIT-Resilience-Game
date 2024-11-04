@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private GameObject background;
     private bool skip;
     private bool skipClicked;
+    [SerializeField] private TutorialToggle tutorialToggle;
 
     // Networking
     [Header("Networking")]
@@ -503,7 +504,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         actualPlayer.InitializeCards();
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
-
+        tutorialToggle.WhenGameStarts();
     }
 
     #endregion

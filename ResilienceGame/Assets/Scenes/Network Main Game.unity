@@ -1262,6 +1262,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1102689069}
+        m_TargetAssemblyTypeName: TutorialToggle, Assembly-CSharp
+        m_MethodName: UpdateCoreSectorCheck
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &55810812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3147,7 +3159,7 @@ Transform:
   - {fileID: 969571135}
   - {fileID: 1537699485}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &99716379
 GameObject:
@@ -18474,7 +18486,7 @@ RectTransform:
   m_Children:
   - {fileID: 1214050762}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -24805,6 +24817,57 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+--- !u!1 &1102689068
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1102689070}
+  - component: {fileID: 1102689069}
+  m_Layer: 0
+  m_Name: TutorialToggle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1102689069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102689068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58069f9ac397ad9498b3311c820631d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 2133546051}
+  tutorialCanvas: {fileID: 1445822332}
+  colorLessPanel: {fileID: 484877709}
+  regSectorPanel: {fileID: 334645908}
+  coreSectorPanel: {fileID: 245824960}
+  blueWeeksPanel: {fileID: 456237960}
+  redWeeksPanel: {fileID: 1965519462}
+--- !u!4 &1102689070
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102689068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1181.3953, y: 474.0667, z: -4.4396076}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1115958859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25967,7 +26030,7 @@ RectTransform:
   m_Children:
   - {fileID: 1567975084}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -27172,7 +27235,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1341839363}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1102689069}
+        m_TargetAssemblyTypeName: TutorialToggle, Assembly-CSharp
+        m_MethodName: ToggleCanvas
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1341839363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27872,7 +27947,7 @@ Transform:
   - {fileID: 1125198115}
   - {fileID: 680164117}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1398539843
 PrefabInstance:
@@ -33129,6 +33204,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1102689069}
+        m_TargetAssemblyTypeName: TutorialToggle, Assembly-CSharp
+        m_MethodName: UpdateCoreSectorCheck
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1615352943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35851,7 +35938,7 @@ RectTransform:
   m_Children:
   - {fileID: 614736211}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -41062,7 +41149,7 @@ RectTransform:
   - {fileID: 1341839361}
   - {fileID: 1445822329}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -44162,6 +44249,7 @@ MonoBehaviour:
   bluffTurnCount: 0
   aggressionTurnCount: 0
   yarnSpinner: {fileID: 2753718019496694862}
+  tutorialToggle: {fileID: 1102689069}
   IsServer: 1
   messageLog: []
   IsLocalPlayerAI: 0
@@ -45626,7 +45714,7 @@ Transform:
   - {fileID: 7084386685316411962}
   - {fileID: 224084850367728341}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3327521054683202740
 MonoBehaviour:
