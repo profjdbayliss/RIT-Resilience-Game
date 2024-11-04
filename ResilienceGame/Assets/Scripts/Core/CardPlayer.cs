@@ -271,6 +271,15 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Card Action Functions
+    public void AddDiscardsToDeck(int amt) {
+        Debug.Log($"Adding {amt} or discard length {Discards.Count} from discards to deck");
+        int numToRemove = Math.Min(amt, Discards.Count);
+        for (int i = 0; i < numToRemove; i++) {
+            var card = Discards.ElementAt(0).Value.GetComponent<Card>();
+            ReturnCardToDeck(card, true);
+        }
+        
+    }
 
     //called by card action to tell the player they need to select facilities to apply the card action to
     public void ForcePlayerSelectFacilities(int numFacilitiesToSelect, bool removeEffect, FacilityEffectType preReqEffect, Action<List<Facility>> onFacilitySelect) {
@@ -372,8 +381,13 @@ public class CardPlayer : MonoBehaviour {
             Destroy(card.gameObject);
             Debug.Log($"Successfully returned {card.data.name} to the deck for player {playerName}");
         }
+        else if (Discards.Remove(card.UniqueID)) {
+            DeckIDs.Add(card.data.cardID);//add it back to the deck
+            Destroy(card.gameObject);
+            Debug.Log($"Successfully returned {card.data.name} to the deck for player {playerName}");
+        }
         else {
-            Debug.LogError($"card with unique id {card.UniqueID} was not found in {playerName}'s hand");
+            Debug.LogError($"card with unique id {card.UniqueID} was not found in {playerName}'s hand or deck");
         }
 
         if (updateNetwork) {//also means its actual player
@@ -407,13 +421,13 @@ public class CardPlayer : MonoBehaviour {
         BaseMaxMeeples[1]++;
         BaseMaxMeeples[2]++;
         ResetMeepleCount();
-        
+
     }
     public void PermaIncRandomMeepleByFlatAmt(int amt) {
         int index = UnityEngine.Random.Range(0, 3);
         BaseMaxMeeples[index] += amt;
         ResetMeepleCount();
-        
+
     }
     public bool TrySpendMeeples(Card card, ref int numMeeplesSpent) {
         bool spendColorless = false;
@@ -2043,6 +2057,14 @@ public class CardPlayer : MonoBehaviour {
         foreach (var cardGroup in deckCardGroups) {
             s += $"\t{cardGroup.Title}{(cardGroup.Count > 1 ? $" x{cardGroup.Count}" : "")}\n";
         }
+
+        //handle discards
+        s += $"Discards: {Discards.Count}\n";
+        foreach (var kvp in Discards) {
+            var card = kvp.Value.GetComponent<Card>();
+            s += "\t[" + kvp.Key + "] - " + card.data.name + $" with uid: {card.UniqueID}\n";
+        }
+
 
         s += $"Active Facilities: {ActiveFacilities.Count}";
         Debug.Log(s);

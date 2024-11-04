@@ -576,15 +576,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (Keyboard.current.f5Key.wasPressedThisFrame) {
             playerDictionary.Values.ToList().ForEach(player => Debug.Log($"Player {player.playerName} has {ScoreManager.Instance.GetPlayerScore(player.NetID)}"));
         }
-        if (Keyboard.current.f6Key.wasPressedThisFrame) {
-            UserInterface.Instance.DebugToggleDiceRollPanel();
-        }
-        if (Keyboard.current.f7Key.wasPressedThisFrame) {
-            DebugRollSectorDice();
-        }
-        if (Keyboard.current.f8Key.wasPressedThisFrame) {
-            DebugChangeMeepleAmountDiceRoll();
-        }
+        //if (Keyboard.current.f6Key.wasPressedThisFrame) {
+        //    UserInterface.Instance.DebugToggleDiceRollPanel();
+        //}
+        //if (Keyboard.current.f7Key.wasPressedThisFrame) {
+        //    DebugRollSectorDice();
+        //}
+        //if (Keyboard.current.f8Key.wasPressedThisFrame) {
+        //    DebugChangeMeepleAmountDiceRoll();
+        //}
 
     }
     #endregion
