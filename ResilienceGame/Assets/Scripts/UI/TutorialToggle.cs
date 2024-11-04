@@ -9,6 +9,7 @@ public class TutorialToggle : MonoBehaviour
     #region SerializeFields
     [SerializeField] private GameManager manager;
     [SerializeField] private Canvas tutorialCanvas;
+    [SerializeField] private GameObject discardPanel;
     [SerializeField] private GameObject colorLessPanel;
     [SerializeField] private GameObject regSectorPanel;
     [SerializeField] private GameObject coreSectorPanel;
@@ -61,5 +62,10 @@ public class TutorialToggle : MonoBehaviour
         isCoreSector = manager.sectorInView.isCore;
         regSectorPanel.SetActive(!isCoreSector);
         coreSectorPanel.SetActive(isCoreSector);
+    }
+
+    public void DiscardPanelToggle(bool shouldDiscardPanelBeActive)
+    {
+        discardPanel.SetActive(shouldDiscardPanelBeActive);
     }
 }

@@ -24848,6 +24848,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 2133546051}
   tutorialCanvas: {fileID: 1445822332}
+  discardPanel: {fileID: 812267298}
   colorLessPanel: {fileID: 484877709}
   regSectorPanel: {fileID: 334645908}
   coreSectorPanel: {fileID: 245824960}
@@ -41206,6 +41207,7 @@ MonoBehaviour:
   - {fileID: 581825361}
   - {fileID: 96236304}
   - {fileID: 1514866355}
+  tutorialToggle: {fileID: 1102689069}
   meepleButtons:
   - {fileID: 381496567}
   - {fileID: 95153327}

@@ -44,6 +44,7 @@ public class UserInterface : MonoBehaviour {
     public GameObject handDropZone;
     public GameObject opponentDropZone;
     public TextMeshProUGUI[] meeplesAmountText;
+    [SerializeField] private TutorialToggle tutorialToggle;
     [SerializeField] private Button[] meepleButtons;
     [SerializeField] private GameObject gameLogMessagePrefab;
     [SerializeField] private Transform gameLogParent;
@@ -152,9 +153,11 @@ public class UserInterface : MonoBehaviour {
     }
     public void EnableDiscardDrop() {
         discardDropZone.SetActive(true);
+        tutorialToggle.DiscardPanelToggle(true);
     }
     public void DisableDiscardDrop() {
         discardDropZone.SetActive(false);
+        tutorialToggle.DiscardPanelToggle(false);
     }
     public void EnableMeepleButtonByIndex(int index) {
         meepleButtons[index].interactable = true;
