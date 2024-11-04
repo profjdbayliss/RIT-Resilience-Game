@@ -627,6 +627,17 @@ public class Sector : MonoBehaviour {
                 AddEffectToFacilities(effectString, playerTeam, playerId);
         };
     }
+    public void AddOnDiceRollEffect(int minRoll, string effectString, PlayerTeam playerTeam, int playerId, FacilityType facilityType) {
+        OnDiceRollComplete = null;
+        OnDiceRollComplete += () => {
+            if (DieRoll < minRoll) {
+                facilities
+                .FirstOrDefault(facility => facility.facilityType == facilityType)
+                .AddRemoveEffectsByIdString(effectString, true, playerTeam, playerId);
+            }
+                
+        };
+    }
 
     public void HandleDieCardPlayToAddEffects(Card card, CardPlayer player) {
         if (IsSimulated || Owner == null) return;

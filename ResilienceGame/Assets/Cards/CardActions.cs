@@ -576,6 +576,43 @@ public class ChangeAllFacPointsBySectorType : ICardAction {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
+public class ChangeTransFacPointsAllSectors : ICardAction {
+    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        // int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
+        // Debug.Log("$$Sector rolled a " + diceRoll);
+
+        var sectors = card.data.onlyPlayedOn.Contains(SectorType.All) ?
+            GameManager.Instance.AllSectors.Values.ToList().Select(sector => sector.sectorName).ToList() :
+            card.data.onlyPlayedOn;
+
+        var playedSectors = GameManager.Instance.AllSectors.Values.Where(
+            sector => !sector.IsSimulated && sectors.Contains(sector.sectorName)).ToList();
+
+        foreach (var sector in playedSectors) {
+            sector.AddOnDiceRollEffect(
+                    minRoll: card.data.minDiceRoll,
+                    effectString: card.data.effectString,
+                    playerTeam: player.playerTeam,
+                    playerId: player.NetID,
+                    FacilityType.Transmission);
+
+        }
+
+        UserInterface.Instance.ShowDiceRollingPanel(
+            playedSectors.Select(x => x.sectorName).ToList(),
+            card.front.description,
+            card.data.minDiceRoll);
+
+
+
+
+        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+
+    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
+        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
+    }
+}
 
 /// <summary>
 /// Changes financial points across all sectors if they fail a dice roll

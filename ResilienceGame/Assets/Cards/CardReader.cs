@@ -239,6 +239,9 @@ public class CardReader : MonoBehaviour {
                                 case "ChangeAllFacPointsBySectorType":
                                     tempCard.ActionList.Add(new ChangeAllFacPointsBySectorType());
                                     break;
+                                case "ChangeTransFacPointsAllSectors":
+                                    tempCard.ActionList.Add(new ChangeTransFacPointsAllSectors());
+                                    break;
                                 case "NWChangeFinPointsDice":
                                     tempCard.ActionList.Add(new NWChangeFinPointsDice());
                                     break;

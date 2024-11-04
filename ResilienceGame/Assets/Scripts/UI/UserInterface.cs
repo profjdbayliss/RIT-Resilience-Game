@@ -400,6 +400,11 @@ public class UserInterface : MonoBehaviour {
 
 
     public void ShowDiceRollingPanel(List<SectorType> sectors, string effect, int rollReq) {
+
+        if (!sectors.Any()) {
+            return;
+        }
+
         Debug.Log($"Displaying Dice roll panel for {sectors.Count} sector rolls with required roll of {rollReq}");
         //DisplayPassFailText(enable: false);
         diceCardEffectText.text = effect;
