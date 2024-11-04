@@ -45,13 +45,13 @@ public class TutorialToggle : MonoBehaviour
         }
         else Debug.Log("Player team not red or blue");
 
-        UpdateCoreSectorCheck();
         isTutorialActive = false;
         tutorialCanvas.gameObject.SetActive(isTutorialActive);
     }
 
     public void ToggleCanvas()
     {
+        UpdateCoreSectorCheck();
         isTutorialActive = !isTutorialActive;
         tutorialCanvas.gameObject.SetActive(isTutorialActive);
     }
