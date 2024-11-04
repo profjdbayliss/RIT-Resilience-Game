@@ -405,6 +405,7 @@ public class UserInterface : MonoBehaviour {
     public void ShowDiceRollingPanel(List<SectorType> sectors, string effect, int rollReq) {
 
         if (!sectors.Any()) {
+            GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
             return;
         }
 
@@ -469,7 +470,8 @@ public class UserInterface : MonoBehaviour {
         DisplayPassFailText(index, true, finalFace, rollReq);
         yield return new WaitForSeconds(3f);
         onDiceRolled?.Invoke();
-
+        yield return new WaitForSeconds(.2f);
+        GameManager.Instance.EndWhitePlayerTurn(); //end the turn after the dice roll ends
         HideDiceRollingPanel();
     }
 

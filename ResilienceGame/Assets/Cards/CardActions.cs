@@ -486,6 +486,7 @@ public class NWIncOvertimeAmount : ICardAction {
         GameManager.Instance.playerDictionary.Values.ToList().ForEach(player =>
             player.AddOvertimeCharge()
         );
+        GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -505,6 +506,7 @@ public class NWShuffleFromDiscard : ICardAction {
         Debug.Log("card " + card.front.title + " played.");
         Debug.Log($"facility amt: {card.data.facilityAmount}\n dur: {card.data.duration}");
         GameManager.Instance.GetPlayerByTeam(PlayerTeam.Blue).ForEach(player => player.AddDiscardsToDeck(card.data.facilityAmount));
+        GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -636,6 +638,7 @@ public class IncreaseBaseMaxMeeples : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("Handling Meeple Change Amount on Dice Roll");
         GameManager.Instance.GetPlayerByTeam(PlayerTeam.Blue).ForEach(player => player.PermaIncAllMeeplesByOne());
+        GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 
@@ -646,8 +649,9 @@ public class IncreaseBaseMaxMeeples : ICardAction {
 //TODO: needs a network update to keep blue players counts updated, cut for now
 public class IncreaseBaseMaxMeeplesRandom : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        Debug.Log("Handling Meeple Change Amount on Dice Roll");
+        Debug.Log("Handling Change base meeple amount random");
         GameManager.Instance.GetPlayerByTeam(PlayerTeam.Blue).ForEach(player => player.PermaIncRandomMeepleByFlatAmt((int)card.data.meepleAmtMulti));
+        GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 

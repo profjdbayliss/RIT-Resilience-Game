@@ -14,7 +14,7 @@ public class WhiteCardPlayer : CardPlayer {
     public override void Start() {
         InitDropLocations();
         MAX_DRAW_AMOUNT = 1000;
-        NetID = 999;
+        
         playerName = "WhitePlayer";
         playerTeam = PlayerTeam.White;
         DeckName = "white";
@@ -100,8 +100,9 @@ public class WhiteCardPlayer : CardPlayer {
                                 card: _card.GetComponent<RectTransform>(),
                                 targetPos: UserInterface.Instance.discardPile.anchoredPosition,
                                 onComplete: () => {
-                                    _card.Play(this);
-                                    Destroy(_card.gameObject);
+                                    _card.Play(this); //play the card
+                                    
+                                    Destroy(_card.gameObject); //destroy it after
                                 },
                                 duration: 1f,
                                 scaleUpAmt: .01f));
@@ -170,6 +171,13 @@ public class WhiteCardPlayer : CardPlayer {
         }
     }
 
+    public void PlayRandomNegativeCard() {
+        if (!GameManager.Instance.IsServer) return;
+
+        Debug.Log("Playing random negative white card");
+        PlayCard(GetRandomPlayableCard(positive: false));
+        
+    }
 
     public Card GetRandomPlayableCard(bool positive) {
         var cardPlays = HandCards.Values

@@ -700,7 +700,7 @@ public class Sector : MonoBehaviour {
                 Amount = DieRoll
             };
             GameManager.Instance.SendUpdateFromSector(GameManager.Instance.MGamePhase, update);
-            Debug.Log($"**Server: {sectorName}-{DieRoll}");
+            //Debug.Log($"**Server: {sectorName}-{DieRoll}");
             return DieRoll;
         }
         //if not the server, this message will be responded to by a server message to set the die roll
@@ -714,7 +714,7 @@ public class Sector : MonoBehaviour {
         if (!GameManager.Instance.IsServer) {
             DieRoll = roll;
             dieRollShadow = DieRoll;
-            Debug.Log($"**Client: {sectorName}-{DieRoll}");
+           // Debug.Log($"**Client: {sectorName}-{DieRoll}");
         }
         else {
             Debug.LogWarning($"Server UpdateDieRollFromNetwork was called");

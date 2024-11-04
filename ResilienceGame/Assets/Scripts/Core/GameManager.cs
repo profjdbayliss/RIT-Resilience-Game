@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             else {
                 // Automatically set the AI player as ready (server only)
-                RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
+               // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
                 RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
             }
 
@@ -581,9 +581,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (Keyboard.current.f5Key.wasPressedThisFrame) {
             playerDictionary.Values.ToList().ForEach(player => Debug.Log($"Player {player.playerName} has {ScoreManager.Instance.GetPlayerScore(player.NetID)}"));
         }
-        //if (Keyboard.current.f6Key.wasPressedThisFrame) {
-        //    UserInterface.Instance.DebugToggleDiceRollPanel();
-        //}
+        if (Keyboard.current.f6Key.wasPressedThisFrame) {
+            RGNetworkPlayerList.instance.DebugLogPlayerLists();
+        }
         //if (Keyboard.current.f7Key.wasPressedThisFrame) {
         //    DebugRollSectorDice();
         //}
@@ -881,6 +881,27 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region White Card Handling
+    private void HandleWhitePlayer(GamePhase phase, bool phaseJustChanged) {
+        if (phaseJustChanged) {
+            switch (phase) {
+                case GamePhase.PlayWhite:
+                    HandleWhiteTurn();
+                    break;
+                default:
+                    EndWhitePlayerTurn();
+                    break;
+            }
+        }
+    }
+    public void EndWhitePlayerTurn() {
+        // Ensure this runs only on the server to avoid duplicate calls
+        if (IsServer) {
+          //  RGNetworkPlayerList.instance.SetWhitePlayerEndPhase();
+            AddMessage(new Message(CardMessageType.EndPhase, (uint) RGNetworkPlayerList.instance.playerIDs.Count-1));
+            Debug.Log("White player's turn ended by server.");
+        }
+    }
+
     private void HandleWhiteCardUpdate() {
 
     }
@@ -895,70 +916,21 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
             }
         }
+        else {
+            //only server handles white card plays
+            return;
+        }
 
-        Debug.Log($"White turn {turnTotal}");
+        
+        
         if (playWhite) {
-            if (!hasWhiteCardPlayed)
-                PlayPos();
+            whitePlayer.PlayRandomNegativeCard();
         }
-        void PlayPos() {
-            int randCard = UnityEngine.Random.Range(0, positiveWhiteCards.Count - 1);
-            Debug.Log("Playing positive white card on turn " + turnTotal);
-            hasWhiteCardPlayed = true;
-
-            Update whiteCardPlay = new Update() {
-                Type = CardMessageType.CardUpdate,
-                CardID = positiveWhiteCards[randCard].data.cardID,
-                UniqueID = 0,
-            };
-
-            AddUpdateFromPlayer(whiteCardPlay, GamePhase.PlayWhite, -1);
-
-            //TODO: Play the card
-            //positiveWhiteCards[randCard].Play(null, null);
-            //  positiveWhiteCards.RemoveAt(randCard);
+        else {
+            Debug.Log($"{numTurnsTillWhiteCard} turns until next white card");
+            EndWhitePlayerTurn();
         }
-
-        void PlayNeg() {
-            Debug.Log("Playing negative white card on turn " + turnTotal);
-            int randCard = UnityEngine.Random.Range(0, negativeWhiteCards.Count - 1);
-            hasWhiteCardPlayed = true;
-            //TODO: Play the card
-            //  negativeWhiteCards[randCard].Play(null, null);
-            //  negativeWhiteCards.RemoveAt(randCard);
-        }
-
-
-
-        if (!hasWhiteCardPlayed) {
-
-
-            if (UnityEngine.Random.Range(0f, 1f) > WHITE_CARD_POS_CHANCE) {
-
-                if (numWhiteCardOfSameTypePlayed >= 2) {
-                    PlayNeg();
-                    playedPosWhiteCard = false;
-                    numWhiteCardOfSameTypePlayed = 0;
-                }
-                if (playedPosWhiteCard)
-                    numWhiteCardOfSameTypePlayed++;
-
-                playedPosWhiteCard = true;
-                PlayPos();
-            }
-            else {
-                if (numWhiteCardOfSameTypePlayed >= 2) {
-                    PlayPos();
-                    playedPosWhiteCard = true;
-                    numWhiteCardOfSameTypePlayed = 0;
-                }
-                if (!playedPosWhiteCard)
-                    numWhiteCardOfSameTypePlayed++;
-
-                playedPosWhiteCard = false;
-                PlayNeg();
-            }
-        }
+       
     }
     #endregion
 
@@ -1035,6 +1007,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             mPreviousGamePhase = phase;
             //SkipTutorial();
         }
+        HandleWhitePlayer(phase, phaseJustChanged);
 
         switch (phase) {
             case GamePhase.Start:
@@ -1186,9 +1159,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 break;
             case GamePhase.PlayWhite:
-                if (phaseJustChanged) {
-                    HandleWhiteTurn();
-                }
+                //if (phaseJustChanged) {
+                //    HandleWhiteTurn();
+                //}
                 break;
             case GamePhase.End:
                 // end of game phase

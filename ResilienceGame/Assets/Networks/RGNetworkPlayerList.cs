@@ -40,12 +40,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #region Local Player Fields
     public int localPlayerID;
     public string localPlayerName;
-    public List<int> playerIDs = new List<int>();
     private GameManager manager;
 
     #endregion
 
     #region Player Lists
+    public List<int> playerIDs = new List<int>();
     private List<bool> playerNetworkReadyFlags = new List<bool>();
     private List<bool> playerTurnTakenFlags = new List<bool>();
     public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
@@ -63,13 +63,14 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
     public void Start() {
         manager = GameManager.Instance;// GameObject.FindObjectOfType<GameManager>();
-        AddWhitePlayer();
+
         Debug.Log("start run on RGNetworkPlayerList.cs");
 
     }
     public bool CheckReadyToStart() {
         bool readyToStart = true;
         for (int i = 0; i < playerIDs.Count; i++) {
+            Debug.Log($"++Player {playerIDs[i]} is ready: {playerNetworkReadyFlags[i]} player type: {playerTypes[i]}");
             if (playerTypes[i] == PlayerTeam.Any) {
                 readyToStart = false;
                 break;
@@ -78,12 +79,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         return readyToStart;
     }
     public void AddWhitePlayer() {
-        Debug.Log("adding white ai player to server : 999");
-        playerIDs.Add(999);
+        Debug.Log($"adding white ai player to server : {playerIDs.Count}");
+        playerIDs.Add(playerIDs.Count);
         playerNetworkReadyFlags.Add(true); // AI is always ready
         playerTurnTakenFlags.Add(false);
         playerTypes.Add(PlayerTeam.White); // Define PlayerTeam.AI in your enum if not done
         playerNames.Add("White_Player");
+        GameManager.Instance.whitePlayer.NetID = playerIDs.Count - 1;
         // No need to add a NetworkConnection for the AI
     }
     public void AddPlayer(int id, string name, CardPlayer cardPlayer, NetworkConnectionToClient conn) {
@@ -106,11 +108,17 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
     public void SetAiPlayerAsReadyToStartGame() {
-        int aiPlayerIndex = playerIDs.IndexOf(999);
+        int aiPlayerIndex = playerIDs.Count - 1;
         if (aiPlayerIndex != -1) {
             playerNetworkReadyFlags[aiPlayerIndex] = true;
             playerTurnTakenFlags[aiPlayerIndex] = false; // reset for new game start
             Debug.Log("AI player automatically marked as ready by server.");
+        }
+    }
+    public void SetWhitePlayerEndPhase() {
+        int aiPlayerIndex = playerIDs.Count - 1;
+        if (aiPlayerIndex != -1) {
+            playerTurnTakenFlags[aiPlayerIndex] = true;
         }
     }
 
@@ -120,6 +128,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         if (isServer) {
             playerTypes[localPlayerID] = type;
             if (CheckReadyToStart()) {
+                AddWhitePlayer();
                 Debug.Log("Ready to start server is last!!");
                 manager.RealGameStart();
                 // get the turn taking flags ready to go again
@@ -160,7 +169,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Helpers
-
+    public void DebugLogPlayerLists() {
+        Debug.Log($"Player List({playerIDs.Count}): ");
+        for (int i = 0; i < playerIDs.Count; i++) {
+            Debug.Log($"[{playerIDs[i]}]: {playerNames[i]}, team {playerTypes[i]}, has taken turn: {playerTurnTakenFlags[i]}");
+        }
+    }
     public int DrawCardForPlayer(int playerId) {
         //  Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
         int cardUID = nextCardUID++;
@@ -309,7 +323,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     Debug.Log("update observer called end phase! ");
                     if (isServer) {
                         // we've played so we're no longer on the ready list
-                        int playerIndex = localPlayerID;
+                        int playerIndex = (int) msg.playerID;
                         playerTurnTakenFlags[playerIndex] = true;
                         // find next player to ok to play and send them a message
                         int nextPlayerId = -1;
@@ -941,6 +955,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             // check to see if we've got a player type for everybody!
                             if (CheckReadyToStart()) {
                                 Debug.Log("Ready to start!");
+                                AddWhitePlayer();
                                 manager.RealGameStart();
                                 // get the turn taking flags ready to go again
                                 for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
@@ -1231,5 +1246,5 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
     #endregion
 
-    
+
 }
