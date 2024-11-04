@@ -317,7 +317,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 numBluePlayers++;
             }
         }
-       // playerDictionary.Add(whitePlayer.NetID, whitePlayer); //
+        // playerDictionary.Add(whitePlayer.NetID, whitePlayer); //
         //assign sectors to all players
         if (IsServer) {
 
@@ -504,6 +504,20 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Debug Logging
+    public void DebugRollSectorDice() {
+        List<SectorType> sectorTypes = new List<SectorType>();
+        AllSectors.Values.ToList().ForEach(sector => {
+            sector.SectorRollDie();
+            sectorTypes.Add(sector.sectorName);
+        });
+
+        UserInterface.Instance.ShowDiceRollingPanel(
+            sectorTypes,
+            "Test Rolling",
+            3);
+
+    }
+
     public void DebugHandleWhiteCardPress(Card card) {
         whitePlayer.DebugPlayCard(card);
     }
@@ -547,6 +561,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         if (Keyboard.current.f6Key.wasPressedThisFrame) {
             UserInterface.Instance.DebugToggleDiceRollPanel();
+        }
+        if (Keyboard.current.f7Key.wasPressedThisFrame) {
+            DebugRollSectorDice();
         }
 
     }
@@ -1243,6 +1260,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
     }
+    public void SendUpdateFromSector(GamePhase phase, Update update) {
+        if (update.Type == CardMessageType.SectorDieRoll) {
+            var msg = new Message(CardMessageType.SectorDieRoll,
+                (uint)RGNetworkPlayerList.instance.localPlayerID,
+                new List<int> { (int)update.sectorPlayedOn, update.Amount });
+            AddMessage(msg);
+        }
+    }
     public void SendUpdatesToOpponent(GamePhase phase, CardPlayer sender) {
         while (sender.HasUpdates()) {
             // Debug.Log("Checking for updates to send to opponent");
@@ -1299,6 +1324,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 break;
         }
     }
+
+
+
     #endregion
 
     #region Turn Handling
@@ -1371,7 +1399,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.SetTurnText(GetTurnsLeft() + "");
         if (IsServer) {
             Debug.Log("server adding increment turn message");
-            AddMessage(new Message(CardMessageType.IncrementTurn, (uint) RGNetworkPlayerList.instance.localPlayerID));
+            AddMessage(new Message(CardMessageType.IncrementTurn, (uint)RGNetworkPlayerList.instance.localPlayerID));
         }
     }
     // Gets which turn it is.

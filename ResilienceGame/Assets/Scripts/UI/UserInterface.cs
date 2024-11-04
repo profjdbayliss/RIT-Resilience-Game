@@ -81,12 +81,15 @@ public class UserInterface : MonoBehaviour {
     [Header("Dice Rolling")]
     [SerializeField] private GameObject diceRollingPanel;
     [SerializeField] private TextMeshProUGUI diceCardEffectText;
-    [SerializeField] private TextMeshProUGUI dicePassFailText;
+    //[SerializeField] private TextMeshProUGUI dicePassFailText;
     [SerializeField] private Sprite[] dieFaces;
-    [SerializeField] private Image die;
+    [SerializeField] private List<Image> dice;
+    [SerializeField] private List<TextMeshProUGUI> successText;
     [SerializeField] private float rollDuration = 4.5f;
     [SerializeField] private float minRollTime = 0.1f;
     [SerializeField] private float maxRollTime = 0.5f;
+    [SerializeField] private GameObject diceParent;
+    [SerializeField] private GameObject diceRollingPrefab;
 
     [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
@@ -391,27 +394,45 @@ public class UserInterface : MonoBehaviour {
         else {
             var roll = UnityEngine.Random.Range(1, 7);
             Debug.Log($"Debug Rolling Die with roll: {3}");
-            ShowDiceRollingPanel("Test Effect", 3, 0, () => Debug.Log($"DEBUG On Dice Roll Complete"));
+            //ShowDiceRollingPanel("Test Effect", 3, 0, () => Debug.Log($"DEBUG On Dice Roll Complete"));
         }
     }
 
 
-    public void ShowDiceRollingPanel(string effect, int roll, int rollReq, Action onDiceRolled) {
-        DisplayPassFailText(false);
+    public void ShowDiceRollingPanel(List<SectorType> sectors, string effect, int rollReq) {
+        Debug.Log($"Displaying Dice roll panel for {sectors.Count} sector rolls with required roll of {rollReq}");
+        //DisplayPassFailText(enable: false);
         diceCardEffectText.text = effect;
+        dice.ForEach(x => Destroy(x.transform.parent.gameObject));
+        dice.Clear();
+        successText.Clear();
+
+        sectors.ForEach(sectorType => {
+            var dieRollObj = Instantiate(diceRollingPrefab, diceParent.transform);
+            dieRollObj.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = sectorType.ToString();
+            successText.Add(dieRollObj.transform.GetChild(1).GetComponent<TextMeshProUGUI>());
+            dice.Add(dieRollObj.transform.GetChild(0).GetComponent<Image>());
+        });
+        LayoutRebuilder.ForceRebuildLayoutImmediate(diceParent.GetComponent<RectTransform>());
         diceRollingPanel.SetActive(true);
-        RollDie(roll, onDiceRolled, rollReq);
+        for (int i = 0; i < sectors.Count; i++) {
+            if (GameManager.Instance.AllSectors.TryGetValue(sectors[i], out Sector sector)) {
+                RollDie(i, sector.DieRoll, sector.OnDiceRollComplete, rollReq);
+            }
+            
+        }
+        
     }
     public void HideDiceRollingPanel() {
         diceRollingPanel.SetActive(false);
     }
-    private void RollDie(int roll, Action onDiceRolled, int rollReq) {
-        StartCoroutine(RollingAnimation(roll, onDiceRolled, rollReq));
+    private void RollDie(int index, int roll, Action onDiceRolled, int rollReq) {
+        StartCoroutine(RollingAnimation(index, roll, onDiceRolled, rollReq));
     }
-    private IEnumerator RollingAnimation(int finalFace, Action onDiceRolled, int rollReq) {
+    private IEnumerator RollingAnimation(int index, int finalFace, Action onDiceRolled, int rollReq) {
         float elapsedTime = 0f;
         int previousFace = -1;
-
+        Image die = dice[index];
         yield return new WaitForSeconds(0.2f);
 
         // Randomized face changes to simulate rolling
@@ -437,10 +458,10 @@ public class UserInterface : MonoBehaviour {
         // Set the final face
         Debug.Log($"Set final face to {finalFace}");
         die.sprite = dieFaces[finalFace - 1]; // Set to the final face
-        DisplayPassFailText(true, finalFace, rollReq);
+        DisplayPassFailText(index, true, finalFace, rollReq);
         yield return new WaitForSeconds(3f);
         onDiceRolled?.Invoke();
-        
+
         HideDiceRollingPanel();
     }
 
@@ -449,21 +470,21 @@ public class UserInterface : MonoBehaviour {
     private float EasingFunction(float t) {
         return 1 - Mathf.Pow(1 - t, 5);
     }
-    public void DisplayPassFailText(bool enable = true, int roll = 0, int req = 0) {
+    public void DisplayPassFailText(int index = -1, bool enable = true, int roll = 0, int req = 0) {
         if (enable) {
             if (roll >= req) {
-                dicePassFailText.text = "Saved";
-                dicePassFailText.color = Color.green;
+                successText[index].text = "Saved";
+                successText[index].color = Color.green;
             }
             else {
-                dicePassFailText.text = "Fail";
-                dicePassFailText.color = Color.red;
+                successText[index].text = "Fail";
+                successText[index].color = Color.red;
             }
         }
         else {
-            dicePassFailText.text = "";
+            successText.ForEach(x => x.text = "");
         }
-        
+
     }
 
 

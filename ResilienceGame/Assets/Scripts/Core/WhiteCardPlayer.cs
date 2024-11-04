@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 public class WhiteCardPlayer : CardPlayer {
 
     [SerializeField] private RectTransform handParent;
-    public int DiceRoll { get; private set; }
+    // public int DiceRoll { get; private set; }
 
     // Start is called before the first frame update
     public override void Start() {
@@ -35,7 +35,7 @@ public class WhiteCardPlayer : CardPlayer {
             }
         }
 
-        
+
         //  Debug.Log("white deck count is: " + DeckIDs.Count);
         DrawCardsToFillHand(false);
 
@@ -66,15 +66,28 @@ public class WhiteCardPlayer : CardPlayer {
 
             //if we are sending an update, include a dice roll with the update to be used everywhere
             if (sendUpdate) {
-                DiceRoll = UnityEngine.Random.Range(1, 7);
-                Debug.Log($"$$Creating White Card play with DiceRoll: {DiceRoll}");
+
+                //roll the die for every affected sector
+                //this will be used by all of the clients to determine the outcome of the card
+                card.data.onlyPlayedOn.ForEach(sectorType => {
+                    if (sectorType == SectorType.All) {
+                        GameManager.Instance.AllSectors.Values.ToList().ForEach(x => x.SectorRollDie());
+                    }
+                    else {
+                        if (GameManager.Instance.AllSectors.ContainsKey(sectorType))
+                            GameManager.Instance.AllSectors[sectorType].SectorRollDie();
+                    }
+                    
+                });
+
+
+                //   Debug.Log($"$$Creating White Card play with DiceRoll: {DiceRoll}");
                 EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate,
                 _card.data.cardID,
-                _card.UniqueID,
-                Amount: DiceRoll);
+                _card.UniqueID);
             }
-           
-            
+
+
 
             card.transform.localScale = new Vector3(.5f, .5f, .5f);
             StartCoroutine(
@@ -145,14 +158,14 @@ public class WhiteCardPlayer : CardPlayer {
     public void HandleNetworkUpdate(Update update, GamePhase phase) {
         if (HandCards.TryGetValue(update.UniqueID, out GameObject cardgo)) {
             Card card = cardgo.GetComponent<Card>();
-            if (update.Amount > 0) {
-                DiceRoll = update.Amount;
-                Debug.Log($"$$Setting Dice Roll to {DiceRoll} from network update");
-                
-            }
-            else {
-                Debug.LogWarning($"$$No dice roll found in network update");
-            }
+            //if (update.Amount > 0) {
+            //    DiceRoll = update.Amount;
+            //    Debug.Log($"$$Setting Dice Roll to {DiceRoll} from network update");
+
+            //}
+            //else {
+            //    Debug.LogWarning($"$$No dice roll found in network update");
+            //}
             PlayCard(card, false);
         }
     }
@@ -191,9 +204,9 @@ public class WhiteCardPlayer : CardPlayer {
                 cardsDrawn?.Add(cardDrawn);
             }
         }
-        
-        
-        
+
+
+
     }
     protected override Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy, ref Dictionary<int, GameObject> activeDeck, bool sendUpdate = false) {

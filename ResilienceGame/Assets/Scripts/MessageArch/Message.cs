@@ -29,6 +29,7 @@ public enum CardMessageType
     LogAction,
     SectorAssignment,
     SendSectorData,
+    SectorDieRoll,
     None
 }
 

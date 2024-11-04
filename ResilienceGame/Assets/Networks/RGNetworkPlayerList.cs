@@ -35,7 +35,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
 
     public int DrawCardForPlayer(int playerId) {
-      //  Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
+        //  Debug.Log($"Network server is assigning uinque id to card {nextCardUID} for player {playerId}");
         int cardUID = nextCardUID++;
         drawnCardUIDs[playerId] = cardUID;
         return cardUID;
@@ -267,6 +267,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.ReduceCost:
             case CardMessageType.RemoveEffect:
             case CardMessageType.DiscardCard:
+            case CardMessageType.SectorDieRoll:
             //case CardMessageType.ForceDiscard:
             case CardMessageType.DrawCard:
             case CardMessageType.ReturnCardToDeck:
@@ -597,6 +598,21 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("CLIENT RECEIVED sector assignment: Sector " + sectorIndex);
                     }
                     break;
+                case CardMessageType.SectorDieRoll: {
+                        // Get the assigned sector index from the message payload
+                        int element = 0;
+                        SectorType sectorPlayedOn = (SectorType)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int roll = GetIntFromByteArray(element, msg.payload);
+                        if (GameManager.Instance.AllSectors.TryGetValue(sectorPlayedOn, out Sector sector)) {
+                            sector.UpdateDieRollFromNetwork(roll);
+                        }
+                        else {
+                            Debug.LogError($"Could not find sector {(int)sectorPlayedOn}");
+                        }
+                        Debug.Log("CLIENT RECEIVED sector die roll: Sector " + sectorPlayedOn + " roll " + roll);
+                    }
+                    break;
                 case CardMessageType.ShareDiscardNumber: {
                         uint count = msg.count;
 
@@ -919,6 +935,21 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddActionLogMessage(receivedString, true); //log the action locally
                         //send it to the clients
                         //SendStringToClients(receivedString);
+                    }
+                    break;
+                case CardMessageType.SectorDieRoll: {
+                        // Get the assigned sector index from the message payload
+                        int element = 0;
+                        SectorType sectorPlayedOn = (SectorType)GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+                        int roll = -1;
+                        if (GameManager.Instance.AllSectors.TryGetValue(sectorPlayedOn, out Sector sector)) {
+                            roll = sector.SectorRollDie();
+                        }
+                        else {
+                            Debug.LogError($"Could not find sector {(int)sectorPlayedOn}");
+                        }
+                        Debug.Log("Server RECEIVED sector die roll request from sector " + sectorPlayedOn + " and rolled " + roll);
                     }
                     break;
                 case CardMessageType.DrawCard: {

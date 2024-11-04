@@ -542,48 +542,32 @@ public class NWShuffleFromDiscard : ICardAction {
 /// </summary>
 public class ChangeAllFacPointsBySectorType : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
-       // Debug.Log("$$Sector rolled a " + diceRoll);
+        // int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
+        // Debug.Log("$$Sector rolled a " + diceRoll);
+
+        var sectors = card.data.onlyPlayedOn.Contains(SectorType.All) ?
+            GameManager.Instance.AllSectors.Values.ToList().Select(sector => sector.sectorName).ToList() :
+            card.data.onlyPlayedOn;
+
+        var playedSectors = GameManager.Instance.AllSectors.Values.Where(
+            sector => !sector.IsSimulated && sectors.Contains(sector.sectorName)).ToList();
+
+        foreach (var sector in playedSectors) {
+            sector.AddOnDiceRollEffect(
+                    minRoll: card.data.minDiceRoll,
+                    effectString: card.data.effectString,
+                    playerTeam: player.playerTeam,
+                    playerId: player.NetID);
+
+        }
 
         UserInterface.Instance.ShowDiceRollingPanel(
+            playedSectors.Select(x => x.sectorName).ToList(),
             card.front.description,
-            diceRoll,
-            card.data.minDiceRoll,
-            () => {
-                if (diceRoll < card.data.minDiceRoll) {
-                    
-                    foreach (var sectorType in card.data.onlyPlayedOn) {
-                       // Debug.Log($"sector type: {sectorType}");
-                        if (GameManager.Instance.AllSectors.TryGetValue(sectorType, out Sector sector)) {
-                          //  Debug.Log($"Looking at sector: {sector.sectorName} for {card.data.name}");
-                            if (!sector.IsSimulated)
-                                sector.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
-                        }
-
-                    }
+            card.data.minDiceRoll);
 
 
 
-                    //var sector1 = GameManager.Instance.AllSectors[SectorType.Water];
-                    //var sector2 = GameManager.Instance.AllSectors[SectorType.Healthcare];
-
-                    //if (!sector1.IsSimulated)
-                    //    sector1.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
-
-                    //if (!sector2.IsSimulated)
-                    //    sector2.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
-                    ////GameManager.Instance.AllSectors.Values.ToList().ForEach(
-                    ////    sector => {
-                    ////        if (!sector.IsSimulated)
-                    ////            sector.AddEffectToFacilities(card.data.effectString, player.playerTeam, player.NetID);
-                    ////    });
-
-
-                }
-                else {
-                    Debug.Log("Sector rolled a " + diceRoll + ", roll successful!");
-                }
-            });
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
     }

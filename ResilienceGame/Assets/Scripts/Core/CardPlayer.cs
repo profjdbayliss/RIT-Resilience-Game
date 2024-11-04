@@ -1765,7 +1765,7 @@ public class CardPlayer : MonoBehaviour {
     protected void ForceSendAllUpdates() {
         GameManager.Instance.SendUpdatesToOpponent(GameManager.Instance.MGamePhase, this);
     }
-    protected void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
+    public void EnqueueAndSendCardMessageUpdate(CardMessageType cardMessageType, int CardID, int UniqueID, int Amount = -1, SectorType sectorType = SectorType.Any,
         FacilityType facilityType = FacilityType.None, FacilityEffectType facilityEffectToRemoveType = FacilityEffectType.None) {
         EnqueueCardMessageUpdate(cardMessageType, CardID, UniqueID, Amount, sectorType, facilityType, facilityEffectToRemoveType, true);
     }

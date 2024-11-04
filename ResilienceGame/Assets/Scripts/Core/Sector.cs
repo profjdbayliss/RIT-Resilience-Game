@@ -73,6 +73,13 @@ public class Sector : MonoBehaviour {
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
 
+
+    [Header("Die Rolling")]
+    public int dieRollShadow;
+    public int DieRoll { get; set; } = 0;
+    public Action OnDiceRollComplete { get; set; }
+
+
     public bool IsDown => facilities.Any(facility => facility.IsDown) || (IsSimulated && SimulatedFacilities.Any(x => x == false));
 
     [Header("Game State")]
@@ -304,8 +311,7 @@ public class Sector : MonoBehaviour {
 
     #region Helpers
     public void AddEffectToFacilities(string idString, PlayerTeam createdBy, int createdById) {
-        foreach (var facility in facilities)
-        {
+        foreach (var facility in facilities) {
             facility.AddRemoveEffectsByIdString(idString, true, createdBy, createdById);
         }
     }
@@ -608,8 +614,56 @@ public class Sector : MonoBehaviour {
 
         }
     }
-    public void SectorRollDie() {
 
+
+    #endregion
+
+    #region Die Rolling
+
+    public void AddOnDiceRollEffect(int minRoll, string effectString, PlayerTeam playerTeam, int playerId) {
+        OnDiceRollComplete = null;
+        OnDiceRollComplete += () => {
+            if (DieRoll < minRoll)
+                AddEffectToFacilities(effectString, playerTeam, playerId);
+        };
+    }
+
+    public void HandleDieCardPlayToAddEffects(Card card, CardPlayer player) {
+        if (IsSimulated || Owner == null) return;
+
+
+
+    }
+
+    public int SectorRollDie() {
+        if (GameManager.Instance.IsServer) {
+            DieRoll = UnityEngine.Random.Range(1, 7);
+            dieRollShadow = DieRoll;
+            var update = new Update {
+                Type = CardMessageType.SectorDieRoll,
+                sectorPlayedOn = sectorName,
+                Amount = DieRoll
+            };
+            GameManager.Instance.SendUpdateFromSector(GameManager.Instance.MGamePhase, update);
+            Debug.Log($"**Server: {sectorName}-{DieRoll}");
+            return DieRoll;
+        }
+        //if not the server, this message will be responded to by a server message to set the die roll
+        GameManager.Instance.SendUpdateFromSector(GameManager.Instance.MGamePhase, new Update {
+            Type = CardMessageType.SectorDieRoll,
+            sectorPlayedOn = sectorName,
+        });
+        return -1;
+    }
+    public void UpdateDieRollFromNetwork(int roll) {
+        if (!GameManager.Instance.IsServer) {
+            DieRoll = roll;
+            dieRollShadow = DieRoll;
+            Debug.Log($"**Client: {sectorName}-{DieRoll}");
+        }
+        else {
+            Debug.LogWarning($"Server UpdateDieRollFromNetwork was called");
+        }
     }
     #endregion
 
