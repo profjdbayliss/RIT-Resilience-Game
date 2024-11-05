@@ -196,8 +196,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -8}
-  m_SizeDelta: {x: 523.48, y: 110.1417}
+  m_AnchoredPosition: {x: 1.3894, y: -15.473}
+  m_SizeDelta: {x: 2098.8198, y: 882.06}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &19538117
 MonoBehaviour:
@@ -219,7 +219,27 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: TODO
+  m_text: 'Blue Team''s Goal: To last until the weeks left hit 0 and the terrorists
+    are found.
+
+    Red Team''s Goal: To down every sector or activate the doom clock
+    and let that tick down to 0.
+
+    Doom Clock: Triggered by a core sector going
+    down or half the sectors being down at the same time.
+
+    Core sector: 4 of
+    the 16 possible sectors are core sectors, which are harder to take down than
+    regular sectors but are more important. For a game to start there needs to be
+    at least one core sector in play.
+
+    Downing a sector: If a sector has one
+    of its facilities go down, the sector goes down. A core sector needs two of its
+    facilities go down before it goes down.
+
+    Downing a facility: If either the
+    physical, financial, or network points of a facility hits 0, then the facility
+    goes down.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -246,7 +266,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 91.6
+  m_fontSize: 60.65
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -254,7 +274,7 @@ MonoBehaviour:
   m_fontSizeMax: 91.6
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
