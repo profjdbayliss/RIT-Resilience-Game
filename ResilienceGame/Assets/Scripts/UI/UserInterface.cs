@@ -107,6 +107,8 @@ public class UserInterface : MonoBehaviour {
     private Action OnCancel;
     [SerializeField] private TextMeshProUGUI confirmationText;
     [SerializeField] private RectTransform menuParent;
+    [SerializeField] private RectTransform map;
+    [SerializeField] private GameObject sectorPanel;
 
 
     [Header("Drag and Drop")]
@@ -563,6 +565,11 @@ public class UserInterface : MonoBehaviour {
     }
     public void ToggleMenu() {
         menuParent.gameObject.SetActive(!menuParent.gameObject.activeInHierarchy);
+    }
+    public void ShowSectorPopup(Sector sector) {
+        map.localScale = new Vector3(.8f, .8f, 1f);
+        sectorPanel.SetActive(true);
+
     }
 
 

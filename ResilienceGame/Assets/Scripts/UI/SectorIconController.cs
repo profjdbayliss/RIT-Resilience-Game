@@ -79,8 +79,9 @@ public class SectorIconController : MonoBehaviour {
         SetHoverState(HoverState.NotHover);
     }
     public void OnPointerUp() {
-        GameManager.Instance.SetSectorInView(sector);
-        UserInterface.Instance.ToggleMapGUI();
+        //GameManager.Instance.SetSectorInView(sector);
+        //UserInterface.Instance.ToggleMapGUI();
+        UserInterface.Instance.ShowSectorPopup(sector);
     }
 
     private void SetHoverState(HoverState newState) {
