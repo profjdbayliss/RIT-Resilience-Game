@@ -121,41 +121,7 @@ public class WhiteCardPlayer : CardPlayer {
             .FirstOrDefault(c => c.data.cardID == card.data.cardID),
             true);
     }
-    private IEnumerator MoveToPositionAndScale(RectTransform card, Vector2 targetPos, Action onComplete, float duration, float scaleUpAmt) {
-
-        var startingPos = card.anchoredPosition;
-        var endingPos = targetPos;
-        var time = 0f;
-        var currentScale = card.localScale;
-        var endScale = new Vector3(card.localScale.x * scaleUpAmt,
-                                card.localScale.y * scaleUpAmt,
-                                card.localScale.z * scaleUpAmt);
-
-        while (time < duration) {
-            time += Time.deltaTime;
-            var t = time / duration;
-            t = CubicEaseInOut(t);
-            card.anchoredPosition = Vector2.Lerp(startingPos, endingPos, t);
-            card.localScale = Vector3.Lerp(currentScale, endScale, t);
-            yield return null;
-        }
-
-        card.anchoredPosition = endingPos;
-        card.localScale = endScale;
-
-        yield return new WaitForSeconds(duration);
-        onComplete?.Invoke();
-
-
-    }
-    private float CubicEaseInOut(float t) {
-        if (t < 0.5f)
-            return 4f * t * t * t;
-        else {
-            float f = (2f * t) - 2f;
-            return 0.5f * f * f * f + 1f;
-        }
-    }
+    
     public void HandleNetworkUpdate(Update update, GamePhase phase) {
         if (HandCards.TryGetValue(update.UniqueID, out GameObject cardgo)) {
             Card card = cardgo.GetComponent<Card>();

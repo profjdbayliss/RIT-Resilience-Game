@@ -17705,45 +17705,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 680164117}
-  - component: {fileID: 680164116}
+  - component: {fileID: 680164118}
   m_Layer: 5
-  m_Name: SecondBasePlayer
+  m_Name: AiPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &680164116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 680164114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f279711f1e71d3940932e3969666c8c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerName: 
-  playerTeam: 3
-  NetID: -1
-  IsAI: 0
-  DeckName: 
-  DeckIDs: 
-  handSize: 0
-  cardPrefab: {fileID: 1938897582}
-  CardsAllowedToBeDiscard: []
-  CardsAllowedToBeSelected: []
-  borrowedMeeples: 
-  lentMeeples: 
-  currentMeeples: 
-  tempMeeples: 
-  updatedMeeplesThisPhase: 0
-  meeplesSpent: 0
-  numMeeplesRequired: 0
-  otState: 0
-  overTimeCharges: 0
 --- !u!4 &680164117
 Transform:
   m_ObjectHideFlags: 0
@@ -17759,6 +17728,38 @@ Transform:
   m_Father: {fileID: 1394912030}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &680164118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 680164114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f019d9f27387c64a80d5b04addf3bfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerName: 
+  playerTeam: 3
+  NetID: -1
+  IsAI: 0
+  DeckName: 
+  DeckIDs: 
+  handSize: 0
+  cardPrefab: {fileID: 0}
+  CardsAllowedToBeDiscard: []
+  CardsAllowedToBeSelected: []
+  borrowedMeeples: 
+  lentMeeples: 
+  currentMeeples: 
+  tempMeeples: 
+  updatedMeeplesThisPhase: 0
+  meeplesSpent: 0
+  numMeeplesRequired: 0
+  otState: 0
+  overTimeCharges: 0
+  handParent: {fileID: 0}
 --- !u!1 &689357524
 GameObject:
   m_ObjectHideFlags: 0
@@ -47846,6 +47847,7 @@ MonoBehaviour:
   opponentType: 3
   actualPlayer: {fileID: 0}
   whitePlayer: {fileID: 1125198116}
+  aiPlayer: {fileID: 680164118}
   networkPlayers: []
   activePlayerNumber: 0
   activeSectors:

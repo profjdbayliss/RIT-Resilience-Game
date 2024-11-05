@@ -11,6 +11,7 @@ using System.Linq;
 using static Facility;
 using System;
 using System.Text;
+using System.Collections;
 #region enums
 // Enum to track player type
 public enum PlayerTeam {
@@ -111,6 +112,7 @@ public class CardPlayer : MonoBehaviour {
     [Header("Facilities")]
     protected int facilityCount = 0;
     protected bool registeredFacilities = false;
+    protected GameObject hoveredDropLocation;
 
     [Header("Meeple Info")]
     //public const int STARTING_MEEPLES = 2;
@@ -713,6 +715,41 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Helpers
+    protected IEnumerator MoveToPositionAndScale(RectTransform card, Vector2 targetPos, Action onComplete, float duration, float scaleUpAmt) {
+
+        var startingPos = card.anchoredPosition;
+        var endingPos = targetPos;
+        var time = 0f;
+        var currentScale = card.localScale;
+        var endScale = new Vector3(card.localScale.x * scaleUpAmt,
+                                card.localScale.y * scaleUpAmt,
+                                card.localScale.z * scaleUpAmt);
+
+        while (time < duration) {
+            time += Time.deltaTime;
+            var t = time / duration;
+            t = CubicEaseInOut(t);
+            card.anchoredPosition = Vector2.Lerp(startingPos, endingPos, t);
+            card.localScale = Vector3.Lerp(currentScale, endScale, t);
+            yield return null;
+        }
+
+        card.anchoredPosition = endingPos;
+        card.localScale = endScale;
+
+        yield return new WaitForSeconds(duration);
+        onComplete?.Invoke();
+
+
+    }
+    protected float CubicEaseInOut(float t) {
+        if (t < 0.5f)
+            return 4f * t * t * t;
+        else {
+            float f = (2f * t) - 2f;
+            return 0.5f * f * f * f + 1f;
+        }
+    }
     public void AddActionToCallAfterTurns(int turns, Action action) {
         temporaryEffectCallbacks.Add((turns, action));
     }
@@ -1344,15 +1381,15 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Dropping
-    public Card AiDropCardOn(Card card, Vector2 position) {
-        Debug.Log($"{playerName}'s ai is playing {card.data.name} at {position}");
-        if (card == null || position == null) return null;
-        UpdateHoveredDropLocation(position, false, card);
-        return HandleCardDrop(card);
-    }
+    //public Card AiDropCardOn(Card card, Vector2 position) {
+    //    Debug.Log($"{playerName}'s ai is playing {card.data.name} at {position}");
+    //    if (card == null || position == null) return null;
+    //    UpdateHoveredDropLocation(position, false, card);
+    //    return HandleCardDrop(card);
+    //}
 
     //This function is called when a card is dropped from that card's slippy component (happens one time at drop)
-    public Card HandleCardDrop(Card card) {
+    public virtual Card HandleCardDrop(Card card) {
         if (UserInterface.Instance.hoveredDropLocation == null) {
             Debug.Log("No drop location found");
             return null;
@@ -1362,7 +1399,7 @@ public class CardPlayer : MonoBehaviour {
             if (UserInterface.Instance.hoveredDropLocation.CompareTag("FacilityDropLocation")) {
                 UserInterface.Instance.hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
-            if (ValidateCardPlay(card)) {
+            if (ValidateCardPlay(card, UserInterface.Instance.hoveredDropLocation)) {
                 //check if the game is waiting for the player to return cards to the deck by playing them
                 if (ReadyState == PlayerReadyState.ReturnCardsToDeck) {
                     Debug.Log("Returning card to deck");
@@ -1531,18 +1568,18 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Card Play Validation
-    protected bool ValidateCardPlay(Card card) {
+    protected virtual bool ValidateCardPlay(Card card, GameObject potentialDropLocation) {
         string response = "";
         bool canPlay = false;
-        if (IsAI) {
-            Debug.LogWarning($"Can't play manually as AI player!!");
-            return false;
-        }
+        
         if (AmountToReturnToDeck > 0) {
             Debug.Log($"Returning {card.front.title} to deck");
             return true;
         }
-
+        if (potentialDropLocation == null) {
+            Debug.LogWarning($"No location is being hovered");
+            return false;
+        }
         switch (GameManager.Instance.MGamePhase) {
             case GamePhase.DrawRed:
             case GamePhase.DrawBlue:
@@ -1554,28 +1591,28 @@ public class CardPlayer : MonoBehaviour {
                 break;
             case GamePhase.ActionBlue:
             case GamePhase.ActionRed:
-                (response, canPlay) = ValidateActionPlay(card);
+                (response, canPlay) = ValidateActionPlay(card, potentialDropLocation);
                 break;
             case GamePhase.DiscardRed:
             case GamePhase.DiscardBlue:
-                (response, canPlay) = ValidateDiscardPlay(card);
+                (response, canPlay) = ValidateDiscardPlay(card, potentialDropLocation);
                 break;
         }
 
-        Debug.Log($"Playing {card.front.title} on {UserInterface.Instance.hoveredDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}\n{response}");
+        Debug.Log($"Playing {card.front.title} on {potentialDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}\n{response}");
 
         return canPlay;
     }
-    protected (string, bool) ValidateDiscardPlay(Card card) {
-        if (UserInterface.Instance.hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
+    protected (string, bool) ValidateDiscardPlay(Card card, GameObject potentialDropLocation) {
+        if (potentialDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
             return ("Can discard during discard phase", true);
         }
         return ("Must discard on the discard drop zone", false);
     }
-    protected (string, bool) ValidateDiscardDuringActionPlay(Card card) {
+    protected (string, bool) ValidateDiscardDuringActionPlay(Card card, GameObject potentialDropLocation) {
         if (!GameManager.Instance.MIsDiscardAllowed)
             return ("Game manager says discard is not allowed", false);
-        if (UserInterface.Instance.hoveredDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
+        if (potentialDropLocation.CompareTag(CardDropZoneTag.DISCARD)) {
             if (CardsAllowedToBeDiscard == null)    //Any card can be discarded
                 return ("Discard any card allowed", true);
             if (CardsAllowedToBeDiscard.Contains(card)) //only highlighted cards can be discarded
@@ -1584,11 +1621,11 @@ public class CardPlayer : MonoBehaviour {
         }
         return ("Must discard cards first", false); //didn't drop on the discard drop zone
     }
-    protected (string, bool) ValidateActionAndReadyPlay(Card card) {
+    protected (string, bool) ValidateActionAndReadyPlay(Card card, GameObject potentialDropLocation) {
         //check prereq effects on cards for effect cards played on single facilities
         if (card.data.preReqEffectType != FacilityEffectType.None) {
 
-            Facility facility = UserInterface.Instance.hoveredDropLocation.GetComponent<Facility>();
+            Facility facility = potentialDropLocation.GetComponent<Facility>();
             if (facility == null) {
                 return ("Facility not found on hovered drop location", false);
             }
@@ -1599,11 +1636,11 @@ public class CardPlayer : MonoBehaviour {
         //check for 'Remove' effect for sector cards
         if (card.data.effectString == "Remove") {
             Sector sector = null;
-            if (UserInterface.Instance.hoveredDropLocation.TryGetComponent(out Facility facility)) {
+            if (potentialDropLocation.TryGetComponent(out Facility facility)) {
                 sector = facility.sectorItsAPartOf;
             }
             else {
-                sector = UserInterface.Instance.hoveredDropLocation.GetComponentInParent<Sector>();
+                sector = potentialDropLocation.GetComponentInParent<Sector>();
             }
             if (sector == null) {
                 Debug.LogError($"Sector should be found here");
@@ -1618,13 +1655,13 @@ public class CardPlayer : MonoBehaviour {
         }
         return ("Valid action play", true);
     }
-    protected (string, bool) ValidateActionPlay(Card card) {
+    protected (string, bool) ValidateActionPlay(Card card, GameObject potentialDropLocation) {
         Debug.Log("Checking if card can be played in action phase");
         if (!GameManager.Instance.IsActualPlayersTurn())    //make sure its the player's turn
             return ($"It is not {playerTeam}'s turn", false);
 
         //dont allow playing on allied sectors outside of doom clock and DC effect cards
-        if (UserInterface.Instance.hoveredDropLocation.TryGetComponent(out Facility facility)) {
+        if (potentialDropLocation.TryGetComponent(out Facility facility)) {
             var sector = facility.sectorItsAPartOf;
             if (sector.sectorName != PlayerSector.sectorName) {
                 if (!GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
@@ -1651,10 +1688,10 @@ public class CardPlayer : MonoBehaviour {
 
         return ReadyState switch {
             PlayerReadyState.SelectFacilties => ($"Player must select facilities before playing cards", false),
-            PlayerReadyState.DiscardCards => ValidateDiscardDuringActionPlay(card),
+            PlayerReadyState.DiscardCards => ValidateDiscardDuringActionPlay(card, potentialDropLocation),
             PlayerReadyState.SelectCardsForCostChange => ("Valid card selection", true),
             PlayerReadyState.EndedPhase => ("Cannot play cards after phase has ended", false),
-            PlayerReadyState.ReadyToPlay => ValidateActionAndReadyPlay(card),
+            PlayerReadyState.ReadyToPlay => ValidateActionAndReadyPlay(card, potentialDropLocation),
             _ => ("Invalid state", false),
         };
     }

@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public PlayerTeam opponentType = PlayerTeam.Any;
     public CardPlayer actualPlayer;
     public WhiteCardPlayer whitePlayer;
+    public AICardPlayer aiPlayer;
     public List<CardPlayer> networkPlayers = new List<CardPlayer>();
     // public CardPlayer opponentPlayer;
     private bool myTurn = false;
@@ -514,6 +515,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
+        //temp add ai player to trackers
+        
 
         // Initialize the deck info and set various
         // player zones active
@@ -523,6 +526,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
         tutorialToggle.WhenGameStarts();
+
+
+        
     }
 
     #endregion
@@ -561,6 +567,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void DebugHandleWhiteCardPress(Card card) {
         whitePlayer.DebugPlayCard(card);
+    }
+    public void DebugAiPlayCard() {
+        aiPlayer.DebugPlayCard();
     }
     private void HandleDebugLogInput() {
         if (Keyboard.current.f1Key.wasPressedThisFrame) {
@@ -603,10 +612,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (Keyboard.current.f6Key.wasPressedThisFrame) {
             RGNetworkPlayerList.instance.DebugLogPlayerLists();
         }
-        
-        //if (Keyboard.current.f8Key.wasPressedThisFrame) {
-        //    DebugChangeMeepleAmountDiceRoll();
-        //}
+
+        if (Keyboard.current.f8Key.wasPressedThisFrame) {
+            DebugAiPlayCard();
+        }
 
     }
     #endregion

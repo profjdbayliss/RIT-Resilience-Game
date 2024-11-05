@@ -5,137 +5,117 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR;
 
-public class AICardPlayer : MonoBehaviour {
-    CardPlayer cardPlayer;
+public class AICardPlayer : CardPlayer {
+
+    [SerializeField] private RectTransform handParent;
+    public override Card HandleCardDrop(Card card) {
 
 
-    List<Facility> DamagedFacilities => cardPlayer.PlayerSector.facilities.Where(facility => facility.IsDamaged).ToList();
-    // Start is called before the first frame update
-    void Start() {
-        cardPlayer = GetComponent<CardPlayer>();
+        //check for a card play or card discard
+        
+            // Debug.Log("Card is valid to play and player is ready");
+            //set var to hold where the card was dropped
+
+            //set card state to played
+            card.SetCardState(CardState.CardDrawnDropped);
+            //remove card from hand
+            handPositioner.cards.Remove(card);
+            //set the parent to where it was played
+            card.transform.transform.SetParent(cardDroppedOnObject.transform);
+            return card;
+        
+
+        
     }
-
-    // Update is called once per frame
-    void Update() {
-        //if (Keyboard.current.numpad0Key.wasPressedThisFrame) {
-        //    PlayCard();
-        //}
+    public void DebugPlayCard() {
+         PlayCard(sendUpdate: false);
+        
     }
-    public void PlayCard() {
-        Debug.Log($"AI on player {cardPlayer.playerName} is playing a card");
-        if (cardPlayer.playerTeam != PlayerTeam.Blue) return;
+    public void PlayCard(bool sendUpdate = true) {
+        Debug.Log($"ai player {playerName} is trying to play a card");
 
-        var cardToPlay = GetRandomPlayableCard(
-            cardPlayer.HandCards.Values.Select(x => x.GetComponent<Card>()).ToList(),
-            out GameObject playLocation);
+        Card _card = GetRandomPlayableCard(out GameObject dropLocation);
+        
+        HandleCardDrop(_card);
+        
 
-        Debug.Log($"Found card able to be played: {cardToPlay.data.name}");
 
-        if (cardToPlay == null) return;
-        if (playLocation == null) return;
+        if (_card == null) {
+            Debug.LogWarning($"No valid Card found for ai player {playerName}");
+            return;
+        }
+        HandCards.Remove(_card.UniqueID);
+        if (_card) {
+            Debug.Log("ai player is playing card: " + _card.data.name);
+            _card.transform.SetParent(UserInterface.Instance.gameCanvas.transform, true);
 
-        cardPlayer.AiDropCardOn(cardToPlay, playLocation.transform.position);
+            if (sendUpdate) {
+                EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate,
+                    _card.data.cardID,
+                    _card.UniqueID);
+            }
 
-       
-    }
-    private Card GetRandomPlayableCard(List<Card> playerHand, out GameObject playLocation) {
 
-        if (!playerHand.Any()) {
-            playLocation = null;
-            return null;
+
+            //card.transform.localScale = new Vector3(.5f, .5f, .5f);
+            //StartCoroutine(
+            //    MoveToPositionAndScale(
+            //        card: _card.GetComponent<RectTransform>(),
+            //        targetPos: new Vector2(0, 0),
+            //        onComplete: () => {
+            //            StartCoroutine(
+            //                MoveToPositionAndScale(
+            //                    card: _card.GetComponent<RectTransform>(),
+            //                    targetPos: UserInterface.Instance.discardPile.anchoredPosition,
+            //                    onComplete: () => {
+            //                        _card.Play(this); //play the card
+
+            //                        Destroy(_card.gameObject); //destroy it after
+            //                    },
+            //                    duration: 1f,
+            //                    scaleUpAmt: .01f));
+
+            //        },
+            //        duration: 1f,
+            //        scaleUpAmt: 2f));
 
         }
 
-        Card cardToPlay = null;
-        //get random card in the hand
-        cardToPlay = playerHand[Random.Range(0, playerHand.Count)];
-
-        //check the card target
-        switch (cardToPlay.target) {
-            case CardTarget.Hand:
-            case CardTarget.Card:
-            case CardTarget.Sector:
-                playLocation = cardPlayer.PlayerSector.facilities[1].gameObject;
-                return cardToPlay;
-            case CardTarget.Effect:
-            case CardTarget.Facility:
-                switch (cardToPlay.ActionList[0]) {
-                    case AddEffect:
-                        var facilityToPlayOn = GetValidFacilityToPlayOn(cardToPlay);
-                        if (facilityToPlayOn != null) {
-                            playLocation = facilityToPlayOn.gameObject;
-                            return cardToPlay;
-                        }
-                        break;
-                    case BackdoorCheckNetworkRestore:
-                        playLocation = cardPlayer.PlayerSector.facilities[1].gameObject;
-                        return cardToPlay;
+    }
+    public Sector GetFirstPlayableSector() {
+        return playerTeam == PlayerTeam.Blue ?
+           PlayerSector :
+           GameManager.Instance.AllSectors.Values.FirstOrDefault(x => !x.IsSimulated);
+    }
+    public GameObject GetFirstPossibleDropLocation(Card card) {
+        Sector sector = GetFirstPlayableSector();
+        if (sector != null) {
+            for (int i = 0; i < sector.facilities.Length; i++) {
+                if (ValidateCardPlay(card, sector.facilities[i].gameObject)) {
+                    return sector.facilities[i].gameObject;
                 }
-                break;
-        }
-        playerHand.Remove(cardToPlay);
-        return GetRandomPlayableCard(playerHand, out playLocation);
-
-
-    }
-
-    private Facility GetRestorableFacility(FacilityEffect cardEffect) {
-        if (cardEffect.EffectType != FacilityEffectType.ModifyPoints) return null;
-        foreach (var facility in DamagedFacilities) {
-            switch (cardEffect.Target) {
-                case FacilityEffectTarget.Physical:
-                    if (!facility.HasMaxPhysicalPoints) return facility;
-                    break;
-                case FacilityEffectTarget.Financial:
-                    if (!facility.HasMaxFinancialPoints) return facility;
-                    break;
-                case FacilityEffectTarget.Network:
-                    if (!facility.HasMaxNetworkPoints) return facility;
-                    break;
-                case FacilityEffectTarget.NetworkPhysical:
-                    if (!facility.HasMaxNetworkPoints || !facility.HasMaxPhysicalPoints) return facility;
-                    break;
-                case FacilityEffectTarget.FinancialNetwork:
-                    if (!facility.HasMaxNetworkPoints || !facility.HasMaxFinancialPoints) return facility;
-                    break;
-                case FacilityEffectTarget.FinancialPhysical:
-                    if (!facility.HasMaxPhysicalPoints || !facility.HasMaxFinancialPoints) return facility;
-                    break;
-
             }
         }
         return null;
     }
-    private Facility GetFortifiableFacility(FacilityEffect cardEffect) {
-        foreach (var facility in cardPlayer.PlayerSector.facilities) {
-            if (!facility.IsFortified()) {
-                return facility;
+
+    public Card GetRandomPlayableCard(out GameObject dropLocation) {
+        var cards = HandCards.Values.Select(x => x.GetComponent<Card>());
+        Card cardToPlay = null;
+        foreach (Card card in cards) {
+            dropLocation = GetFirstPossibleDropLocation(card);
+            if (dropLocation != null) {
+                if (ValidateCardPlay(card, dropLocation)) {
+                    cardDroppedOnObject = dropLocation;
+                    cardToPlay = card;
+                    break;
+                }
             }
+
         }
-        return cardPlayer.PlayerSector.facilities[0];
-    }
-    private Facility GetFacilityWithRemovableEffects(Card card) {
-        if (cardPlayer.PlayerSector.GetFacilityWithRemovableEffects(PlayerTeam.Blue, out Facility facility)) {
-            return facility;
-        }
+
+        dropLocation = null;
         return null;
     }
-    private Facility GetValidFacilityToPlayOn(Card card) {
-        var cardEffect = FacilityEffect.CreateEffectsFromID(card.data.effectString)[0];
-        if (cardEffect == null) return null;
-        switch (cardEffect.EffectType) {
-            case FacilityEffectType.ModifyPoints:
-                return GetRestorableFacility(cardEffect);
-            case FacilityEffectType.Fortify:
-                return GetFortifiableFacility(cardEffect);
-            case FacilityEffectType.RemoveAll:
-            case FacilityEffectType.RemoveOne:
-                return GetFacilityWithRemovableEffects(card);
-            default:
-                return cardPlayer.PlayerSector.facilities[1]; //return middle facility by default for now
-
-        }
-    }
-
 
 }
