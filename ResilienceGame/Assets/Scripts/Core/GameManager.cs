@@ -270,6 +270,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
                 //create player menu items now that all players sectors assigned
                 playerDictionary.Values.ToList().ForEach(player => UserInterface.Instance.SpawnPlayerMenuItem(player));
+                //assign sectors to map icons and enable them
+                activeSectors.ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
             }
 
         }
@@ -388,8 +390,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 UserInterface.Instance.SpawnPlayerMenuItem(player);
                 
             });
+            //assign sectors to map icons and enable them
+            activeSectors.ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
 
-            
 
 
 
@@ -397,8 +400,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         } //end isServer
 
-        //assign sectors to map icons and enable them
-        activeSectors.ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
+        
 
         // in this game people go in parallel to each other
         // per phase
