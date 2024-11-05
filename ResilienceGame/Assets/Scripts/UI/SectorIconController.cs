@@ -37,20 +37,21 @@ public class SectorIconController : MonoBehaviour {
         targetSize = normalSize;
         iconCollider = GetComponent<Collider2D>();
     }
-    //void OnEnable() {
-    //    iconCollider = GetComponent<Collider2D>();
-    //    rectTransform = GetComponent<RectTransform>();
-    //    if (backGround != null) {
-    //        backGround.sprite = bgs[0]; // Reset to default background
-    //    }
-    //    targetSize = normalSize;
-    //    hoverState = HoverState.NotHover;
-    //    targetState = HoverState.NotHover;
-    //}
+    void OnEnable() {
+        iconCollider = GetComponent<Collider2D>();
+        rectTransform = GetComponent<RectTransform>();
+        rectTransform.sizeDelta = normalSize;
+        if (backGround != null) {
+            backGround.sprite = bgs[0]; // Reset to default background
+        }
+        targetSize = normalSize;
+        hoverState = HoverState.NotHover;
+        targetState = HoverState.NotHover;
+    }
 
     public void SetSector(Sector sector) {
         this.sector = sector;
-        //Debug.Log($"Assigning sector: {sector.sectorName} to {name}");
+        Debug.Log($"Assigning sector: {sector.sectorName} to {name}");
         gameObject.SetActive(true);
 
         sectorNameText.text = sector.sectorName.ToString();
@@ -77,6 +78,10 @@ public class SectorIconController : MonoBehaviour {
         Debug.Log("Pointer Exit");
         SetHoverState(HoverState.NotHover);
     }
+    public void OnPointerUp() {
+        GameManager.Instance.SetSectorInView(sector);
+        UserInterface.Instance.ToggleMapGUI();
+    }
 
     private void SetHoverState(HoverState newState) {
         if (hoverState == newState) return;
@@ -96,11 +101,11 @@ public class SectorIconController : MonoBehaviour {
         sizeCoroutine = StartCoroutine(AnimateSizeChange());
     }
     public void SetToCircleIcon() {
-        icon.enabled = true;
-        sectorInfoParent.SetActive(false);
+        
 
         rectTransform.sizeDelta = normalSize;
-
+        icon.enabled = true;
+        sectorInfoParent.SetActive(false);
     }
 
     private IEnumerator AnimateSizeChange() {

@@ -282,7 +282,8 @@ public class UserInterface : MonoBehaviour {
             Debug.Log($"Invalid sector index: {sectorIndex}");
             return;
         }
-        sectorIcons[sectorIndex].SetSector(sector);
+        Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
+        sectorIcons[sector.transform.GetSiblingIndex()].SetSector(sector);
     }
     public void UpdatePlayerMenuItems() {
         playerMenuItems.ForEach(item => item.UpdatePopup());
@@ -520,12 +521,13 @@ public class UserInterface : MonoBehaviour {
         isGameBoardActive = !isGameBoardActive;
         if (!isGameBoardActive)
             sectorIcons.ForEach(icon => icon.UpdateSectorInfo());
-        
+
         // gameCanvas.GetComponent<GraphicRaycaster>().enabled = isGameBoardActive;
         mapParent.SetActive(!isGameBoardActive);
 
-        if (isGameBoardActive)
-            sectorIcons.ForEach(icon => icon.SetToCircleIcon());
+        //if (isGameBoardActive)
+        //    sectorIcons.ForEach(icon => icon.SetToCircleIcon());
+        
 
     }
 
