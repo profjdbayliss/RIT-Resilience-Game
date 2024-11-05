@@ -9,7 +9,10 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        var networkManager = FindObjectOfType<RGNetworkManager>();
+        if (networkManager != null) {
+            Destroy(networkManager.gameObject);
+        }
     }
 
     // Update is called once per frame
@@ -17,6 +20,7 @@ public class MainMenu : MonoBehaviour
     {
         
     }
+
     public void ToggleRulesMenu(bool enable) {
         rulesMenu.SetActive(enable);
     }

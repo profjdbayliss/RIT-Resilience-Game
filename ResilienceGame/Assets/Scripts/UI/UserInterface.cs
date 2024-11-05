@@ -64,6 +64,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI overTimeTurnsLabelText;
     [SerializeField] private TextMeshProUGUI playerDeckText;
     [SerializeField] private TextMeshProUGUI playerHandText;
+
     [Header("Meeple Sharing")]
     [SerializeField] private GameObject MeepleSharingPanel;
     [SerializeField] private TextMeshProUGUI[] MeepleSharingTextCurrent = new TextMeshProUGUI[3];
@@ -73,6 +74,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private RectTransform rightSelectionparent;
     [SerializeField] private List<Button> allySelectionButtons;
     [SerializeField] private GameObject allySelectionButtonPrefab;
+
     [Header("End Game")]
     public GameObject endGameCanvas;
     public TextMeshProUGUI endGameTitle;
@@ -100,6 +102,11 @@ public class UserInterface : MonoBehaviour {
 
     [Header("Map GUI")]
     [SerializeField] private List<SectorIconController> sectorIcons = new List<SectorIconController>();
+    [SerializeField] private GameObject confirmationWindow;
+    private Action OnConfirm;
+    private Action OnCancel;
+    [SerializeField] private TextMeshProUGUI confirmationText;
+
 
     [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
@@ -517,20 +524,44 @@ public class UserInterface : MonoBehaviour {
         }
 
     }
+
+    #region Map GUI
+    //enable or disable the map gui
     public void ToggleMapGUI() {
         isGameBoardActive = !isGameBoardActive;
         if (!isGameBoardActive)
             sectorIcons.ForEach(icon => icon.UpdateSectorInfo());
 
-        // gameCanvas.GetComponent<GraphicRaycaster>().enabled = isGameBoardActive;
         mapParent.SetActive(!isGameBoardActive);
 
-        //if (isGameBoardActive)
-        //    sectorIcons.ForEach(icon => icon.SetToCircleIcon());
-        
-
+    }
+    public void ShowConfirmWindow(string message, Action onConfirm, Action onCancel) {
+        Debug.Log("Showing confirm window");
+        confirmationText.text = message;
+        OnConfirm = onConfirm;
+        OnCancel = onCancel;
+        confirmationWindow.SetActive(true);
+    }
+    public void ConfirmAction() {
+        OnConfirm?.Invoke();
+        confirmationWindow.SetActive(false);
+    }
+    public void CancelAction() {
+        OnCancel?.Invoke();
+        confirmationWindow.SetActive(false);
+    }
+    public void QuitToMenu() {
+        ShowConfirmWindow("Are you sure you want to quit to the main menu?",
+            () => GameManager.Instance.QuitToMenu(),
+            null);
+    }
+    public void QuitToDesktop() {
+        ShowConfirmWindow("Are you sure you want to quit to desktop?",
+            () => GameManager.Instance.QuitToDesktop(),
+            null);
     }
 
+    #endregion
 
 
 }

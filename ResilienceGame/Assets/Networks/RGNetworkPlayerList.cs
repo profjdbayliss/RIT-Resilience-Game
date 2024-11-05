@@ -70,7 +70,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public bool CheckReadyToStart() {
         bool readyToStart = true;
         for (int i = 0; i < playerIDs.Count; i++) {
-            Debug.Log($"++Player {playerIDs[i]} is ready: {playerNetworkReadyFlags[i]} player type: {playerTypes[i]}");
+           // Debug.Log($"++Player {playerIDs[i]} is ready: {playerNetworkReadyFlags[i]} player type: {playerTypes[i]}");
             if (playerTypes[i] == PlayerTeam.Any) {
                 readyToStart = false;
                 break;
@@ -79,7 +79,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         return readyToStart;
     }
     public void AddWhitePlayer() {
-        Debug.Log($"adding white ai player to server : {playerIDs.Count}");
+       // Debug.Log($"adding white ai player to server : {playerIDs.Count}");
         playerIDs.Add(playerIDs.Count);
         playerNetworkReadyFlags.Add(true); // AI is always ready
         playerTurnTakenFlags.Add(false);

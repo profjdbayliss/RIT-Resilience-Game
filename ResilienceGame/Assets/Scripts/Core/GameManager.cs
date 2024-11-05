@@ -7,13 +7,14 @@ using UnityEngine.InputSystem;
 using System.IO;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour, IRGObservable {
 
     #region fields
     // Static Members
     public static GameManager Instance;
-    private static bool hasStartedAlready = false;
+    private bool hasStartedAlready = false;
     //  public static event Action OnRoundEnd;
 
     // Debug
@@ -182,6 +183,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Doesn't actually start the game until ALL
     // the players connected have pressed their start buttons.
     public void StartGame() {
+        Debug.Log("Start Game called");
         if (!mStartGameRun) {
             Debug.Log("running start of game");
 
@@ -424,6 +426,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         mStartGameRun = false;
         Debug.Log("start run on GameManager");
         if (!hasStartedAlready) {
+            CardPlayer.cards.Clear();
+           // Debug.Log("has not already started");
             //startScreen.SetActive(true);
             UserInterface.Instance.ToggleStartScreen(true);
 
@@ -452,7 +456,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 CardPlayer.AddCards(redCards);
                 //energyPlayer.playerTeam = PlayerTeam.Red;
                 //energyPlayer.DeckName = "red";
-                //   Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+                   //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
 
             }
             else {
@@ -514,7 +518,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // Initialize the deck info and set various
         // player zones active
         whitePlayer.InitializeCards();
-        actualPlayer.InitializeCards();
+        //actualPlayer.InitializeCards();
+        actualPlayer.InitMeeples();
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
         tutorialToggle.WhenGameStarts();
@@ -746,6 +751,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     #region Helpers
 
+    public void QuitToMenu() {
+        if (IsServer)
+            NetworkManager.singleton.StopHost();
+        else {
+            NetworkManager.singleton.StopClient();
+        }
+        SceneManager.LoadScene("MainMenu");
+        
+    }
+    public void QuitToDesktop() {
+        if (IsServer)
+            NetworkManager.singleton.StopHost();
+        else {
+            NetworkManager.singleton.StopClient();
+        }
+        Application.Quit();
+    }
     public List<CardPlayer> GetPlayerByTeam(PlayerTeam team) {
         return playerDictionary.Values.Where(player => player.playerTeam == team).ToList();
     }

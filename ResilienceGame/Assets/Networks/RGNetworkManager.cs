@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using Mirror.Examples.Chat;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class RGNetworkManager : NetworkManager
 {
@@ -59,8 +60,9 @@ public class RGNetworkManager : NetworkManager
     public override void OnClientDisconnect()
     {
         base.OnClientDisconnect();
-        RGNetworkLoginUI.s_instance.gameObject.SetActive(true);
-        RGNetworkLoginUI.s_instance.playernameInput.text = "";
-        RGNetworkLoginUI.s_instance.playernameInput.ActivateInputField();
+        //RGNetworkLoginUI.s_instance.gameObject.SetActive(true);
+        //RGNetworkLoginUI.s_instance.playernameInput.text = "";
+        //RGNetworkLoginUI.s_instance.playernameInput.ActivateInputField();
+        SceneManager.LoadScene("MainMenu");
     }
 }

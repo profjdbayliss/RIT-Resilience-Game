@@ -214,21 +214,7 @@ public class CardPlayer : MonoBehaviour {
 
         overTimeCharges = MAX_OVERTIME_CHARGES;
     }
-    public virtual void InitializeCards() {
-
-        DeckIDs.Clear();
-        //manager = GameObject.FindObjectOfType<GameManager>();
-        Debug.Log("card count is: " + cards.Count);
-        foreach (Card card in cards.Values) {
-            if (card != null && card.DeckName.Equals(DeckName)) {
-                //    Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
-                for (int j = 0; j < card.data.numberInDeck; j++) {
-                    DeckIDs.Add(card.data.cardID);
-                }
-
-            }
-        }
-
+    public void InitMeeples() {
         BaseMaxMeeples = new int[] { 2, 2, 2, playerTeam == PlayerTeam.Red ? 1 : 0 };
         borrowedMeeples = new int[4];
         lentMeeples = new int[4];
@@ -237,6 +223,30 @@ public class CardPlayer : MonoBehaviour {
         for (int i = 0; i < BaseMaxMeeples.Length; i++) {
             currentMeeples[i] = BaseMaxMeeples[i];
         }
+    }
+    public virtual void InitializeCards() {
+
+        DeckIDs.Clear();
+        //manager = GameObject.FindObjectOfType<GameManager>();
+        Debug.Log($"Cards in deck: {cards.Count}");
+        Debug.Log($"team: {playerTeam}");
+        Debug.Log($"deck name: {DeckName}");
+        foreach (Card card in cards.Values) {
+            if (card != null && card.DeckName.Equals(DeckName)) {
+                Debug.Log("adding card " + card.name + " with id " + card.data.cardID + " to deck " + DeckName);
+                if (card.data.numberInDeck > 0) {
+                    for (int j = 0; j < card.data.numberInDeck; j++) {
+                        DeckIDs.Add(card.data.cardID);
+                    }
+                } 
+            }
+            else if (card == null) {
+                Debug.LogError("Card is null");
+            }
+        }
+        InitMeeples();
+        Debug.Log($"Init cards and meeples for {playerName}");
+        LogPlayerInfo();
     }
     //add the facilities to the player's active facilities
     public void RegisterFacilities() {
@@ -278,7 +288,7 @@ public class CardPlayer : MonoBehaviour {
             var card = Discards.ElementAt(0).Value.GetComponent<Card>();
             ReturnCardToDeck(card, true);
         }
-        
+
     }
 
     //called by card action to tell the player they need to select facilities to apply the card action to
