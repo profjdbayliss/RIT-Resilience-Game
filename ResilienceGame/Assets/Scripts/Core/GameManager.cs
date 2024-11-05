@@ -596,9 +596,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (Keyboard.current.f6Key.wasPressedThisFrame) {
             RGNetworkPlayerList.instance.DebugLogPlayerLists();
         }
-        if (Keyboard.current.f7Key.wasPressedThisFrame) {
-            UserInterface.Instance.ToggleAllUIVisuals();
-        }
+        
         //if (Keyboard.current.f8Key.wasPressedThisFrame) {
         //    DebugChangeMeepleAmountDiceRoll();
         //}
@@ -615,6 +613,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (isInit) {
             if (gameStarted) {
                 HandlePhases(MGamePhase);
+            }
+            if (Keyboard.current.escapeKey.wasPressedThisFrame) {
+                UserInterface.Instance.ToggleMapGUI();
             }
 
             // always notify observers in case there's a message

@@ -516,10 +516,16 @@ public class UserInterface : MonoBehaviour {
         }
 
     }
-    public void ToggleAllUIVisuals() {
+    public void ToggleMapGUI() {
         isGameBoardActive = !isGameBoardActive;
-        gameCanvas.GetComponent<GraphicRaycaster>().enabled = isGameBoardActive;
+        if (!isGameBoardActive)
+            sectorIcons.ForEach(icon => icon.UpdateSectorInfo());
+        
+        // gameCanvas.GetComponent<GraphicRaycaster>().enabled = isGameBoardActive;
         mapParent.SetActive(!isGameBoardActive);
+
+        if (isGameBoardActive)
+            sectorIcons.ForEach(icon => icon.SetToCircleIcon());
 
     }
 
