@@ -515,7 +515,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
-        //temp add ai player to trackers
+       
         
 
         // Initialize the deck info and set various

@@ -106,6 +106,7 @@ public class UserInterface : MonoBehaviour {
     private Action OnConfirm;
     private Action OnCancel;
     [SerializeField] private TextMeshProUGUI confirmationText;
+    [SerializeField] private RectTransform menuParent;
 
 
     [Header("Drag and Drop")]
@@ -560,6 +561,10 @@ public class UserInterface : MonoBehaviour {
             () => GameManager.Instance.QuitToDesktop(),
             null);
     }
+    public void ToggleMenu() {
+        menuParent.gameObject.SetActive(!menuParent.gameObject.activeInHierarchy);
+    }
+
 
     #endregion
 
