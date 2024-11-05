@@ -97,6 +97,10 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private GameObject diceParent;
     [SerializeField] private GameObject diceRollingPrefab;
 
+
+    [Header("Map GUI")]
+    [SerializeField] private List<SectorIconController> sectorIcons = new List<SectorIconController>();
+
     [Header("Drag and Drop")]
     public GameObject hoveredDropLocation;
     // Start is called before the first frame update
@@ -271,6 +275,14 @@ public class UserInterface : MonoBehaviour {
         var newPlayerMenu = Instantiate(playerMenuPrefab, playerMenuContainer).GetComponent<PlayerPopupMenuItem>();
         newPlayerMenu.SetPlayer(player);
         playerMenuItems.Add(newPlayerMenu);
+    }
+    public void AssignSectorToIcon(Sector sector) {
+        var sectorIndex = GameManager.Instance.AllSectors.Values.ToList().IndexOf(sector);
+        if (sectorIndex < 0 || sectorIndex >= sectorIcons.Count) {
+            Debug.Log($"Invalid sector index: {sectorIndex}");
+            return;
+        }
+        sectorIcons[sectorIndex].SetSector(sector);
     }
     public void UpdatePlayerMenuItems() {
         playerMenuItems.ForEach(item => item.UpdatePopup());

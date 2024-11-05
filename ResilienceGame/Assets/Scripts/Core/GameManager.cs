@@ -212,12 +212,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 };
                 msg = new Message(CardMessageType.SharePlayerType, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
                 AddMessage(msg);
-                
+
 
             }
             else {
                 // Automatically set the AI player as ready (server only)
-               // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
+                // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
                 RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
             }
 
@@ -382,12 +382,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 //temp assign in view sector to red player.
                 actualPlayer.PlayerSector = activeSectors[0];
             }
-            //create player menu items
-            playerDictionary.Values.ToList().ForEach(player => UserInterface.Instance.SpawnPlayerMenuItem(player));
 
-        }
+            playerDictionary.Values.ToList().ForEach(player => {
+                //create player menu items
+                UserInterface.Instance.SpawnPlayerMenuItem(player);
+                
+            });
+
+            
 
 
+
+
+
+        } //end isServer
+
+        //assign sectors to map icons and enable them
+        activeSectors.ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
 
         // in this game people go in parallel to each other
         // per phase
@@ -529,7 +540,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (sector.IsSimulated) continue;
             sector.AddOnDiceRollChangeMeepleAmtMulti(
                     minRoll: 6,
-                    meepleType: new string[] {"Black", "Purple"},
+                    meepleType: new string[] { "Black", "Purple" },
                     removalTime: 2,
                     amount: 2);
 
@@ -897,8 +908,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void EndWhitePlayerTurn() {
         // Ensure this runs only on the server to avoid duplicate calls
         if (IsServer) {
-          //  RGNetworkPlayerList.instance.SetWhitePlayerEndPhase();
-            AddMessage(new Message(CardMessageType.EndPhase, (uint) RGNetworkPlayerList.instance.playerIDs.Count-1));
+            //  RGNetworkPlayerList.instance.SetWhitePlayerEndPhase();
+            AddMessage(new Message(CardMessageType.EndPhase, (uint)RGNetworkPlayerList.instance.playerIDs.Count - 1));
             Debug.Log("White player's turn ended by server.");
         }
     }
@@ -922,8 +933,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             return;
         }
 
-        
-        
+
+
         if (playWhite) {
             whitePlayer.PlayRandomNegativeCard();
         }
@@ -931,7 +942,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.Log($"{numTurnsTillWhiteCard} turns until next white card");
             EndWhitePlayerTurn();
         }
-       
+
     }
     #endregion
 
@@ -995,7 +1006,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Handle all the card game phases with
     // this simple state machine.
     public void HandlePhases(GamePhase phase) {
-        
+
 
         // keep track of 
         bool phaseJustChanged = false;
@@ -1097,7 +1108,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                             UserInterface.Instance.ToggleOvertimeButton(false);
                         }
                     }
-                    
+
 
                     //simulate the sectors getting attacked/restored 
                     if (simulateSectors && turnTotal >= SECTOR_SIM_TURN_START)
