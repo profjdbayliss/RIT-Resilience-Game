@@ -1098,6 +1098,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   facilityDownPercentage: 0.05
   facilityUpPercentage: 0.5
+  coreFacilityMitigationAmount: 0.5
+  backdoorIncreaseDownPercent: 1
   SimulatedFacilities: 010101
   SimulationLog: []
   sectorName: 0
@@ -1136,6 +1138,7 @@ MonoBehaviour:
   - {fileID: -1212681790, guid: 7fb98b456b824d44b80c14f7ebab1cfe, type: 3}
   - {fileID: -61540746, guid: 7fb98b456b824d44b80c14f7ebab1cfe, type: 3}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
+  dieRollShadow: 0
 --- !u!1 &774510761193872058
 GameObject:
   m_ObjectHideFlags: 0
@@ -3057,6 +3060,7 @@ MonoBehaviour:
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   downedOverlay: {fileID: 774510763012636948}
   sectorPopoutMenu: {fileID: 774510761491713204}
+  WasEverDowned: 0
 --- !u!114 &774510761536410495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3472,6 +3476,7 @@ MonoBehaviour:
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   downedOverlay: {fileID: 774510761223617374}
   sectorPopoutMenu: {fileID: 774510762403388001}
+  WasEverDowned: 0
 --- !u!114 &774510761691721040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9715,6 +9720,7 @@ MonoBehaviour:
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
   downedOverlay: {fileID: 774510761117016015}
   sectorPopoutMenu: {fileID: 774510761204077605}
+  WasEverDowned: 0
 --- !u!114 &774510763029888657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10033,7 +10039,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -722, y: 474}
+  m_AnchoredPosition: {x: -866, y: 431}
   m_SizeDelta: {x: 174, y: 117.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &774510763082413367

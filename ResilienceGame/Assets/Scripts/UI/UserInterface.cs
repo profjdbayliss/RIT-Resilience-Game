@@ -65,6 +65,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI overTimeTurnsLabelText;
     [SerializeField] private TextMeshProUGUI playerDeckText;
     [SerializeField] private TextMeshProUGUI playerHandText;
+    [SerializeField] private TextMeshProUGUI latestActionText;
 
     [Header("Meeple Sharing")]
     [SerializeField] private GameObject MeepleSharingPanel;
@@ -110,7 +111,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private RectTransform menuParent;
     [SerializeField] private RectTransform map;
     [SerializeField] private GameObject mapSectorPanel;
-    [SerializeField] private GameObject menuButton;
+    //[SerializeField] private GameObject menuButton;
 
 
     [Header("Animations")]
@@ -144,6 +145,13 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private RectTransform meepleParent;
     private readonly Vector2 meepleHiddenPos = new Vector2(1761, -301);
     private readonly Vector2 meepleVisiblePos = new Vector2(1761, 7);
+
+    [SerializeField] private RectTransform consoleLog;
+    private readonly Vector2 consoleHiddenPos = new Vector2(0, 267.7f);
+    private readonly Vector2 consoleVisiblePos = new Vector2(0, 15.2f);
+    private Coroutine consoleMoveRoutine;
+
+
 
 
     [Header("Drag and Drop")]
@@ -246,6 +254,7 @@ public class UserInterface : MonoBehaviour {
         if (fromNet || IsServer) {
             Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
             Debug.Log($"Created log message: {message}");
+            latestActionText.text = message;
             messageLog.Add(message);
             if (IsServer) {
                 RGNetworkPlayerList.instance.SendStringToClients(message);
@@ -742,5 +751,18 @@ public class UserInterface : MonoBehaviour {
     #endregion
     #endregion
 
-
+    public void ShowConsoleLog() {
+        Debug.Log("Showing console log");
+        if (consoleMoveRoutine != null) {
+            StopCoroutine(consoleMoveRoutine);
+        }
+        consoleMoveRoutine = StartCoroutine(MoveMenuItem(consoleLog, consoleVisiblePos, animDuration));
+    }
+    public void HideConsoleLog() {
+        Debug.Log("Hiding console log");
+        if (consoleMoveRoutine != null) {
+            StopCoroutine(consoleMoveRoutine);
+        }
+        consoleMoveRoutine = StartCoroutine(MoveMenuItem(consoleLog, consoleHiddenPos, animDuration));
+    }
 }
