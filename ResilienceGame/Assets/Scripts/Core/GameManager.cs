@@ -581,6 +581,28 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             whitePlayer.LogPlayerInfo();
         }
+        
+        if (Keyboard.current.f2Key.wasPressedThisFrame) {
+            string s = "";
+            foreach (var sector in AllSectors.Values) {
+                s += $"Sector {sector.sectorName} is {(sector.IsDown ? "down" : "up")}\n";
+                s += $"Sector is {(sector.IsSimulated ? "simulated" : "human played\n\n")}";
+            }
+            Debug.Log(s);
+        }
+        if (Keyboard.current.f5Key.wasPressedThisFrame) {
+            playerDictionary.Values.ToList().ForEach(player => Debug.Log($"Player {player.playerName} has {ScoreManager.Instance.GetPlayerScore(player.NetID)}"));
+        }
+        if (Keyboard.current.f6Key.wasPressedThisFrame) {
+            RGNetworkPlayerList.instance.DebugLogPlayerLists();
+        }
+        if (Keyboard.current.f7Key.wasPressedThisFrame) {
+            UserInterface.Instance.DebugToggleSectorMenu();
+        }
+
+        if (Keyboard.current.f8Key.wasPressedThisFrame) {
+            DebugAiPlayCard();
+        }
         if (Keyboard.current.f9Key.wasPressedThisFrame) {
             Debug.Log($"Player has {actualPlayer.mUpdatesThisPhase.Count} updates in queue:");
             foreach (Update update in actualPlayer.mUpdatesThisPhase) {
@@ -597,24 +619,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                           $"Sector Played On: {update.sectorPlayedOn}\n" +
                           $"==============================");
             }
-        }
-        if (Keyboard.current.f2Key.wasPressedThisFrame) {
-            string s = "";
-            foreach (var sector in AllSectors.Values) {
-                s += $"Sector {sector.sectorName} is {(sector.IsDown ? "down" : "up")}\n";
-                s += $"Sector is {(sector.IsSimulated ? "simulated" : "human played\n\n")}";
-            }
-            Debug.Log(s);
-        }
-        if (Keyboard.current.f5Key.wasPressedThisFrame) {
-            playerDictionary.Values.ToList().ForEach(player => Debug.Log($"Player {player.playerName} has {ScoreManager.Instance.GetPlayerScore(player.NetID)}"));
-        }
-        if (Keyboard.current.f6Key.wasPressedThisFrame) {
-            RGNetworkPlayerList.instance.DebugLogPlayerLists();
-        }
-
-        if (Keyboard.current.f8Key.wasPressedThisFrame) {
-            DebugAiPlayCard();
         }
 
     }

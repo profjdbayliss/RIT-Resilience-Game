@@ -28,7 +28,7 @@ public class SectorIconController : MonoBehaviour {
     private Vector2 targetSize;
     private Vector2 normalSize = new Vector2(64, 64);
     private Vector2 hoverSize = new Vector2(136, 256);
-    float duration = 0.2f;
+    float animDuration = 0.2f;
     private Coroutine sizeCoroutine;
 
     // Start is called before the first frame update
@@ -41,6 +41,8 @@ public class SectorIconController : MonoBehaviour {
         iconCollider = GetComponent<Collider2D>();
         rectTransform = GetComponent<RectTransform>();
         rectTransform.sizeDelta = normalSize;
+        icon.enabled = true;
+        sectorInfoParent.SetActive(false);
         if (backGround != null) {
             backGround.sprite = bgs[0]; // Reset to default background
         }
@@ -114,9 +116,9 @@ public class SectorIconController : MonoBehaviour {
 
         float elapsed = 0f;
 
-        while (elapsed < duration) {
+        while (elapsed < animDuration) {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
+            float t = elapsed / animDuration;
             t = Mathf.SmoothStep(0f, 1f, t); // Cubic smoothing for smoother transition
             rectTransform.sizeDelta = Vector2.Lerp(initialSize, targetSize, t);
             yield return null;

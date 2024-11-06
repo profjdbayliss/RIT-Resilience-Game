@@ -46,6 +46,7 @@ public class UserInterface : MonoBehaviour {
     public AlertPanel mAlertPanel;
     //public DeckSizeTracker deckSizeTracker;
     public GameObject discardDropZone;
+    public RectTransform discardRect;
     public GameObject handDropZone;
     public GameObject opponentDropZone;
     public TextMeshProUGUI[] meeplesAmountText;
@@ -108,7 +109,41 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI confirmationText;
     [SerializeField] private RectTransform menuParent;
     [SerializeField] private RectTransform map;
-    [SerializeField] private GameObject sectorPanel;
+    [SerializeField] private GameObject mapSectorPanel;
+    [SerializeField] private GameObject menuButton;
+
+
+    [Header("Animations")]
+    //animations
+    [SerializeField] private float animDuration = 0.2f;
+
+    private Coroutine mapStateChangeRoutine;
+    private List<Coroutine> menuItemMoveRoutines = new List<Coroutine>();
+    public enum MapState {
+        Hidden,
+        FullScreen,
+        SectorPopup
+    }
+    [SerializeField] private MapState mapState = MapState.Hidden;
+    //[SerializeField] private MapState mapTargetState = MapState.Hidden;
+
+    private readonly Vector2 sectorPanelHiddenPos = new Vector2(1300, 105);
+    private readonly Vector2 sectorPanelVisiblePos = new Vector2(600, 105);
+
+    [SerializeField] private RectTransform guiButtonBg;
+    private readonly Vector2 buttonBgHiddenPos = new Vector2(-800, -691);
+    private readonly Vector2 buttonBgVisiblePos = new Vector2(-800, -383.5f);
+
+    private readonly Vector2 discardHiddenPos = new Vector2(-546, -692 );
+    private readonly Vector2 discardVisiblePos = new Vector2(-546, -383.9f);
+
+    [SerializeField] private RectTransform playerHandPosition;
+    private readonly Vector2 handHiddenPos = new Vector2(173, -720);
+    private readonly Vector2 handVisiblePos = new Vector2(173, -385);
+
+    [SerializeField] private RectTransform meepleParent;
+    private readonly Vector2 meepleHiddenPos = new Vector2(1761, -301);
+    private readonly Vector2 meepleVisiblePos = new Vector2(1761, 7);
 
 
     [Header("Drag and Drop")]
@@ -469,6 +504,205 @@ public class UserInterface : MonoBehaviour {
     private void RollDie(int index, int roll, Action onDiceRolled, int rollReq) {
         StartCoroutine(RollingAnimation(index, roll, onDiceRolled, rollReq));
     }
+    
+
+
+    // Easing function to create acceleration and deceleration
+    private float EasingFunction(float t) {
+        return 1 - Mathf.Pow(1 - t, 5);
+    }
+    public void DisplayPassFailText(int index = -1, bool enable = true, int roll = 0, int req = 0) {
+        if (enable) {
+            if (roll >= req) {
+                successText[index].text = "Saved";
+                successText[index].color = Color.green;
+            }
+            else {
+                successText[index].text = "Fail";
+                successText[index].color = Color.red;
+            }
+        }
+        else {
+            successText.ForEach(x => x.text = "");
+        }
+
+    }
+    #region Map GUI
+    //enable or disable the map gui
+    public void ToggleMapGUI() {
+        Debug.Log("Toggling map GUI");
+        isGameBoardActive = !isGameBoardActive;
+        mapParent.SetActive(!isGameBoardActive);
+        mapState = isGameBoardActive ? MapState.Hidden : MapState.FullScreen;
+
+        if (isGameBoardActive) {
+            ShowPlayerGUI();
+        }
+        else {
+            HidePlayerGUI();
+            mapSectorPanel.GetComponent<RectTransform>().anchoredPosition = sectorPanelHiddenPos;
+            map.localScale = Vector3.one;
+        }
+
+        if (!isGameBoardActive)
+            sectorIcons.ForEach(icon => icon.UpdateSectorInfo());
+
+    }
+    public void ShowConfirmWindow(string message, Action onConfirm, Action onCancel) {
+        Debug.Log("Showing confirm window");
+        confirmationText.text = message;
+        OnConfirm = onConfirm;
+        OnCancel = onCancel;
+        confirmationWindow.SetActive(true);
+    }
+    public void ConfirmAction() {
+        OnConfirm?.Invoke();
+        confirmationWindow.SetActive(false);
+    }
+    public void CancelAction() {
+        OnCancel?.Invoke();
+        confirmationWindow.SetActive(false);
+    }
+    public void QuitToMenu() {
+        ShowConfirmWindow("Are you sure you want to quit to the main menu?",
+            () => GameManager.Instance.QuitToMenu(),
+            null);
+    }
+    public void QuitToDesktop() {
+        ShowConfirmWindow("Are you sure you want to quit to desktop?",
+            () => GameManager.Instance.QuitToDesktop(),
+            null);
+    }
+    public void ToggleMenu() {
+
+        menuParent.gameObject.SetActive(!menuParent.gameObject.activeInHierarchy);
+    }
+    public void DebugToggleSectorMenu() {
+        if (mapState == MapState.SectorPopup) {
+            HideSectorPopup();
+        }
+        else {
+            ShowSectorPopup(null);
+        }
+    }
+    //animate in the player GUI elements
+    public void ShowPlayerGUI() {
+        if (mapStateChangeRoutine != null) {
+            menuItemMoveRoutines.ForEach(r => StopCoroutine(r));
+            menuItemMoveRoutines.Clear();
+            StopCoroutine(mapStateChangeRoutine);
+        }
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(guiButtonBg.GetComponent<RectTransform>(),
+                buttonBgVisiblePos, animDuration)));
+
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(discardRect, discardVisiblePos, animDuration)));
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(meepleParent, meepleVisiblePos, animDuration)));
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(playerHandPosition, handVisiblePos, animDuration)));
+
+    }
+    //animate out the player GUI elements
+    public void HidePlayerGUI() {
+        if (mapStateChangeRoutine != null) {
+            menuItemMoveRoutines.ForEach(r => StopCoroutine(r));
+            menuItemMoveRoutines.Clear();
+            StopCoroutine(mapStateChangeRoutine);
+        }
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(guiButtonBg.GetComponent<RectTransform>(),
+                buttonBgHiddenPos, animDuration)));
+
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(discardRect, discardHiddenPos, animDuration)));
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(meepleParent, meepleHiddenPos, animDuration)));
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(playerHandPosition, handHiddenPos, animDuration)));
+
+    }
+    //handles showing changing the map menu from full screen map to showing the sector popup
+    public void ShowSectorPopup(Sector sector) {
+        //check for existing animations
+        ShowPlayerGUI();
+        //scale map size
+        mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(.8f, .8f, 1f), animDuration));
+        
+        //move sector panel
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(), 
+                sectorPanelVisiblePos, animDuration)));
+
+    }
+    //handles hiding the sector popup
+    public void HideSectorPopup() {
+        //check for existing animations
+        
+        HidePlayerGUI();
+        //scale map size
+        mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(1f, 1f, 1f), animDuration));
+        //move sector panel
+        menuItemMoveRoutines.Add(
+            StartCoroutine(
+                MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(),
+                sectorPanelHiddenPos, animDuration)));
+
+        
+    }
+    #region Animation Coroutines
+    private IEnumerator ResizeElement(RectTransform transform, Vector3 targetScale, float duration) {
+        float time = 0;
+        Vector3 startScale = transform.localScale;
+
+        // Temporarily set mapState to indicate transition
+        mapState = targetScale == Vector3.one ? MapState.FullScreen : MapState.SectorPopup;
+
+        while (time < duration) {
+            time += Time.deltaTime;
+            float t = time / duration;
+            t = CubicEaseInOut(t);
+            transform.localScale = Vector3.Lerp(startScale, targetScale, t);
+            yield return null;
+        }
+
+        // Finalize the target state once animation completes
+        transform.localScale = targetScale;
+        mapState = targetScale == Vector3.one ? MapState.FullScreen : MapState.SectorPopup;
+        mapStateChangeRoutine = null; // Animation is done, clear coroutine reference
+    }
+    private IEnumerator MoveMenuItem(RectTransform transform, Vector2 finalPos, float duration) {
+        var initPos = transform.anchoredPosition;
+        float time = 0;
+        while (time < duration) {
+            time += Time.deltaTime;
+            float t = time / duration;
+            t = CubicEaseInOut(t);
+            transform.anchoredPosition = Vector2.Lerp(initPos, finalPos, t);
+            yield return null;
+        }
+        transform.anchoredPosition = finalPos;
+
+    }
+    private float CubicEaseInOut(float t) {
+        if (t < 0.5f) {
+            return 4f * t * t * t;
+        }
+        else {
+            float f = (2f * t) - 2f;
+            return 0.5f * f * f * f + 1f;
+        }
+    }
     private IEnumerator RollingAnimation(int index, int finalFace, Action onDiceRolled, int rollReq) {
         float elapsedTime = 0f;
         int previousFace = -1;
@@ -505,74 +739,7 @@ public class UserInterface : MonoBehaviour {
         GameManager.Instance.EndWhitePlayerTurn(); //end the turn after the dice roll ends
         HideDiceRollingPanel();
     }
-
-
-    // Easing function to create acceleration and deceleration
-    private float EasingFunction(float t) {
-        return 1 - Mathf.Pow(1 - t, 5);
-    }
-    public void DisplayPassFailText(int index = -1, bool enable = true, int roll = 0, int req = 0) {
-        if (enable) {
-            if (roll >= req) {
-                successText[index].text = "Saved";
-                successText[index].color = Color.green;
-            }
-            else {
-                successText[index].text = "Fail";
-                successText[index].color = Color.red;
-            }
-        }
-        else {
-            successText.ForEach(x => x.text = "");
-        }
-
-    }
-
-    #region Map GUI
-    //enable or disable the map gui
-    public void ToggleMapGUI() {
-        isGameBoardActive = !isGameBoardActive;
-        if (!isGameBoardActive)
-            sectorIcons.ForEach(icon => icon.UpdateSectorInfo());
-
-        mapParent.SetActive(!isGameBoardActive);
-
-    }
-    public void ShowConfirmWindow(string message, Action onConfirm, Action onCancel) {
-        Debug.Log("Showing confirm window");
-        confirmationText.text = message;
-        OnConfirm = onConfirm;
-        OnCancel = onCancel;
-        confirmationWindow.SetActive(true);
-    }
-    public void ConfirmAction() {
-        OnConfirm?.Invoke();
-        confirmationWindow.SetActive(false);
-    }
-    public void CancelAction() {
-        OnCancel?.Invoke();
-        confirmationWindow.SetActive(false);
-    }
-    public void QuitToMenu() {
-        ShowConfirmWindow("Are you sure you want to quit to the main menu?",
-            () => GameManager.Instance.QuitToMenu(),
-            null);
-    }
-    public void QuitToDesktop() {
-        ShowConfirmWindow("Are you sure you want to quit to desktop?",
-            () => GameManager.Instance.QuitToDesktop(),
-            null);
-    }
-    public void ToggleMenu() {
-        menuParent.gameObject.SetActive(!menuParent.gameObject.activeInHierarchy);
-    }
-    public void ShowSectorPopup(Sector sector) {
-        map.localScale = new Vector3(.8f, .8f, 1f);
-        sectorPanel.SetActive(true);
-
-    }
-
-
+    #endregion
     #endregion
 
 
