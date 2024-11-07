@@ -111,6 +111,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private RectTransform menuParent;
     [SerializeField] private RectTransform map;
     [SerializeField] private GameObject mapSectorPanel;
+    [SerializeField] private List<Sector> _mapSectors;
     //[SerializeField] private GameObject menuButton;
 
 
@@ -139,7 +140,7 @@ public class UserInterface : MonoBehaviour {
     private readonly Vector2 discardVisiblePos = new Vector2(-546, -383.9f);
 
     [SerializeField] private RectTransform playerHandPosition;
-    private readonly Vector2 handHiddenPos = new Vector2(173, -720);
+    private readonly Vector2 handHiddenPos = new Vector2(173, -800);
     private readonly Vector2 handVisiblePos = new Vector2(173, -385);
 
     [SerializeField] private RectTransform meepleParent;
@@ -336,8 +337,13 @@ public class UserInterface : MonoBehaviour {
             Debug.Log($"Invalid sector index: {sectorIndex}");
             return;
         }
+        var sectorShadow = _mapSectors.Find(s=>s.sectorName == sector.sectorName);
+        if (sectorShadow == null) {
+            Debug.Log($"Could not find sector shadow for {sector.sectorName}");
+            return;
+        }
         Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
-        sectorIcons[sector.transform.GetSiblingIndex()].SetSector(sector);
+        sectorIcons[sector.transform.GetSiblingIndex()].SetSector(sectorShadow, sector.Owner == null);
     }
     public void UpdatePlayerMenuItems() {
         playerMenuItems.ForEach(item => item.UpdatePopup());
@@ -642,7 +648,11 @@ public class UserInterface : MonoBehaviour {
     }
     //handles showing changing the map menu from full screen map to showing the sector popup
     public void ShowSectorPopup(Sector sector) {
-        //check for existing animations
+        _mapSectors.ForEach(s => s.gameObject.SetActive(false));
+        var sectorShadow = _mapSectors.Find(s => s.sectorName == sector.sectorName);
+        sectorShadow.gameObject.SetActive(true);
+        Debug.Log($"Showing sector popup for {sector.sectorName}");
+        //show player hand ect..
         ShowPlayerGUI();
         //scale map size
         mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(.8f, .8f, 1f), animDuration));
@@ -656,8 +666,8 @@ public class UserInterface : MonoBehaviour {
     }
     //handles hiding the sector popup
     public void HideSectorPopup() {
-        //check for existing animations
-        
+        //hide player hand ect..
+
         HidePlayerGUI();
         //scale map size
         mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(1f, 1f, 1f), animDuration));

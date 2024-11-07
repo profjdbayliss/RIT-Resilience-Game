@@ -3,13 +3,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class HoverMoveUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler {
-    public float moveDistance = 100f; // Distance to move in the Y direction
     public float openDuration = 0.75f; // Duration for opening animation
     public float closeDuration = 1.5f; // Duration for closing animation
 
+    [SerializeField] private RectTransform closedTarget; // Target position for closed state
+    [SerializeField] private RectTransform openTarget; // Target position for open state
+
     private RectTransform rectTransform;
-    private Vector3 closedPosition;
-    private Vector3 openPosition;
     private bool isHovered = false;
     private bool isLockedOpen = false;
     public bool overrideMover = false;
@@ -17,15 +17,13 @@ public class HoverMoveUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void Start() {
         rectTransform = GetComponent<RectTransform>();
-        closedPosition = rectTransform.anchoredPosition;
-        openPosition = closedPosition + new Vector3(0, moveDistance, 0);
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
         if (overrideMover) return;
         if (!isLockedOpen) {
             isHovered = true;
-            StartMoveCoroutine(openPosition, openDuration);
+            StartMoveCoroutine(openTarget.anchoredPosition, openDuration);
         }
     }
 
@@ -33,7 +31,7 @@ public class HoverMoveUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (overrideMover) return;
         if (!isLockedOpen) {
             isHovered = false;
-            StartMoveCoroutine(closedPosition, closeDuration);
+            StartMoveCoroutine(closedTarget.anchoredPosition, closeDuration);
         }
     }
 
@@ -42,26 +40,30 @@ public class HoverMoveUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         isLockedOpen = !isLockedOpen;
 
         if (isLockedOpen) {
-            StartMoveCoroutine(openPosition, openDuration);
+            StartMoveCoroutine(openTarget.anchoredPosition, openDuration);
         }
         else if (!isHovered) {
-            StartMoveCoroutine(closedPosition, closeDuration);
+            StartMoveCoroutine(closedTarget.anchoredPosition, closeDuration);
         }
     }
+
     public void SetLockedOpen() {
         overrideMover = true;
-        StartMoveCoroutine(openPosition, openDuration);
+        StartMoveCoroutine(openTarget.anchoredPosition, openDuration);
     }
+
     public void DisableLockedOpen() {
         overrideMover = false;
-        StartMoveCoroutine(closedPosition, closeDuration);
+        StartMoveCoroutine(closedTarget.anchoredPosition, closeDuration);
     }
+
     private void StartMoveCoroutine(Vector3 targetPosition, float duration) {
         if (currentMoveCoroutine != null) {
             StopCoroutine(currentMoveCoroutine);
         }
         currentMoveCoroutine = StartCoroutine(MoveToPosition(targetPosition, duration));
     }
+
     private IEnumerator MoveToPosition(Vector3 targetPosition, float duration) {
         Vector3 startPosition = rectTransform.anchoredPosition;
         float elapsedTime = 0f;

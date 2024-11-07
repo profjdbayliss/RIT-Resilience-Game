@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 SimulatedSectors = unAssignedSectors.ToDictionary(sector => sector.sectorName,
                                                                   sector => sector);
                 SimulatedSectorList = SimulatedSectors.Keys.ToList();
-                SimulatedSectors.Values.ToList().ForEach(sector => sector.IsSimulated = true);
+                SimulatedSectors.Values.ToList().ForEach(sector => sector.SetSimulated(true));
                 activeSectors.RemoveAll(unAssignedSectors.Contains);
 
                 //blue player look at their sector
@@ -274,7 +274,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 //create player menu items now that all players sectors assigned
                 playerDictionary.Values.ToList().ForEach(player => UserInterface.Instance.SpawnPlayerMenuItem(player));
                 //assign sectors to map icons and enable them
-                activeSectors.ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
+                AllSectors.Values.ToList().ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
             }
 
         }
@@ -371,7 +371,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
             SimulatedSectors = AssignableSectors.ToDictionary(Sector => Sector.sectorName, Sector => Sector);
             SimulatedSectorList = SimulatedSectors.Keys.ToList();
-            SimulatedSectors.Values.ToList().ForEach(sector => sector.IsSimulated = true);
+            SimulatedSectors.Values.ToList().ForEach(sector => sector.SetSimulated(true));
 
 
             //remove assgined sectors from the sector pages
@@ -394,7 +394,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 
             });
             //assign sectors to map icons and enable them
-            activeSectors.ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
+            AllSectors.Values.ToList().ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
 
 
 

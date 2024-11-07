@@ -30,12 +30,18 @@ public class SectorIconController : MonoBehaviour {
     private Vector2 hoverSize = new Vector2(136, 256);
     float animDuration = 0.2f;
     private Coroutine sizeCoroutine;
+    private bool isSectorSimulated = false;
+    [SerializeField] private Color simColor;
+    [SerializeField] private Color downColor;
+    private int prevSiblingIndex = 0;
+
 
     // Start is called before the first frame update
     void Start() {
         rectTransform = GetComponent<RectTransform>();
         targetSize = normalSize;
         iconCollider = GetComponent<Collider2D>();
+        prevSiblingIndex = transform.GetSiblingIndex();
     }
     void OnEnable() {
         iconCollider = GetComponent<Collider2D>();
@@ -51,11 +57,11 @@ public class SectorIconController : MonoBehaviour {
         targetState = HoverState.NotHover;
     }
 
-    public void SetSector(Sector sector) {
+    public void SetSector(Sector sector, bool isSim) {
         this.sector = sector;
         Debug.Log($"Assigning sector: {sector.sectorName} to {name}");
         gameObject.SetActive(true);
-
+        isSectorSimulated = isSim;
         sectorNameText.text = sector.sectorName.ToString();
         sectorOwnerNameText.text = sector.Owner != null ? sector.Owner.playerName : "";
         UpdateSectorInfo();
@@ -65,10 +71,17 @@ public class SectorIconController : MonoBehaviour {
         for (int i = 0; i < facilityPointTexts.Count; i++) {
             facilityPointTexts[i].text = sector.facilities[i / 3].Points[i % 3].ToString();
         }
+
+        backGround.color = sector.IsDown ? downColor : (isSectorSimulated ? simColor : Color.white);
+        
+        
     }
 
     // This is called when the pointer enters the UI element
     public void OnPointerEnter() {
+        if (isSectorSimulated) return;
+        transform.SetAsLastSibling();
+
         Debug.Log("Pointer Enter");
         icon.enabled = false;
         sectorInfoParent.SetActive(true);
@@ -77,10 +90,14 @@ public class SectorIconController : MonoBehaviour {
 
     // This is called when the pointer exits the UI element
     public void OnPointerExit() {
+        if (isSectorSimulated) return;
+        transform.SetSiblingIndex(prevSiblingIndex);
         Debug.Log("Pointer Exit");
         SetHoverState(HoverState.NotHover);
     }
     public void OnPointerUp() {
+        if (isSectorSimulated) return;
+        
         //GameManager.Instance.SetSectorInView(sector);
         //UserInterface.Instance.ToggleMapGUI();
         UserInterface.Instance.ShowSectorPopup(sector);
