@@ -69,12 +69,12 @@ public class Sector : MonoBehaviour {
     public string spriteSheetName = "sectorIconAtlas.png";
     public Texture2D iconAtlasTexture;
     public List<Sprite> sectorIconList = new List<Sprite>();
-    [SerializeField] private MapSector mapSector;
+    public MapSector mapSector;
     private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
 
-   // [SerializeField] private TextMeshProUGUI _mapSectorNametext;
+    // [SerializeField] private TextMeshProUGUI _mapSectorNametext;
     // [SerializeField] private TextMeshProUGUI _mapSectorOwnerText;
     // [SerializeField] private Sector mainSector;
     // [SerializeField] private Sector shadow;
@@ -305,10 +305,10 @@ public class Sector : MonoBehaviour {
         //if (!isShadow) {
         //    shadow.Initialize();
         //}
-        
+
     }
-    
-public void SetOwner(CardPlayer player) {
+
+    public void SetOwner(CardPlayer player) {
         Owner = player;
         sectorOwnerText.text = player.playerName;
         mapSector.Init();
@@ -690,7 +690,7 @@ public void SetOwner(CardPlayer player) {
                         (int)(playerMeepls[i] * (amount < 1 ? amount : -amount)) : 0;
                 }
                 //add them as temporary meeples
-              //  Debug.Log($"Adding meeple change to sector owner: {Owner.playerName}");
+                //  Debug.Log($"Adding meeple change to sector owner: {Owner.playerName}");
                 for (int i = 0; i < playerMeepls.Length; i++) {
                     Owner.SetTempMeeples(i, meeplesChanged[i]);
                 }
@@ -700,7 +700,7 @@ public void SetOwner(CardPlayer player) {
                 //will overwrite/be overwritten by Overtime
                 Owner.AddActionToCallAfterTurns(removalTime,
                     () => {
-                       // Debug.Log($"Remove meeple change");
+                        // Debug.Log($"Remove meeple change");
                         for (int i = 0; i < playerMeepls.Length; i++) {
                             Owner.SetTempMeeples(i, 0);
                         }
@@ -738,7 +738,7 @@ public void SetOwner(CardPlayer player) {
         if (!GameManager.Instance.IsServer) {
             DieRoll = roll;
             dieRollShadow = DieRoll;
-           // Debug.Log($"**Client: {sectorName}-{DieRoll}");
+            // Debug.Log($"**Client: {sectorName}-{DieRoll}");
         }
         else {
             Debug.LogWarning($"Server UpdateDieRollFromNetwork was called");

@@ -391,7 +391,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             playerDictionary.Values.ToList().ForEach(player => {
                 //create player menu items
                 UserInterface.Instance.SpawnPlayerMenuItem(player);
-                
+
             });
             //assign sectors to map icons and enable them
             AllSectors.Values.ToList().ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
@@ -403,7 +403,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         } //end isServer
 
-        
+
 
         // in this game people go in parallel to each other
         // per phase
@@ -428,7 +428,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log("start run on GameManager");
         if (!hasStartedAlready) {
             CardPlayer.cards.Clear();
-           // Debug.Log("has not already started");
+            // Debug.Log("has not already started");
             //startScreen.SetActive(true);
             UserInterface.Instance.ToggleStartScreen(true);
 
@@ -457,7 +457,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 CardPlayer.AddCards(redCards);
                 //energyPlayer.playerTeam = PlayerTeam.Red;
                 //energyPlayer.DeckName = "red";
-                   //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
+                //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
 
             }
             else {
@@ -515,8 +515,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
-       
-        
+
+
 
         // Initialize the deck info and set various
         // player zones active
@@ -528,7 +528,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         tutorialToggle.WhenGameStarts();
 
 
-        
+
     }
 
     #endregion
@@ -581,7 +581,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             whitePlayer.LogPlayerInfo();
         }
-        
+
         if (Keyboard.current.f2Key.wasPressedThisFrame) {
             string s = "";
             foreach (var sector in AllSectors.Values) {
@@ -702,6 +702,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 //change color based on if you are the owner
                 UserInterface.Instance.SetInfoBackground(sectorInView == actualPlayer.PlayerSector ? 1 : 2);
             }
+            if (UserInterface.Instance.mapState == UserInterface.MapState.SectorPopup) {
+                UserInterface.Instance.ShowSectorPopup(sectorInView.mapSector);
+            }
         }
     }
     public void ViewPreviousSector() {
@@ -713,6 +716,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void ViewNextSector() {
         sectorIndex = sectorIndex + 1 < activeSectors.Count ? sectorIndex + 1 : 0;
         SetSectorInView(sectorIndex);
+
 
     }
 
@@ -773,7 +777,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             NetworkManager.singleton.StopClient();
         }
         SceneManager.LoadScene("MainMenu");
-        
+
     }
     public void QuitToDesktop() {
         if (IsServer)

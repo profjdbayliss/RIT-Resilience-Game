@@ -126,17 +126,17 @@ public class UserInterface : MonoBehaviour {
         FullScreen,
         SectorPopup
     }
-    [SerializeField] private MapState mapState = MapState.Hidden;
+    [SerializeField] public MapState mapState = MapState.Hidden;
     //[SerializeField] private MapState mapTargetState = MapState.Hidden;
 
     private readonly Vector2 sectorPanelHiddenPos = new Vector2(1421, 105);
-    private readonly Vector2 sectorPanelVisiblePos = new Vector2(600, 105);
+    private readonly Vector2 sectorPanelVisiblePos = new Vector2(523, 105);
 
     [SerializeField] private RectTransform guiButtonBg;
     private readonly Vector2 buttonBgHiddenPos = new Vector2(-800, -691);
     private readonly Vector2 buttonBgVisiblePos = new Vector2(-800, -383.5f);
 
-    private readonly Vector2 discardHiddenPos = new Vector2(-546, -692 );
+    private readonly Vector2 discardHiddenPos = new Vector2(-546, -692);
     private readonly Vector2 discardVisiblePos = new Vector2(-546, -383.9f);
 
     [SerializeField] private RectTransform playerHandPosition;
@@ -156,7 +156,7 @@ public class UserInterface : MonoBehaviour {
 
 
     //[Header("Drag and Drop")]
-    
+
     // Start is called before the first frame update
     public void StartGame(PlayerTeam playerType) {
         AddPlayerToLobby(name: RGNetworkPlayerList.instance.localPlayerName, team: playerType);
@@ -338,7 +338,7 @@ public class UserInterface : MonoBehaviour {
             return;
         }
         var sectorShadow = GameManager.Instance.AllSectors.Values.ToList()
-            .Find(s=>s.sectorName == sector.sectorName);
+            .Find(s => s.sectorName == sector.sectorName);
         if (sectorShadow == null) {
             Debug.Log($"Could not find sector shadow for {sector.sectorName}");
             return;
@@ -520,7 +520,7 @@ public class UserInterface : MonoBehaviour {
     private void RollDie(int index, int roll, Action onDiceRolled, int rollReq) {
         StartCoroutine(RollingAnimation(index, roll, onDiceRolled, rollReq));
     }
-    
+
 
 
     // Easing function to create acceleration and deceleration
@@ -649,24 +649,26 @@ public class UserInterface : MonoBehaviour {
     }
     //handles showing changing the map menu from full screen map to showing the sector popup
     public void ShowSectorPopup(MapSector mSector) {
+
+       // GameManager.Instance.SetSectorInView(mSector.sector);
         _mapSectors.ForEach(s => s.ToggleVisuals(false));
         if (mSector == null) return;
         mSector.ToggleVisuals(true);
 
-        //var sectorShadow = _mapSectors.Find(s => s.sectorName == sector.sectorName);
-        //sectorShadow.gameObject.SetActive(true);
-        Debug.Log($"Showing sector popup for {mSector.sector.sectorName}");
-        //show player hand ect..
-        ShowPlayerGUI();
-        //scale map size
-        mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(.8f, .8f, 1f), animDuration));
-        
-        //move sector panel
-        menuItemMoveRoutines.Add(
-            StartCoroutine(
-                MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(), 
-                sectorPanelVisiblePos, animDuration)));
+        if (mapState == MapState.FullScreen) {
+            Debug.Log($"Showing sector popup for {mSector.sector.sectorName}");
+            //show player hand ect..
+            ShowPlayerGUI();
+            //scale map size
+            mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(.8f, .8f, 1f), animDuration));
 
+            //move sector panel
+            menuItemMoveRoutines.Add(
+                StartCoroutine(
+                    MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(),
+                    sectorPanelVisiblePos, animDuration)));
+        }
+        mapState = MapState.SectorPopup;
     }
     //handles hiding the sector popup
     public void HideSectorPopup() {
@@ -681,7 +683,7 @@ public class UserInterface : MonoBehaviour {
                 MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(),
                 sectorPanelHiddenPos, animDuration)));
 
-        
+
     }
     #region Animation Coroutines
     private IEnumerator ResizeElement(RectTransform transform, Vector3 targetScale, float duration) {
