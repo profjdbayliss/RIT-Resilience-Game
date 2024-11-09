@@ -111,7 +111,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private RectTransform menuParent;
     [SerializeField] private RectTransform map;
     [SerializeField] private GameObject mapSectorPanel;
-    [SerializeField] private List<Sector> _mapSectors;
+    [SerializeField] private List<MapSector> _mapSectors;
     //[SerializeField] private GameObject menuButton;
 
 
@@ -337,7 +337,8 @@ public class UserInterface : MonoBehaviour {
             Debug.Log($"Invalid sector index: {sectorIndex}");
             return;
         }
-        var sectorShadow = _mapSectors.Find(s=>s.sectorName == sector.sectorName);
+        var sectorShadow = GameManager.Instance.AllSectors.Values.ToList()
+            .Find(s=>s.sectorName == sector.sectorName);
         if (sectorShadow == null) {
             Debug.Log($"Could not find sector shadow for {sector.sectorName}");
             return;
@@ -647,11 +648,14 @@ public class UserInterface : MonoBehaviour {
 
     }
     //handles showing changing the map menu from full screen map to showing the sector popup
-    public void ShowSectorPopup(Sector sector) {
-        _mapSectors.ForEach(s => s.gameObject.SetActive(false));
-        var sectorShadow = _mapSectors.Find(s => s.sectorName == sector.sectorName);
-        sectorShadow.gameObject.SetActive(true);
-        Debug.Log($"Showing sector popup for {sector.sectorName}");
+    public void ShowSectorPopup(MapSector mSector) {
+        _mapSectors.ForEach(s => s.ToggleVisuals(false));
+        if (mSector == null) return;
+        mSector.ToggleVisuals(true);
+
+        //var sectorShadow = _mapSectors.Find(s => s.sectorName == sector.sectorName);
+        //sectorShadow.gameObject.SetActive(true);
+        Debug.Log($"Showing sector popup for {mSector.sector.sectorName}");
         //show player hand ect..
         ShowPlayerGUI();
         //scale map size

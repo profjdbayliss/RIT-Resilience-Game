@@ -24,6 +24,7 @@ public class SectorIconController : MonoBehaviour {
     [SerializeField] TextMeshProUGUI sectorNameText;
     [SerializeField] TextMeshProUGUI sectorOwnerNameText;
     [SerializeField] GameObject sectorInfoParent;
+    [SerializeField] MapSector mapSector;
     private Sector sector;
     private Vector2 targetSize;
     private Vector2 normalSize = new Vector2(64, 64);
@@ -100,7 +101,7 @@ public class SectorIconController : MonoBehaviour {
         
         //GameManager.Instance.SetSectorInView(sector);
         //UserInterface.Instance.ToggleMapGUI();
-        UserInterface.Instance.ShowSectorPopup(sector);
+        UserInterface.Instance.ShowSectorPopup(mapSector);
     }
 
     private void SetHoverState(HoverState newState) {

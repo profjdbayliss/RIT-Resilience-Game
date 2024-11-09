@@ -39,7 +39,7 @@ public class Sector : MonoBehaviour {
     [SerializeField] float backdoorIncreaseDownPercent = 1;
     public bool[] SimulatedFacilities = new bool[3] { true, true, true }; //simulated facility up/down status
     private bool isSimulated = false;
-    public bool IsSimulated => isShadow ? mainSector.IsSimulated : isSimulated;
+    public bool IsSimulated => isSimulated;
     public List<string> SimulationLog = new List<string>();
 
     [Header("Player and Sector Info")]
@@ -69,17 +69,17 @@ public class Sector : MonoBehaviour {
     public string spriteSheetName = "sectorIconAtlas.png";
     public Texture2D iconAtlasTexture;
     public List<Sprite> sectorIconList = new List<Sprite>();
-
+    [SerializeField] private MapSector mapSector;
     private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
 
-    [SerializeField] private TextMeshProUGUI _mapSectorNametext;
+   // [SerializeField] private TextMeshProUGUI _mapSectorNametext;
     // [SerializeField] private TextMeshProUGUI _mapSectorOwnerText;
-    [SerializeField] private Sector mainSector;
-    [SerializeField] private Sector shadow;
+    // [SerializeField] private Sector mainSector;
+    // [SerializeField] private Sector shadow;
 
-    [SerializeField] private bool isShadow = false;
+    //[SerializeField] private bool isShadow = false;
 
     [Header("Die Rolling")]
     public int dieRollShadow;
@@ -87,8 +87,7 @@ public class Sector : MonoBehaviour {
     public Action OnDiceRollComplete { get; set; }
 
 
-    public bool IsDown => isShadow ? mainSector.IsDown :
-        facilities.Any(facility => facility.IsDown) ||
+    public bool IsDown => facilities.Any(facility => facility.IsDown) ||
         (IsSimulated && SimulatedFacilities.Any(x => x == false));
 
     [Header("Game State")]
@@ -286,9 +285,10 @@ public class Sector : MonoBehaviour {
             Debug.LogError("Failed to load effect icon atlas");
         }
     }
+    //called on all sectors at the beginning of the game
     public void Initialize() {
         SectorIcon = SectorIconImage.sprite;
-        if (isShadow) _mapSectorNametext.text = sectorName.ToString();
+        // if (isShadow) _mapSectorNametext.text = sectorName.ToString();
         InitEffectSprites();
         //  sectorCanvas = this.gameObject;
         //overTimeCharges = 3;
@@ -302,10 +302,16 @@ public class Sector : MonoBehaviour {
         foreach (Facility facility in facilities) {
             facility.ProcessConnections(sectorIconList);
         }
+        //if (!isShadow) {
+        //    shadow.Initialize();
+        //}
+        
     }
-    public void SetOwner(CardPlayer player) {
+    
+public void SetOwner(CardPlayer player) {
         Owner = player;
         sectorOwnerText.text = player.playerName;
+        mapSector.Init();
     }
     #endregion
 
