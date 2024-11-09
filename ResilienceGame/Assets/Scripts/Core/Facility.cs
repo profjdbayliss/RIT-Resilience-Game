@@ -35,7 +35,9 @@ public class Facility : MonoBehaviour {
     public Image[] dependencyXs;
 
 
-    private int maxPhysicalPoints, maxFinacialPoints, maxNetworkPoints;
+    public int MaxPhysicalPoints { get; private set; }
+    public int MaxFinancialPoints { get; private set; }
+    public int MaxNetworkPoints { get; private set; }
     private int tempPhysPoints, tempFinPoints, tempNetPoints;
     public int[] Points = new int[3];
     //public int Points[0];
@@ -63,12 +65,12 @@ public class Facility : MonoBehaviour {
                             Points[2] == 0 ||
                             Points[1] == 0 ||
                             downedConnections == 3;
-    public bool IsDamaged => Points[0] < maxPhysicalPoints ||
-                            Points[1] < maxNetworkPoints ||
-                            Points[2] < maxFinacialPoints;
-    public bool HasMaxPhysicalPoints => Points[0] == maxPhysicalPoints;
-    public bool HasMaxNetworkPoints => Points[1] == maxNetworkPoints;
-    public bool HasMaxFinancialPoints => Points[2] == maxFinacialPoints;
+    public bool IsDamaged => Points[0] < MaxPhysicalPoints ||
+                            Points[1] < MaxNetworkPoints ||
+                            Points[2] < MaxFinancialPoints;
+    public bool HasMaxPhysicalPoints => Points[0] == MaxPhysicalPoints;
+    public bool HasMaxNetworkPoints => Points[1] == MaxNetworkPoints;
+    public bool HasMaxFinancialPoints => Points[2] == MaxFinancialPoints;
     private void Update() {
         if (IsDown && !WasEverDowned)
             WasEverDowned = true;
@@ -199,9 +201,9 @@ public class Facility : MonoBehaviour {
 
 
     public void UpdatePointsUI() {
-        UpdatePointTypeUI(0, Points[0], maxPhysicalPoints);
-        UpdatePointTypeUI(2, Points[2], maxFinacialPoints);
-        UpdatePointTypeUI(1, Points[1], maxNetworkPoints);
+        UpdatePointTypeUI(0, Points[0], MaxPhysicalPoints);
+        UpdatePointTypeUI(2, Points[2], MaxFinancialPoints);
+        UpdatePointTypeUI(1, Points[1], MaxNetworkPoints);
     }
 
     private void UpdatePointTypeUI(int typeIndex, int currentPoints, int maxPoints) {
@@ -266,30 +268,30 @@ public class Facility : MonoBehaviour {
         }
         switch (target) {
             case FacilityEffectTarget.Physical:
-                UpdatePoints(ref Points[0], maxPhysicalPoints);
+                UpdatePoints(ref Points[0], MaxPhysicalPoints);
                 break;
             case FacilityEffectTarget.Financial:
-                UpdatePoints(ref Points[2], maxFinacialPoints);
+                UpdatePoints(ref Points[2], MaxFinancialPoints);
                 break;
             case FacilityEffectTarget.Network:
-                UpdatePoints(ref Points[1], maxNetworkPoints);
+                UpdatePoints(ref Points[1], MaxNetworkPoints);
                 break;
             case FacilityEffectTarget.NetworkPhysical:
-                UpdatePoints(ref Points[1], maxNetworkPoints);
-                UpdatePoints(ref Points[0], maxPhysicalPoints);
+                UpdatePoints(ref Points[1], MaxNetworkPoints);
+                UpdatePoints(ref Points[0], MaxPhysicalPoints);
                 break;
             case FacilityEffectTarget.FinancialPhysical:
-                UpdatePoints(ref Points[2], maxFinacialPoints);
-                UpdatePoints(ref Points[0], maxPhysicalPoints);
+                UpdatePoints(ref Points[2], MaxFinancialPoints);
+                UpdatePoints(ref Points[0], MaxPhysicalPoints);
                 break;
             case FacilityEffectTarget.FinancialNetwork:
-                UpdatePoints(ref Points[2], maxFinacialPoints);
-                UpdatePoints(ref Points[1], maxNetworkPoints);
+                UpdatePoints(ref Points[2], MaxFinancialPoints);
+                UpdatePoints(ref Points[1], MaxNetworkPoints);
                 break;
             case FacilityEffectTarget.All:
-                UpdatePoints(ref Points[0], maxPhysicalPoints);
-                UpdatePoints(ref Points[2], maxFinacialPoints);
-                UpdatePoints(ref Points[1], maxNetworkPoints);
+                UpdatePoints(ref Points[0], MaxPhysicalPoints);
+                UpdatePoints(ref Points[2], MaxFinancialPoints);
+                UpdatePoints(ref Points[1], MaxNetworkPoints);
                 break;
 
         }
@@ -326,9 +328,9 @@ public class Facility : MonoBehaviour {
     }
 
     public void SetupFacilityPoints(int physical, int finacial, int network) {
-        maxPhysicalPoints = Points[0] = physical;
-        maxFinacialPoints = Points[2] = finacial;
-        maxNetworkPoints = Points[1] = network;
+        MaxPhysicalPoints = Points[0] = physical;
+        MaxFinancialPoints = Points[2] = finacial;
+        MaxNetworkPoints = Points[1] = network;
 
         UpdateUI();
     }
@@ -376,9 +378,9 @@ public class Facility : MonoBehaviour {
     public void LogFacilityDebug() {
         StringBuilder facilityInfo = new StringBuilder();
         facilityInfo.Append($"Facility Name: {facilityName} ");
-        facilityInfo.Append($"Physical Points: {Points[0]}/{maxPhysicalPoints} ");
-        facilityInfo.Append($"Financial Points: {Points[2]}/{maxFinacialPoints} ");
-        facilityInfo.Append($"Network Points: {Points[1]}/{maxNetworkPoints} ");
+        facilityInfo.Append($"Physical Points: {Points[0]}/{MaxPhysicalPoints} ");
+        facilityInfo.Append($"Financial Points: {Points[2]}/{MaxFinancialPoints} ");
+        facilityInfo.Append($"Network Points: {Points[1]}/{MaxNetworkPoints} ");
         facilityInfo.Append($"Connected Sectors: ");
         foreach (var sector in connectedSectors) {
             facilityInfo.Append(sector.sectorName).Append(", ");

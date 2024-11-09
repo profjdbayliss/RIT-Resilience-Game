@@ -11,6 +11,7 @@ public class MapSector : MonoBehaviour
     [SerializeField] private List<TextMeshProUGUI> facilityNames;
     public Sector sector;
     [SerializeField] private Canvas sectorVisuals;
+    [SerializeField] List<FacilityPointsUIController> pointsUIControllers;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +30,9 @@ public class MapSector : MonoBehaviour
         sectorOwner.text = sector.Owner != null ? sector.Owner.playerName : "Unclaimed";
         for (int i = 0; i < sector.facilities.Length; i++) {
             facilityNames[i].text = sector.facilities[i].facilityName;
+            pointsUIControllers[i].Init(sector.facilities[i]);
         }
+        
     }
     public void ToggleVisuals(bool enable) {
         sectorVisuals.enabled = enable;
