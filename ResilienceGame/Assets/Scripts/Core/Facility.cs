@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,6 +11,8 @@ using UnityEngine.UI;
 
 
 public class Facility : MonoBehaviour {
+
+    public Action OnPointsChanged;
     public enum FacilityType {
         None,
         Production,
@@ -305,7 +308,7 @@ public class Facility : MonoBehaviour {
 
 
         ScoreManager.Instance.AddResistancePointsRestored(createdById, pointsChanged);
-
+        OnPointsChanged?.Invoke();
 
         GameManager.Instance.CheckDownedFacilities();
         UpdateUI();

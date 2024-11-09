@@ -55,6 +55,14 @@ public class FacilityPointsUIController : MonoBehaviour {
             InitMaxPointValues(2, facility.MaxFinancialPoints);
         }
     }
+    public void UpdateAllPoints() {
+        if (facility != null) {
+            UpdatePointValue(0, facility.Points[0], facility.MaxPhysicalPoints);
+            UpdatePointValue(1, facility.Points[1], facility.MaxNetworkPoints);
+            UpdatePointValue(2, facility.Points[2], facility.MaxFinancialPoints);
+
+        }
+    }
     public void Init(Facility facility) {
         this.facility = facility;
         physPoints.ForEach(pointParent => {
@@ -80,6 +88,7 @@ public class FacilityPointsUIController : MonoBehaviour {
         });
         Debug.Log($"Init Facility Points UI {facility.facilityName}: {facility.MaxPhysicalPoints}, {facility.MaxNetworkPoints}, {facility.MaxFinancialPoints}");
         UpdateAllMax();
+
     }
     private void InitMaxPointValues(int type, int maxAmt) {
         if (type < 0 || type > 2) {
@@ -90,6 +99,17 @@ public class FacilityPointsUIController : MonoBehaviour {
         Debug.Log($"init max points count: {points.Count}");
         for (int i = 0; i < points.Count; i++) {
             points[i].SetState(i < maxAmt ? FacilityPointState.Full : FacilityPointState.Disabled);
+        }
+    }
+    private void UpdatePointValue(int type, int amt, int maxAmt) {
+        if (type < 0 || type > 2) {
+            Debug.LogError("Invalid point type");
+            return;
+        }
+        List<FacilityPointUIElement> points = type == 0 ? physPointsUI : type == 1 ? netPointsUI : finPointsUI;
+        Debug.Log($"init max points count: {points.Count}");
+        for (int i = 0; i < points.Count; i++) {
+            points[i].SetState(i < amt ? FacilityPointState.Full : i < maxAmt ? FacilityPointState.Empty : FacilityPointState.Disabled);
         }
     }
 

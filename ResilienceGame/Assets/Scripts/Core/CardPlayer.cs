@@ -1244,7 +1244,7 @@ public class CardPlayer : MonoBehaviour {
             //    // Only one collider, process that
             //    hoveredFacilityCollider = hoveredColliders.First();
             //}
-            Debug.Log(hoveredFacilityCollider);
+            //   Debug.Log(hoveredFacilityCollider);
             bool highlight = false;
 
             // Process the hovered facility collider
@@ -1357,7 +1357,7 @@ public class CardPlayer : MonoBehaviour {
                         case CardDropZoneTag.MAP_FACILITY:
                             Debug.Log("Dropped on map facility");
                             if (cardDroppedOnObject.TryGetComponent(out FacilityProxy proxy)) {
-                                
+
                                 if (proxy.facility != null) {
                                     cardDroppedOnObject = proxy.facility.gameObject;
                                     if (proxy.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
@@ -1373,13 +1373,13 @@ public class CardPlayer : MonoBehaviour {
                                 else {
                                     Debug.LogError($"Proxy {cardDroppedOnObject.name} is missing facility ref");
                                 }
-                                
+
                             }
                             else {
                                 Debug.LogError("Missing Facility Proxy on map facility");
                             }
-                            
-                            
+
+
                             break;
                         default:
                             Debug.Log("card not dropped in card drop zone");
@@ -1663,8 +1663,10 @@ public class CardPlayer : MonoBehaviour {
     protected (string, bool) ValidateActionAndReadyPlay(Card card, GameObject potentialDropLocation) {
         //check prereq effects on cards for effect cards played on single facilities
         if (card.data.preReqEffectType != FacilityEffectType.None) {
+            Facility facility = potentialDropLocation.CompareTag(CardDropZoneTag.MAP_FACILITY) ?
+                potentialDropLocation.GetComponent<FacilityProxy>().facility :
+                potentialDropLocation.GetComponent<Facility>();
 
-            Facility facility = potentialDropLocation.GetComponent<Facility>();
             if (facility == null) {
                 return ("Facility not found on hovered drop location", false);
             }
