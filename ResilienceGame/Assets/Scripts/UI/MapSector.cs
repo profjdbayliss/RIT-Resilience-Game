@@ -13,6 +13,7 @@ public class MapSector : MonoBehaviour {
     [SerializeField] private Canvas sectorVisuals;
     [SerializeField] List<FacilityPointsUIController> pointsUIControllers;
     [SerializeField] List<BoxCollider2D> facilityColliders;
+    private List<FacilityProxy> proxies;
 
     // Start is called before the first frame update
     void Start() {
@@ -27,15 +28,16 @@ public class MapSector : MonoBehaviour {
 
         sectorName.text = sector.sectorName.ToString();
         sectorOwner.text = sector.Owner != null ? sector.Owner.playerName : "Unclaimed";
-        var facilityProxies = GetComponentsInChildren<FacilityProxy>();
+        proxies = GetComponentsInChildren<FacilityProxy>().ToList();
         
 
         for (int i = 0; i < sector.facilities.Length; i++) {
             facilityNames[i].text = sector.facilities[i].facilityName;
             pointsUIControllers[i].Init(sector.facilities[i]);
-            facilityProxies[i].facility = sector.facilities[i];
-            facilityProxies[i].AddListeners();
+            proxies[i].facility = sector.facilities[i];
+            proxies[i].AddListeners();
         }
+
 
     }
     public void ToggleVisuals(bool enable) {
@@ -43,6 +45,10 @@ public class MapSector : MonoBehaviour {
         foreach (BoxCollider2D collider in facilityColliders) {
             collider.enabled = enable;
         }
+        if (enable)
+            proxies.ForEach(proxy => proxy.UpdatePoints(this));
+
+
     }
     public void UpdateFacilityPoints(FacilityProxy proxy) {
         int index = facilityColliders.FindIndex(collider => collider.GetComponent<FacilityProxy>() == proxy);

@@ -20,10 +20,14 @@ public class FacilityProxy : MonoBehaviour
     public void AddListeners() {
         facility.OnPointsChanged += UpdatePoints;
     }
-    void UpdatePoints() {
-        var sector = GetComponentInParent<MapSector>();
+    public void UpdatePoints(MapSector sector = null) {
+        if (sector == null) 
+            sector = GetComponentInParent<MapSector>();
         if (sector != null ) {
             sector.UpdateFacilityPoints(this);
         }
+    }
+    public void UpdatePoints() {
+        UpdatePoints(null);
     }
 }
