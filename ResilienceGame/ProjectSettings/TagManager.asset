@@ -11,6 +11,7 @@ TagManager:
   - FreePlayDropLocation
   - DiscardDropLocation
   - SectorMenu
+  - MapFacilityDropLocation
   layers:
   - Default
   - TransparentFX

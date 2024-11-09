@@ -326,6 +326,11 @@ public void SetOwner(CardPlayer player) {
     #endregion
 
     #region Helpers
+    public void ToggleFacilityColliders(bool enable) {
+        for (int i = 0; i < facilityColliders.Length; i++) {
+            facilityColliders[i].enabled = enable;
+        }
+    }
     public void SetSimulated(bool sim) {
         isSimulated = sim;
     }

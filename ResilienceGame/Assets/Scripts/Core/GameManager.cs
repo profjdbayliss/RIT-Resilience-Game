@@ -763,7 +763,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Helpers
-
+    public void ToggleAllSectorColliders(bool enable) {
+        activeSectors.ForEach(s => s.ToggleFacilityColliders(enable));
+    }
     public void QuitToMenu() {
         if (IsServer)
             NetworkManager.singleton.StopHost();

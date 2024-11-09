@@ -139,7 +139,7 @@ public class CardPlayer : MonoBehaviour {
     //public int sharedMeepleTimer = 0;
     public readonly int MEEPLE_SHARE_DURATION = 2;
 
-
+    public GameObject HoveredDropLocation { get; set; }
 
     //public TextMeshProUGUI[] meeplesAmountText;
     // [SerializeField] protected Button[] meepleButtons;
@@ -240,7 +240,7 @@ public class CardPlayer : MonoBehaviour {
                     for (int j = 0; j < card.data.numberInDeck; j++) {
                         DeckIDs.Add(card.data.cardID);
                     }
-                } 
+                }
             }
             else if (card == null) {
                 Debug.LogError("Card is null");
@@ -783,6 +783,7 @@ public class CardPlayer : MonoBehaviour {
     }
     protected SectorType SectorPlayedOn() {
         if (cardDroppedOnObject != null) {
+            Debug.Log($"card played on {cardDroppedOnObject.name}");
             return cardDroppedOnObject.GetComponentInParent<Sector>().sectorName;
         }
         return SectorType.Any;
@@ -790,6 +791,7 @@ public class CardPlayer : MonoBehaviour {
     protected Facility FacilityPlayedOn() {
         Facility facility = null;
         if (cardDroppedOnObject != null) {
+            Debug.Log($"card played on {cardDroppedOnObject.name}");
             facility = cardDroppedOnObject.GetComponentInParent<Facility>();
         }
         return facility;
@@ -1205,6 +1207,9 @@ public class CardPlayer : MonoBehaviour {
 
     //updates the hoverDropLocation class field to hold the object the card is hovering over
     void UpdateHoveredDropLocation(Vector2 position, bool shouldHighlight = true, Card cardDragged = null) {
+        if (this != GameManager.Instance.actualPlayer) {
+            return;
+        }
         GameObject currentHoveredFacility = null; // Reset at the beginning of each update
         bool isOverAnyDropLocation = false;
 
@@ -1215,30 +1220,31 @@ public class CardPlayer : MonoBehaviour {
 
         //  Vector2 mousePosition = Mouse.current.position.ReadValue();
 
-        Collider2D[] hoveredColliders = Physics2D.OverlapPointAll(position, LayerMask.GetMask("CardDrop"));
-        //  Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
-        if (hoveredColliders != null && hoveredColliders.Length > 0) {
+        var hoveredFacilityCollider = Physics2D.OverlapPoint(position, LayerMask.GetMask("CardDrop"));
+
+        //Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
+        if (hoveredFacilityCollider != null) {
             isOverAnyDropLocation = true;
-            Collider2D hoveredFacilityCollider = null;
+            //Collider2D hoveredFacilityCollider = null;
 
-            // Check for a facility collider if there are multiple
-            if (hoveredColliders.Length == 2) {
-                foreach (var collider in hoveredColliders) {
-                    if (collider.CompareTag(CardDropZoneTag.FACILITY)) {
-                        hoveredFacilityCollider = collider;
-                        break;
-                    }
-                }
-                // If no facility collider is found, process the other collider
-                if (hoveredFacilityCollider == null) {
-                    hoveredFacilityCollider = hoveredColliders.First();
-                }
-            }
-            else {
-                // Only one collider, process that
-                hoveredFacilityCollider = hoveredColliders.First();
-            }
-
+            //// Check for a facility collider if there are multiple
+            //if (hoveredColliders.Length >= 2) {
+            //    foreach (var collider in hoveredColliders) {
+            //        if (collider.CompareTag(CardDropZoneTag.FACILITY) || collider.CompareTag(CardDropZoneTag.MAP_FACILITY)) {
+            //            hoveredFacilityCollider = collider;
+            //            break;
+            //        }
+            //    }
+            //    // If no facility collider is found, process the other collider
+            //    if (hoveredFacilityCollider == null) {
+            //        hoveredFacilityCollider = hoveredColliders.First();
+            //    }
+            //}
+            //else {
+            //    // Only one collider, process that
+            //    hoveredFacilityCollider = hoveredColliders.First();
+            //}
+            Debug.Log(hoveredFacilityCollider);
             bool highlight = false;
 
             // Process the hovered facility collider
@@ -1258,6 +1264,12 @@ public class CardPlayer : MonoBehaviour {
                                     highlight = true;
                                 }
                             }
+                            else if (hoveredFacilityCollider.TryGetComponent(out FacilityProxy proxy)) {
+                                if (proxy.facility.HasRemovableEffects(GetOpponentTeam())) {
+                                    highlight = true;
+                                }
+
+                            }
                         }
                         //facility card hover
                         else {
@@ -1267,12 +1279,12 @@ public class CardPlayer : MonoBehaviour {
                 }
                 if (highlight) {
                     if (hoveredFacilityCollider.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
-                        //    Debug.Log("Hovering");
+
                         hoverActivateObject.ActivateHover();
                         currentHoveredFacility = hoveredFacilityCollider.gameObject; // Assign currentHoveredFacility
                     }
                 }
-                UserInterface.Instance.hoveredDropLocation = hoveredFacilityCollider.gameObject;
+                HoveredDropLocation = hoveredFacilityCollider.gameObject;
             }
         }
 
@@ -1288,7 +1300,7 @@ public class CardPlayer : MonoBehaviour {
 
         // If we're not over any drop location, set hoveredDropLocation to null
         if (!isOverAnyDropLocation) {
-            UserInterface.Instance.hoveredDropLocation = null;
+            HoveredDropLocation = null;
         }
 
         // Debug.Log("Hovered Drop Location: " + hoveredDropLocation);
@@ -1342,6 +1354,33 @@ public class CardPlayer : MonoBehaviour {
                             Debug.Log($"Handing a sectorwide drop");
                             HandleFreePlayDrop(card, phase, ref playCount, ref playKey);
                             break;
+                        case CardDropZoneTag.MAP_FACILITY:
+                            Debug.Log("Dropped on map facility");
+                            if (cardDroppedOnObject.TryGetComponent(out FacilityProxy proxy)) {
+                                
+                                if (proxy.facility != null) {
+                                    cardDroppedOnObject = proxy.facility.gameObject;
+                                    if (proxy.TryGetComponent(out HoverActivateObject hoverActivateObject)) {
+                                        hoverActivateObject.DeactivateHover();
+                                    }
+                                    if (card.target == CardTarget.Facility || card.target == CardTarget.Effect) {
+                                        HandleFacilityDrop(card, phase, ref playCount, ref playKey);
+                                    }
+                                    else {
+                                        HandleFreePlayDrop(card, phase, ref playCount, ref playKey);
+                                    }
+                                }
+                                else {
+                                    Debug.LogError($"Proxy {cardDroppedOnObject.name} is missing facility ref");
+                                }
+                                
+                            }
+                            else {
+                                Debug.LogError("Missing Facility Proxy on map facility");
+                            }
+                            
+                            
+                            break;
                         default:
                             Debug.Log("card not dropped in card drop zone");
                             handPositioner.ReturnCardToHand(card);
@@ -1390,16 +1429,16 @@ public class CardPlayer : MonoBehaviour {
 
     //This function is called when a card is dropped from that card's slippy component (happens one time at drop)
     public virtual Card HandleCardDrop(Card card) {
-        if (UserInterface.Instance.hoveredDropLocation == null) {
+        if (HoveredDropLocation == null) {
             Debug.Log("No drop location found");
             return null;
         }
         else {
             //clear the hover effect
-            if (UserInterface.Instance.hoveredDropLocation.CompareTag("FacilityDropLocation")) {
-                UserInterface.Instance.hoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
+            if (HoveredDropLocation.CompareTag("FacilityDropLocation")) {
+                HoveredDropLocation.GetComponent<HoverActivateObject>().DeactivateHover();
             }
-            if (ValidateCardPlay(card, UserInterface.Instance.hoveredDropLocation)) {
+            if (ValidateCardPlay(card, HoveredDropLocation)) {
                 //check if the game is waiting for the player to return cards to the deck by playing them
                 if (ReadyState == PlayerReadyState.ReturnCardsToDeck) {
                     Debug.Log("Returning card to deck");
@@ -1419,13 +1458,13 @@ public class CardPlayer : MonoBehaviour {
                 else if (ReadyState == PlayerReadyState.ReadyToPlay || ReadyState == PlayerReadyState.DiscardCards) {
                     Debug.Log("Card is valid to play and player is ready");
                     //set var to hold where the card was dropped
-                    cardDroppedOnObject = UserInterface.Instance.hoveredDropLocation;
+                    cardDroppedOnObject = HoveredDropLocation;
                     //set card state to played
                     card.SetCardState(CardState.CardDrawnDropped);
                     //remove card from hand
                     handPositioner.cards.Remove(card);
                     //set the parent to where it was played
-                    card.transform.transform.SetParent(UserInterface.Instance.hoveredDropLocation.transform);
+                    card.transform.transform.SetParent(HoveredDropLocation.transform);
                     return card;
                 }
                 else if (ReadyState == PlayerReadyState.SelectCardsForCostChange) {
@@ -1571,7 +1610,7 @@ public class CardPlayer : MonoBehaviour {
     protected virtual bool ValidateCardPlay(Card card, GameObject potentialDropLocation) {
         string response = "";
         bool canPlay = false;
-        
+
         if (AmountToReturnToDeck > 0) {
             Debug.Log($"Returning {card.front.title} to deck");
             return true;
@@ -1703,7 +1742,7 @@ public class CardPlayer : MonoBehaviour {
             return ($"It is not {playerTeam}'s turn", false);
         //draw phase checks if the player is discarding a card and if they havent discard more than allowed this phase
         if (GameManager.Instance.MGamePhase == GamePhase.DrawBlue || GameManager.Instance.MGamePhase == GamePhase.DrawRed) {
-            if (UserInterface.Instance.hoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.Instance.MNumberDiscarded < GameManager.Instance.MAX_DISCARDS) {
+            if (HoveredDropLocation.CompareTag("DiscardDropLocation") && GameManager.Instance.MNumberDiscarded < GameManager.Instance.MAX_DISCARDS) {
                 return ("", true);
             }
             return ("Cannot discard more than " + GameManager.Instance.MAX_DISCARDS + " cards per turn", false);

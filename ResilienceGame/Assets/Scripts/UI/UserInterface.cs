@@ -155,8 +155,8 @@ public class UserInterface : MonoBehaviour {
 
 
 
-    [Header("Drag and Drop")]
-    public GameObject hoveredDropLocation;
+    //[Header("Drag and Drop")]
+    
     // Start is called before the first frame update
     public void StartGame(PlayerTeam playerType) {
         AddPlayerToLobby(name: RGNetworkPlayerList.instance.localPlayerName, team: playerType);
@@ -550,7 +550,7 @@ public class UserInterface : MonoBehaviour {
         isGameBoardActive = !isGameBoardActive;
         mapParent.SetActive(!isGameBoardActive);
         mapState = isGameBoardActive ? MapState.Hidden : MapState.FullScreen;
-
+        GameManager.Instance.ToggleAllSectorColliders(isGameBoardActive);
         if (isGameBoardActive) {
             ShowPlayerGUI();
         }

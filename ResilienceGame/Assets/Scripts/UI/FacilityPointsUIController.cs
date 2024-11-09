@@ -39,7 +39,24 @@ public class FacilityPointsUIController : MonoBehaviour {
     [SerializeField] List<FacilityPointUIElement> netPointsUI = new List<FacilityPointUIElement>();
     [SerializeField] List<FacilityPointUIElement> finPointsUI = new List<FacilityPointUIElement>();
     // Start is called before the first frame update
-    void Start() {
+    
+
+    // Update is called once per frame
+    void Update() {
+
+    }
+    public void SetPointAmt(int type, int amt) {
+
+    }
+    public void UpdateAllMax() {
+        if (facility != null) {
+            InitMaxPointValues(0, facility.MaxPhysicalPoints);
+            InitMaxPointValues(1, facility.MaxNetworkPoints);
+            InitMaxPointValues(2, facility.MaxFinancialPoints);
+        }
+    }
+    public void Init(Facility facility) {
+        this.facility = facility;
         physPoints.ForEach(pointParent => {
             physPointsUI.Add(
                 new FacilityPointUIElement(
@@ -61,25 +78,7 @@ public class FacilityPointsUIController : MonoBehaviour {
                     pointParent.transform.GetChild(1).GetComponent<Image>(),
                     pointParent.transform.childCount > 2 ? pointParent.transform.GetChild(2).GetComponent<Image>() : null));
         });
-    }
-
-    // Update is called once per frame
-    void Update() {
-
-    }
-    public void SetPointAmt(int type, int amt) {
-
-    }
-    public void UpdateAllMax() {
-        if (facility != null) {
-            InitMaxPointValues(0, facility.MaxPhysicalPoints);
-            InitMaxPointValues(1, facility.MaxNetworkPoints);
-            InitMaxPointValues(2, facility.MaxFinancialPoints);
-        }
-    }
-    public void Init(Facility facility) {
-        this.facility = facility;
-        Debug.Log($"Init Facility Points UI {facility.MaxPhysicalPoints}, {facility.MaxNetworkPoints}, {facility.MaxFinancialPoints}");
+        Debug.Log($"Init Facility Points UI {facility.facilityName}: {facility.MaxPhysicalPoints}, {facility.MaxNetworkPoints}, {facility.MaxFinancialPoints}");
         UpdateAllMax();
     }
     private void InitMaxPointValues(int type, int maxAmt) {
@@ -88,7 +87,7 @@ public class FacilityPointsUIController : MonoBehaviour {
             return;
         }
         List<FacilityPointUIElement> points = type == 0 ? physPointsUI : type == 1 ? netPointsUI : finPointsUI;
-
+        Debug.Log($"init max points count: {points.Count}");
         for (int i = 0; i < points.Count; i++) {
             points[i].SetState(i < maxAmt ? FacilityPointState.Full : FacilityPointState.Disabled);
         }
