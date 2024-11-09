@@ -129,7 +129,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private MapState mapState = MapState.Hidden;
     //[SerializeField] private MapState mapTargetState = MapState.Hidden;
 
-    private readonly Vector2 sectorPanelHiddenPos = new Vector2(1300, 105);
+    private readonly Vector2 sectorPanelHiddenPos = new Vector2(1421, 105);
     private readonly Vector2 sectorPanelVisiblePos = new Vector2(600, 105);
 
     [SerializeField] private RectTransform guiButtonBg;
