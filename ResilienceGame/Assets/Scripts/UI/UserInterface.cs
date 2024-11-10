@@ -136,8 +136,8 @@ public class UserInterface : MonoBehaviour {
     private readonly Vector2 buttonBgHiddenPos = new Vector2(-800, -691);
     private readonly Vector2 buttonBgVisiblePos = new Vector2(-800, -383.5f);
 
-    private readonly Vector2 discardHiddenPos = new Vector2(-546, -692);
-    private readonly Vector2 discardVisiblePos = new Vector2(-546, -383.9f);
+    private readonly Vector2 discardHiddenPos = new Vector2(-1065, 0);
+    private readonly Vector2 discardVisiblePos = new Vector2(-887, 0);
 
     [SerializeField] private RectTransform playerHandPosition;
     private readonly Vector2 handHiddenPos = new Vector2(173, -800);
@@ -344,7 +344,7 @@ public class UserInterface : MonoBehaviour {
             return;
         }
         Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
-        sectorIcons[sector.transform.GetSiblingIndex()].SetSector(sectorShadow, sector.Owner == null);
+        sectorIcons[sector.transform.GetSiblingIndex()-1].SetSector(sectorShadow, sector.Owner == null);
     }
     public void UpdatePlayerMenuItems() {
         playerMenuItems.ForEach(item => item.UpdatePopup());
@@ -682,6 +682,7 @@ public class UserInterface : MonoBehaviour {
             StartCoroutine(
                 MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(),
                 sectorPanelHiddenPos, animDuration)));
+        mapState = MapState.FullScreen;
 
 
     }

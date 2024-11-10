@@ -1349,6 +1349,7 @@ MonoBehaviour:
   sectorNameText: {fileID: 763322797887883308}
   sectorOwnerNameText: {fileID: 7428158883706394730}
   sectorInfoParent: {fileID: 2230693381014310412}
+  mapSector: {fileID: 0}
   simColor: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
   downColor: {r: 1, g: 0.40251565, b: 0.40251565, a: 1}
 --- !u!61 &1395507840131185400
@@ -2257,7 +2258,7 @@ MonoBehaviour:
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 15
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
