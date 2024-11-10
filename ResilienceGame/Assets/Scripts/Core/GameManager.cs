@@ -634,9 +634,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (gameStarted) {
                 HandlePhases(MGamePhase);
             }
-            if (Keyboard.current.escapeKey.wasPressedThisFrame) {
-                UserInterface.Instance.ToggleMapGUI();
-            }
+            
 
             // always notify observers in case there's a message
             // waiting to be processed.
@@ -670,7 +668,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
             UserInterface.Instance.TogglePlayerMenu(false);
         }
 
-
+        if (Keyboard.current.escapeKey.wasPressedThisFrame) {
+            UserInterface.Instance.ToggleMapGUI();
+        }
 
     }
 
