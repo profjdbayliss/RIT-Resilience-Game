@@ -139,6 +139,7 @@ public class UserInterface : MonoBehaviour {
 
     private readonly Vector2 discardHiddenPos = new Vector2(0, 771);
     private readonly Vector2 discardVisiblePos = new Vector2(0, 475);
+    private Coroutine discardMoveRoutine;
 
     [SerializeField] private RectTransform playerHandPosition;
     private readonly Vector2 handHiddenPos = new Vector2(173, -800);
@@ -234,11 +235,20 @@ public class UserInterface : MonoBehaviour {
         }
     }
     public void EnableDiscardDrop() {
-        discardDropZone.SetActive(true);
+        //discardDropZone.SetActive(true);
+        if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
+        discardMoveRoutine =
+            StartCoroutine(
+                MoveMenuItem(discardRect, discardVisiblePos, sectorAnimDuration));
+
         tutorialToggle.DiscardPanelToggle(true);
     }
     public void DisableDiscardDrop() {
-        discardDropZone.SetActive(false);
+        // discardDropZone.SetActive(false);
+        if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
+        discardMoveRoutine =
+            StartCoroutine(
+                MoveMenuItem(discardRect, discardHiddenPos, sectorAnimDuration));
         tutorialToggle.DiscardPanelToggle(false);
     }
     public void EnableMeepleButtonByIndex(int index) {
@@ -363,7 +373,7 @@ public class UserInterface : MonoBehaviour {
             return;
         }
         Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
-        sectorIcons[sector.transform.GetSiblingIndex()-1].SetSector(sectorShadow, sector.Owner == null);
+        sectorIcons[sector.transform.GetSiblingIndex() - 1].SetSector(sectorShadow, sector.Owner == null);
     }
     public void UpdatePlayerMenuItems() {
         playerMenuItems.ForEach(item => item.UpdatePopup());
@@ -570,6 +580,7 @@ public class UserInterface : MonoBehaviour {
         //mapParent.SetActive(!isGameBoardActive);
         mapState = isGameBoardActive ? MapState.Hidden : MapState.FullScreen;
         GameManager.Instance.ToggleAllSectorColliders(isGameBoardActive);
+        sectorIcons.ForEach(x => x.gameObject.SetActive(!isGameBoardActive));
         if (sectorMoveRoutine != null || leftMoveRoutine != null || rightMoveRoutine != null) {
             StopCoroutine(sectorMoveRoutine);
             StopCoroutine(leftMoveRoutine);
@@ -578,12 +589,12 @@ public class UserInterface : MonoBehaviour {
         if (isGameBoardActive) {
             ShowPlayerGUI();
             sectorMoveRoutine = StartCoroutine(MoveMenuItem(sectorParent, sectorVisiblePos, sectorAnimDuration));
-            
+
         }
         else {
             HidePlayerGUI();
             sectorMoveRoutine = StartCoroutine(MoveMenuItem(sectorParent, sectorHiddenPos, sectorAnimDuration));
-            
+
 
             //   mapSectorPanel.GetComponent<RectTransform>().anchoredPosition = sectorPanelHiddenPos;
             //    map.localScale = Vector3.one;
@@ -627,7 +638,7 @@ public class UserInterface : MonoBehaviour {
             HideSectorPopup();
         }
         else {
-            ShowSectorPopup(null);
+            HandleSectorIconClick(null);
         }
     }
     //animate in the player GUI elements
@@ -638,6 +649,7 @@ public class UserInterface : MonoBehaviour {
             StopCoroutine(leftMoveRoutine);
             StopCoroutine(rightMoveRoutine);
             StopCoroutine(mapStateChangeRoutine);
+            StopCoroutine(discardMoveRoutine);
         }
         menuItemMoveRoutines.Add(
             StartCoroutine(
@@ -647,10 +659,9 @@ public class UserInterface : MonoBehaviour {
         leftMoveRoutine = StartCoroutine(MoveMenuItem(leftMenu, leftVisiblePos, sectorAnimDuration));
         rightMoveRoutine = StartCoroutine(MoveMenuItem(rightMenu, rightMenuVisiblePos, sectorAnimDuration));
 
-
-        menuItemMoveRoutines.Add(
+        discardMoveRoutine =
             StartCoroutine(
-                MoveMenuItem(discardRect, discardVisiblePos, animDuration)));
+                MoveMenuItem(discardRect, discardVisiblePos, animDuration));
         //menuItemMoveRoutines.Add(
         //    StartCoroutine(
         //        MoveMenuItem(meepleParent, meepleVisiblePos, animDuration)));
@@ -667,6 +678,7 @@ public class UserInterface : MonoBehaviour {
             StopCoroutine(leftMoveRoutine);
             StopCoroutine(rightMoveRoutine);
             StopCoroutine(mapStateChangeRoutine);
+            StopCoroutine(discardMoveRoutine);
         }
         menuItemMoveRoutines.Add(
             StartCoroutine(
@@ -676,9 +688,9 @@ public class UserInterface : MonoBehaviour {
         leftMoveRoutine = StartCoroutine(MoveMenuItem(leftMenu, leftHiddenPos, sectorAnimDuration));
         rightMoveRoutine = StartCoroutine(MoveMenuItem(rightMenu, rightMenuHiddenPos, sectorAnimDuration));
 
-        menuItemMoveRoutines.Add(
+        discardMoveRoutine =
             StartCoroutine(
-                MoveMenuItem(discardRect, discardHiddenPos, animDuration)));
+                MoveMenuItem(discardRect, discardHiddenPos, animDuration));
         //menuItemMoveRoutines.Add(
         //    StartCoroutine(
         //        MoveMenuItem(meepleParent, meepleHiddenPos, animDuration)));
@@ -688,27 +700,29 @@ public class UserInterface : MonoBehaviour {
 
     }
     //handles showing changing the map menu from full screen map to showing the sector popup
-    public void ShowSectorPopup(MapSector mSector) {
+    public void HandleSectorIconClick(Sector _sector) {
+        GameManager.Instance.SetSectorInView(_sector);
+        ToggleMapGUI();
 
-       //// GameManager.Instance.SetSectorInView(mSector.sector);
-       // _mapSectors.ForEach(s => s.ToggleVisuals(false));
-       // if (mSector == null) return;
-       // mSector.ToggleVisuals(true);
+        //// GameManager.Instance.SetSectorInView(mSector.sector);
+        // _mapSectors.ForEach(s => s.ToggleVisuals(false));
+        // if (mSector == null) return;
+        // mSector.ToggleVisuals(true);
 
-       // if (mapState == MapState.FullScreen) {
-       //     Debug.Log($"Showing sector popup for {mSector.sector.sectorName}");
-       //     //show player hand ect..
-       //     ShowPlayerGUI();
-       //     //scale map size
-       //     mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(.8f, .8f, 1f), animDuration));
+        // if (mapState == MapState.FullScreen) {
+        //     Debug.Log($"Showing sector popup for {mSector.sector.sectorName}");
+        //     //show player hand ect..
+        //     ShowPlayerGUI();
+        //     //scale map size
+        //     mapStateChangeRoutine = StartCoroutine(ResizeElement(map, new Vector3(.8f, .8f, 1f), animDuration));
 
-       //     //move sector panel
-       //     menuItemMoveRoutines.Add(
-       //         StartCoroutine(
-       //             MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(),
-       //             sectorPanelVisiblePos, animDuration)));
-       // }
-       // mapState = MapState.SectorPopup;
+        //     //move sector panel
+        //     menuItemMoveRoutines.Add(
+        //         StartCoroutine(
+        //             MoveMenuItem(mapSectorPanel.GetComponent<RectTransform>(),
+        //             sectorPanelVisiblePos, animDuration)));
+        // }
+        // mapState = MapState.SectorPopup;
     }
     //handles hiding the sector popup
     public void HideSectorPopup() {

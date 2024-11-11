@@ -698,13 +698,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (actualPlayer.playerTeam == PlayerTeam.Red) {
                 actualPlayer.PlayerSector = sectorInView;
             }
-            else {
-                //change color based on if you are the owner
-                UserInterface.Instance.SetInfoBackground(sectorInView == actualPlayer.PlayerSector ? 1 : 2);
-            }
-            if (UserInterface.Instance.mapState == UserInterface.MapState.SectorPopup) {
-                UserInterface.Instance.ShowSectorPopup(sectorInView.mapSector);
-            }
+            //else {
+            //    //change color based on if you are the owner
+            //    UserInterface.Instance.SetInfoBackground(sectorInView == actualPlayer.PlayerSector ? 1 : 2);
+            //}
+            //if (UserInterface.Instance.mapState == UserInterface.MapState.SectorPopup) {
+            //    UserInterface.Instance.HandleSectorIconClick(sectorInView);
+            //}
         }
     }
     public void ViewPreviousSector() {
