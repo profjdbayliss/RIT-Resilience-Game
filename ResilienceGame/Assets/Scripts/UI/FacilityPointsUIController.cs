@@ -82,9 +82,9 @@ public class FacilityPointsUIController : MonoBehaviour {
         finPoints.ForEach(pointParent => {
             finPointsUI.Add(
                 new FacilityPointUIElement(
-                    pointParent.transform.GetChild(0).GetComponent<Image>(),
-                    pointParent.transform.GetChild(1).GetComponent<Image>(),
-                    pointParent.transform.childCount > 2 ? pointParent.transform.GetChild(2).GetComponent<Image>() : null));
+                    pointParent.transform.GetChild(0).GetComponent<Image>(), //empty
+                    pointParent.transform.GetChild(1).GetComponent<Image>(), //filled
+                    pointParent.transform.childCount > 2 ? pointParent.transform.GetChild(2).GetComponent<Image>() : null)); //temp
         });
         Debug.Log($"Init Facility Points UI {facility.facilityName}: {facility.MaxPhysicalPoints}, {facility.MaxNetworkPoints}, {facility.MaxFinancialPoints}");
         UpdateAllMax();
