@@ -115,6 +115,13 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private List<MapSector> _mapSectors;
     //[SerializeField] private GameObject menuButton;
 
+    [Header("Sector Lines")]
+    [SerializeField] private Image sectorLines;
+    [SerializeField] private Image sectorOutline;
+    [SerializeField] private Color[] doomClockLinesColor;
+    [SerializeField] private Color sectorOutlineOwnerColor;
+
+
 
     [Header("Animations")]
     //animations
@@ -359,9 +366,13 @@ public class UserInterface : MonoBehaviour {
             infoBg.sprite = infoBackgrounds[index];
     }
     public void SetDoomClockActive(bool active, int index = 0) {
-        doomClockBg.SetActive(active);
+        //doomClockBg.SetActive(active);
         if (active) {
-            doomClockImage.sprite = doomClockSprites[index];
+           // doomClockImage.sprite = doomClockSprites[index];
+           sectorLines.color = doomClockLinesColor[index];
+        }
+        else {
+            sectorLines.color = Color.white;
         }
     }
     public void UpdateDoomClockTurnsLeft(int turnsLeft) {
@@ -370,7 +381,8 @@ public class UserInterface : MonoBehaviour {
             SetDoomClockActive(false);
             return;
         }
-        doomClockImage.sprite = doomClockSprites[^turnsLeft];
+        //doomClockImage.sprite = doomClockSprites[^turnsLeft];
+        sectorLines.color = doomClockLinesColor[^turnsLeft];
     }
     public void SpawnPlayerMenuItem(CardPlayer player) {
         var newPlayerMenu = Instantiate(playerMenuPrefab, playerMenuContainer).GetComponent<PlayerPopupMenuItem>();
@@ -390,7 +402,9 @@ public class UserInterface : MonoBehaviour {
             return;
         }
         Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
-        sectorIcons[sector.transform.GetSiblingIndex() - 1].SetSector(sectorShadow, sector.Owner == null);
+        var icon = sectorIcons[sector.transform.GetSiblingIndex() - 1];
+        icon.SetSector(sectorShadow, sector.Owner == null);
+        icon.gameObject.SetActive(false);
     }
     public void UpdatePlayerMenuItems() {
         playerMenuItems.ForEach(item => item.UpdatePopup());
