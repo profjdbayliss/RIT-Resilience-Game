@@ -17,17 +17,17 @@ public class CardFront : MonoBehaviour
     public Texture2D background;
     public Texture2D img;
 
-    [SerializeField] private Image meepleBgBlack;
-    [SerializeField] private Image meepleBgBlue;
-    [SerializeField] private Image meepleBgPurple;
+    public Image meepleBgBlack;
+    public Image meepleBgBlue;
+    public Image meepleBgPurple;
 
-    public void DisableBlackMeeple() {
-        meepleBgBlack.enabled = false;
-    }
-    public void DisableBlueMeeple() {
-        meepleBgBlue.enabled = false;
-    }
-    public void DisablePurpleMeeple() {
-        meepleBgPurple.enabled = false;
-    }
+    //public void DisableBlackMeeple() {
+    //    meepleBgBlack.enabled = false;
+    //}
+    //public void DisableBlueMeeple() {
+    //    meepleBgBlue.enabled = false;
+    //}
+    //public void DisablePurpleMeeple() {
+    //    meepleBgPurple.enabled = false;
+    //}
 }

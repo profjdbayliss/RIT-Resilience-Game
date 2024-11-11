@@ -945,15 +945,19 @@ public class CardPlayer : MonoBehaviour {
         //        tempImage[i].enabled = tempCard.front.purpleCircle;
         //    }
         //}
-        if (!tempCard.front.blackCircle) {
-            tempCard.front.DisableBlackMeeple();
+        var actualFront = tempCard.GetComponent<CardFront>();
+        if (actualFront != null) {
+            if (!tempCard.front.blackCircle) {
+                actualFront.meepleBgBlack.enabled = false;
         }
-        if (!tempCard.front.blueCircle) {
-            tempCard.front.DisableBlueMeeple();
+            if (!tempCard.front.blueCircle) {
+                actualFront.meepleBgBlue.enabled = false;
+            }
+            if (!tempCard.front.purpleCircle) {
+                actualFront.meepleBgPurple.enabled = false;
+            }
         }
-        if (!tempCard.front.purpleCircle) {
-            tempCard.front.DisablePurpleMeeple();
-        }
+        
 
 
         TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
