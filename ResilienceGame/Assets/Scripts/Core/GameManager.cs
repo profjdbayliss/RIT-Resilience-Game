@@ -1057,7 +1057,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         MGamePhase = phase;
         if (!MGamePhase.Equals(mPreviousGamePhase)) {
             phaseJustChanged = true;
-            UserInterface.Instance.SetPhaseText(MGamePhase.ToString());
+            UserInterface.Instance.SetPhaseText(MGamePhase);
             actualPlayer.ReadyState = CardPlayer.PlayerReadyState.ReadyToPlay;
             //mPhaseText.text = MGamePhase.ToString();
             mPreviousGamePhase = phase;

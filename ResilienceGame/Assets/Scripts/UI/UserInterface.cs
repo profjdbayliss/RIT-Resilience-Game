@@ -182,7 +182,8 @@ public class UserInterface : MonoBehaviour {
         AddPlayerToLobby(name: RGNetworkPlayerList.instance.localPlayerName, team: playerType);
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
         mTurnText.text = "" + GameManager.Instance.GetTurnsLeft();
-        mPhaseText.text = "Phase: " + GameManager.Instance.MGamePhase.ToString();
+        
+        SetPhaseText(GameManager.Instance.MGamePhase);
         mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
         mPlayerDeckType.text = "" + playerType;
         Debug.Log($"Creating UI for {RGNetworkPlayerList.instance.localPlayerName} who is type {playerType}");
@@ -201,6 +202,22 @@ public class UserInterface : MonoBehaviour {
 
     private void Awake() {
         Instance = this;
+    }
+
+    public void SetPhaseText(GamePhase phase) {
+        mPhaseText.text = phase switch {
+            GamePhase.Start => "Start",
+            GamePhase.DrawRed => "Red's Draw",
+            GamePhase.DrawBlue => "Blues' Draw",
+            GamePhase.BonusBlue => "Bonus",
+            GamePhase.ActionRed => "Red's Play",
+            GamePhase.ActionBlue => "Blue's Play",
+            GamePhase.DiscardRed => "Red Discard",
+            GamePhase.DiscardBlue => "Blue Discard",
+            GamePhase.PlayWhite => "White's Play",
+            GamePhase.End => "",
+            _ => ""
+        };
     }
 
 
@@ -328,9 +345,9 @@ public class UserInterface : MonoBehaviour {
             mAlertPanel.ToggleCardSelectionPanel(true);
 
     }
-    public void SetPhaseText(string text) {
-        mPhaseText.text = text;
-    }
+    //public void SetPhaseText(string text) {
+    //    mPhaseText.text = text;
+    //}
     public void ResolveTextAlert() {
         mAlertPanel.ResolveTextAlert();
     }
