@@ -15,7 +15,7 @@ public class FacilityPointsUIController : MonoBehaviour {
         Image empty;
         Image full;
         Image temp;
-        FacilityPointState state;
+        public FacilityPointState state;
         public FacilityPointUIElement(Image empty, Image full, Image temp = null) {
             this.empty = empty;
             this.full = full;
@@ -39,7 +39,7 @@ public class FacilityPointsUIController : MonoBehaviour {
     [SerializeField] List<FacilityPointUIElement> netPointsUI = new List<FacilityPointUIElement>();
     [SerializeField] List<FacilityPointUIElement> finPointsUI = new List<FacilityPointUIElement>();
     // Start is called before the first frame update
-    
+
 
     // Update is called once per frame
     void Update() {
@@ -112,6 +112,20 @@ public class FacilityPointsUIController : MonoBehaviour {
             points[i].SetState(i < amt ? FacilityPointState.Full : i < maxAmt ? FacilityPointState.Empty : FacilityPointState.Disabled);
         }
     }
+    public void UpdateTempPoints(int tempPhys, int tempNet, int tempFin) {
+        for (int i = 0; i < physPointsUI.Count; i++) {
+            var state = physPointsUI[i].state;
+            physPointsUI[i].SetState(i < tempPhys ? FacilityPointState.Temp : state);
+        }
+        for (int i = 0; i < netPointsUI.Count; i++) {
+            var state = netPointsUI[i].state;
+            netPointsUI[i].SetState(i < tempPhys ? FacilityPointState.Temp : state);
+        }
+        for (int i = 0; i < finPointsUI.Count; i++) {
+            var state = finPointsUI[i].state;
+            finPointsUI[i].SetState(i < tempPhys ? FacilityPointState.Temp : state);
+        }
 
-    
+
+    }
 }

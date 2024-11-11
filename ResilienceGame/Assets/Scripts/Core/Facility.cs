@@ -264,6 +264,7 @@ public class Facility : MonoBehaviour {
                 tempNetPoints += value;
                 break;
         }
+        pointsUIController.UpdateTempPoints(tempPhysPoints, tempNetPoints, tempFinPoints);
     }
     public void ChangeFacilityPoints(FacilityEffectTarget target, int createdById, int value) {
         Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
