@@ -69652,6 +69652,13 @@ MonoBehaviour:
   - {fileID: 788153623}
   - {fileID: 716741617}
   - {fileID: 1280864660}
+  sectorLines: {fileID: 40084788}
+  sectorOutline: {fileID: 302173116}
+  doomClockLinesColor:
+  - {r: 0.8773585, g: 0.8304363, b: 0.32004267, a: 1}
+  - {r: 0.9960785, g: 0.6509804, b: 0.25490198, a: 1}
+  - {r: 0.8018868, g: 0.2471223, b: 0.2471223, a: 1}
+  sectorOutlineOwnerColor: {r: 0.2890708, g: 0.39885798, b: 0.7924528, a: 1}
   animDuration: 0.2
   mapState: 0
   guiButtonBg: {fileID: 1155642817}
@@ -76681,6 +76688,9 @@ MonoBehaviour:
   flavor: 
   background: {fileID: 0}
   img: {fileID: 0}
+  meepleBgBlack: {fileID: 0}
+  meepleBgBlue: {fileID: 0}
+  meepleBgPurple: {fileID: 0}
 --- !u!114 &3395120114322209512
 MonoBehaviour:
   m_ObjectHideFlags: 0

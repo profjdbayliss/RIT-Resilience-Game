@@ -59,6 +59,7 @@ public class Facility : MonoBehaviour {
     [SerializeField] private Material outlineMat;
     [SerializeField] private Image downedOverlay;
     [SerializeField] private HoverMoveUI sectorPopoutMenu;
+    [SerializeField] FacilityPointsUIController pointsUIController;
 
 
     // public FacilityEffect effect;
@@ -84,6 +85,7 @@ public class Facility : MonoBehaviour {
     public void Initialize() {
         hoverEffect = GetComponent<HoverActivateObject>();
         effectManager = GetComponent<FacilityEffectManager>();
+        pointsUIController.Init(this);
         // facilityCanvas = this.transform.gameObject;
         dependencies = new SectorType[3];
         // pointsUI = new TextMeshProUGUI[3];
@@ -95,7 +97,7 @@ public class Facility : MonoBehaviour {
         //    pointsUI[i] = facilityCanvas.transform.Find("Points").GetChild(i).GetComponentInChildren<TextMeshProUGUI>();
         //}
         tempFinPoints = tempNetPoints = tempPhysPoints = 0;
-        SetupPointImages();
+        //SetupPointImages();
         UpdateUI();
     }
     //Init the facility with the connection icons and references
@@ -204,9 +206,10 @@ public class Facility : MonoBehaviour {
 
 
     public void UpdatePointsUI() {
-        UpdatePointTypeUI(0, Points[0], MaxPhysicalPoints);
-        UpdatePointTypeUI(2, Points[2], MaxFinancialPoints);
-        UpdatePointTypeUI(1, Points[1], MaxNetworkPoints);
+        pointsUIController.UpdateAllPoints();
+        //UpdatePointTypeUI(0, Points[0], MaxPhysicalPoints);
+        //UpdatePointTypeUI(2, Points[2], MaxFinancialPoints);
+        //UpdatePointTypeUI(1, Points[1], MaxNetworkPoints);
     }
 
     private void UpdatePointTypeUI(int typeIndex, int currentPoints, int maxPoints) {

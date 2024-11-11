@@ -1299,6 +1299,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4457829249020022687}
   - component: {fileID: 4457829249020022680}
+  - component: {fileID: 6602021766728018706}
   m_Layer: 0
   m_Name: Points
   m_TagString: Untagged
@@ -1355,6 +1356,31 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &6602021766728018706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4457829249020022686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f12a6992e831e842a0da371cc3a112b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  physPoints:
+  - {fileID: 4457829248811881256}
+  - {fileID: 4457829249096583030}
+  - {fileID: 4457829249215643323}
+  netPoints:
+  - {fileID: 4457829247947398644}
+  - {fileID: 4457829247903521716}
+  - {fileID: 4457829249570331393}
+  finPoints:
+  - {fileID: 4457829249398920656}
+  - {fileID: 4457829248411820099}
+  - {fileID: 4457829249594814363}
+  facility: {fileID: 0}
 --- !u!1 &4457829249096583030
 GameObject:
   m_ObjectHideFlags: 0
