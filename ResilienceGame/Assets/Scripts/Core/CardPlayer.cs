@@ -933,18 +933,28 @@ public class CardPlayer : MonoBehaviour {
             }
         }
 
-        Image[] tempImage = tempCardObj.GetComponentsInChildren<Image>();
-        for (int i = 0; i < tempImage.Length; i++) {
-            if (tempImage[i].name.Equals("BlackCardSlot")) {
-                tempImage[i].enabled = tempCard.front.blackCircle;
-            }
-            else if (tempImage[i].name.Equals("BlueCardSlot")) {
-                tempImage[i].enabled = tempCard.front.blueCircle;
-            }
-            else if (tempImage[i].name.Equals("PurpleCardSlot")) {
-                tempImage[i].enabled = tempCard.front.purpleCircle;
-            }
+        //Image[] tempImage = tempCardObj.GetComponentsInChildren<Image>();
+        //for (int i = 0; i < tempImage.Length; i++) {
+        //    if (tempImage[i].name.Equals("BlackCardSlot")) {
+        //        tempImage[i].enabled = tempCard.front.blackCircle;
+        //    }
+        //    else if (tempImage[i].name.Equals("BlueCardSlot")) {
+        //        tempImage[i].enabled = tempCard.front.blueCircle;
+        //    }
+        //    else if (tempImage[i].name.Equals("PurpleCardSlot")) {
+        //        tempImage[i].enabled = tempCard.front.purpleCircle;
+        //    }
+        //}
+        if (!tempCard.front.blackCircle) {
+            tempCard.front.DisableBlackMeeple();
         }
+        if (!tempCard.front.blueCircle) {
+            tempCard.front.DisableBlueMeeple();
+        }
+        if (!tempCard.front.purpleCircle) {
+            tempCard.front.DisablePurpleMeeple();
+        }
+
 
         TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
         for (int i = 0; i < tempTexts.Length; i++) {
