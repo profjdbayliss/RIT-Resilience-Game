@@ -232,6 +232,27 @@ public class Facility : MonoBehaviour {
     public void UpdateNameText() {
         facilityNameText.text = facilityName;
     }
+    public void ActivatePointProtectionUI(bool protectPhys = false, bool protectNet = false, bool protectFin = false) {
+        if (protectPhys)
+            pointsUIController.EnablePhysProtection();
+        if (protectNet)
+            pointsUIController.EnableNetProtection();
+        if (protectFin)
+            pointsUIController.EnableFinProtection();
+    }
+    public void DisableSinglePointProtection(bool disablePhys = false, bool disableNet = false, bool disableFin = false) {
+        if (disablePhys)
+            pointsUIController.DisablePhysProtection();
+        if (disableNet)
+            pointsUIController.DisableNetProtection();
+        if (disableFin)
+            pointsUIController.DisableFinProtection();
+    }
+    public void DisableAllPointsProtection() {
+        pointsUIController.DisablePhysProtection();
+        pointsUIController.DisableNetProtection();
+        pointsUIController.DisableFinProtection();
+    }
 
     public void ChangeTemporaryPoints(FacilityEffectTarget target, int value)
     {

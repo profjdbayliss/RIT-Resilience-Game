@@ -38,6 +38,9 @@ public class FacilityPointsUIController : MonoBehaviour {
     [SerializeField] List<FacilityPointUIElement> physPointsUI = new List<FacilityPointUIElement>();
     [SerializeField] List<FacilityPointUIElement> netPointsUI = new List<FacilityPointUIElement>();
     [SerializeField] List<FacilityPointUIElement> finPointsUI = new List<FacilityPointUIElement>();
+
+    [SerializeField] List<GameObject> pointBgs = new List<GameObject>();
+
     // Start is called before the first frame update
 
 
@@ -126,6 +129,24 @@ public class FacilityPointsUIController : MonoBehaviour {
             finPointsUI[i].SetState(i < tempPhys ? FacilityPointState.Temp : state);
         }
 
-
+        
+    }
+    public void EnablePhysProtection() {
+        pointBgs[0].SetActive(true);
+    }
+    public void DisablePhysProtection() {
+        pointBgs[0].SetActive(false);
+    }
+    public void EnableNetProtection() {
+        pointBgs[1].SetActive(true);
+    }
+    public void DisableNetProtection() {
+        pointBgs[1].SetActive(false);
+    }
+    public void EnableFinProtection() {
+        pointBgs[2].SetActive(true);
+    }
+    public void DisableFinProtection() {
+        pointBgs[2].SetActive(false);
     }
 }

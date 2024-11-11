@@ -288,7 +288,22 @@ public class FacilityEffectManager : MonoBehaviour {
             case FacilityEffectType.ModifyPoints:
                 ChangeFacilityPoints(effect, createdById, isRemoving: true);
                 break;
+            case FacilityEffectType.ProtectPoints:
+                bool protectPhys = effect.Target == FacilityEffectTarget.Physical ||
+                                   effect.Target == FacilityEffectTarget.FinancialPhysical ||
+                                   effect.Target == FacilityEffectTarget.NetworkPhysical ||
+                                   effect.Target == FacilityEffectTarget.All;
+                bool protectNet = effect.Target == FacilityEffectTarget.Network ||
+                                   effect.Target == FacilityEffectTarget.FinancialNetwork ||
+                                   effect.Target == FacilityEffectTarget.NetworkPhysical ||
+                                   effect.Target == FacilityEffectTarget.All;
+                bool protectFin = effect.Target == FacilityEffectTarget.Financial ||
+                                   effect.Target == FacilityEffectTarget.FinancialNetwork ||
+                                   effect.Target == FacilityEffectTarget.FinancialPhysical ||
+                                   effect.Target == FacilityEffectTarget.All;
 
+                facility.DisableSinglePointProtection(protectPhys, protectNet, protectFin);
+                break;
             case FacilityEffectType.ModifyPointsPerTurn:
             case FacilityEffectType.Backdoor:
             case FacilityEffectType.Fortify:
@@ -447,6 +462,22 @@ public class FacilityEffectManager : MonoBehaviour {
                 RemoveNegativeEffects(createdById);
 
                 break;
+            case FacilityEffectType.ProtectPoints:
+                bool protectPhys = effect.Target == FacilityEffectTarget.Physical ||
+                                   effect.Target == FacilityEffectTarget.FinancialPhysical ||
+                                   effect.Target == FacilityEffectTarget.NetworkPhysical ||
+                                   effect.Target == FacilityEffectTarget.All;
+                bool protectNet = effect.Target == FacilityEffectTarget.Network ||
+                                   effect.Target == FacilityEffectTarget.FinancialNetwork ||
+                                   effect.Target == FacilityEffectTarget.NetworkPhysical ||
+                                   effect.Target == FacilityEffectTarget.All;
+                bool protectFin = effect.Target == FacilityEffectTarget.Financial ||
+                                   effect.Target == FacilityEffectTarget.FinancialNetwork ||
+                                   effect.Target == FacilityEffectTarget.FinancialPhysical ||
+                                   effect.Target == FacilityEffectTarget.All;
+
+                facility.ActivatePointProtectionUI(protectPhys, protectNet, protectFin);
+                break;
             default:
                 break;
         }
@@ -458,28 +489,28 @@ public class FacilityEffectManager : MonoBehaviour {
     #region Interface Updates
     private void UpdateUI(FacilityEffect effect, bool add) {
         if (!effect.HasUIElement) return;
-        Debug.Log($"Updating UI element for effect {effect.EffectType}");
+        // Debug.Log($"Updating UI element for effect {effect.EffectType}");
 
         Action action;
 
         if (add) {
-            Debug.Log($"Creating UI Element to Add");
+            //   Debug.Log($"Creating UI Element to Add");
             action = () => {
-                Debug.Log("Adding effect ui element");
+                //  Debug.Log("Adding effect ui element");
                 var facilityEffectUI = Instantiate(effectPrefab, effectParent).GetComponent<FacilityEffectUIElement>();
                 effect.UIElement = facilityEffectUI;
                 facilityEffectUI.Init(effect);
             };
         }
         else {
-            Debug.Log($"Queueing destroy action");
+            //   Debug.Log($"Queueing destroy action");
             action = () => {
                 Destroy(effect.UIElement.gameObject);
             };
         }
         QueuedUIUpdates.Enqueue(action);
         if (effectPopoutRoutine == null && effectMenuState == EffectMenuState.Open) {
-            Debug.Log($"Hiding menu to change effects");
+            //  Debug.Log($"Hiding menu to change effects");
             //hide the effect box to prepare for the new effect
             effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
                         effectHiddenPos - new Vector2(0, effectPopoutDistance),
@@ -487,7 +518,7 @@ public class FacilityEffectManager : MonoBehaviour {
             effectMenuState = EffectMenuState.Closing;
         }
         else if (effectPopoutRoutine == null && effectMenuState == EffectMenuState.Closed) {
-            Debug.Log($"Showing effects menu");
+            //  Debug.Log($"Showing effects menu");
             ProcessQueuedUIUpdates();
             if (add) {
                 effectPopoutRoutine = StartCoroutine(MoveUI(effectBoxParent,
@@ -500,7 +531,7 @@ public class FacilityEffectManager : MonoBehaviour {
             }
         }
         else if (effectPopoutRoutine != null && effectMenuState == EffectMenuState.Opening) {
-            Debug.Log($"Canceling menu opening to change effects");
+            // Debug.Log($"Canceling menu opening to change effects");
             //cancel menu opening and close it
             StopCoroutine(effectPopoutRoutine);
             effectPopoutRoutine = null;

@@ -69,7 +69,7 @@ public class Sector : MonoBehaviour {
     public string spriteSheetName = "sectorIconAtlas.png";
     public Texture2D iconAtlasTexture;
     public List<Sprite> sectorIconList = new List<Sprite>();
-    public MapSector mapSector;
+  //  public MapSector mapSector;
     private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
@@ -311,7 +311,7 @@ public class Sector : MonoBehaviour {
     public void SetOwner(CardPlayer player) {
         Owner = player;
         sectorOwnerText.text = player.playerName;
-        mapSector.Init();
+        //mapSector.Init();
     }
     #endregion
 
