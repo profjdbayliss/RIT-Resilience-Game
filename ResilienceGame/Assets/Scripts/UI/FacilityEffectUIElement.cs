@@ -28,6 +28,7 @@ public class FacilityEffectUIElement : MonoBehaviour, IPointerEnterHandler, IPoi
             FacilityEffectType.Fortify => ("Fortified - blocks the first red effect played on this facility each turn", effectSprites[1]),
             FacilityEffectType.ModifyPointsPerTurn => ("Reduces Physical and Network points by 1 per turn", effectSprites[2]),
             FacilityEffectType.ProtectPoints => ($"{effect.Target} points cannot be reduced for the duration", effectSprites[3]),
+            FacilityEffectType.HoneyPot => ($"If a red effect targets this facility, cancel the effect and the red player discards 1 card", effectSprites[4]),
             _ => ("", null)
         };
         if (effect.Duration > 0) {

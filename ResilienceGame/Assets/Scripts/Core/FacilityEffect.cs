@@ -65,7 +65,8 @@ public class FacilityEffect {
         HasUIElement = effectType == FacilityEffectType.ModifyPointsPerTurn ||
                         effectType == FacilityEffectType.Backdoor ||
                         effectType == FacilityEffectType.Fortify ||
-                        effectType == FacilityEffectType.ProtectPoints;
+                        effectType == FacilityEffectType.ProtectPoints ||
+                        effectType == FacilityEffectType.HoneyPot;
 
 
         Target = target;

@@ -15,6 +15,9 @@ using static Facility;
 /// </summary>
 public class FacilityEffectManager : MonoBehaviour {
     #region Fields
+
+
+
     private readonly List<FacilityEffect> activeEffects = new List<FacilityEffect>();
     private List<FacilityEffectUIElement> uiElements = new List<FacilityEffectUIElement>();
     private Facility facility;
@@ -26,8 +29,8 @@ public class FacilityEffectManager : MonoBehaviour {
     //  public EffectPopoutState effectTargetState = EffectPopoutState.Hide;
     //  private EffectPopoutState effectPopoutState = EffectPopoutState.Hide;
     private Vector2 effectHiddenPos;
-    private float effectAnimationDuration = .75f;
-    private float effectPopoutDistance = 120f;
+    private readonly float effectAnimationDuration = .75f;
+    private readonly float effectPopoutDistance = 120f;
     public Coroutine effectPopoutRoutine;
     public enum EffectMenuState {
         Opening,
@@ -95,6 +98,88 @@ public class FacilityEffectManager : MonoBehaviour {
     #endregion
 
     #region Helpers
+    public static bool IsEffectObfuscated(FacilityEffectType type) =>
+       type switch {
+           FacilityEffectType.HoneyPot => true,
+           _ => false
+       };
+    public void CheckForScoring(FacilityEffect effect, bool isAdding, int createdById) {
+        if (!GameManager.Instance.playerDictionary.ContainsKey(createdById)) return;
+
+        if (isAdding) {
+            if (effect.IsRestoreEffect) {
+                //restore points to a core sector
+                if (facility.sectorItsAPartOf.isCore) {
+                    ScoreManager.Instance.AddCoreFacilitySupport(createdById);
+                }
+                else {
+                    //bring a non-core sector back up
+                    if (facility.IsDown) {
+                        ScoreManager.Instance.AddFacilityRestoration(createdById);
+                    }
+                }
+            }
+            else {
+                switch (effect.EffectType) {
+                    case FacilityEffectType.Fortify: //fortify
+                        ScoreManager.Instance.AddFortification(createdById);
+                        break;
+                    case FacilityEffectType.ModifyPoints:
+                        if (WillEffectDownFacility(effect)) {
+                            if (facility.sectorItsAPartOf.isCore) {
+                                ScoreManager.Instance.AddCoreFacilityTakeDown(createdById);
+                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById);
+                            }
+                            ScoreManager.Instance.AddFacilityTakeDown(createdById);
+
+                            //check if this will start Doom clock
+                            if (GameManager.Instance.NumDownedSectors + 1 > GameManager.Instance.AllSectors.Count / 2) {
+                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById);
+                            }
+                        }
+                        break;
+                    case FacilityEffectType.Backdoor:
+                        ScoreManager.Instance.AddBackdoorCreation(createdById);
+                        break;
+                }
+
+            }
+        }
+    }
+    public bool CheckForTrapEffects(int createdById) {
+        if (!GameManager.Instance.playerDictionary.ContainsKey(createdById)) return false;
+
+        Debug.Log($"Checking for trap effects that would trigger from {createdById}'s card play");
+        List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
+        List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
+        if (trapEffectsFromOpposingTeam.Any()) {
+            trapEffectsFromOpposingTeam.ForEach(trapEffect => {
+                //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
+                Debug.Log($"Triggering trap effect: {trapEffect.EffectType}");
+                RemoveEffect(trapEffect, createdById, true); //remove the trap effect
+            });
+            return true;
+        }
+        return false;
+    }
+    private bool WillEffectDownFacility(FacilityEffect effect) =>
+
+
+            (effect.EffectType == FacilityEffectType.ModifyPoints) && effect.Target switch {
+                FacilityEffectTarget.Physical => facility.Points[0] + effect.Magnitude <= 0,
+                FacilityEffectTarget.Network => facility.Points[1] + effect.Magnitude <= 0,
+                FacilityEffectTarget.Financial => facility.Points[2] + effect.Magnitude <= 0,
+                FacilityEffectTarget.All => facility.Points[0] + effect.Magnitude <= 0 &&
+                                           facility.Points[1] + effect.Magnitude <= 0 &&
+                                           facility.Points[2] + effect.Magnitude <= 0,
+                FacilityEffectTarget.FinancialPhysical => facility.Points[0] + effect.Magnitude <= 0 &&
+                                                          facility.Points[2] + effect.Magnitude <= 0,
+                FacilityEffectTarget.NetworkPhysical => facility.Points[0] + effect.Magnitude <= 0 &&
+                                                         facility.Points[1] + effect.Magnitude <= 0,
+                FacilityEffectTarget.FinancialNetwork => facility.Points[1] + effect.Magnitude <= 0 &&
+                                                        facility.Points[2] + effect.Magnitude <= 0,
+                _ => false
+            };
     private void ChangeFacilityPoints(FacilityEffect effect, int createdById, bool isRemoving = false) {
         // Debug.Log($"Changing facility points for {facility.facilityName} by {effect.Magnitude} for {effect.Target}");
         int value = effect.Magnitude * (isRemoving ? 0 : 1); //dont give points back when removing effects
@@ -181,89 +266,6 @@ public class FacilityEffectManager : MonoBehaviour {
                 RemoveEffect(effect, createdById);
             }
         });
-
-
-    }
-    public void CheckForScoring(FacilityEffect effect, bool isAdding, int createdById) {
-        if (!GameManager.Instance.playerDictionary.ContainsKey(createdById)) return;
-
-        if (isAdding) {
-            if (effect.IsRestoreEffect) {
-                //restore points to a core sector
-                if (facility.sectorItsAPartOf.isCore) {
-                    ScoreManager.Instance.AddCoreFacilitySupport(createdById);
-                }
-                else {
-                    //bring a non-core sector back up
-                    if (facility.IsDown) {
-                        ScoreManager.Instance.AddFacilityRestoration(createdById);
-                    }
-                }
-            }
-            else {
-                switch (effect.EffectType) {
-                    case FacilityEffectType.Fortify: //fortify
-                        ScoreManager.Instance.AddFortification(createdById);
-                        break;
-                    case FacilityEffectType.ModifyPoints:
-                        if (WillEffectDownFacility(effect)) {
-                            if (facility.sectorItsAPartOf.isCore) {
-                                ScoreManager.Instance.AddCoreFacilityTakeDown(createdById);
-                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById);
-                            }
-                            ScoreManager.Instance.AddFacilityTakeDown(createdById);
-
-                            //check if this will start Doom clock
-                            if (GameManager.Instance.NumDownedSectors + 1 > GameManager.Instance.AllSectors.Count / 2) {
-                                ScoreManager.Instance.AddDoomClockActivateionPersonal(createdById);
-                            }
-                        }
-                        break;
-                    case FacilityEffectType.Backdoor:
-                        ScoreManager.Instance.AddBackdoorCreation(createdById);
-                        break;
-                }
-
-            }
-        }
-    }
-    private bool WillEffectDownFacility(FacilityEffect effect) =>
-
-
-            (effect.EffectType == FacilityEffectType.ModifyPoints) && effect.Target switch {
-                FacilityEffectTarget.Physical => facility.Points[0] + effect.Magnitude <= 0,
-                FacilityEffectTarget.Network => facility.Points[1] + effect.Magnitude <= 0,
-                FacilityEffectTarget.Financial => facility.Points[2] + effect.Magnitude <= 0,
-                FacilityEffectTarget.All => facility.Points[0] + effect.Magnitude <= 0 &&
-                                           facility.Points[1] + effect.Magnitude <= 0 &&
-                                           facility.Points[2] + effect.Magnitude <= 0,
-                FacilityEffectTarget.FinancialPhysical => facility.Points[0] + effect.Magnitude <= 0 &&
-                                                          facility.Points[2] + effect.Magnitude <= 0,
-                FacilityEffectTarget.NetworkPhysical => facility.Points[0] + effect.Magnitude <= 0 &&
-                                                         facility.Points[1] + effect.Magnitude <= 0,
-                FacilityEffectTarget.FinancialNetwork => facility.Points[1] + effect.Magnitude <= 0 &&
-                                                        facility.Points[2] + effect.Magnitude <= 0,
-                _ => false
-            };
-
-
-
-
-    public bool CheckForTrapEffects(int createdById) {
-        if (!GameManager.Instance.playerDictionary.ContainsKey(createdById)) return false;
-
-        Debug.Log($"Checking for trap effects that would trigger from {createdById}'s card play");
-        List<FacilityEffect> trapEffects = activeEffects.Where(effect => effect.HasTrap).ToList();
-        List<FacilityEffect> trapEffectsFromOpposingTeam = trapEffects.Where(effect => effect.CreatedByTeam != GameManager.Instance.GetPlayerTeam(createdById)).ToList();
-        if (trapEffectsFromOpposingTeam.Any()) {
-            trapEffectsFromOpposingTeam.ForEach(trapEffect => {
-                //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
-                Debug.Log($"Triggering trap effect: {trapEffect.EffectType}");
-                RemoveEffect(trapEffect, createdById, true); //remove the trap effect
-            });
-            return true;
-        }
-        return false;
     }
 
     #region Remove Effects
@@ -444,7 +446,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Applies the effect to the facility based on the facility effect type
     /// </summary>
     /// <param name="effect">The facility effect object that holds the facility effect type</param>
-    private void ApplyEffect(FacilityEffect effect, int createdById) {
+    private void ApplyEffect(FacilityEffect effect, int createdById, bool obfuscate = false) {
         Debug.Log($"Applying effect {effect.EffectType} to {facility.facilityName}");
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
@@ -481,14 +483,19 @@ public class FacilityEffectManager : MonoBehaviour {
             default:
                 break;
         }
-        UpdateUI(effect, true);
+        UpdateUI(effect, true, obfuscate ? GameManager.Instance.GetPlayerTeam(createdById) : PlayerTeam.Any);
 
     }
     #endregion
 
     #region Interface Updates
-    private void UpdateUI(FacilityEffect effect, bool add) {
+    private void UpdateUI(FacilityEffect effect, bool add, PlayerTeam showForTeam = PlayerTeam.Any) {
         if (!effect.HasUIElement) return;
+        //only show the effect for the player if its the correct team
+        if (showForTeam != PlayerTeam.Any) {
+            if (GameManager.Instance.actualPlayer.playerTeam != showForTeam)
+                return;
+        }
         // Debug.Log($"Updating UI element for effect {effect.EffectType}");
 
         Action action;
@@ -646,4 +653,6 @@ public class FacilityEffectManager : MonoBehaviour {
     }
     #endregion
 
+
+   
 }
