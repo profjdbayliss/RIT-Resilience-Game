@@ -1557,7 +1557,11 @@ public class CardPlayer : MonoBehaviour {
                 playCount = 1;
                 playKey = card.UniqueID;
                 //log the play
-                GameManager.Instance.AddActionLogMessage($"{playerName} played {card.front.title} on {facility.facilityName} in sector {facility.sectorItsAPartOf.sectorName}");
+                string actionLog = card.data.isObfuscated ?
+                    $"{playerName} played {card.front.title}" :
+                    $"{playerName} played {card.front.title} on {facility.facilityName} in sector {facility.sectorItsAPartOf.sectorName}";
+
+                GameManager.Instance.AddActionLogMessage(actionLog);
 
                 // Start the animation
 

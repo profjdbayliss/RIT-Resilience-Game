@@ -394,6 +394,9 @@ public class CardReader : MonoBehaviour {
                         tempCardFront.description = individualCSVObjects[26];
                         tempCardFront.description.Replace(';', ',');
 
+                        // 28:  Is this card obfuscated?
+                        tempCard.data.isObfuscated = bool.Parse(individualCSVObjects[28].Trim());
+
                         // now add one copy of this card for every instance in the card game
                         tempCard.data.numberInDeck = numberOfCards;
 

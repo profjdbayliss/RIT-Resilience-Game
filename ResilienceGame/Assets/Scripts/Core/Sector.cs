@@ -444,7 +444,7 @@ public class Sector : MonoBehaviour {
         Debug.Log($"Sector {sectorName} is processing a card update from {player.playerName} of type {update.Type} on sector {update.sectorPlayedOn}");
 
         if (update.Type == CardMessageType.CardUpdate || update.Type == CardMessageType.CardUpdateWithExtraFacilityInfo) {
-            IsAnimating = true;
+            
             //disable the ability to end phase during opponent card plays
             //I think this is necessary to stop potential issues
             UserInterface.Instance.ToggleEndPhaseButton(false);
@@ -606,7 +606,7 @@ public class Sector : MonoBehaviour {
         if (card != null) {
             if (player.HandCards.TryGetValue(card.UniqueID, out GameObject cardGameObject)) {
                 RectTransform cardRect = cardGameObject.GetComponent<RectTransform>();
-
+                IsAnimating = true;
                 // Set the card's parent to nothing, in order to position it in world space
                 cardRect.SetParent(null, true);
                 Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2); // top middle just off the screen
@@ -615,21 +615,33 @@ public class Sector : MonoBehaviour {
                 cardRect.SetParent(sectorCanvas.transform, true); //parent to the sector canvas to only show anim on active sector
                 cardGameObject.SetActive(true);
                 //Debug.Log($"Added card to screen, starting animation");
-                // Start the card animation
-                StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
+
+
+                void finishCardAction() {
                     card.SetCardState(CardState.CardInPlay);
                     player.HandCards.Remove(card.UniqueID); //remove the card from the opponent's hand
                     if (callPlay)
                         card.Play(player: player, facilityActedUpon: facility);
-
-                    //handle extra stuff from card actions
-                    //many of them work very differently from the standard card.Play so those Play functions are not called
                     resolveCardAction?.Invoke(cUpdate, card);
-
-                    UserInterface.Instance.UpdateUISizeTrackers();//update hand size ui possibly deck size depending on which card was played
-                    // After the current animation is done, check if there's another card queued
+                    UserInterface.Instance.UpdateUISizeTrackers();
                     OnAnimationComplete();
-                }));
+                }
+
+                if (!card.data.isObfuscated) {
+                    // Start the card animation
+                    StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
+                        Debug.Log($"starting card animation for {card.data.name}");
+                        finishCardAction();
+                    }));
+                }
+                //dont create an animation just do the logic
+                else {
+                    Debug.Log($"Skipping anim for obfuscated card {card.data.name}");
+                    finishCardAction();
+                }
+
+
+                
             }
             else {
                 Debug.Log($"Card with uid {card.UniqueID} was not found in {player.playerName}'s Hand which has size {player.HandCards.Count}");

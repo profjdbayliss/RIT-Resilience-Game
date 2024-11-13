@@ -41,4 +41,5 @@ public struct CardData
     public string[] meeplesChanged;
     public float meepleAmtMulti;
     public List<SectorType> onlyPlayedOn;
+    public bool isObfuscated;
 }
