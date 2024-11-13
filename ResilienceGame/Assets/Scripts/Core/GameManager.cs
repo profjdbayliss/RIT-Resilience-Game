@@ -682,6 +682,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void AddActionLogMessage(string message, bool fromNet = false) {
         UserInterface.Instance.AddActionLogMessage(message, fromNet, IsServer, ref messageLog);
     }
+    public void AddCardToPlayHistory(Card card, CardPlayer player, string message, bool fromNet = false) {
+       // string s = $"{player.playerName} played {card.front.title} {message}";
+      //  UserInterface.Instance.AddActionLogMessage(s, fromNet, IsServer, ref messageLog);
+
+        HistoryMenuController.Instance.AddNewHistoryItem(card, player, message, fromNet, IsServer);
+    }
     public void SetSectorInView(Sector sector) {
         // Debug.Log("setting sector in view to " + sector?.sectorName);
         if (sector != null)

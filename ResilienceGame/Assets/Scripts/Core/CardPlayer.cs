@@ -1556,12 +1556,14 @@ public class CardPlayer : MonoBehaviour {
                 // card.Play(this, opponentPlayer, facility);
                 playCount = 1;
                 playKey = card.UniqueID;
+
                 //log the play
                 string actionLog = card.data.isObfuscated ?
-                    $"{playerName} played {card.front.title}" :
-                    $"{playerName} played {card.front.title} on {facility.facilityName} in sector {facility.sectorItsAPartOf.sectorName}";
+                    "" :
+                    $"on {facility.facilityName} in sector {facility.sectorItsAPartOf.sectorName}";
 
-                GameManager.Instance.AddActionLogMessage(actionLog);
+                //GameManager.Instance.AddActionLogMessage(actionLog);
+                GameManager.Instance.AddCardToPlayHistory(card, this, actionLog);  
 
                 // Start the animation
 
@@ -1605,7 +1607,8 @@ public class CardPlayer : MonoBehaviour {
                 playCount = 1;
                 playKey = card.UniqueID;
 
-                GameManager.Instance.AddActionLogMessage($"{playerName} played {card.front.title} on sector {sector.sectorName}");
+                // GameManager.Instance.AddActionLogMessage($"{playerName} played {card.front.title} on sector {sector.sectorName}");
+                GameManager.Instance.AddCardToPlayHistory(card, this, $"on sector {sector.sectorName}");
 
                 //start shrink animation
                 StartCoroutine(card.AnimateAndShrinkCard(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), .6f,

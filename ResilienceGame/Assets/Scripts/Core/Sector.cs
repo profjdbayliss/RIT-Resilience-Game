@@ -448,6 +448,7 @@ public class Sector : MonoBehaviour {
             //disable the ability to end phase during opponent card plays
             //I think this is necessary to stop potential issues
             UserInterface.Instance.ToggleEndPhaseButton(false);
+
             //handle facility card play
             if (update.FacilityPlayedOnType != FacilityType.None) {
                 HandleFacilityOpponentPlay(update, phase, player);
@@ -500,6 +501,10 @@ public class Sector : MonoBehaviour {
             }
             //grab the first facility in the sector, this is fine because these card types are not for specific facilities
             Facility tempFacility = GameManager.Instance.AllSectors[update.sectorPlayedOn].facilities[0];
+
+            //log the action to history
+            HistoryMenuController.Instance.AddNewHistoryItem(tempCard, player, "", false, GameManager.Instance.IsServer);
+
             //Debug.Log($"Update:\ncard uid: {update.UniqueID}\ncard id: " +
             //    $"{update.CardID}\ntype: {update.Type}\nSector: {update.sectorPlayedOn}\nFacility: {update.FacilityPlayedOnType}");
             CreateCardAnimation(
@@ -533,7 +538,9 @@ public class Sector : MonoBehaviour {
                 Card tempCard = cardObject.GetComponent<Card>();
 
                 Debug.Log($"Found {tempCard.data.name} with uid {tempCard.UniqueID} in {player.playerTeam}'s hand");
-
+                string message = tempCard.data.isObfuscated ? "":
+                    $" on {facility.facilityName} in sector {facility.sectorItsAPartOf.sectorName}";
+                HistoryMenuController.Instance.AddNewHistoryItem(tempCard, player, message, false, GameManager.Instance.IsServer);
                 CreateCardAnimation(tempCard, facility.gameObject, player, facility);
             }
             else {
@@ -626,6 +633,9 @@ public class Sector : MonoBehaviour {
                     UserInterface.Instance.UpdateUISizeTrackers();
                     OnAnimationComplete();
                 }
+
+                
+
 
                 if (!card.data.isObfuscated) {
                     // Start the card animation
