@@ -446,7 +446,7 @@ public class FacilityEffectManager : MonoBehaviour {
     /// Applies the effect to the facility based on the facility effect type
     /// </summary>
     /// <param name="effect">The facility effect object that holds the facility effect type</param>
-    private void ApplyEffect(FacilityEffect effect, int createdById, bool obfuscate = false) {
+    private void ApplyEffect(FacilityEffect effect, int createdById) {
         Debug.Log($"Applying effect {effect.EffectType} to {facility.facilityName}");
         switch (effect.EffectType) {
             case FacilityEffectType.ModifyPoints:
@@ -483,7 +483,7 @@ public class FacilityEffectManager : MonoBehaviour {
             default:
                 break;
         }
-        UpdateUI(effect, true, obfuscate ? GameManager.Instance.GetPlayerTeam(createdById) : PlayerTeam.Any);
+        UpdateUI(effect, true, effect.IsObfuscated ? GameManager.Instance.GetPlayerTeam(createdById) : PlayerTeam.Any);
 
     }
     #endregion
@@ -491,6 +491,7 @@ public class FacilityEffectManager : MonoBehaviour {
     #region Interface Updates
     private void UpdateUI(FacilityEffect effect, bool add, PlayerTeam showForTeam = PlayerTeam.Any) {
         if (!effect.HasUIElement) return;
+        Debug.Log($"showing ui for {effect.EffectType} with show for team: {showForTeam}");
         //only show the effect for the player if its the correct team
         if (showForTeam != PlayerTeam.Any) {
             if (GameManager.Instance.actualPlayer.playerTeam != showForTeam)
@@ -512,7 +513,8 @@ public class FacilityEffectManager : MonoBehaviour {
         else {
             //   Debug.Log($"Queueing destroy action");
             action = () => {
-                Destroy(effect.UIElement.gameObject);
+                if (effect.HasUIElement && effect.UIElement != null)
+                    Destroy(effect.UIElement.gameObject);
             };
         }
         QueuedUIUpdates.Enqueue(action);
@@ -534,7 +536,8 @@ public class FacilityEffectManager : MonoBehaviour {
                 effectMenuState = EffectMenuState.Opening;
             }
             else {
-                Debug.LogWarning($"Shouldn't get here, removing a UI component with menu hidden");
+                //this is ok now with some effects being hidden for some teams and not others
+                //Debug.LogWarning($"Shouldn't get here, removing a UI component with menu hidden");
             }
         }
         else if (effectPopoutRoutine != null && effectMenuState == EffectMenuState.Opening) {
@@ -639,7 +642,7 @@ public class FacilityEffectManager : MonoBehaviour {
             if (effect.Duration > 0) {
                 // Debug.Log($"Reducing duration of {effect.EffectType} on facility {facility.facilityName}");
                 effect.Duration--;
-                if (effect.HasUIElement) {
+                if (effect.HasUIElement && effect.UIElement != null) {
                     effect.UIElement.SetCounterText(effect.Duration.ToString());
                 }
                 // DecrementCounter();

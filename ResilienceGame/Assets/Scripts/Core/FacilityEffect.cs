@@ -50,6 +50,8 @@ public class FacilityEffect {
     public Action<int> OnEffectRemoved;
     //private static int _uniqueID = 0;
     public int UniqueID { get; private set; }
+    //add more hidden effects here
+    public bool IsObfuscated => EffectType == FacilityEffectType.HoneyPot;
 
     public string EffectCreatedOnRoundEndIdString { get; private set; } //holds a string used to create the effect that this effect will create
     public string EffectIdString { get; private set; } //holds a string used to create this effect
