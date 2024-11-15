@@ -67,6 +67,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI playerHandText;
     [SerializeField] private TextMeshProUGUI latestActionText;
     [SerializeField] private Image circuitLines;
+    [SerializeField] private GameObject rulesMenu;
 
     [Header("Meeple Sharing")]
     [SerializeField] private GameObject MeepleSharingPanel;
@@ -866,5 +867,9 @@ public class UserInterface : MonoBehaviour {
             StopCoroutine(consoleMoveRoutine);
         }
         consoleMoveRoutine = StartCoroutine(MoveMenuItem(consoleLog, consoleHiddenPos, animDuration));
+    }
+    public void ToggleRulesMenu(bool enable) {
+        rulesMenu.SetActive(enable);
+
     }
 }

@@ -23,7 +23,7 @@ public class MainMenu : MonoBehaviour {
     }
     public void ToggleRulesMenu(bool enable) {
         rulesMenu.SetActive(enable);
-        rulesPagesController.SetCurrentPageActive();
+        
     }
 
     // Update is called once per frame
