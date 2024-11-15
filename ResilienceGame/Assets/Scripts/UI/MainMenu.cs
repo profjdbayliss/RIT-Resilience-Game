@@ -8,54 +8,53 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
+
     [SerializeField] private GameObject rulesMenu;
     [SerializeField] private string rulesPath;
-    [SerializeField] private RectTransform rulesParent;
-    [SerializeField] private TextMeshProUGUI pageCountText;
-    [SerializeField] private List<GameObject> rulesPages = new List<GameObject>();
-    private int currentPage = 0;
+    [SerializeField] private RulesPagesController rulesPagesController;
+
     // Start is called before the first frame update
     void Start() {
         var networkManager = FindObjectOfType<RGNetworkManager>();
         if (networkManager != null) {
             Destroy(networkManager.gameObject);
         }
-        if (rulesParent != null && rulesPages != null) {
-           // rulesPages = rulesParent.GetComponentsInChildren<RectTransform>().Select(s => s.gameObject).ToList();
-            rulesPages.ForEach(x=>x.SetActive(false));
-            pageCountText.text = $"{currentPage+1}/{rulesPages.Count}";
-        }
+        
+    }
+    public void ToggleRulesMenu(bool enable) {
+        rulesMenu.SetActive(enable);
+        rulesPagesController.SetCurrentPageActive();
     }
 
     // Update is called once per frame
     void Update() {
 
     }
-    public void NextRulesPage() {
-        rulesPages[currentPage].SetActive(false);
-        currentPage++;
-        if (currentPage >= rulesPages.Count) {
-            currentPage = 0;
-        }
-        pageCountText.text = $"{currentPage + 1}/{rulesPages.Count}";
-        rulesPages[currentPage].SetActive(true);
+    //public void NextRulesPage() {
+    //    rulesPages[currentPage].SetActive(false);
+    //    currentPage++;
+    //    if (currentPage >= rulesPages.Count) {
+    //        currentPage = 0;
+    //    }
+    //    pageCountText.text = $"{currentPage + 1}/{rulesPages.Count}";
+    //    rulesPages[currentPage].SetActive(true);
 
-    }
-    public void PreviousRulesPage() {
-        rulesPages[currentPage].SetActive(false);
-        currentPage--;
-        if (currentPage < 0) {
-            currentPage = rulesPages.Count - 1;
-        }
-        pageCountText.text = $"{currentPage + 1}/{rulesPages.Count}";
-        rulesPages[currentPage].SetActive(true);
-    }
+    //}
+    //public void PreviousRulesPage() {
+    //    rulesPages[currentPage].SetActive(false);
+    //    currentPage--;
+    //    if (currentPage < 0) {
+    //        currentPage = rulesPages.Count - 1;
+    //    }
+    //    pageCountText.text = $"{currentPage + 1}/{rulesPages.Count}";
+    //    rulesPages[currentPage].SetActive(true);
+    //}
 
 
-    public void ToggleRulesMenu(bool enable) {
-        rulesMenu.SetActive(enable);
-        rulesPages[currentPage].SetActive(enable);
-    }
+    //public void ToggleRulesMenu(bool enable) {
+    //    rulesMenu.SetActive(enable);
+    //    rulesPages[currentPage].SetActive(enable);
+    //}
     public void QuitGame() {
         Application.Quit();
     }
