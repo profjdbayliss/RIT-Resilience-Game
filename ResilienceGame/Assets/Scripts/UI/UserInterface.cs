@@ -56,6 +56,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Transform gameLogParent;
     [SerializeField] private Image infoBg;
     [SerializeField] private Image doomClockImage;
+   
     [SerializeField] private GameObject doomClockBg;
     [SerializeField] private RectTransform playerMenuContainer;
     [SerializeField] private RectTransform playerMenuParent;
@@ -121,6 +122,9 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Image sectorOutline;
     [SerializeField] private Color[] doomClockLinesColor;
     [SerializeField] private Color sectorOutlineOwnerColor;
+
+    
+    
 
 
 
@@ -190,7 +194,7 @@ public class UserInterface : MonoBehaviour {
         AddPlayerToLobby(name: RGNetworkPlayerList.instance.localPlayerName, team: playerType);
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
         mTurnText.text = "" + GameManager.Instance.GetTurnsLeft();
-        
+
         SetPhaseText(GameManager.Instance.MGamePhase);
         mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
         mPlayerDeckType.text = "" + playerType;
@@ -367,10 +371,12 @@ public class UserInterface : MonoBehaviour {
             infoBg.sprite = infoBackgrounds[index];
     }
     public void SetDoomClockActive(bool active, int index = 0) {
-        //doomClockBg.SetActive(active);
+        doomClockBg.SetActive(active);
         if (active) {
-           // doomClockImage.sprite = doomClockSprites[index];
-           sectorLines.color = doomClockLinesColor[index];
+             doomClockImage.sprite = doomClockSprites[index];
+            sectorLines.color = doomClockLinesColor[index];
+
+
         }
         else {
             sectorLines.color = Color.white;
@@ -382,7 +388,7 @@ public class UserInterface : MonoBehaviour {
             SetDoomClockActive(false);
             return;
         }
-        //doomClockImage.sprite = doomClockSprites[^turnsLeft];
+        doomClockImage.sprite = doomClockSprites[^turnsLeft];
         sectorLines.color = doomClockLinesColor[^turnsLeft];
     }
     public void SpawnPlayerMenuItem(CardPlayer player) {
