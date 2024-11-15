@@ -36,6 +36,8 @@ public class FacilityEffectUIElement : MonoBehaviour, IPointerEnterHandler, IPoi
             counterText.text = effect.Duration.ToString();
         }
 
+        
+
     }
     
     public void SetCounterText(string dur) {

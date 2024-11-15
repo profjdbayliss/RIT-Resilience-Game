@@ -393,7 +393,7 @@ public class Sector : MonoBehaviour {
     private void OnAnimationComplete() {
         Debug.Log("animation complete");
         IsAnimating = false;
-        if (GameManager.Instance.IsActualPlayersTurn())
+        if (GameManager.Instance.IsActualPlayersTurn() && GameManager.Instance.actualPlayer.ReadyState != CardPlayer.PlayerReadyState.EndedPhase)
             UserInterface.Instance.ToggleEndPhaseButton(true);
 
         // Check if there are more cards in the queue
