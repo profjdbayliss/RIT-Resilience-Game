@@ -271,9 +271,9 @@ public class FacilityEffectManager : MonoBehaviour {
     #region Remove Effects
     void RemoveNegativeEffects(int calledById) {
         var negativeEffects = activeEffects
-            .Where(effect => effect.EffectType == FacilityEffectType.ModifyPoints ||
-                             effect.EffectType == FacilityEffectType.Backdoor).ToList();
-
+            .Where(effect => effect.CreatedByTeam == PlayerTeam.Red).ToList();
+        Debug.Log("Removing negative effects: " + negativeEffects.Count);
+        negativeEffects.ForEach(negativeEffects => Debug.Log(negativeEffects.EffectType));
         negativeEffects.ForEach(effect => RemoveEffect(effect, calledById, true));
     }
     private void RemoveAllEffects(int calledById) {
