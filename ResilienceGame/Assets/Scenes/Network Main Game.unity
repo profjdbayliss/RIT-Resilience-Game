@@ -81418,6 +81418,7 @@ MonoBehaviour:
   OpponentCardPlayAnimDuration: 1
   rotationDurationPercent: 0.3
   rotationDelayPercent: 0.35
+  centerYOffset: 200
   waitTimeAtCenter: 1.5
   shrinkDuration: 1.5
 --- !u!114 &8428484966745356290
