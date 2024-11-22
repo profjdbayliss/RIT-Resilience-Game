@@ -634,7 +634,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (gameStarted) {
                 HandlePhases(MGamePhase);
             }
-            
+
 
             // always notify observers in case there's a message
             // waiting to be processed.
@@ -683,8 +683,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.AddActionLogMessage(message, fromNet, IsServer, ref messageLog);
     }
     public void AddCardToPlayHistory(Card card, CardPlayer player, string message, bool fromNet = false) {
-       // string s = $"{player.playerName} played {card.front.title} {message}";
-      //  UserInterface.Instance.AddActionLogMessage(s, fromNet, IsServer, ref messageLog);
+        // string s = $"{player.playerName} played {card.front.title} {message}";
+        //  UserInterface.Instance.AddActionLogMessage(s, fromNet, IsServer, ref messageLog);
 
         HistoryMenuController.Instance.AddNewHistoryItem(card, player, message, fromNet, IsServer);
     }
@@ -975,18 +975,66 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (numTurnsTillWhiteCard == 0) {
                 Debug.Log($"Server wants to play a white card");
                 playWhite = true;
-                numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //2-5
+                numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //[2-5)
             }
         }
         else {
             //only server handles white card plays
             return;
         }
-
-
+        //    private const bool ENABLE_WHITE_CARDS = true;
+        //private int numTurnsTillWhiteCard = 0;
+        //private int numWhiteCardOfSameTypePlayed = 0;
+        //private const int MIN_TURNS_TILL_WHITE_CARD = 2;
+        //private const int MAX_TURNS_TILL_WHITE_CARD = 5;
+        //private const float WHITE_CARD_POS_CHANCE = 0.5f;
+        //private bool playWhite = false;
+        //private bool playedPosWhiteCard = false;
+        //private bool hasWhiteCardPlayed = true;
 
         if (playWhite) {
-            whitePlayer.PlayRandomNegativeCard();
+            var rand = UnityEngine.Random.Range(0, 1f);
+            if (rand < WHITE_CARD_POS_CHANCE) {
+                if (playedPosWhiteCard) {
+                    if (numWhiteCardOfSameTypePlayed >= 2) {
+                        numWhiteCardOfSameTypePlayed = 0;
+                        whitePlayer.PlayRandomNegativeCard();
+                        playedPosWhiteCard = false;
+                    }
+                    else {
+                        numWhiteCardOfSameTypePlayed++;
+                        whitePlayer.PlayRandomPositiveCard();
+                        playedPosWhiteCard = true;
+                    }
+                }
+                else {
+                    playedPosWhiteCard = true;
+                    numWhiteCardOfSameTypePlayed = 0;
+                    whitePlayer.PlayRandomPositiveCard();
+                }
+            }
+            else {
+                if (!playedPosWhiteCard) {
+                    if (numWhiteCardOfSameTypePlayed >= 2) {
+                        numWhiteCardOfSameTypePlayed = 0;
+                        whitePlayer.PlayRandomPositiveCard();
+                        playedPosWhiteCard = true;
+                    }
+                    else {
+                        numWhiteCardOfSameTypePlayed++;
+                        whitePlayer.PlayRandomNegativeCard();
+                        playedPosWhiteCard = false;
+                    }
+                }
+                else {
+                    playedPosWhiteCard = false;
+                    numWhiteCardOfSameTypePlayed = 0;
+                    whitePlayer.PlayRandomNegativeCard();
+                }
+            }
+            playWhite = false;
+            Debug.Log($"{numTurnsTillWhiteCard} turns until next white card");
+
         }
         else {
             Debug.Log($"{numTurnsTillWhiteCard} turns until next white card");

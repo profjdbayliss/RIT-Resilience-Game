@@ -144,6 +144,13 @@ public class WhiteCardPlayer : CardPlayer {
         PlayCard(GetRandomPlayableCard(positive: false));
         
     }
+    public void PlayRandomPositiveCard() {
+        if (!GameManager.Instance.IsServer) return;
+
+        Debug.Log("Playing random negative white card");
+        PlayCard(GetRandomPlayableCard(positive: true));
+
+    }
 
     public Card GetRandomPlayableCard(bool positive) {
         var cardPlays = HandCards.Values
@@ -182,6 +189,10 @@ public class WhiteCardPlayer : CardPlayer {
 
 
     }
+    private void Update() {
+        
+    }
+
     protected override Card DrawCard(bool random, int cardId, int uniqueId, ref List<int> deckToDrawFrom,
         GameObject dropZone, bool allowSlippy, ref Dictionary<int, GameObject> activeDeck, bool sendUpdate = false) {
         var card = base.DrawCard(random, cardId, uniqueId, ref deckToDrawFrom, dropZone, false, ref activeDeck, sendUpdate);
@@ -190,10 +201,4 @@ public class WhiteCardPlayer : CardPlayer {
     }
 
 
-    // Update is called once per frame
-    void Update() {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame) {
-            PlayCard();
-        }
-    }
 }
