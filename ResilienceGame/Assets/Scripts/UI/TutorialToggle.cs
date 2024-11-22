@@ -26,7 +26,11 @@ public class TutorialToggle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (UserInterface.Instance.mapState == UserInterface.MapState.FullScreen)
+        {
+            tutorialCanvas.gameObject.SetActive(false);
+        }
+        else tutorialCanvas.gameObject.SetActive(isTutorialActive);
     }
 
     public void WhenGameStarts()
@@ -54,7 +58,11 @@ public class TutorialToggle : MonoBehaviour
     {
         UpdateCoreSectorCheck();
         isTutorialActive = !isTutorialActive;
-        tutorialCanvas.gameObject.SetActive(isTutorialActive);
+        if(UserInterface.Instance.mapState == UserInterface.MapState.FullScreen)
+        {
+            tutorialCanvas.gameObject.SetActive(false);
+        }
+        else tutorialCanvas.gameObject.SetActive(isTutorialActive);
     }
 
     public void UpdateCoreSectorCheck()
