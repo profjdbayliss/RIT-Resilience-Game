@@ -639,10 +639,15 @@ public class Sector : MonoBehaviour {
 
                 if (!card.data.isObfuscated) {
                     // Start the card animation
-                    StartCoroutine(card.MoveAndRotateToCenter(cardRect, dropZone, () => {
+                    StartCoroutine(card.MoveAndRotateToCenter(
+                        rectTransform: cardRect, 
+                        facilityTarget: dropZone, 
+                        onComplete: () => {
                         Debug.Log($"starting card animation for {card.data.name}");
                         finishCardAction();
-                    }));
+                        },
+                        scaleUpFactor: 1.0f
+                        ));
                 }
                 //dont create an animation just do the logic
                 else {

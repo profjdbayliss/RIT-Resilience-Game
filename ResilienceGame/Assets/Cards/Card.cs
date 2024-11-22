@@ -61,7 +61,9 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public float OpponentCardPlayAnimDuration = 1f;
     public float rotationDurationPercent = 0.3f; // Rotation happens over 20% of the total duration
     public float rotationDelayPercent = 0.35f;    // Rotation starts after 40% of the duration
-    public float scaleUpFactor = 1.5f;            // Increases size by 50%
+                                                  // public float scaleUpFactor = 1.5f;            // Increases size by 50%
+
+    float centerYOffset = 200;      
     public float waitTimeAtCenter = 1.5f;           // Waits for 1.5 seconds at the center
     public float shrinkDuration = 1.5f;             // Duration of the shrink and move animation
     private bool isAnimating = false;
@@ -170,11 +172,14 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     /// <param name="rectTransform">The RectTransform of the UI element to animate.</param>
     /// <param name="facilityPosition">The target position to move to after waiting at the center.</param>
     /// <param name="onComplete">Callback function to call before destroying the object.</param>
-    public IEnumerator MoveAndRotateToCenter(RectTransform rectTransform, GameObject facilityTarget = null, Action onComplete = null) {
+    public IEnumerator MoveAndRotateToCenter(RectTransform rectTransform, 
+        GameObject facilityTarget = null, 
+        Action onComplete = null, 
+        float scaleUpFactor = 1.5f) {
         isAnimating = true;
         // Initial and target positions
         Vector2 startPosition = rectTransform.anchoredPosition;
-        Vector2 centerPosition = Vector2.zero; // Center of the screen
+        Vector2 centerPosition = new Vector2(0, centerYOffset); // Center of the screen
 
         // Initial and target rotations
         Quaternion startRotation = rectTransform.localRotation;
