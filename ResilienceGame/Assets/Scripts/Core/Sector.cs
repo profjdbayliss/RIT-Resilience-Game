@@ -73,6 +73,8 @@ public class Sector : MonoBehaviour {
     private const string EFFECT_ICON_PATH = "facilityEffectIcons.png";
     public static Sprite[] EffectSprites;
     [SerializeField] private Material outlineMat;
+    public Image sectorOwnerBackground;
+    public Sprite[] sectorOwnerBackgrounds = new Sprite[3];
 
     // [SerializeField] private TextMeshProUGUI _mapSectorNametext;
     // [SerializeField] private TextMeshProUGUI _mapSectorOwnerText;
@@ -293,6 +295,7 @@ public class Sector : MonoBehaviour {
         //  sectorCanvas = this.gameObject;
         //overTimeCharges = 3;
 
+        
 
         foreach (Facility facility in facilities) {
             facility.Initialize();
@@ -311,6 +314,14 @@ public class Sector : MonoBehaviour {
     public void SetOwner(CardPlayer player) {
         Owner = player;
         sectorOwnerText.text = player.playerName;
+        //set background color based on owner
+        if (GameManager.Instance.actualPlayer == Owner) {
+            sectorOwnerBackground.sprite = sectorOwnerBackgrounds[2];
+        }
+        else {
+            sectorOwnerBackground.sprite = GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red ?
+                sectorOwnerBackgrounds[0] : sectorOwnerBackgrounds[1];
+        }
         //mapSector.Init();
     }
     #endregion

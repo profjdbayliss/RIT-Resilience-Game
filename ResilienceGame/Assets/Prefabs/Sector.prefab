@@ -730,6 +730,11 @@ MonoBehaviour:
   - {fileID: -1212681790, guid: 7fb98b456b824d44b80c14f7ebab1cfe, type: 3}
   - {fileID: -61540746, guid: 7fb98b456b824d44b80c14f7ebab1cfe, type: 3}
   outlineMat: {fileID: 2100000, guid: c59ee6e9f00d8464ab871fd74308ac2b, type: 2}
+  sectorOwnerBackground: {fileID: 4403787705550030721}
+  sectorOwnerBackgrounds:
+  - {fileID: 21300000, guid: 00749b2909f5b7343809aedcfa8c7765, type: 3}
+  - {fileID: 21300000, guid: 70110ae5b7978bb4aaaa7ba550af188a, type: 3}
+  - {fileID: 21300000, guid: fc4adf4d4b210c341866730316915355, type: 3}
   dieRollShadow: 0
 --- !u!1 &774510761204077603
 GameObject:
