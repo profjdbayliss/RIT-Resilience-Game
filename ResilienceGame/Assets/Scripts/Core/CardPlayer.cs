@@ -1653,6 +1653,14 @@ public class CardPlayer : MonoBehaviour {
         return ("Must discard cards first", false); //didn't drop on the discard drop zone
     }
     protected (string, bool) ValidateActionAndReadyPlay(Card card, GameObject potentialDropLocation) {
+
+        if (card.data.name == "Call Bluff" && !GameManager.Instance.IsBluffActive) {
+            return ($"Cannot play {card.data.name} when the bluff isn't active", false);
+        }
+
+        if (card.data.name == "Aggression" && GameManager.Instance.IsRedAggressive) {
+            return ($"Cannot play {card.data.name} as Red is already aggressive", false);
+        }
         //check prereq effects on cards for effect cards played on single facilities
         if (card.data.preReqEffectType != FacilityEffectType.None) {
             Facility facility = potentialDropLocation.CompareTag(CardDropZoneTag.MAP_FACILITY) ?
@@ -1716,13 +1724,7 @@ public class CardPlayer : MonoBehaviour {
             }
         }
 
-        if (card.data.name == "Call Bluff" && !GameManager.Instance.IsBluffActive) {
-            return ($"Cannot play {card.data.name} when the bluff isn't active", false);
-        }
-
-        if (card.data.name == "Aggression" && GameManager.Instance.IsRedAggressive) {
-            return ($"Cannot play {card.data.name} as Red is already aggressive", false);
-        }
+        
 
 
         return ReadyState switch {
