@@ -1227,38 +1227,13 @@ public class CardPlayer : MonoBehaviour {
         GameObject currentHoveredFacility = null; // Reset at the beginning of each update
         bool isOverAnyDropLocation = false;
 
-        ////only highlight when the player is ready to play cards
-        //if (ReadyState != PlayerReadyState.ReadyToPlay) {
-        //    return;
-        //}
-
-        //  Vector2 mousePosition = Mouse.current.position.ReadValue();
 
         var hoveredFacilityCollider = Physics2D.OverlapPoint(position, LayerMask.GetMask("CardDrop"));
 
         //Debug.Log("Hovered Colliders: " + hoveredColliders.Length);
         if (hoveredFacilityCollider != null) {
             isOverAnyDropLocation = true;
-            //Collider2D hoveredFacilityCollider = null;
-
-            //// Check for a facility collider if there are multiple
-            //if (hoveredColliders.Length >= 2) {
-            //    foreach (var collider in hoveredColliders) {
-            //        if (collider.CompareTag(CardDropZoneTag.FACILITY) || collider.CompareTag(CardDropZoneTag.MAP_FACILITY)) {
-            //            hoveredFacilityCollider = collider;
-            //            break;
-            //        }
-            //    }
-            //    // If no facility collider is found, process the other collider
-            //    if (hoveredFacilityCollider == null) {
-            //        hoveredFacilityCollider = hoveredColliders.First();
-            //    }
-            //}
-            //else {
-            //    // Only one collider, process that
-            //    hoveredFacilityCollider = hoveredColliders.First();
-            //}
-            //   Debug.Log(hoveredFacilityCollider);
+           
             bool highlight = false;
 
             // Process the hovered facility collider
@@ -1272,17 +1247,13 @@ public class CardPlayer : MonoBehaviour {
                         //effect card or facility with pre req effect hover
                         if (cardBeingDragged.target == CardTarget.Effect || cardBeingDragged.data.preReqEffectType != FacilityEffectType.None) {
                             if (hoveredFacilityCollider.TryGetComponent(out Facility facility)) {
-                                //Debug.Log($"Hovering facility {facility.facilityName} while holding effect card");
-                                //removable effects are the only ones to check for the prereq effects
-                                if (facility.HasRemovableEffects(GetOpponentTeam())) {
+                            //    Debug.Log($"Hovering facility {facility.facilityName} while holding effect card");
+                                Debug.Log(cardBeingDragged.data.preReqEffectType);
+                                if (facility.HasEffectOfType(cardBeingDragged.data.preReqEffectType))
+                                {
                                     highlight = true;
                                 }
-                            }
-                            else if (hoveredFacilityCollider.TryGetComponent(out FacilityProxy proxy)) {
-                                if (proxy.facility.HasRemovableEffects(GetOpponentTeam())) {
-                                    highlight = true;
-                                }
-
+                                
                             }
                         }
                         //facility card hover
