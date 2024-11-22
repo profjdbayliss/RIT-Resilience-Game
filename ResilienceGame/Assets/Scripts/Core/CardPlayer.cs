@@ -1694,20 +1694,26 @@ public class CardPlayer : MonoBehaviour {
             return ($"It is not {playerTeam}'s turn", false);
 
         //dont allow playing on allied sectors outside of doom clock and DC effect cards
-        if (potentialDropLocation.TryGetComponent(out Facility facility)) {
-            var sector = facility.sectorItsAPartOf;
-            if (sector.sectorName != PlayerSector.sectorName) {
-                if (!GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
-                    return ("Cannot play on allied sectors outside of doomclock", false);
-                }
-                else if (GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
-                    if (!card.data.hasDoomEffect) {
-                        return ($"Cannot play {card.data.name} on allied sectors", false);
+        if (card.target == CardTarget.Facility || card.target == CardTarget.Effect || card.target == CardTarget.Sector) {
+
+
+            if (potentialDropLocation.TryGetComponent(out Facility facility)) {
+                var sector = facility.sectorItsAPartOf;
+
+                if (sector.sectorName != PlayerSector.sectorName) {
+
+                    if (!GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
+                        return ("Cannot play on allied sectors outside of doomclock", false);
                     }
+                    else if (GameManager.Instance.IsDoomClockActive && playerTeam == PlayerTeam.Blue) {
+                        if (!card.data.hasDoomEffect) {
+                            return ($"Cannot play {card.data.name} on allied sectors", false);
+                        }
+                    }
+
                 }
 
             }
-
         }
 
         if (card.data.name == "Call Bluff" && !GameManager.Instance.IsBluffActive) {

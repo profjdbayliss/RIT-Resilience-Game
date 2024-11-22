@@ -63,7 +63,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public float rotationDelayPercent = 0.35f;    // Rotation starts after 40% of the duration
                                                   // public float scaleUpFactor = 1.5f;            // Increases size by 50%
 
-    float centerYOffset = 200;      
+    public float centerYOffset = 200;      
     public float waitTimeAtCenter = 1.5f;           // Waits for 1.5 seconds at the center
     public float shrinkDuration = 1.5f;             // Duration of the shrink and move animation
     private bool isAnimating = false;
@@ -83,16 +83,6 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     void Start() {
         originalPosition = this.gameObject.transform.position;
 
-    }
-
-    void Update() {
-        if (State == CardState.CardInPlay) {
-            if (isAnimating) {
-                if (Mouse.current.leftButton.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame) {
-                    //skipCurrentAnimation = true;
-                }
-            }
-        }
     }
     
     public void SetCardState(CardState newState) {
