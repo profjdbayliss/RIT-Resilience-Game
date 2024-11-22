@@ -111,6 +111,9 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     // Play all of a cards actions
     public void Play(CardPlayer player, CardPlayer opponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null) {
         Debug.Log($"Executing card actions for card: {front.name}");
+        if (player.playerTeam == PlayerTeam.White) {
+            HistoryMenuController.Instance.AddNewHistoryItem(this, player, "", false, GameManager.Instance.IsServer);
+        }
         foreach (ICardAction action in ActionList) {
             action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
         }
