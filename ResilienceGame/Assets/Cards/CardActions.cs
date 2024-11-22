@@ -113,7 +113,8 @@ public class RemoveEffect : ICardAction {
             }
         }
         else {
-            Debug.LogError($"No removable effects to remove on {facilityActedUpon.facilityName}");
+            // Debug.LogError($"No removable effects to remove on {facilityActedUpon.facilityName}");
+            Debug.Log("No Removable Effect, this is fine, just a wasted card play");
         }
 
         base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);

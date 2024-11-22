@@ -45,7 +45,12 @@ public class FacilityEffect {
 
     public int CreatedByPlayerID { get; set; } = -1;
     public bool HasTrap { get; set; } = false;
-    public bool IsRemoveable => EffectType == FacilityEffectType.Backdoor || EffectType == FacilityEffectType.ModifyPointsPerTurn || EffectType == FacilityEffectType.Fortify;
+    public bool IsRemoveable => 
+        EffectType == FacilityEffectType.Backdoor || 
+        EffectType == FacilityEffectType.ModifyPointsPerTurn || 
+        EffectType == FacilityEffectType.Fortify ||
+        EffectType == FacilityEffectType.HoneyPot ||
+        EffectType == FacilityEffectType.ProtectPoints;
 
     public Action<int> OnEffectRemoved;
     //private static int _uniqueID = 0;
@@ -81,7 +86,7 @@ public class FacilityEffect {
 
     public override string ToString() {
         string effectInfo = $"UID: {UniqueID}, Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
-                            $"Negated: {IsNegated}";
+                            $"Negated: {IsNegated}, Removable: {IsRemoveable}";
 
         if (CreatedEffects.Count > 0) {
             effectInfo += "\n  Created Effects: ";

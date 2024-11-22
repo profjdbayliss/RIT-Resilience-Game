@@ -1248,8 +1248,9 @@ public class CardPlayer : MonoBehaviour {
                         if (cardBeingDragged.target == CardTarget.Effect || cardBeingDragged.data.preReqEffectType != FacilityEffectType.None) {
                             if (hoveredFacilityCollider.TryGetComponent(out Facility facility)) {
                             //    Debug.Log($"Hovering facility {facility.facilityName} while holding effect card");
-                                Debug.Log(cardBeingDragged.data.preReqEffectType);
-                                if (facility.HasEffectOfType(cardBeingDragged.data.preReqEffectType))
+                                //Debug.Log(cardBeingDragged.data.preReqEffectType);
+                                if (facility.HasEffectOfType(cardBeingDragged.data.preReqEffectType) || 
+                                    cardBeingDragged.data.preReqEffectType == FacilityEffectType.None)
                                 {
                                     highlight = true;
                                 }
