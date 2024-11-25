@@ -89,8 +89,8 @@ public class Sector : MonoBehaviour {
     public Action OnDiceRollComplete { get; set; }
 
 
-    public bool IsDown => facilities.Any(facility => facility.IsDown) ||
-        (IsSimulated && SimulatedFacilities.Any(x => x == false));
+    public bool IsDown => isCore ? (facilities.Count(facility => facility.IsDown) > 1) : (facilities.Any(facility => facility.IsDown) ||
+        (IsSimulated && SimulatedFacilities.Any(x => x == false)));
 
     [Header("Game State")]
     public Queue<(Update, GamePhase, CardPlayer)> playerCardPlayQueue = new Queue<(Update, GamePhase, CardPlayer)>();
