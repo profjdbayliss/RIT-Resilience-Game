@@ -1467,7 +1467,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         Debug.Log("Red is aggressive: " + IsRedAggressive);
         if (IsRedAggressive) {
-            roundsLeft--; //its already subtracting once in line 1191
+            roundsLeft--; //its already subtracting once in line 1466
             aggressionTurnCount++;
             if (aggressionTurnCount >= aggressionTurnCheck) {
                 IsRedAggressive = false;
