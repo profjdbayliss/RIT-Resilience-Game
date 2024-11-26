@@ -187,52 +187,60 @@ public class FacilityEffectManager : MonoBehaviour {
             GameManager.Instance.IsRedLayingLow = false;
         Debug.Log(effect.ToString());
 
-        var protectPointsEffects = activeEffects.FindAll(effect => effect.EffectType == FacilityEffectType.ProtectPoints);
+        var protectPointsEffects = activeEffects.FindAll(effect => effect.EffectType == FacilityEffectType.ProtectPoints).Select(effect=>effect.Target);
 
 
         //convert possible multi point target to a list of single point targets
-        List<FacilityEffectTarget> protectPointsTargets = new List<FacilityEffectTarget>();
+        List<FacilityEffectTarget> effectTargets = new List<FacilityEffectTarget>();
 
         switch (effect.Target) {
             case FacilityEffectTarget.Physical:
-                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                effectTargets.Add(FacilityEffectTarget.Physical);
                 break;
             case FacilityEffectTarget.Financial:
-                protectPointsTargets.Add(FacilityEffectTarget.Financial);
+                effectTargets.Add(FacilityEffectTarget.Financial);
                 break;
             case FacilityEffectTarget.Network:
-                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                effectTargets.Add(FacilityEffectTarget.Network);
                 break;
             case FacilityEffectTarget.NetworkPhysical:
-                protectPointsTargets.Add(FacilityEffectTarget.Network);
-                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                effectTargets.Add(FacilityEffectTarget.Network);
+                effectTargets.Add(FacilityEffectTarget.Physical);
                 break;
             case FacilityEffectTarget.FinancialPhysical:
-                protectPointsTargets.Add(FacilityEffectTarget.Financial);
-                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                effectTargets.Add(FacilityEffectTarget.Financial);
+                effectTargets.Add(FacilityEffectTarget.Physical);
                 break;
             case FacilityEffectTarget.FinancialNetwork:
-                protectPointsTargets.Add(FacilityEffectTarget.Financial);
-                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                effectTargets.Add(FacilityEffectTarget.Financial);
+                effectTargets.Add(FacilityEffectTarget.Network);
                 break;
             case FacilityEffectTarget.All:
-                protectPointsTargets.Add(FacilityEffectTarget.Financial);
-                protectPointsTargets.Add(FacilityEffectTarget.Physical);
-                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                effectTargets.Add(FacilityEffectTarget.Financial);
+                effectTargets.Add(FacilityEffectTarget.Physical);
+                effectTargets.Add(FacilityEffectTarget.Network);
                 break;
         }
 
 
         //check for any protection points effects that would prevent this effect from taking place
-        foreach (var protectPointsEffect in protectPointsEffects) {
-            foreach (var target in protectPointsTargets) {
+        foreach (var target in effectTargets) {
+            bool add = true;
+
+
+            foreach (var protectedPoint in protectPointsEffects) {
+            
                 //protected point
-                if (effect.Magnitude < 0 && target == protectPointsEffect.Target) {
-                    continue;
+                if (effect.Magnitude < 0 && target == protectedPoint) {
+                    add = false;
+                    break;
                 }
-                //unprotected point
-                facility.ChangeFacilityPoints(target, createdById, value);
+                
+               
             }
+            //unprotected point
+            if (add)
+                facility.ChangeFacilityPoints(target, createdById, value);
         }
 
         
