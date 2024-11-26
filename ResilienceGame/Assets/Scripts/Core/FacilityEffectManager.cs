@@ -185,16 +185,60 @@ public class FacilityEffectManager : MonoBehaviour {
         int value = effect.Magnitude * (isRemoving ? 0 : 1); //dont give points back when removing effects
         if (effect.Magnitude < 0 && GameManager.Instance.IsRedLayingLow)
             GameManager.Instance.IsRedLayingLow = false;
+        Debug.Log(effect.ToString());
 
-        FacilityEffect protectPointsEffect = activeEffects.Find(effect => effect.EffectType == FacilityEffectType.ProtectPoints);
-        if (protectPointsEffect != null) {
-            if (effect.Magnitude < 0 && effect.Target == protectPointsEffect.Target)
-                return;
+        var protectPointsEffects = activeEffects.FindAll(effect => effect.EffectType == FacilityEffectType.ProtectPoints);
+
+
+        //convert possible multi point target to a list of single point targets
+        List<FacilityEffectTarget> protectPointsTargets = new List<FacilityEffectTarget>();
+
+        switch (effect.Target) {
+            case FacilityEffectTarget.Physical:
+                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                break;
+            case FacilityEffectTarget.Financial:
+                protectPointsTargets.Add(FacilityEffectTarget.Financial);
+                break;
+            case FacilityEffectTarget.Network:
+                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                break;
+            case FacilityEffectTarget.NetworkPhysical:
+                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                break;
+            case FacilityEffectTarget.FinancialPhysical:
+                protectPointsTargets.Add(FacilityEffectTarget.Financial);
+                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                break;
+            case FacilityEffectTarget.FinancialNetwork:
+                protectPointsTargets.Add(FacilityEffectTarget.Financial);
+                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                break;
+            case FacilityEffectTarget.All:
+                protectPointsTargets.Add(FacilityEffectTarget.Financial);
+                protectPointsTargets.Add(FacilityEffectTarget.Physical);
+                protectPointsTargets.Add(FacilityEffectTarget.Network);
+                break;
         }
 
 
-        facility.ChangeFacilityPoints(effect.Target, createdById, value);
+        //check for any protection points effects that would prevent this effect from taking place
+        foreach (var protectPointsEffect in protectPointsEffects) {
+            foreach (var target in protectPointsTargets) {
+                //protected point
+                if (effect.Magnitude < 0 && target == protectPointsEffect.Target) {
+                    continue;
+                }
+                //unprotected point
+                facility.ChangeFacilityPoints(target, createdById, value);
+            }
+        }
+
+        
+
     }
+    
     private bool IsEffectCreatorsTurn(FacilityEffect effect) {
         //Debug.Log($"Checking if {effect.EffectType} created by the {effect.CreatedByTeam} team should be adjusted during {GameManager.instance.MGamePhase} phase");
         return effect.CreatedByTeam switch {
@@ -657,5 +701,5 @@ public class FacilityEffectManager : MonoBehaviour {
     #endregion
 
 
-   
+
 }

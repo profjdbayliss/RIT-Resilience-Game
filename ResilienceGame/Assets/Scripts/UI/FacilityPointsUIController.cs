@@ -89,7 +89,7 @@ public class FacilityPointsUIController : MonoBehaviour {
                     pointParent.transform.GetChild(1).GetComponent<Image>(), //filled
                     pointParent.transform.childCount > 2 ? pointParent.transform.GetChild(2).GetComponent<Image>() : null)); //temp
         });
-        Debug.Log($"Init Facility Points UI {facility.facilityName}: {facility.MaxPhysicalPoints}, {facility.MaxNetworkPoints}, {facility.MaxFinancialPoints}");
+      //  Debug.Log($"Init Facility Points UI {facility.facilityName}: {facility.MaxPhysicalPoints}, {facility.MaxNetworkPoints}, {facility.MaxFinancialPoints}");
         UpdateAllMax();
 
     }
@@ -99,7 +99,7 @@ public class FacilityPointsUIController : MonoBehaviour {
             return;
         }
         List<FacilityPointUIElement> points = type == 0 ? physPointsUI : type == 1 ? netPointsUI : finPointsUI;
-        Debug.Log($"init max points count: {points.Count}");
+      //  Debug.Log($"init max points count: {points.Count}");
         for (int i = 0; i < points.Count; i++) {
             points[i].SetState(i < maxAmt ? FacilityPointState.Full : FacilityPointState.Disabled);
         }
@@ -110,7 +110,7 @@ public class FacilityPointsUIController : MonoBehaviour {
             return;
         }
         List<FacilityPointUIElement> points = type == 0 ? physPointsUI : type == 1 ? netPointsUI : finPointsUI;
-        Debug.Log($"init max points count: {points.Count}");
+      //  Debug.Log($"init max points count: {points.Count}");
         for (int i = 0; i < points.Count; i++) {
             points[i].SetState(i < amt ? FacilityPointState.Full : i < maxAmt ? FacilityPointState.Empty : FacilityPointState.Disabled);
         }
