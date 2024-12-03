@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,4 +31,44 @@ public class CardFront : MonoBehaviour
     //public void DisablePurpleMeeple() {
     //    meepleBgPurple.enabled = false;
     //}
+
+    public TextMeshProUGUI titleText;
+    public TextMeshProUGUI descriptionText;
+    public TextMeshProUGUI flavorText;
+    public TextMeshProUGUI blueCost;
+    public TextMeshProUGUI blackCost;
+    public TextMeshProUGUI purpleCost;
+
+    public RawImage backgroundImage;
+
+    public void SetTitle(string title) {
+        this.title = title;
+        titleText.text = title;
+
+    }
+    public void SetDescription(string description) {
+        this.description = description;
+        descriptionText.text = description;
+    }
+    public void SetFlavor(string flavor) {
+        this.flavor = flavor;
+        flavorText.text = flavor;
+    }
+    public void SetBlueCost(int blueCost) {
+        blueCircle = true;
+        this.blueCost.text = blueCost.ToString();
+    }
+    public void SetBlackCost(int blackCost) {
+        blackCircle = true;
+        this.blackCost.text = blackCost.ToString();
+    }
+    public void SetPurpleCost(int purpleCost) {
+        purpleCircle = true;
+        this.purpleCost.text = purpleCost.ToString();
+    }
+    public void SetColor(Color c) {
+        color = c;
+        backgroundImage.color = c;
+    }
+
 }

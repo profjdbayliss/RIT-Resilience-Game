@@ -868,7 +868,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5538209950631311435}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db459d57a8150a14f97040d524ce04c0, type: 3}
   m_Name: 
@@ -915,7 +915,7 @@ MonoBehaviour:
   blueCircle: 0
   blackCircle: 0
   purpleCircle: 0
-  color: {r: 0, g: 0, b: 0, a: 0}
+  color: {r: 0, g: 0, b: 0, a: 1}
   title: 
   description: 
   flavor: 
@@ -924,6 +924,13 @@ MonoBehaviour:
   meepleBgBlack: {fileID: 4002483342685665858}
   meepleBgBlue: {fileID: 6303880431907385214}
   meepleBgPurple: {fileID: 2904217296101636555}
+  titleText: {fileID: 875747055090416960}
+  descriptionText: {fileID: 6810838657920220605}
+  flavorText: {fileID: 6104344170908158682}
+  blueCost: {fileID: 2316703530183543239}
+  blackCost: {fileID: 8185598458530600147}
+  purpleCost: {fileID: 1527689668969010186}
+  backgroundImage: {fileID: 6091015590675726360}
 --- !u!114 &3359404772266723563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -980,8 +987,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: 
-  card: {fileID: 0}
-  cardGameObject: {fileID: 0}
+  card: {fileID: 417334599258768096}
+  cardFront: {fileID: 6896326771716047841}
+  cardGameObject: {fileID: 5538209950631311435}
 --- !u!1 &5598679006554992621
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,14 +3,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
 public class CardEditor : MonoBehaviour
 {
 
-    [SerializeField] private TextMeshProUGUI cardList;
     [SerializeField] private TextMeshProUGUI deckTitle;
+    [SerializeField] private GameObject editorCardPrefab;
+    [SerializeField] private RectTransform editorCardContainer;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,20 +35,25 @@ public class CardEditor : MonoBehaviour
                 string filePath = paths[0];
                 try {
                     // Read the CSV file contents
-                    string[] lines = File.ReadAllLines(filePath);
+                    string[] lines = File.ReadAllLines(filePath).Skip(1).ToArray();
 
                     // Process each line (for example, split by commas)
                     foreach (string line in lines) {
-                        string[] values = line.Split(',');
 
-                        // Example: Output the CSV values to the console
-                        Debug.Log($"Line Data: {string.Join(", ", values)}");
-                        s += string.Join(", ", values) + "\n";
+
+                        var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
+                        editorCard.Init(line);
+
+
+                        //string[] values = line.Split(',');
+
+                        //// Example: Output the CSV values to the console
+                        //Debug.Log($"Line Data: {string.Join(", ", values)}");
+                        //s += string.Join(", ", values) + "\n";
 
 
                     }
-                    deckTitle.text = filePath;
-                    cardList.text = s;
+                    deckTitle.text = Path.GetFileName(filePath);
                 }
                 catch (Exception e) {
                     Debug.LogError($"Error reading CSV file: {e.Message}");
