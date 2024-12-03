@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardEditor : MonoBehaviour
 {
@@ -13,10 +14,18 @@ public class CardEditor : MonoBehaviour
     [SerializeField] private TextMeshProUGUI deckTitle;
     [SerializeField] private GameObject editorCardPrefab;
     [SerializeField] private RectTransform editorCardContainer;
+    [SerializeField] private RectTransform cardContainerParent;
+    [SerializeField] private RectTransform containerOpenPos;
+    [SerializeField] private RectTransform containerClosedPos;
+    [SerializeField] private GameObject editCardParent;
+    private Coroutine moveCoroutine;
+    [SerializeField] private RectTransform toggleBtnTransform;
+
     private List<EditorCard> cards = new List<EditorCard>();
     private const string DEFAULT_NAME = "SectorDownCards.csv";
     private string setName;
     string headers;
+    bool isOpen = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +36,46 @@ public class CardEditor : MonoBehaviour
     void Update() {
 
     }
+    public void ToggleMenuOpen() {
+        isOpen = !isOpen;
+        MoveCardContainer(isOpen);
+    }
+
+    public void MoveCardContainer(bool open) {
+        // Stop any existing movement coroutine
+        if (moveCoroutine != null) {
+            StopCoroutine(moveCoroutine);
+        }
+        toggleBtnTransform.rotation = Quaternion.Euler(0, 0, !isOpen ? 0 : 180);
+        // Start a new movement coroutine
+        moveCoroutine = StartCoroutine(MoveContainerCoroutine(open));
+    }
+
+    private IEnumerator MoveContainerCoroutine(bool open) {
+        float duration = 0.5f; // Duration of the animation
+        float elapsed = 0f;
+
+        Vector3 start = cardContainerParent.position;
+        Vector3 target = open ? containerOpenPos.position : containerClosedPos.position;
+
+        while (elapsed < duration) {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Apply easing using SmoothStep
+            t = Mathf.SmoothStep(0, 1, t);
+
+            cardContainerParent.position = Vector3.Lerp(start, target, t);
+            yield return null;
+        }
+
+        // Ensure final position is precise
+        cardContainerParent.position = target;
+    }
+
+
+
+    #region File IO
 
     public void OpenDeck() {
         // Check if the application supports file dialogs
@@ -112,5 +161,6 @@ public class CardEditor : MonoBehaviour
         File.WriteAllLines(filePath, allLines);
     }
 
+    #endregion
 
 }
