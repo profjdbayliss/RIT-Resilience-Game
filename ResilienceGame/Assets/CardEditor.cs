@@ -18,6 +18,7 @@ public class CardEditor : MonoBehaviour
     [SerializeField] private RectTransform containerOpenPos;
     [SerializeField] private RectTransform containerClosedPos;
     [SerializeField] private GameObject editCardParent;
+    [SerializeField] private EditorCard selectedCard;
     private Coroutine moveCoroutine;
     [SerializeField] private RectTransform toggleBtnTransform;
 
@@ -26,6 +27,7 @@ public class CardEditor : MonoBehaviour
     private string setName;
     string headers;
     bool isOpen = true;
+    bool cardSelected = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +38,17 @@ public class CardEditor : MonoBehaviour
     void Update() {
 
     }
+
+    public void SetSelectedCard(EditorCard card) {
+        if (!cardSelected) {
+            editCardParent.SetActive(true);
+        }
+        cardSelected = true;
+        selectedCard.cardData = card.cardData;
+        selectedCard.UpdateCardVisuals();
+    }
+
+    #region card grid menu
     public void ToggleMenuOpen() {
         isOpen = !isOpen;
         MoveCardContainer(isOpen);
@@ -73,7 +86,7 @@ public class CardEditor : MonoBehaviour
         cardContainerParent.position = target;
     }
 
-
+    #endregion
 
     #region File IO
 
@@ -97,11 +110,13 @@ public class CardEditor : MonoBehaviour
 
 
                         var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
+                        editorCard.onClick += () => SetSelectedCard(editorCard);
                         editorCard.Init(line);
                         cards.Add(editorCard);
                     }
                     setName = Path.GetFileName(filePath);
                     deckTitle.text = setName;
+                    SetSelectedCard(cards[0]);
                 }
                 catch (Exception e) {
                     Debug.LogError($"Error reading CSV file: {e.Message}");

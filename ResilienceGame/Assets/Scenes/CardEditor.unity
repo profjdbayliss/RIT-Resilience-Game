@@ -904,6 +904,7 @@ MonoBehaviour:
   containerOpenPos: {fileID: 479465100}
   containerClosedPos: {fileID: 942792644}
   editCardParent: {fileID: 1898946123}
+  selectedCard: {fileID: 1461312196}
   toggleBtnTransform: {fileID: 854628708}
 --- !u!1 &763301777
 GameObject:
@@ -1676,6 +1677,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3359404772266723560, guid: 8b679acbc349006479e3c022fde62ce3, type: 3}
   m_PrefabInstance: {fileID: 1461312194}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1461312196 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 859165447304942939, guid: 8b679acbc349006479e3c022fde62ce3, type: 3}
+  m_PrefabInstance: {fileID: 1461312194}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3722c843636cdc945a69f6c40e727a06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1540573039
 GameObject:
   m_ObjectHideFlags: 0
