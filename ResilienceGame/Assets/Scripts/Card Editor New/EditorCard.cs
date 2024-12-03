@@ -94,10 +94,14 @@ public class EditorCard : MonoBehaviour {
 
     }
     public void UpdateCardVisuals() {
-        Debug.Log("Updating card visuals for " + cardData.title);
+        //Debug.Log("Updating card visuals for " + cardData.title);
         cardFront.SetTitle(cardData.title);
         cardFront.SetDescription(cardData.description);
         cardFront.SetFlavor(cardData.flavourText);
+        cardFront.SetBlueCost(cardData.blueCost);
+        cardFront.SetBlackCost(cardData.blackCost);
+        cardFront.SetPurpleCost(cardData.purpleCost);
+        cardFront.SetImage(cardData.imgLocation);
 
         cardFront.SetColor(
             cardData.team.ToLower() switch {
@@ -106,5 +110,7 @@ public class EditorCard : MonoBehaviour {
                 _ => Color.white,
             }
         );
+
+
     }
 }

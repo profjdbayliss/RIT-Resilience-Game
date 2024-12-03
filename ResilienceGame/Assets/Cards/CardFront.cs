@@ -1,16 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 // Visual parts of the card
-public class CardFront : MonoBehaviour
-{
+public class CardFront : MonoBehaviour {
     public bool blueCircle;
     public bool blackCircle;
-    public bool purpleCircle; 
-    public Color color; 
+    public bool purpleCircle;
+    public Color color;
     public string title;
     public string description;
     public string flavor;
@@ -40,6 +40,7 @@ public class CardFront : MonoBehaviour
     public TextMeshProUGUI purpleCost;
 
     public RawImage backgroundImage;
+    public RawImage cardImage;
 
     public void SetTitle(string title) {
         this.title = title;
@@ -69,6 +70,15 @@ public class CardFront : MonoBehaviour
     public void SetColor(Color c) {
         color = c;
         backgroundImage.color = c;
+    }
+    public void SetImage(string path) {
+        var imgPath = Path.Combine(Application.streamingAssetsPath, path);
+        if (File.Exists(imgPath)) {
+            var fileData = File.ReadAllBytes(imgPath);
+            img = new Texture2D(256, 256);
+            img.LoadImage(fileData);
+            cardImage.texture = img;
+        }
     }
 
 }
