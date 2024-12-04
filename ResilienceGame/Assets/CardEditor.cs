@@ -8,8 +8,34 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardEditor : MonoBehaviour
-{
+public class CardEditor : MonoBehaviour {
+    public enum CardMethods {
+        DrawAndDiscardCards,
+        ShuffleAndDrawCards,
+        ReturnHandToDeckAndDraw,
+        AddEffect,
+        RemoveEffect,
+        SpreadEffect,
+        SelectFacilitiesAddRemoveEffect,
+        ReduceTurnsLeftByBackdoor,
+        TemporaryReductionOfTurnsLeft,
+        CancelTemporaryReductionOfTurns,
+        BackdoorCheckNetworkRestore,
+        ConvertFortifyToBackdoor,
+        IncreaseTurnsDuringPeace,
+        IncColorlessMeeplesRoundReduction,
+        ChangeMeepleAmount,
+        IncreaseOvertimeAmount,
+        ShuffleCardsFromDiscard,
+        ReduceCardCost,
+        NWIncOvertimeAmount,
+        NWShuffleFromDiscard,
+        ChangeAllFacPointsBySectorType,
+        ChangeTransFacPointsAllSectors,
+        CheckAllSectorsChangeMeepleAmtMulti,
+        IncreaseBaseMaxMeeples
+    }
+
 
     [SerializeField] private TextMeshProUGUI deckTitle;
     [SerializeField] private GameObject editorCardPrefab;
@@ -21,6 +47,16 @@ public class CardEditor : MonoBehaviour
     [SerializeField] private EditorCard selectedCard;
     private Coroutine moveCoroutine;
     [SerializeField] private RectTransform toggleBtnTransform;
+
+    [Header("Card Edit Fields")]
+    [SerializeField] private TMP_InputField titleInput;
+    [SerializeField] private TMP_InputField dupeInput;
+    [SerializeField] private TMP_Dropdown actionDropdown;
+    [SerializeField] private TMP_Dropdown targetDropdown;
+    [SerializeField] private TMP_InputField cardsDrawn;
+    [SerializeField] private TMP_InputField cardsDiscarded;
+
+
 
     private List<EditorCard> cards = new List<EditorCard>();
     private const string DEFAULT_NAME = "SectorDownCards.csv";
@@ -39,6 +75,8 @@ public class CardEditor : MonoBehaviour
 
     }
 
+    #region Card Selection
+
     public void SetSelectedCard(EditorCard card) {
         if (!cardSelected) {
             editCardParent.SetActive(true);
@@ -46,7 +84,32 @@ public class CardEditor : MonoBehaviour
         cardSelected = true;
         selectedCard.cardData = card.cardData;
         selectedCard.UpdateCardVisuals();
+        SetEditFieldsForNewCard(card);
     }
+
+    public void SetEditFieldsForNewCard(EditorCard card) {
+        titleInput.text = card.cardData.title;
+        dupeInput.text = card.cardData.duplication.ToString();
+        cardsDrawn.text = card.cardData.cardsDrawn.ToString();
+        cardsDiscarded.text = card.cardData.cardsRemoved.ToString();
+        SetDropdownOptionByText(card.cardData.methods, actionDropdown);
+        SetDropdownOptionByText(card.cardData.target.ToString(), targetDropdown);
+    }
+
+    public void SetDropdownOptionByText(string optionText, TMP_Dropdown dropdown) {
+        for (int i = 0; i < dropdown.options.Count; i++) {
+            if (dropdown.options[i].text == optionText) {
+                dropdown.value = i; // Set the dropdown to the matching index
+                dropdown.RefreshShownValue(); // Update the visual display
+                return;
+            }
+        }
+
+        Debug.LogWarning($"Option with text '{optionText}' not found in the dropdown.");
+    }
+
+
+    #endregion
 
     #region card grid menu
     public void ToggleMenuOpen() {
@@ -116,7 +179,7 @@ public class CardEditor : MonoBehaviour
                     }
                     setName = Path.GetFileName(filePath);
                     deckTitle.text = setName;
-                    SetSelectedCard(cards[0]);
+                    
                 }
                 catch (Exception e) {
                     Debug.LogError($"Error reading CSV file: {e.Message}");
