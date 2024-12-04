@@ -55,6 +55,15 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private TMP_Dropdown targetDropdown;
     [SerializeField] private TMP_InputField cardsDrawn;
     [SerializeField] private TMP_InputField cardsDiscarded;
+    [SerializeField] private TMP_InputField team;
+    [SerializeField] private TMP_InputField sectorsAffected;
+    [SerializeField] private TMP_InputField numTargets;
+    [SerializeField] private TMP_InputField blackCost;
+    [SerializeField] private TMP_InputField blueCost;
+    [SerializeField] private TMP_InputField purpleCost;
+    [SerializeField] private TMP_InputField duration;
+    [SerializeField] private TMP_InputField diceRoll;
+
 
 
 
@@ -92,6 +101,14 @@ public class CardEditor : MonoBehaviour {
         dupeInput.text = card.cardData.duplication.ToString();
         cardsDrawn.text = card.cardData.cardsDrawn.ToString();
         cardsDiscarded.text = card.cardData.cardsRemoved.ToString();
+        team.text = card.cardData.team;
+        sectorsAffected.text = card.cardData.sectorsAffected;
+        numTargets.text = card.cardData.targetAmt.ToString();
+        blackCost.text = card.cardData.blackCost.ToString();
+        blueCost.text = card.cardData.blueCost.ToString();
+        purpleCost.text = card.cardData.purpleCost.ToString();
+        duration.text = card.cardData.duration.ToString();
+        diceRoll.text = card.cardData.diceRoll.ToString();
         SetDropdownOptionByText(card.cardData.methods, actionDropdown);
         SetDropdownOptionByText(card.cardData.target.ToString(), targetDropdown);
     }
