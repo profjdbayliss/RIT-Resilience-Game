@@ -79,8 +79,10 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Card Limits")]
     public int handSize;
-    protected int MAX_DRAW_AMOUNT => playerTeam == PlayerTeam.Blue ? 5 : 6;
+    protected int MAX_DRAW_AMOUNT = 5;
     public const int MAX_HAND_SIZE_AFTER_ACTION = 9;
+    public const int RED_EXTRA_DRAW_AMT = 1;
+    public const int RED_AGGR_DRAW_AMT = 2;
 
     [Header("Prefabs and UI Elements")]
     public GameObject cardPrefab;
@@ -815,9 +817,15 @@ public class CardPlayer : MonoBehaviour {
     #endregion
 
     #region Card Drawing Functions
-    public virtual void DrawCardsToFillHand(bool updateNetwork = true) {
+    public virtual void DrawCardsToFillHand(bool updateNetwork = true)
+    {
+
+        int maxCards = playerTeam == PlayerTeam.Blue ? MAX_DRAW_AMOUNT :
+            GameManager.Instance.IsRedAggressive ? MAX_DRAW_AMOUNT + RED_AGGR_DRAW_AMT : MAX_DRAW_AMOUNT + RED_EXTRA_DRAW_AMT;
+
         int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
-        if (numCards <= 0) {
+        if (numCards <= 0)
+        {
             return;
         }
         DrawNumberOfCards(numCards, updateNetwork: updateNetwork);
