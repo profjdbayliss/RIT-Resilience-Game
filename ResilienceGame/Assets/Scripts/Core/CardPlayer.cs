@@ -79,8 +79,8 @@ public class CardPlayer : MonoBehaviour {
 
     [Header("Card Limits")]
     public int handSize;
-    protected int MAX_DRAW_AMOUNT = 5;
-    public const int MAX_HAND_SIZE_AFTER_ACTION = 7;
+    protected int MAX_DRAW_AMOUNT => playerTeam == PlayerTeam.Blue ? 5 : 6;
+    public const int MAX_HAND_SIZE_AFTER_ACTION = 9;
 
     [Header("Prefabs and UI Elements")]
     public GameObject cardPrefab;
