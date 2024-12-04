@@ -82,7 +82,7 @@ public class CardPlayer : MonoBehaviour {
     protected int MAX_DRAW_AMOUNT = 5;
     public const int MAX_HAND_SIZE_AFTER_ACTION = 9;
     public const int RED_EXTRA_DRAW_AMT = 1;
-    public const int RED_AGGR_DRAW_AMT = 2;
+    public const int RED_AGGR_DRAW_AMT = 1;
 
     [Header("Prefabs and UI Elements")]
     public GameObject cardPrefab;
@@ -821,9 +821,11 @@ public class CardPlayer : MonoBehaviour {
     {
 
         int maxCards = playerTeam == PlayerTeam.Blue ? MAX_DRAW_AMOUNT :
-            GameManager.Instance.IsRedAggressive ? MAX_DRAW_AMOUNT + RED_AGGR_DRAW_AMT : MAX_DRAW_AMOUNT + RED_EXTRA_DRAW_AMT;
+            GameManager.Instance.IsRedAggressive ? 
+            MAX_DRAW_AMOUNT + RED_AGGR_DRAW_AMT + RED_EXTRA_DRAW_AMT : 
+            MAX_DRAW_AMOUNT + RED_EXTRA_DRAW_AMT;
 
-        int numCards = MAX_DRAW_AMOUNT - HandCards.Count;
+        int numCards = maxCards - HandCards.Count;
         if (numCards <= 0)
         {
             return;

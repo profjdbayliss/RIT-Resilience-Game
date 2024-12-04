@@ -63,6 +63,8 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private TMP_InputField purpleCost;
     [SerializeField] private TMP_InputField duration;
     [SerializeField] private TMP_InputField diceRoll;
+    [SerializeField] private TMP_InputField description;
+    [SerializeField] private TMP_InputField flavor;
 
 
 
@@ -109,6 +111,8 @@ public class CardEditor : MonoBehaviour {
         purpleCost.text = card.cardData.purpleCost.ToString();
         duration.text = card.cardData.duration.ToString();
         diceRoll.text = card.cardData.diceRoll.ToString();
+        description.text = card.cardData.description;
+        flavor.text = card.cardData.flavourText;
         SetDropdownOptionByText(card.cardData.methods, actionDropdown);
         SetDropdownOptionByText(card.cardData.target.ToString(), targetDropdown);
     }
