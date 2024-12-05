@@ -2553,7 +2553,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -718, y: 0}
+  m_AnchoredPosition: {x: -718, y: 475.64}
   m_SizeDelta: {x: 64, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &55810811
@@ -57930,7 +57930,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 718, y: 0}
+  m_AnchoredPosition: {x: 718, y: 475.64}
   m_SizeDelta: {x: 64, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1615352942
@@ -79953,6 +79953,14 @@ MonoBehaviour:
   meepleBgBlack: {fileID: 0}
   meepleBgBlue: {fileID: 0}
   meepleBgPurple: {fileID: 0}
+  titleText: {fileID: 0}
+  descriptionText: {fileID: 0}
+  flavorText: {fileID: 0}
+  blueCost: {fileID: 0}
+  blackCost: {fileID: 0}
+  purpleCost: {fileID: 0}
+  backgroundImage: {fileID: 0}
+  cardImage: {fileID: 0}
 --- !u!114 &3395120114322209512
 MonoBehaviour:
   m_ObjectHideFlags: 0
