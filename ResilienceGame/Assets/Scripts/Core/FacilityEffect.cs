@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Messaging;
+using System.Windows.Forms;
+using System.Xml;
 using UnityEngine;
 
 public enum FacilityEffectTarget {
@@ -80,7 +82,12 @@ public class FacilityEffect {
         Magnitude = magnitude;
         Duration = duration;
         CreatedEffects = new List<FacilityEffect>();
-        UniqueID = GameManager.Instance.UniqueFacilityEffectIdCount++;
+        if (GameManager.Instance != null) {
+            UniqueID = GameManager.Instance.UniqueFacilityEffectIdCount++;
+        }
+        else {
+            UniqueID = -1;
+        }
         EffectCreatedOnRoundEndIdString = createdEffectID;
     }
 
@@ -100,6 +107,14 @@ public class FacilityEffect {
 
 
     #region Facility Effect Creation
+
+    public static string CreateEffectIdString(FacilityEffectType effectType, FacilityEffectTarget target, int magnitude) {
+        if (effectType == FacilityEffectType.ModifyPointsPerTurn || effectType == FacilityEffectType.ModifyPoints) {
+            return $"{GetEffectTypeString(effectType)};{GetTargetString(target)};{magnitude}";
+        }
+        return GetEffectTypeString(effectType);
+
+    }
 
     //creates a list of facility effects from a string in the csv file
     //format currently supports multiple effects, but only 1 effect with a target

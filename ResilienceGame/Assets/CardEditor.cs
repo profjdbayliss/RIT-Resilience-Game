@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Yarn.Unity;
 
 public class CardEditor : MonoBehaviour {
     public enum CardMethods {
@@ -47,6 +48,9 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private EditorCard selectedCard;
     private Coroutine moveCoroutine;
     [SerializeField] private RectTransform toggleBtnTransform;
+    [SerializeField] private RectTransform editEffectsParent;
+    [SerializeField] private GameObject editEffectPrefab;
+    private List<EditEffect> effects = new List<EditEffect>();
 
     [Header("Card Edit Fields")]
     [SerializeField] private TMP_InputField titleInput;
@@ -73,7 +77,7 @@ public class CardEditor : MonoBehaviour {
     private const string DEFAULT_NAME = "SectorDownCards.csv";
     private string setName;
     string headers;
-    bool isOpen = true;
+    bool isOpen = false;
     bool cardSelected = false;
     // Start is called before the first frame update
     void Start()
@@ -99,6 +103,10 @@ public class CardEditor : MonoBehaviour {
     }
 
     public void SetEditFieldsForNewCard(EditorCard card) {
+        if (effects.Count > 0) {
+            effects.ForEach(effects => Destroy(effects.gameObject));
+            effects.Clear();
+        }
         titleInput.text = card.cardData.title;
         dupeInput.text = card.cardData.duplication.ToString();
         cardsDrawn.text = card.cardData.cardsDrawn.ToString();
@@ -115,6 +123,12 @@ public class CardEditor : MonoBehaviour {
         flavor.text = card.cardData.flavourText;
         SetDropdownOptionByText(card.cardData.methods, actionDropdown);
         SetDropdownOptionByText(card.cardData.target.ToString(), targetDropdown);
+        var createdEffects = FacilityEffect.CreateEffectsFromID(card.cardData.effect);
+        foreach (var effect in createdEffects) {
+            var editEffect = Instantiate(editEffectPrefab, editEffectsParent).GetComponent<EditEffect>();
+            editEffect.SetEffect(effect);
+            this.effects.Add(editEffect);
+        }
     }
 
     public void SetDropdownOptionByText(string optionText, TMP_Dropdown dropdown) {
@@ -200,7 +214,9 @@ public class CardEditor : MonoBehaviour {
                     }
                     setName = Path.GetFileName(filePath);
                     deckTitle.text = setName;
-                    
+                    ToggleMenuOpen();
+
+
                 }
                 catch (Exception e) {
                     Debug.LogError($"Error reading CSV file: {e.Message}");
