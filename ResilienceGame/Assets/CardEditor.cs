@@ -48,6 +48,7 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private EditorCard selectedCard;
     private Coroutine moveCoroutine;
     [SerializeField] private RectTransform toggleBtnTransform;
+    [SerializeField] private GameObject effectsSection;
     [SerializeField] private RectTransform editEffectsParent;
     [SerializeField] private GameObject editEffectPrefab;
     private List<EditEffect> effects = new List<EditEffect>();
@@ -85,12 +86,31 @@ public class CardEditor : MonoBehaviour {
         
     }
 
+
     // Update is called once per frame
     void Update() {
 
     }
 
     #region Card Selection
+    public void DisableEffectSection() {
+        effectsSection.SetActive(false);
+    }
+    public void EnableEffectSection() {
+        effectsSection.SetActive(true);
+    }
+    public void OnMethodsChange() {
+        var action = Enum.Parse<CardMethods>(actionDropdown.options[actionDropdown.value].text);
+        switch (action) {
+            case CardMethods.AddEffect:
+                EnableEffectSection();
+                break;
+            default:
+                DisableEffectSection();
+                break;
+        }
+
+    }
     public void RemoveEffect(EditEffect effect) {
         effects.Remove(effect);
         Destroy(effect.gameObject);
