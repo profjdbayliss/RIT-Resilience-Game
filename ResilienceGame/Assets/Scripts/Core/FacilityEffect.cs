@@ -90,7 +90,20 @@ public class FacilityEffect {
         }
         EffectCreatedOnRoundEndIdString = createdEffectID;
     }
+    public static string CombineEffectStrings(string effect1, string effect2) {
+        var effect1Parts = effect1.Split(';');
+        var effect2Parts = effect2.Split(';');
 
+        if (effect1Parts.Length > 1) {
+            return $"{effect1}&{effect2Parts[0]};{effect1Parts[1]};{effect1Parts[2]}";
+        }
+        else if (effect2Parts.Length > 1) {
+            return $"{effect2Parts[0]}&{effect2};{effect2Parts[1]};{effect2Parts[2]}";
+        }
+        else {
+            return $"{effect1}&{effect2}";
+        }
+    }
     public override string ToString() {
         string effectInfo = $"UID: {UniqueID}, Effect: {EffectType}, Target: {Target}, Magnitude: {Magnitude}, Duration: {(Duration == -1 ? "Infinite" : Duration.ToString())}, " +
                             $"Negated: {IsNegated}, Removable: {IsRemoveable}";

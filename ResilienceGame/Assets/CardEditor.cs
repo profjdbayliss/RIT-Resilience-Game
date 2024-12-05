@@ -103,6 +103,7 @@ public class CardEditor : MonoBehaviour {
         var action = Enum.Parse<CardMethods>(actionDropdown.options[actionDropdown.value].text);
         switch (action) {
             case CardMethods.AddEffect:
+            case CardMethods.SelectFacilitiesAddRemoveEffect:
                 EnableEffectSection();
                 break;
             default:
@@ -120,10 +121,48 @@ public class CardEditor : MonoBehaviour {
         if (!cardSelected) {
             editCardParent.SetActive(true);
         }
+        else {
+            SaveEditedCard();
+        }
         cardSelected = true;
         selectedCard.cardData = card.cardData;
         selectedCard.UpdateCardVisuals();
         SetEditFieldsForNewCard(card);
+    }
+    public void SaveEditedCard() {
+        if (!cardSelected) {
+            return;
+        }
+        selectedCard.cardData.title = titleInput.text;
+        selectedCard.cardData.duplication = dupeInput.text == "" ? 0 : int.Parse(dupeInput.text);
+        selectedCard.cardData.cardsDrawn = cardsDrawn.text == "" ? 0 : int.Parse(cardsDrawn.text);
+        selectedCard.cardData.cardsRemoved = cardsDiscarded.text == "" ? 0 : int.Parse(cardsDiscarded.text);
+        selectedCard.cardData.team = team.text;
+        selectedCard.cardData.sectorsAffected = sectorsAffected.text;
+        selectedCard.cardData.targetAmt = numTargets.text == "" ? 0 : int.Parse(numTargets.text);
+        selectedCard.cardData.blackCost = blackCost.text == "" ? 0 : int.Parse(blackCost.text);
+        selectedCard.cardData.blueCost = blueCost.text == "" ? 0 : int.Parse(blueCost.text);
+        selectedCard.cardData.purpleCost = purpleCost.text == "" ? 0 : int.Parse(purpleCost.text);
+        selectedCard.cardData.duration = duration.text == "" ? 0 : int.Parse(duration.text);
+        selectedCard.cardData.diceRoll = diceRoll.text == "" ? 0 : int.Parse(diceRoll.text);
+        selectedCard.cardData.description = description.text;
+        selectedCard.cardData.flavourText = flavor.text;
+        selectedCard.cardData.methods = actionDropdown.options[actionDropdown.value].text;
+        selectedCard.cardData.target = (CardTarget)Enum.Parse(typeof(CardTarget), targetDropdown.options[targetDropdown.value].text);
+
+        string effectString = "";
+        
+        if (effects.Count > 1) {
+            effectString = FacilityEffect.CombineEffectStrings(effects[0].GetEffectStringFromFields(), 
+                effects[1].GetEffectStringFromFields());
+        }
+        else if (effects.Count == 1) {
+            effectString = effects[0].GetEffectStringFromFields();
+        }
+        selectedCard.cardData.effect = effectString;
+        Debug.Log($"Saving card effect string as: {effectString}");
+
+
     }
 
     public void SetEditFieldsForNewCard(EditorCard card) {
@@ -147,8 +186,13 @@ public class CardEditor : MonoBehaviour {
         flavor.text = card.cardData.flavourText;
         SetDropdownOptionByText(card.cardData.methods, actionDropdown);
         SetDropdownOptionByText(card.cardData.target.ToString(), targetDropdown);
+        Debug.Log($"Selected card effect string: {card.cardData.effect}");
         var createdEffects = FacilityEffect.CreateEffectsFromID(card.cardData.effect);
+        Debug.Log($"created effects: {createdEffects.Count}");
         foreach (var effect in createdEffects) {
+            if (effect.EffectType == FacilityEffectType.None) {
+                continue;
+            }
             var editEffect = Instantiate(editEffectPrefab, editEffectsParent).GetComponent<EditEffect>();
             editEffect.SetEffect(effect);
             this.effects.Add(editEffect);
