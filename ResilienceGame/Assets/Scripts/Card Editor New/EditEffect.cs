@@ -126,4 +126,8 @@ public class EditEffect : MonoBehaviour {
             GetDropdownTarget(), 
             GetMagDropdown());
     }
+    public void RemoveEffect() {
+        CardEditor editor = FindObjectOfType<CardEditor>();
+        editor.RemoveEffect(this);
+    }
 }

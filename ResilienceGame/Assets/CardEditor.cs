@@ -91,6 +91,10 @@ public class CardEditor : MonoBehaviour {
     }
 
     #region Card Selection
+    public void RemoveEffect(EditEffect effect) {
+        effects.Remove(effect);
+        Destroy(effect.gameObject);
+    }
 
     public void SetSelectedCard(EditorCard card) {
         if (!cardSelected) {
