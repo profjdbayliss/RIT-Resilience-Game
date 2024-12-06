@@ -95,10 +95,10 @@ public class FacilityEffect {
         var effect2Parts = effect2.Split(';');
 
         if (effect1Parts.Length > 1) {
-            return $"{effect1}&{effect2Parts[0]};{effect1Parts[1]};{effect1Parts[2]}";
+            return $"{effect1Parts[0]}&{effect2Parts[0]};{effect1Parts[1]};{effect1Parts[2]}";
         }
         else if (effect2Parts.Length > 1) {
-            return $"{effect2Parts[0]}&{effect2};{effect2Parts[1]};{effect2Parts[2]}";
+            return $"{effect2Parts[0]}&{effect1Parts[0]};{effect2Parts[1]};{effect2Parts[2]}";
         }
         else {
             return $"{effect1}&{effect2}";
