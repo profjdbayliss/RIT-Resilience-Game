@@ -22,7 +22,7 @@ public class CardReader : MonoBehaviour {
     public string outputAtlasName;
 
     // filename + directory path
-    string fileLocation;
+    string fileLocation = Path.Join(Application.streamingAssetsPath, "SectorDownCards.csv");
 
     // card prefab that all cards are made from
     public GameObject cardPrefab;
@@ -39,16 +39,16 @@ public class CardReader : MonoBehaviour {
             fileLocation = cardDeckNameHolder.DECK_NAME;
         }
         else {
-            Debug.LogError("DeckNameHolder not found, using default deck name");
-            return null;
+            Debug.LogWarning("DeckNameHolder not found, using default deck name");
+            
         }
         // Check to see if the file exists
         //fileLocation = Application.streamingAssetsPath + "/" + cardFileName;
         Debug.Log("Creating deck from file: " + fileLocation);
         //Debug.Log("trying to read file at location: " + fileLocation);
         if (!File.Exists(fileLocation)) {
-            Debug.LogError($"{fileLocation} is missing cannot read card data!!!");
-            return null;
+            Debug.LogWarning($"{fileLocation} is missing cannot read card data!!!");
+            fileLocation = Path.Join(Application.streamingAssetsPath, "SectorDownCards.csv");
         }
 
         Debug.Log("reading the file!");

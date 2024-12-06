@@ -60,7 +60,7 @@ public class SectorIconController : MonoBehaviour {
 
     public void SetSector(Sector sector, bool isSim) {
         this.sector = sector;
-        Debug.Log($"Assigning sector: {sector.sectorName} to {name}");
+      //  Debug.Log($"Assigning sector: {sector.sectorName} to {name}");
         gameObject.SetActive(true);
         isSectorSimulated = isSim;
         sectorNameText.text = sector.sectorName.ToString();

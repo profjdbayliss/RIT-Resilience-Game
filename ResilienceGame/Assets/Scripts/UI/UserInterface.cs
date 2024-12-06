@@ -408,7 +408,7 @@ public class UserInterface : MonoBehaviour {
             Debug.Log($"Could not find sector shadow for {sector.sectorName}");
             return;
         }
-        Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
+        //Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
         var icon = sectorIcons[sector.transform.GetSiblingIndex() - 1];
         icon.SetSector(sectorShadow, sector.Owner == null);
         icon.gameObject.SetActive(false);
