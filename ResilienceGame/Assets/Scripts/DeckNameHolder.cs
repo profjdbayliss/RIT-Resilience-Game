@@ -7,11 +7,12 @@ using UnityEngine;
 
 public class DeckNameHolder : MonoBehaviour
 {
-    public string DECK_NAME = "SectorDownCards.csv";
+    public string DECK_NAME = "";
     public TextMeshProUGUI deckName;
     // Start is called before the first frame update
     void Start()
     {
+        DECK_NAME = Path.Join(Application.streamingAssetsPath, "SectorDownCards.csv");
         DontDestroyOnLoad(this);
     }
 
