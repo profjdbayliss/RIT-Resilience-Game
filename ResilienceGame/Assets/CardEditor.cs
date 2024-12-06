@@ -70,6 +70,11 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private TMP_InputField diceRoll;
     [SerializeField] private TMP_InputField description;
     [SerializeField] private TMP_InputField flavor;
+    [SerializeField] private TMP_InputField imgRow;
+    [SerializeField] private TMP_InputField imgCol;
+    [SerializeField] private Toggle obfuscated;
+    [SerializeField] private Toggle doom;
+
 
 
 
@@ -116,6 +121,10 @@ public class CardEditor : MonoBehaviour {
         effects.Remove(effect);
         Destroy(effect.gameObject);
     }
+    public void AddEffect() {
+        var editEffect = Instantiate(editEffectPrefab, editEffectsParent).GetComponent<EditEffect>();
+        effects.Add(editEffect);
+    }
 
     public void SetSelectedCard(EditorCard card) {
         if (!cardSelected) {
@@ -145,10 +154,14 @@ public class CardEditor : MonoBehaviour {
         selectedCard.cardData.purpleCost = purpleCost.text == "" ? 0 : int.Parse(purpleCost.text);
         selectedCard.cardData.duration = duration.text == "" ? 0 : int.Parse(duration.text);
         selectedCard.cardData.diceRoll = diceRoll.text == "" ? 0 : int.Parse(diceRoll.text);
+        selectedCard.cardData.imgRow = imgRow.text == "" ? 0 : int.Parse(imgRow.text);
+        selectedCard.cardData.imgCol = imgCol.text == "" ? 0 : int.Parse(imgCol.text);
         selectedCard.cardData.description = description.text;
         selectedCard.cardData.flavourText = flavor.text;
         selectedCard.cardData.methods = actionDropdown.options[actionDropdown.value].text;
         selectedCard.cardData.target = (CardTarget)Enum.Parse(typeof(CardTarget), targetDropdown.options[targetDropdown.value].text);
+        selectedCard.cardData.obfuscated = obfuscated.isOn;
+        selectedCard.cardData.hasDoom = doom.isOn;
 
         string effectString = "";
         
@@ -160,9 +173,14 @@ public class CardEditor : MonoBehaviour {
             effectString = effects[0].GetEffectStringFromFields();
         }
         selectedCard.cardData.effect = effectString;
-        Debug.Log($"Saving card effect string as: {effectString}");
-
-
+       // Debug.Log($"Saving card effect string as: {effectString}");
+       // Debug.Log($"Selected card effect string: {selectedCard.cardData.effect}");
+        
+        var actualCard = cards.FirstOrDefault(cards => cards.cardData.title == selectedCard.cardData.title);
+        if (actualCard != null) {
+            actualCard.cardData = selectedCard.cardData;
+            actualCard.UpdateCSVData();
+        }
     }
 
     public void SetEditFieldsForNewCard(EditorCard card) {
@@ -184,11 +202,15 @@ public class CardEditor : MonoBehaviour {
         diceRoll.text = card.cardData.diceRoll.ToString();
         description.text = card.cardData.description;
         flavor.text = card.cardData.flavourText;
+        imgRow.text = card.cardData.imgRow.ToString();
+        imgCol.text = card.cardData.imgCol.ToString();
+        obfuscated.isOn = card.cardData.obfuscated;
+        doom.isOn = card.cardData.hasDoom;
         SetDropdownOptionByText(card.cardData.methods, actionDropdown);
         SetDropdownOptionByText(card.cardData.target.ToString(), targetDropdown);
-        Debug.Log($"Selected card effect string: {card.cardData.effect}");
+      //  Debug.Log($"Selected card effect string: {card.cardData.effect}");
         var createdEffects = FacilityEffect.CreateEffectsFromID(card.cardData.effect);
-        Debug.Log($"created effects: {createdEffects.Count}");
+      //  Debug.Log($"created effects: {createdEffects.Count}");
         foreach (var effect in createdEffects) {
             if (effect.EffectType == FacilityEffectType.None) {
                 continue;
@@ -197,6 +219,7 @@ public class CardEditor : MonoBehaviour {
             editEffect.SetEffect(effect);
             this.effects.Add(editEffect);
         }
+
     }
 
     public void SetDropdownOptionByText(string optionText, TMP_Dropdown dropdown) {
@@ -299,7 +322,9 @@ public class CardEditor : MonoBehaviour {
         }
     }
     public void Save() {
+        SaveEditedCard();
         if (string.IsNullOrEmpty(setName) || setName == DEFAULT_NAME) {
+
             // Prevent overwriting the default file
             Debug.LogWarning("Default file cannot be overwritten. Use Save As instead.");
             return;
@@ -316,6 +341,7 @@ public class CardEditor : MonoBehaviour {
     }
 
     public void SaveAs() {
+        SaveEditedCard();
         // Open the file browser for the user to select a location and name
         string path = StandaloneFileBrowser.SaveFilePanel("Save As", "", "NewDeck", "csv");
 

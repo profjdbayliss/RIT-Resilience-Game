@@ -42,6 +42,36 @@ public class EditorCard : MonoBehaviour {
     void Start() {
 
     }
+    public void UpdateCSVData() {
+        data = $"{cardData.team}," +
+            $"{cardData.duplication}," +
+            $"{cardData.methods}," +
+            $"{cardData.target}," +
+            $"{cardData.sectorsAffected}," +
+            $"{cardData.targetAmt}," +
+            $"{cardData.title}," +
+            $"{cardData.imgRow}," +
+            $"{cardData.imgCol}," +
+            $"{cardData.bgRow}," +
+            $"{cardData.bgCol}," +
+            $"{cardData.meeplesChanged}," +
+            $"{cardData.meepleChangeAmt}," +
+            $"{cardData.blueCost}," +
+            $"{cardData.blackCost}," +
+            $"{cardData.purpleCost},," +
+            $"{cardData.cardsDrawn}," +
+            $"{cardData.cardsRemoved}," +
+            $"{cardData.effect}," +
+            $"{cardData.numEffects}," +
+            $"{cardData.preReqEffect}," +
+            $"{cardData.duration}," +
+            $"{cardData.hasDoom}," +
+            $"{cardData.diceRoll}," +
+            $"{cardData.flavourText}," +
+            $"{cardData.description}," +
+            $"{cardData.imgLocation}," +
+            $"{cardData.obfuscated}";
+    }
     public void HandleClick() {
         onClick?.Invoke();
     }
@@ -62,7 +92,20 @@ public class EditorCard : MonoBehaviour {
             cardData.sectorsAffected = csvData[4];
             cardData.targetAmt = int.Parse(csvData[5]);
             cardData.title = csvData[6];
-            //7-10 are atlas locations for the image and background
+            
+            if (int.TryParse(csvData[7], out int result)) {
+                cardData.imgRow = result;
+            }
+            else {
+                cardData.imgRow = 0;
+            }
+            if (int.TryParse(csvData[8], out result)) {
+                cardData.imgCol = result;
+            }
+            else {
+                cardData.imgCol = 0;
+            }
+            //9-10 are atlas locations for the background
             var meepleChangeData = csvData[11];
             var meepleChangeAmtData = csvData[12];
 
