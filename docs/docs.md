@@ -9,7 +9,7 @@ Her repo can be found here: [https://github.com/profjdbayliss/accessDenied](http
 
 Task List: https://docs.google.com/spreadsheets/d/1qD-LCI60T8OVRBIYg3zjuUYa-XjXpcHyX3CcTnzzYqQ/edit?gid=1234996300#gid=1234996300
 
-design doc: https://docs.google.com/document/d/1XX7vvzohJw5KxB5seTvaujeh4dh9IuloLZEdLoqlr9k/edit?tab=t.0#heading=h.a264o4m8z6f9
+Design doc: https://docs.google.com/document/d/1XX7vvzohJw5KxB5seTvaujeh4dh9IuloLZEdLoqlr9k/edit?tab=t.0#heading=h.a264o4m8z6f9
 
 ## Current State
 
@@ -56,6 +56,8 @@ The upside to the p2p system is that we do not need to maintain any dedicated se
 ### Playtest Playtest Playtest
 
 The game is now in a state that it is testable by non developers. Beginning the next dev cycle with in depth playtesting, combined with targeted forms/questions to get feedback on the issues previously discussed, would be a great way to start. 
+
+Small video guide to playtest the game by oneself: https://www.youtube.com/watch?v=h0u-rbMuPx8
 
 ### Adjust core issues
 
