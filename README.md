@@ -5,7 +5,7 @@
 This is Sector Down, an asymmetrical card game meant to simulate cyber-attacks and cyber-security principles.
 
 The current version of this game was based on the foundation of Jessica Bayliss' game accessDenied.
-Her repo can be found here: [https://github.com/profjdbayliss/accessDenied](https://github.com/profjdbayliss/accessDenied)
+Her repo can be found here: [Access Denied](https://github.com/profjdbayliss/accessDenied)
 
 Task List: https://docs.google.com/spreadsheets/d/1qD-LCI60T8OVRBIYg3zjuUYa-XjXpcHyX3CcTnzzYqQ/edit?gid=1234996300#gid=1234996300
 
@@ -52,7 +52,7 @@ This game uses a peer to peer based networking system. It extends Mirror’s cap
 The upside to the p2p system is that we do not need to maintain any dedicated server once the game is shipped.
 
 ### File Structure
-[https://github.com/profjdbayliss/RIT-Resilience-Game/blob/main/docs/Important%20Files.md](Files)
+[Files](https://github.com/profjdbayliss/RIT-Resilience-Game/blob/main/docs/Important%20Files.md)
 
 # First Steps
 
@@ -117,7 +117,7 @@ There are also some current technical limitations due to the network setup:
     - In theory cards effects affecting other cards in your HAND should be ok, but if the card left your hand for some reason, this effect would be eliminated.
 
 ### Networking details: 
-[https://github.com/profjdbayliss/RIT-Resilience-Game/blob/main/docs/Detailed%20Networking%20Docs.md](Networking Docs)
+[Networking](https://github.com/profjdbayliss/RIT-Resilience-Game/blob/main/docs/Detailed%20Networking%20Docs.md)
 
 ### Unique Card Tracking
 
