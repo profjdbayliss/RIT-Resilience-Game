@@ -51,6 +51,9 @@ This game uses a peer to peer based networking system. It extends Mirror’s cap
 
 The upside to the p2p system is that we do not need to maintain any dedicated server once the game is shipped.
 
+### File Structure
+[https://github.com/profjdbayliss/RIT-Resilience-Game/blob/main/docs/Important%20Files.md](Files)
+
 # First Steps
 
 ### Playtest Playtest Playtest
@@ -112,6 +115,9 @@ There are also some current technical limitations due to the network setup:
     - There is no system for tracking unique cards across multiple players. Cards are assigned unique ID when DRAWN. When a card is played it passes the unique ID and the player ID around, so other game clients can tell which card was played.
     - This means that cards cannot affect other cards. We originally had a card that was meant to reduce other cards cost, but it was a monumental amount of work, and we ended up cutting it.
     - In theory cards effects affecting other cards in your HAND should be ok, but if the card left your hand for some reason, this effect would be eliminated.
+
+### Networking details: 
+[https://github.com/profjdbayliss/RIT-Resilience-Game/blob/main/docs/Detailed%20Networking%20Docs.md](Networking Docs)
 
 ### Unique Card Tracking
 
