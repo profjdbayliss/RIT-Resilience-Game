@@ -76,18 +76,18 @@ This above code snippet is a single switch block inside of the `OnServerReceiveL
 - 23 relays the message to all clients since its the server, this is how more than 2 player functions
 - 24 passes the update back to the Game Manger.
 
-1. Back in the Game manager (but on the other game client) we call `AddUpdateFromPlayer()` 
-    1. This function will either pass it to the sector that the card was targeting, or it will pass it to the local card player if its not a card update. Our example will pass it to the sector’s `AddUpdateFromPlayer()` function, passing it the update, phase, and a reference to the card player that played the card (held in a dictionary in the game manager.
+8. Back in the Game manager (but on the other game client) we call `AddUpdateFromPlayer()` 
+    1. This function will either pass it to the sector that the card was targeting, or it will pass it to the local card player if its not a card update. Our example will pass it to the sector’s `AddUpdateFromPlayer()` function, passing it the update, phase, and a reference to the card player that played the card held in a dictionary in the game manager.
     
-2. `Sector.cs` receives the network message.
+9. `Sector.cs` receives the network message.
     1. It  either enqueues the update (if there are ongoing updates or animations to be called later) or calls `ProcessCardPlay`
-    2. `ProcessCardPlay()` will call another function  based on the type of card (if its a facility target, sector target, hand target (draw card) ect…
+    2. `ProcessCardPlay()` will call another function based on the type of card if its a facility target, sector target, hand target (draw card) ect…
     3. Our Phishing card is a facility target card so it will move to `HandleFacilityOpponentPlay()`
-3. `HandleFacilityOpponentPlay()` will find the card in the local player’s hand via the card ID
+10. `HandleFacilityOpponentPlay()` will find the card in the local player’s hand via the card ID
     1. This is done via non unique Card ID, so we pass it `23` as the ID of Phishing, so the network client will attempt to pull a card with ID `23` out of the player’s hand
     2. It updates the history menu locally, and then passes the card over the `CreateCardAnimation()`
-4. `CreateCardAnimation()` handles creating a basic card animation via coroutines.
+11. `CreateCardAnimation()` handles creating a basic card animation via coroutines.
     1. It also handles actually calling the card’s play function, which is done when the card animation completes.
-5. The Card Action `CardPlay` is actually called in the case for Phishing, the action is `AddEffect` which adds a `FacilityEffect` instance to facility’s `FacilityEffectManager`
+12. The Card Action `CardPlay` is actually called in the case for Phishing, the action is `AddEffect` which adds a `FacilityEffect` instance to facility’s `FacilityEffectManager`
     1. This specific action is Type: `ModifyPoints` Target: `NetworkPhysical` Magnitude: `-1`
     2. So it will reduce the network and physical points on the facility by 1
