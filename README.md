@@ -58,17 +58,20 @@ The upside to the p2p system is that we do not need to maintain any dedicated se
 
 ### Playtest Playtest Playtest
 
-The game is now in a state that it is testable by non developers. Beginning the next dev cycle with in depth playtesting, combined with targeted forms/questions to get feedback on the issues previously discussed, would be a great way to start. 
-
-Small video guide to playtest the game by oneself: https://www.youtube.com/watch?v=h0u-rbMuPx8
+- The game is now in a state that it is testable by non developers. Beginning the next dev cycle with in depth playtesting, combined with targeted forms/questions to get feedback on the issues previously discussed, would be a great way to start. 
+- Testing the game across LAN would be useful, for now we have only ever played the game on a single computer (localhost)
+- Small video guide to playtest the game by oneself: https://www.youtube.com/watch?v=h0u-rbMuPx8
 
 ### Adjust core issues
 
-From playtest feedback, personal preference, or team decisions, create a plan to fix some of the core issues with the game.
+- From playtest feedback, personal preference, or team decisions, create a plan to fix some of the core issues with the game.
+- Reduce complexity. At the games core, Red will always need to have way more to do since its a 1 red vs 4 blue team game.
+- We added complexity to fix Blue not having anything to do. Interesting cards are cool. A bunch of not very impactful small game mechanics, is not good for new players.
+- Some small issues left over on the end game scoring screen.
 
 ### Add Extras
-
-Add more animations, card effect animations, sounds ect..
+- There is a lot of room for added UX design and polish to help the player intuitively know what to do without reading a guide/rule sheet.
+- Add more animations, card effect animations, sounds ect..
 
 # More Details
 
