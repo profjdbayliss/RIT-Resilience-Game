@@ -2553,7 +2553,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -718, y: 475.64}
+  m_AnchoredPosition: {x: -685.9, y: 400.9}
   m_SizeDelta: {x: 64, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &55810811
@@ -21137,7 +21137,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeckName: blue
-  cardFileName: SectorDownCards.csv
   outputAtlasName: waterAtlas.png
   cardPrefab: {fileID: 1938897582}
 --- !u!1 &553243928
@@ -33321,7 +33320,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeckName: red
-  cardFileName: SectorDownCards.csv
   outputAtlasName: energyAtlas.png
   cardPrefab: {fileID: 1938897582}
 --- !u!1 &842196070
@@ -41230,7 +41228,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeckName: white;positive
-  cardFileName: SectorDownCards.csv
   outputAtlasName: posWhiteAtlas.png
   cardPrefab: {fileID: 1938897582}
 --- !u!1 &971169862
@@ -56678,7 +56675,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeckName: white;negative
-  cardFileName: SectorDownCards.csv
   outputAtlasName: negWhiteAtlas.png
   cardPrefab: {fileID: 1938897582}
 --- !u!1 &1556341610
@@ -57930,7 +57926,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 718, y: 475.64}
+  m_AnchoredPosition: {x: -617.6, y: 400.9}
   m_SizeDelta: {x: 64, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1615352942
