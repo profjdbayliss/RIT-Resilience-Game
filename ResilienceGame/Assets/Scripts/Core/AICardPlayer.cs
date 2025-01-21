@@ -118,4 +118,22 @@ public class AICardPlayer : CardPlayer {
         return null;
     }
 
+    // New method to handle AI logic for Blue Team
+    public void PlayBlueTeamCard() {
+        if (playerTeam != PlayerTeam.Blue) {
+            Debug.LogWarning("This method is only for Blue Team AI.");
+            return;
+        }
+
+        // Implement AI logic for Blue Team card play
+        Card cardToPlay = GetRandomPlayableCard(out GameObject dropLocation);
+        if (cardToPlay != null) {
+            HandleCardDrop(cardToPlay);
+            HandCards.Remove(cardToPlay.UniqueID);
+            if (dropLocation != null) {
+                cardToPlay.transform.SetParent(dropLocation.transform, true);
+                EnqueueAndSendCardMessageUpdate(CardMessageType.CardUpdate, cardToPlay.data.cardID, cardToPlay.UniqueID);
+            }
+        }
+    }
 }

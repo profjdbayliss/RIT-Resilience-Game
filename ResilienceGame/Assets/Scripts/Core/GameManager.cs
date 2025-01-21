@@ -515,8 +515,10 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
-
-
+        // Create blue AI players based on the number of red players
+        int redPlayerCount = playerDictionary.Values.Count(player => player.playerTeam == PlayerTeam.Red);
+        int blueAICount = redPlayerCount * 4;
+        CreateBlueAIPlayers(blueAICount);
 
         // Initialize the deck info and set various
         // player zones active
@@ -526,9 +528,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
         tutorialToggle.WhenGameStarts();
+    }
 
-
-
+    // Method to create blue AI players
+    private void CreateBlueAIPlayers(int count) {
+        for (int i = 0; i < count; i++) {
+            GameObject aiPlayerObj = Instantiate(aiPlayerPrefab);
+            RGNetworkPlayer aiPlayer = aiPlayerObj.GetComponent<RGNetworkPlayer>();
+            aiPlayer.InitializeAIPlayer("BlueAI_" + i, PlayerTeam.Blue);
+            NetworkServer.AddPlayerForConnection(null, aiPlayerObj);
+        }
     }
 
     #endregion
@@ -1097,7 +1106,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             GamePhase.DrawBlue => GamePhase.ActionBlue,
             GamePhase.ActionBlue => GamePhase.DiscardBlue,
             GamePhase.DiscardBlue => GamePhase.BonusBlue,
-            GamePhase.BonusBlue => GamePhase.DrawRed,
             _ => GamePhase.End
         };
     }

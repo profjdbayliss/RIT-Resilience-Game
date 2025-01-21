@@ -9,8 +9,8 @@ using UnityEngine.SceneManagement;
 public class RGNetworkManager : NetworkManager
 {
     public GameObject playerListPrefab;
-   // public GameObject cardPlayerPrefab;
-   
+    public GameObject aiPlayerPrefab; // Prefab for AI players
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -20,11 +20,11 @@ public class RGNetworkManager : NetworkManager
         NetworkServer.Spawn(obj);
     }
 
-
     public override void OnStartClient()
     {
         base.OnStartClient();
     }
+
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
@@ -33,12 +33,27 @@ public class RGNetworkManager : NetworkManager
         RGNetworkPlayer player = (RGNetworkPlayer)conn.identity.GetComponent<RGNetworkPlayer>();
         string name = player.mPlayerName;
         var cardPlayer = player.cardPlayerInstance;
-        
+
         // Add to network player list
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
 
+        // Check the number of red players and create blue AI players if needed
+        int redPlayerCount = RGNetworkPlayerList.instance.GetPlayerCountByTeam(PlayerTeam.Red);
+        int blueAICount = redPlayerCount * 4;
+        CreateBlueAIPlayers(blueAICount);
     }
 
+    // Method to create blue AI players
+    private void CreateBlueAIPlayers(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            GameObject aiPlayerObj = Instantiate(aiPlayerPrefab);
+            RGNetworkPlayer aiPlayer = aiPlayerObj.GetComponent<RGNetworkPlayer>();
+            aiPlayer.InitializeAIPlayer("BlueAI_" + i, PlayerTeam.Blue);
+            NetworkServer.AddPlayerForConnection(null, aiPlayerObj);
+        }
+    }
 
     // Called by UI element NetworkAddressInput.OnValueChanged
     public void SetHostname(string hostname)
