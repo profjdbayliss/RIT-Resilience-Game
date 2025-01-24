@@ -513,29 +513,53 @@ public class UserInterface : MonoBehaviour {
         BuildEndgameScoreMenu();
 
     }
-    private void BuildEndgameScoreMenu() {
+    private void BuildEndgameScoreMenu()
+    {
+        // Clear existing menu items to avoid duplicates
+        foreach (Transform child in leftParent)
+            Destroy(child.gameObject);
+        foreach (Transform child in rightParent)
+            Destroy(child.gameObject);
+
+        // Number of players and score items
         int numPlayers = GameManager.Instance.playerDictionary.Count;
-
         List<(int score, GameObject scoreItem)> scoreItems = new List<(int score, GameObject scoreItem)>();
-        int num = 0;
-        foreach (CardPlayer player in GameManager.Instance.playerDictionary.Values) {
 
+        int num = 0;
+        foreach (CardPlayer player in GameManager.Instance.playerDictionary.Values)
+        {
+            // Get player score and debug the info
             int _score = ScoreManager.Instance.GetPlayerScore(player.NetID);
+            Debug.Log($"Adding player: {player.playerName} with score: {_score}");
+
+            // Instantiate the score item and set parent
             var scoreItem = Instantiate(playerScoreItemPrefab, num > numPlayers / 2 ? rightParent : leftParent);
             num++;
-            var bg = scoreItem.GetComponent<Image>();
-            //todo: set bg color based on team color
-            scoreItem.GetComponentInChildren<TextMeshProUGUI>().text = $"{player.playerName}:\t{_score}";
-            scoreItems.Add((_score, scoreItem));
 
+            // Assign a unique name for debugging purposes
+            scoreItem.name = $"PlayerScoreMenuItem_{player.NetID}";
+
+            // Update text
+            var textComponent = scoreItem.GetComponentInChildren<TextMeshProUGUI>();
+            if (textComponent != null)
+            {
+                textComponent.text = $"{player.playerName}:\t{_score}";
+            }
+
+            // Add to score items list
+            scoreItems.Add((_score, scoreItem));
         }
+
+        // Sort items by score (descending order)
         scoreItems.Sort((a, b) => b.score.CompareTo(a.score));
 
-        for (int i = 0; i < scoreItems.Count; i++) {
+        // Update sibling indices to reflect the score order
+        for (int i = 0; i < scoreItems.Count; i++)
+        {
             scoreItems[i].scoreItem.transform.SetSiblingIndex(i);
         }
-
     }
+
     public void HideEndGameCanvas() {
         endGameCanvas.SetActive(false);
     }
