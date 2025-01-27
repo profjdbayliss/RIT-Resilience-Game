@@ -12,14 +12,17 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] private GameObject rulesMenu;
     [SerializeField] private string rulesPath;
     [SerializeField] private RulesPagesController rulesPagesController;
+    AudioSource audio; 
+    [SerializeField] private AudioClip noSound;
 
-    // Start is called before the first frame update
-    void Start() {
+// Start is called before the first frame update
+void Start() {
         var networkManager = FindObjectOfType<RGNetworkManager>();
         if (networkManager != null) {
             Destroy(networkManager.gameObject);
         }
-        
+
+        audio = GetComponent<AudioSource>();
     }
     public void ToggleRulesMenu(bool enable) {
         rulesMenu.SetActive(enable);
@@ -82,5 +85,8 @@ public class MainMenu : MonoBehaviour {
         }
     }
 
-
+    public void PlayNoSound()
+    {
+        audio.PlayOneShot(noSound, 1);
+    }
 }
