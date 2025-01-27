@@ -8,6 +8,7 @@ using System.IO;
 using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour, IRGObservable {
 
@@ -90,7 +91,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     //// UI Elements
     //[Header("UI Elements")]
-
+    public GameObject playerSlide;
 
     // End Game
     //[Header("End Game")]
@@ -155,20 +156,24 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #region Initialization
     // Called by dropdown list box to set up the player type
     public void SetPlayerType() {
-        if (playerDeckChoice == null) {
+        //Creates the float by getting the value from the slider
+        float sliderValue = playerSlide.GetComponent<Slider>().value;
+
+        //Left over from when it was a drop down box. Could possibly be removed. 
+        if (sliderValue == null) {
             playerDeckChoice = playerDeckList.GetComponent<TMPro.TMP_Dropdown>();
             if (playerDeckChoice == null) {
                 Debug.Log("deck choice is null!");
             }
         }
 
-        if (playerDeckChoice != null) {
+        if (sliderValue != null) {
             // set this player's type
-            switch (playerDeckChoice.value) {
-                case 0:
+            switch (sliderValue) {
+                case 0: //red
                     playerTeam = PlayerTeam.Red;
                     break;
-                case 1:
+                case 1: //blue
                     playerTeam = PlayerTeam.Blue;
                     break;
                 default:
