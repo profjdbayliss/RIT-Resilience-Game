@@ -56858,6 +56858,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 96490225}
     m_Modifications:
+    - target: {fileID: 608634684141155029, guid: 76f14c0fca0b58f48aa95d4025c402c4, type: 3}
+      propertyPath: m_text
+      value: PORCHE
+      objectReference: {fileID: 0}
+    - target: {fileID: 608634684141155029, guid: 76f14c0fca0b58f48aa95d4025c402c4, type: 3}
+      propertyPath: m_fontSize
+      value: 23.15
+      objectReference: {fileID: 0}
     - target: {fileID: 6593860481028707754, guid: 76f14c0fca0b58f48aa95d4025c402c4, type: 3}
       propertyPath: m_IsActive
       value: 0
