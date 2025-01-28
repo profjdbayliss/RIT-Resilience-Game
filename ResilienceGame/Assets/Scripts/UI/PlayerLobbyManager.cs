@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class PlayerLobbyManager : MonoBehaviour {
+public class PlayerLobbyManager : MonoBehaviour
+{
     [SerializeField] private GameObject playerPopupPrefab;
     [SerializeField] private RectTransform blueLeftParent;
     [SerializeField] private RectTransform blueRightParent;
@@ -17,52 +18,83 @@ public class PlayerLobbyManager : MonoBehaviour {
     private int numBluePlayers = 0;
     private int numRedPlayers = 0;
 
+    private Queue<(string name, PlayerTeam team)> playerQueue = new Queue<(string name, PlayerTeam team)>();
+    private bool isAddingPlayer = false;
 
     // Start is called before the first frame update
-    void Start() {
+    void Start()
+    {
 
     }
 
     // Update is called once per frame
-    void Update() {
+    void Update()
+    {
 
     }
 
-    public void AddPlayer(string name, PlayerTeam team) {
-        switch (team) {
-            case PlayerTeam.Red:
-                if (numRedPlayers <= redPlayers.Count)
-                    AddToRed(name);
-                else {
-                    Debug.LogWarning("Red player list is full, adding to blue instead");
-                    AddToBlue(name);
-                }
-                break;
-            case PlayerTeam.Blue:
-                if (numBluePlayers <= bluePlayers.Count)
-                    AddToBlue(name);
-                else {
-                    Debug.LogWarning("Blue player list is full, adding to red instead");
-                    AddToRed(name);
-                }
-                break;
+    public void AddPlayer(string name, PlayerTeam team)
+    {
+        playerQueue.Enqueue((name, team));
+        if (!isAddingPlayer)
+        {
+            StartCoroutine(AddPlayerSequentially());
         }
     }
-    public void AddToRed(string name) {
+
+    private IEnumerator AddPlayerSequentially()
+    {
+        isAddingPlayer = true;
+        while (playerQueue.Count > 0)
+        {
+            var (name, team) = playerQueue.Dequeue();
+            switch (team)
+            {
+                case PlayerTeam.Red:
+                    if (numRedPlayers < redPlayers.Count)
+                        AddToRed(name);
+                    else
+                    {
+                        Debug.LogWarning("Red player list is full, adding to blue instead");
+                        AddToBlue(name);
+                    }
+                    break;
+                case PlayerTeam.Blue:
+                    if (numBluePlayers < bluePlayers.Count)
+                        AddToBlue(name);
+                    else
+                    {
+                        Debug.LogWarning("Blue player list is full, adding to red instead");
+                        AddToRed(name);
+                    }
+                    break;
+            }
+            yield return new WaitForSeconds(0.5f); // Adjust the delay as needed
+        }
+        isAddingPlayer = false;
+    }
+
+    public void AddToRed(string name)
+    {
         redPlayers[numRedPlayers].SetPlayerNameAndTeam(name, PlayerTeam.Red);
         numRedPlayers++;
-
-
     }
-    public void AddToBlue(string name) {
+
+    public void AddToBlue(string name)
+    {
         bluePlayers[numBluePlayers].SetPlayerNameAndTeam(name, PlayerTeam.Blue);
         numBluePlayers++;
     }
-    public void ChangePlayerTeam(string name, PlayerTeam team) {
-        switch (team) {
+
+    public void ChangePlayerTeam(string name, PlayerTeam team)
+    {
+        switch (team)
+        {
             case PlayerTeam.Red:
-                foreach (var player in bluePlayers) {
-                    if (player.PlayerName.text == name) {
+                foreach (var player in bluePlayers)
+                {
+                    if (player.PlayerName.text == name)
+                    {
                         player.SetPlayerNameAndTeam(name, PlayerTeam.Red);
                         numBluePlayers--;
                         numRedPlayers++;
@@ -71,8 +103,10 @@ public class PlayerLobbyManager : MonoBehaviour {
                 }
                 break;
             case PlayerTeam.Blue:
-                foreach (var player in redPlayers) {
-                    if (player.PlayerName.text == name) {
+                foreach (var player in redPlayers)
+                {
+                    if (player.PlayerName.text == name)
+                    {
                         player.SetPlayerNameAndTeam(name, PlayerTeam.Blue);
                         numRedPlayers--;
                         numBluePlayers++;
