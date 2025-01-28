@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using TMPro;
 using UnityEngine;
 
-public class PlayerLobbyManager : MonoBehaviour
+public class PlayerLobbyManager : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPopupPrefab;
     [SerializeField] private RectTransform blueLeftParent;
@@ -13,107 +14,143 @@ public class PlayerLobbyManager : MonoBehaviour
     [SerializeField] private Color redColor;
     [SerializeField] private Color blueColor;
 
-    [SerializeField] private List<LobbyItem> bluePlayers = new List<LobbyItem>();
-    [SerializeField] private List<LobbyItem> redPlayers = new List<LobbyItem>();
-    private int numBluePlayers = 0;
-    private int numRedPlayers = 0;
+    public SyncList<PlayerData> players = new SyncList<PlayerData>();
 
-    private Queue<(string name, PlayerTeam team)> playerQueue = new Queue<(string name, PlayerTeam team)>();
-    private bool isAddingPlayer = false;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-
+        players.Callback += OnPlayersChanged;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDestroy()
     {
+        players.Callback -= OnPlayersChanged;
+    }
 
+    private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem)
+    {
+        switch (op)
+        {
+            case SyncList<PlayerData>.Operation.OP_ADD:
+                AddPlayerToUI(newItem);
+                break;
+
+            case SyncList<PlayerData>.Operation.OP_REMOVEAT:
+                RemovePlayerFromUI(oldItem.Name);
+                break;
+
+            case SyncList<PlayerData>.Operation.OP_INSERT:
+                AddPlayerToUI(newItem);
+                break;
+
+            case SyncList<PlayerData>.Operation.OP_CLEAR:
+                ClearUI();
+                break;
+
+            default:
+                Debug.LogWarning($"Unhandled operation: {op}");
+                break;
+        }
     }
 
     public void AddPlayer(string name, PlayerTeam team)
     {
-        playerQueue.Enqueue((name, team));
-        if (!isAddingPlayer)
+        if (isServer)
         {
-            StartCoroutine(AddPlayerSequentially());
+            var newPlayer = new PlayerData { Name = name, Team = team };
+            players.Add(newPlayer);
         }
     }
 
-    private IEnumerator AddPlayerSequentially()
+    public void RemovePlayer(string name)
     {
-        isAddingPlayer = true;
-        while (playerQueue.Count > 0)
+        if (isServer)
         {
-            var (name, team) = playerQueue.Dequeue();
-            switch (team)
+            var player = players.Find(p => p.Name == name);
+            if (player != null)
             {
-                case PlayerTeam.Red:
-                    if (numRedPlayers < redPlayers.Count)
-                        AddToRed(name);
-                    else
-                    {
-                        Debug.LogWarning("Red player list is full, adding to blue instead");
-                        AddToBlue(name);
-                    }
-                    break;
-                case PlayerTeam.Blue:
-                    if (numBluePlayers < bluePlayers.Count)
-                        AddToBlue(name);
-                    else
-                    {
-                        Debug.LogWarning("Blue player list is full, adding to red instead");
-                        AddToRed(name);
-                    }
-                    break;
+                players.Remove(player);
             }
-            yield return new WaitForSeconds(0.5f); // Adjust the delay as needed
         }
-        isAddingPlayer = false;
     }
 
-    public void AddToRed(string name)
+    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam)
     {
-        redPlayers[numRedPlayers].SetPlayerNameAndTeam(name, PlayerTeam.Red);
-        numRedPlayers++;
-    }
-
-    public void AddToBlue(string name)
-    {
-        bluePlayers[numBluePlayers].SetPlayerNameAndTeam(name, PlayerTeam.Blue);
-        numBluePlayers++;
-    }
-
-    public void ChangePlayerTeam(string name, PlayerTeam team)
-    {
-        switch (team)
+        if (isServer)
         {
-            case PlayerTeam.Red:
-                foreach (var player in bluePlayers)
-                {
-                    if (player.PlayerName.text == name)
-                    {
-                        player.SetPlayerNameAndTeam(name, PlayerTeam.Red);
-                        numBluePlayers--;
-                        numRedPlayers++;
-                        return;
-                    }
-                }
-                break;
-            case PlayerTeam.Blue:
-                foreach (var player in redPlayers)
-                {
-                    if (player.PlayerName.text == name)
-                    {
-                        player.SetPlayerNameAndTeam(name, PlayerTeam.Blue);
-                        numRedPlayers--;
-                        numBluePlayers++;
-                        return;
-                    }
-                }
-                break;
+            var player = players.Find(p => p.Name == playerName);
+            if (player != null)
+            {
+                player.Team = newTeam;
+                players[players.IndexOf(player)] = player; // Trigger a SyncList update
+            }
         }
     }
+
+    private void AddPlayerToUI(PlayerData playerData)
+    {
+        GameObject newPlayerPopup = Instantiate(playerPopupPrefab, GetParentForTeam(playerData.Team));
+        LobbyItem lobbyItem = newPlayerPopup.GetComponent<LobbyItem>();
+        lobbyItem.SetPlayerNameAndTeam(playerData.Name, playerData.Team);
+    }
+
+    private void RemovePlayerFromUI(string name)
+    {
+        var lobbyItem = FindLobbyItemByName(name);
+        if (lobbyItem != null)
+        {
+            Destroy(lobbyItem.gameObject);
+        }
+    }
+
+    private void ClearUI()
+    {
+        foreach (Transform child in redParent) Destroy(child.gameObject);
+        foreach (Transform child in blueLeftParent) Destroy(child.gameObject);
+        foreach (Transform child in blueRightParent) Destroy(child.gameObject);
+    }
+
+    private Transform GetParentForTeam(PlayerTeam team)
+    {
+        return team == PlayerTeam.Red ? redParent : blueLeftParent; // Adjust as needed
+    }
+
+    private LobbyItem FindLobbyItemByName(string name)
+    {
+        // Check in red, blueLeft, and blueRight parents
+        foreach (Transform child in redParent)
+        {
+            var lobbyItem = child.GetComponent<LobbyItem>();
+            if (lobbyItem != null && lobbyItem.PlayerName.text == name)
+                return lobbyItem;
+        }
+
+        foreach (Transform child in blueLeftParent)
+        {
+            var lobbyItem = child.GetComponent<LobbyItem>();
+            if (lobbyItem != null && lobbyItem.PlayerName.text == name)
+                return lobbyItem;
+        }
+
+        foreach (Transform child in blueRightParent)
+        {
+            var lobbyItem = child.GetComponent<LobbyItem>();
+            if (lobbyItem != null && lobbyItem.PlayerName.text == name)
+                return lobbyItem;
+        }
+
+        return null;
+    }
+}
+
+public enum PlayerTeam
+{
+    Red,
+    Blue
+}
+
+[System.Serializable]
+public class PlayerData
+{
+    public string Name;
+    public PlayerTeam Team;
 }
