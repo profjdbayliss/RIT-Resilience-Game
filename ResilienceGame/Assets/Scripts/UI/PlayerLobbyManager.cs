@@ -29,8 +29,8 @@ public class PlayerLobbyManager : NetworkBehaviour
     private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem)
     {
         UserInterface.Instance.BuildLobbyMenu(); // Notify UI to update
+        UpdatePlayerLobbyUI(); // Update the actual game UI
     }
-
 
     public void AddPlayer(string name, PlayerTeam team)
     {
@@ -39,7 +39,6 @@ public class PlayerLobbyManager : NetworkBehaviour
             players.Add(new PlayerData { Name = name, Team = team });
         }
     }
-
 
     public void RemovePlayer(string name)
     {
@@ -119,6 +118,15 @@ public class PlayerLobbyManager : NetworkBehaviour
         }
 
         return null;
+    }
+
+    private void UpdatePlayerLobbyUI()
+    {
+        ClearUI();
+        foreach (var player in players)
+        {
+            AddPlayerToUI(player);
+        }
     }
 }
 
