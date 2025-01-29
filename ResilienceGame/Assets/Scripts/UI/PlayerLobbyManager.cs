@@ -11,8 +11,8 @@ public class PlayerLobbyManager : NetworkBehaviour
     [SerializeField] private RectTransform blueRightParent;
     [SerializeField] private RectTransform redParent;
 
-    [SerializeField] private Color redColor;
-    [SerializeField] private Color blueColor;
+    [SerializeField] public Color redColor;
+    [SerializeField] public Color blueColor;
 
     public SyncList<PlayerData> players = new SyncList<PlayerData>();
 
@@ -28,38 +28,18 @@ public class PlayerLobbyManager : NetworkBehaviour
 
     private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem)
     {
-        switch (op)
-        {
-            case SyncList<PlayerData>.Operation.OP_ADD:
-                AddPlayerToUI(newItem);
-                break;
-
-            case SyncList<PlayerData>.Operation.OP_REMOVEAT:
-                RemovePlayerFromUI(oldItem.Name);
-                break;
-
-            case SyncList<PlayerData>.Operation.OP_INSERT:
-                AddPlayerToUI(newItem);
-                break;
-
-            case SyncList<PlayerData>.Operation.OP_CLEAR:
-                ClearUI();
-                break;
-
-            default:
-                Debug.LogWarning($"Unhandled operation: {op}");
-                break;
-        }
+        UserInterface.Instance.BuildLobbyMenu(); // Notify UI to update
     }
+
 
     public void AddPlayer(string name, PlayerTeam team)
     {
         if (isServer)
         {
-            var newPlayer = new PlayerData { Name = name, Team = team };
-            players.Add(newPlayer);
+            players.Add(new PlayerData { Name = name, Team = team });
         }
     }
+
 
     public void RemovePlayer(string name)
     {
@@ -81,7 +61,7 @@ public class PlayerLobbyManager : NetworkBehaviour
             if (player != null)
             {
                 player.Team = newTeam;
-                players[players.IndexOf(player)] = player; // Trigger a SyncList update
+                players[players.IndexOf(player)] = player; // SyncList updates automatically
             }
         }
     }
@@ -140,12 +120,6 @@ public class PlayerLobbyManager : NetworkBehaviour
 
         return null;
     }
-}
-
-public enum PlayerTeam
-{
-    Red,
-    Blue
 }
 
 [System.Serializable]
