@@ -17,7 +17,7 @@ public class PickADeckScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        folderPath = Application.streamingAssetsPath;  //Get path of folder
+        folderPath = Application.streamingAssetsPath + "/SavedCSVs/";  //Get path of folder
 
         isPickACardCanvasActive = false;
         connectPickACardCanvas.SetActive(isPickACardCanvasActive);
@@ -27,7 +27,7 @@ public class PickADeckScript : MonoBehaviour
         refreshCards();
     }
 
-    public void ToggleConnectHelpCanvas()
+    public void ToggleDeckCanvas()
     {
         isPickACardCanvasActive = !isPickACardCanvasActive;
         connectPickACardCanvas.SetActive(isPickACardCanvasActive);
@@ -35,6 +35,13 @@ public class PickADeckScript : MonoBehaviour
 
     public void refreshCards()
     {
+        //Destroys all the cards to comepletly refresh the list
+        for (int i = 0; i < decksOfCards.Count; i++)
+        {
+            Destroy(decksOfCards[i]);
+        }
+
+        //Clears the list
         decksOfCards.Clear();
 
         //Temp NEW array to push into the list

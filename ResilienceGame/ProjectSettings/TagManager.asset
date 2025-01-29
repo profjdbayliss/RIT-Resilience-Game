@@ -12,6 +12,8 @@ TagManager:
   - DiscardDropLocation
   - SectorMenu
   - MapFacilityDropLocation
+  - NetworkManager
+  - DeckNameHolder
   layers:
   - Default
   - TransparentFX
