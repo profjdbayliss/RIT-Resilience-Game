@@ -211,6 +211,7 @@ public class UserInterface : MonoBehaviour {
             }
         }
         UpdateMeepleAmountUI();
+        UpdateLobbyUI();
     }
 
     private void Awake() {
@@ -249,8 +250,26 @@ public class UserInterface : MonoBehaviour {
             if (bgImage != null)
                 bgImage.color = player.Team == PlayerTeam.Red ? playerLobbyManager.redColor : playerLobbyManager.blueColor;
         }
+        UpdateLobbyUI();
     }
 
+    public void UpdateLobbyUI()
+    {
+        foreach (Transform child in playerMenuContainer)
+            Destroy(child.gameObject);
+
+        foreach (var player in playerLobbyManager.players)
+        {
+            var playerItem = Instantiate(playerMenuPrefab, playerMenuContainer);
+            var textComponent = playerItem.GetComponentInChildren<TextMeshProUGUI>();
+            if (textComponent != null)
+                textComponent.text = $"{player.Name} - Team: {player.Team}";
+
+            var bgImage = playerItem.GetComponent<Image>();
+            if (bgImage != null)
+                bgImage.color = player.Team == PlayerTeam.Red ? playerLobbyManager.redColor : playerLobbyManager.blueColor;
+        }
+    }
 
     public void UpdateMeepleAmountUI(/*float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples*/) {
         for (int i = 0; i < meeplesAmountText.Length; i++) {
