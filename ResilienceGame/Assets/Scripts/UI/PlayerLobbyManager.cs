@@ -37,6 +37,7 @@ public class PlayerLobbyManager : NetworkBehaviour
         if (isServer)
         {
             players.Add(new PlayerData { Name = name, Team = team });
+            UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
         }
     }
 
