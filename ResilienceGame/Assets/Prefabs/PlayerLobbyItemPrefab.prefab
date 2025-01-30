@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 8619153982037929661}
   - component: {fileID: 8619153982037929658}
   - component: {fileID: 6027514099998295820}
+  - component: {fileID: 8619153982037929659}
   m_Layer: 5
   m_Name: PlayerLobbyItemPrefab
   m_TagString: Untagged
@@ -276,6 +277,20 @@ MonoBehaviour:
   missingPlayerColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
   PlayerName: {fileID: 8619153982340501886}
   backgroundImage: {fileID: 7790799613682159410}
+--- !u!114 &8619153982037929659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8619153982037929663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 457a9e1b-7f8a-4a9e-8a1e-7b34d9b748ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerName: {fileID: 8619153982340501886}
+  Team: 0
 --- !u!1 &8619153982340505216
 GameObject:
   m_ObjectHideFlags: 0
