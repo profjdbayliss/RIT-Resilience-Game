@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -47,24 +48,37 @@ public class PickADeckScript : MonoBehaviour
         //Temp NEW array to push into the list
         string[] filePathsArray = Directory.GetFiles(folderPath, "*.csv"); // Get all files of type .csv in this folder
 
+        //extra I, meant for desks in the list that actually work/are formated for sector down.
+        int iExtra = 0;
         //Adds to the list
         for (int i = 0; i < filePathsArray.Length; i++)
         {
             //Temp file that's the file name. Will be parsed in later
             string fileName = Path.GetFileName(filePathsArray[i]);
 
+            string[] linesCSV = File.ReadAllLines(filePathsArray[i]);
+
+            if (linesCSV[0] == "Team,Duplication,Method,Target,SectorsAffected,TargetAmount,Title,imgRow,imgCol,bgCol,bgRow,MeeplesChanged,MeepleIChange,BlueCost,BlackCost,PurpleCost,FacilityPoint,CardsDrawn,CardsRemoved,Effect,EffectCount,PrerequisiteEffect,Duration,DoomEffect,DiceRoll,FlavourText,Description,imgLocation,Obfuscate")
+            {
             //Instatiates the deck prefab (it's empty)
             decksOfCards.Add(Instantiate(deckPrefab));
 
             //Parrents the cards
-            decksOfCards[i].transform.parent = deckArea.transform;
+            decksOfCards[iExtra].transform.parent = deckArea.transform;
 
             //So the scale doesn't mess up when they spawn in. 
-            decksOfCards[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 0.33f);
+            decksOfCards[iExtra].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 0.33f);
 
             //Adds in the data to the deck
-            decksOfCards[i].GetComponent<DeckValues>().deckLocationAndName = filePathsArray[i];
-            decksOfCards[i].GetComponent<DeckValues>().name = fileName;
+            decksOfCards[iExtra].GetComponent<DeckValues>().deckLocationAndName = filePathsArray[i];
+            decksOfCards[iExtra].GetComponent<DeckValues>().name = fileName;
+
+            iExtra++;
+            }
+            else
+            {
+                Debug.Log($"{fileName} is invalid! I'm gonna kill you!");
+            }
         }
     }
 }
