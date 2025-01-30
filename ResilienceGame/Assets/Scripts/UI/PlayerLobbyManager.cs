@@ -91,7 +91,35 @@ public class PlayerLobbyManager : NetworkBehaviour
 
     private Transform GetParentForTeam(PlayerTeam team)
     {
-        return team == PlayerTeam.Red ? redParent : blueLeftParent; // Adjust as needed
+        if (team == PlayerTeam.Red)
+        {
+            return redParent;
+        }
+        else
+        {
+            return GetNextAvailableSlot();
+        }
+    }
+
+    private Transform GetNextAvailableSlot()
+    {
+        foreach (Transform child in blueLeftParent)
+        {
+            if (child.childCount == 0)
+            {
+                return child;
+            }
+        }
+
+        foreach (Transform child in blueRightParent)
+        {
+            if (child.childCount == 0)
+            {
+                return child;
+            }
+        }
+
+        return blueLeftParent; // Default to blueLeftParent if all slots are taken
     }
 
     private LobbyItem FindLobbyItemByName(string name)

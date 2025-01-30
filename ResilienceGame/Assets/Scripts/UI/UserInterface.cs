@@ -275,8 +275,18 @@ public class UserInterface : MonoBehaviour
                 textComponent.text = $"{player.Name} - Team: {player.Team}";
 
             var bgImage = playerItem.GetComponent<Image>();
-            if (bgImage != null)
-                bgImage.color = player.Team == PlayerTeam.Red ? playerLobbyManager.redColor : playerLobbyManager.blueColor;
+                if (player.Team == PlayerTeam.Red)
+                {
+                    bgImage.color = playerLobbyManager.redColor;
+                }
+                else if (player.Team == PlayerTeam.Blue)
+                {
+                    bgImage.color = playerLobbyManager.blueColor;
+                }
+                else
+                {
+                    bgImage.color = Color.gray; // Default/fallback color
+                }
         }
     }
 
