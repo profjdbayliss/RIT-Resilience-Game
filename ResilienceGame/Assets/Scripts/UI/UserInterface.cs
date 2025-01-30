@@ -6,7 +6,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UserInterface : MonoBehaviour {
+public class UserInterface : MonoBehaviour
+{
 
     //public CardPlayer actualPlayer;
     //public CardPlayer opponentPlayer; //TODO: remove this and replace with a list of players
@@ -56,7 +57,7 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Transform gameLogParent;
     [SerializeField] private Image infoBg;
     [SerializeField] private Image doomClockImage;
-   
+
     [SerializeField] private GameObject doomClockBg;
     [SerializeField] private RectTransform playerMenuContainer;
     [SerializeField] private RectTransform playerMenuParent;
@@ -123,8 +124,8 @@ public class UserInterface : MonoBehaviour {
     [SerializeField] private Color[] doomClockLinesColor;
     [SerializeField] private Color sectorOutlineOwnerColor;
 
-    
-    
+
+
 
 
 
@@ -134,7 +135,8 @@ public class UserInterface : MonoBehaviour {
 
     private Coroutine mapStateChangeRoutine;
     private List<Coroutine> menuItemMoveRoutines = new List<Coroutine>();
-    public enum MapState {
+    public enum MapState
+    {
         Hidden,
         FullScreen,
         SectorPopup
@@ -190,7 +192,8 @@ public class UserInterface : MonoBehaviour {
     //[Header("Drag and Drop")]
 
     // Start is called before the first frame update
-    public void StartGame(PlayerTeam playerType) {
+    public void StartGame(PlayerTeam playerType)
+    {
         playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType);
         BuildLobbyMenu();
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
@@ -200,13 +203,16 @@ public class UserInterface : MonoBehaviour {
         mPlayerName.text = RGNetworkPlayerList.instance.localPlayerName;
         mPlayerDeckType.text = "" + playerType;
         Debug.Log($"Creating UI for {RGNetworkPlayerList.instance.localPlayerName} who is type {playerType}");
-        if (playerType != PlayerTeam.Red) {
+        if (playerType != PlayerTeam.Red)
+        {
             meepleButtons[3].gameObject.SetActive(false);
         }
         playerMenuItems = new List<PlayerPopupMenuItem>();
         var sectorMenu = playerMenuContainer.GetChild(0);
-        if (sectorMenu.CompareTag("SectorMenu")) {
-            for (int i = 0; i < sectorMenu.childCount; i++) {
+        if (sectorMenu.CompareTag("SectorMenu"))
+        {
+            for (int i = 0; i < sectorMenu.childCount; i++)
+            {
                 sectorXIcons.Add(sectorMenu.GetChild(i).GetChild(0).GetComponent<Image>());
             }
         }
@@ -214,12 +220,15 @@ public class UserInterface : MonoBehaviour {
         UpdateLobbyUI();
     }
 
-    private void Awake() {
+    private void Awake()
+    {
         Instance = this;
     }
 
-    public void SetPhaseText(GamePhase phase) {
-        mPhaseText.text = phase switch {
+    public void SetPhaseText(GamePhase phase)
+    {
+        mPhaseText.text = phase switch
+        {
             GamePhase.Start => "Start",
             GamePhase.DrawRed => "Red's Draw",
             GamePhase.DrawBlue => "Blues' Draw",
@@ -271,9 +280,12 @@ public class UserInterface : MonoBehaviour {
         }
     }
 
-    public void UpdateMeepleAmountUI(/*float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples*/) {
-        for (int i = 0; i < meeplesAmountText.Length; i++) {
-            if (i == 3 && GameManager.Instance.actualPlayer.playerTeam != PlayerTeam.Red) {
+    public void UpdateMeepleAmountUI(/*float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples*/)
+    {
+        for (int i = 0; i < meeplesAmountText.Length; i++)
+        {
+            if (i == 3 && GameManager.Instance.actualPlayer.playerTeam != PlayerTeam.Red)
+            {
                 break;
             }
             meeplesAmountText[i].text = $"{GameManager.Instance.actualPlayer.currentMeeples[i]}/{GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i)}";
@@ -285,23 +297,30 @@ public class UserInterface : MonoBehaviour {
         //if (GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red)
         //    meeplesAmountText[3].text = colorlessMeeples.ToString();
     }
-    public void EnableMeepleButtons() {
-        foreach (Button button in meepleButtons) {
+    public void EnableMeepleButtons()
+    {
+        foreach (Button button in meepleButtons)
+        {
             button.interactable = true;
         }
     }
-    public void DisableMeepleButtons() {
-        foreach (Button button in meepleButtons) {
+    public void DisableMeepleButtons()
+    {
+        foreach (Button button in meepleButtons)
+        {
             button.interactable = false;
         }
     }
     //called by the buttons in the sector canvas
-    public void TryButtonSpendMeeple(int index) {
-        if (meepleButtons[index].interactable) {
+    public void TryButtonSpendMeeple(int index)
+    {
+        if (meepleButtons[index].interactable)
+        {
             GameManager.Instance.actualPlayer.SpendMeepleWithButton(index);
         }
     }
-    public void EnableDiscardDrop() {
+    public void EnableDiscardDrop()
+    {
         //discardDropZone.SetActive(true);
         if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
         discardMoveRoutine =
@@ -310,7 +329,8 @@ public class UserInterface : MonoBehaviour {
 
         tutorialToggle.DiscardPanelToggle(true);
     }
-    public void DisableDiscardDrop() {
+    public void DisableDiscardDrop()
+    {
         // discardDropZone.SetActive(false);
         if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
         discardMoveRoutine =
@@ -318,78 +338,96 @@ public class UserInterface : MonoBehaviour {
                 MoveMenuItem(discardRect, discardHiddenPos, sectorAnimDuration));
         tutorialToggle.DiscardPanelToggle(false);
     }
-    public void EnableMeepleButtonByIndex(int index) {
+    public void EnableMeepleButtonByIndex(int index)
+    {
         meepleButtons[index].interactable = true;
     }
-    public void DisableMeepleButtonByIndex(int index) {
+    public void DisableMeepleButtonByIndex(int index)
+    {
         meepleButtons[index].interactable = false;
     }
-    public void ToggleGameCanvas(bool enable) {
+    public void ToggleGameCanvas(bool enable)
+    {
         gameCanvas.enabled = enable;
     }
 
-    public void ToggleStartScreen(bool enable) {
+    public void ToggleStartScreen(bool enable)
+    {
         startScreen.SetActive(enable);
     }
-    public void ToggleEndPhaseButton(bool enable) {
+    public void ToggleEndPhaseButton(bool enable)
+    {
         mEndPhaseButton.GetComponent<Button>().interactable = enable;
         mEndPhaseButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
         //mEndPhaseButton.SetActive(enable);
     }
-    public void ToggleOvertimeButton(bool enable) {
+    public void ToggleOvertimeButton(bool enable)
+    {
         if (!overTimeButton.activeSelf) return;
         overTimeButton.GetComponent<Button>().interactable = enable;
         overTimeButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
     }
-    public void DisableOverTimeButtonForRed() {
+    public void DisableOverTimeButtonForRed()
+    {
         overTimeButton.SetActive(false);
     }
     //adds the string message to the game log
     //if the message is from the network, or this is the server, it will be added to the game log
     //otherwise its sent to the server and returned to ensure log consistency
-    public void AddActionLogMessage(string message, bool fromNet, bool IsServer, ref List<string> messageLog) {
-        if (fromNet || IsServer) {
+    public void AddActionLogMessage(string message, bool fromNet, bool IsServer, ref List<string> messageLog)
+    {
+        if (fromNet || IsServer)
+        {
             Instantiate(gameLogMessagePrefab, gameLogParent).GetComponent<TextMeshProUGUI>().text = message;
             Debug.Log($"Created log message: {message}");
             latestActionText.text = message;
             messageLog.Add(message);
-            if (IsServer) {
+            if (IsServer)
+            {
                 RGNetworkPlayerList.instance.SendStringToClients(message);
             }
         }
-        else {
+        else
+        {
             RGNetworkPlayerList.instance.SendStringToServer(message);
         }
 
     }
-    public void UpdateUISizeTrackers() {
+    public void UpdateUISizeTrackers()
+    {
         playerDeckText.text = GameManager.Instance.actualPlayer.DeckIDs.Count.ToString();
         playerHandText.text = GameManager.Instance.actualPlayer.HandCards.Count.ToString();
     }
     // Show the cards and game UI for player.
-    public void ShowPlayUI() {
+    public void ShowPlayUI()
+    {
         handDropZone.SetActive(true);
         discardDropZone.SetActive(true);
     }
 
     // Hide the cards and game UI for the player.
-    public void HidePlayUI() {
+    public void HidePlayUI()
+    {
         handDropZone.SetActive(false);
         discardDropZone.SetActive(false);
     }
     // display info about the game's status on the screen
-    public void DisplayGameStatus(string message) {
+    public void DisplayGameStatus(string message)
+    {
         StatusText.text = message;
     }
-    public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1, Action onAlertFinish = null) {
-        if (player == GameManager.Instance.actualPlayer) {
+    public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1, Action onAlertFinish = null)
+    {
+        if (player == GameManager.Instance.actualPlayer)
+        {
             if (onAlertFinish == null)
                 mAlertPanel.ShowTextAlert(message, duration);
             else
                 mAlertPanel.ShowTextAlert(message, onAlertFinish);
         }
     }
-    public void DisplayCardChoiceMenu(Card card, int numRequired) {
+    public void DisplayCardChoiceMenu(Card card, int numRequired)
+    {
         mAlertPanel.AddCardToSelectionMenu(card.gameObject);
         if (numRequired < 3)
             mAlertPanel.ToggleCardSelectionPanel(true);
@@ -398,30 +436,38 @@ public class UserInterface : MonoBehaviour {
     //public void SetPhaseText(string text) {
     //    mPhaseText.text = text;
     //}
-    public void ResolveTextAlert() {
+    public void ResolveTextAlert()
+    {
         mAlertPanel.ResolveTextAlert();
     }
-    public void SetTurnText(string text) {
+    public void SetTurnText(string text)
+    {
         mTurnText.text = text;
     }
-    public void SetInfoBackground(int index) {
+    public void SetInfoBackground(int index)
+    {
         if (index >= 0 && index < infoBackgrounds.Length)
             infoBg.sprite = infoBackgrounds[index];
     }
-    public void SetDoomClockActive(bool active, int index = 0) {
+    public void SetDoomClockActive(bool active, int index = 0)
+    {
         doomClockBg.SetActive(active);
-        if (active) {
-             doomClockImage.sprite = doomClockSprites[index];
+        if (active)
+        {
+            doomClockImage.sprite = doomClockSprites[index];
             sectorLines.color = doomClockLinesColor[index];
 
 
         }
-        else {
+        else
+        {
             sectorLines.color = Color.white;
         }
     }
-    public void UpdateDoomClockTurnsLeft(int turnsLeft) {
-        if (turnsLeft <= 0 || turnsLeft >= doomClockSprites.Length) {
+    public void UpdateDoomClockTurnsLeft(int turnsLeft)
+    {
+        if (turnsLeft <= 0 || turnsLeft >= doomClockSprites.Length)
+        {
             Debug.LogWarning("Invalid doom clock index: " + turnsLeft);
             SetDoomClockActive(false);
             return;
@@ -429,20 +475,24 @@ public class UserInterface : MonoBehaviour {
         doomClockImage.sprite = doomClockSprites[^turnsLeft];
         sectorLines.color = doomClockLinesColor[^turnsLeft];
     }
-    public void SpawnPlayerMenuItem(CardPlayer player) {
+    public void SpawnPlayerMenuItem(CardPlayer player)
+    {
         var newPlayerMenu = Instantiate(playerMenuPrefab, playerMenuContainer).GetComponent<PlayerPopupMenuItem>();
         newPlayerMenu.SetPlayer(player);
         playerMenuItems.Add(newPlayerMenu);
     }
-    public void AssignSectorToIcon(Sector sector) {
+    public void AssignSectorToIcon(Sector sector)
+    {
         var sectorIndex = GameManager.Instance.AllSectors.Values.ToList().IndexOf(sector);
-        if (sectorIndex < 0 || sectorIndex >= sectorIcons.Count) {
+        if (sectorIndex < 0 || sectorIndex >= sectorIcons.Count)
+        {
             Debug.Log($"Invalid sector index: {sectorIndex}");
             return;
         }
         var sectorShadow = GameManager.Instance.AllSectors.Values.ToList()
             .Find(s => s.sectorName == sector.sectorName);
-        if (sectorShadow == null) {
+        if (sectorShadow == null)
+        {
             Debug.Log($"Could not find sector shadow for {sector.sectorName}");
             return;
         }
@@ -451,22 +501,28 @@ public class UserInterface : MonoBehaviour {
         icon.SetSector(sectorShadow, sector.Owner == null);
         icon.gameObject.SetActive(false);
     }
-    public void UpdatePlayerMenuItems() {
+    public void UpdatePlayerMenuItems()
+    {
         playerMenuItems.ForEach(item => item.UpdatePopup());
     }
-    public void UpdatePlayerMenuItem(CardPlayer player) {
+    public void UpdatePlayerMenuItem(CardPlayer player)
+    {
         var item = playerMenuItems.Find(item => item.Player == player);
-        if (item != null) {
+        if (item != null)
+        {
             item.UpdatePopup();
         }
     }
 
-    public void TogglePlayerMenu(bool enable) {
+    public void TogglePlayerMenu(bool enable)
+    {
         if (enable) UpdatePlayerMenuItems();
         playerMenuParent.gameObject.SetActive(enable);
     }
-    public void ToggleDownedSectorInMenu(int sectorIndex, bool enable) {
-        if (sectorIndex < 0 || sectorIndex >= sectorXIcons.Count) {
+    public void ToggleDownedSectorInMenu(int sectorIndex, bool enable)
+    {
+        if (sectorIndex < 0 || sectorIndex >= sectorXIcons.Count)
+        {
             Debug.Log($"Invalid sector index: {sectorIndex}");
             return;
         }
@@ -474,46 +530,57 @@ public class UserInterface : MonoBehaviour {
         sectorXIcons[sectorIndex].color = new Color(255, 255, 255, enable ? 1 : 0);
 
     }
-    public void AddPlayerToLobby(string name, PlayerTeam team) {
+    public void AddPlayerToLobby(string name, PlayerTeam team)
+    {
         playerLobbyManager.AddPlayer(name, team);
     }
-    public void ChangePlayerTeam(string name, PlayerTeam team) {
+    public void ChangePlayerTeam(string name, PlayerTeam team)
+    {
         playerLobbyManager.ChangePlayerTeam(name, team);
     }
-    public void UpdateOTChargesText() {
+    public void UpdateOTChargesText()
+    {
         overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
     }
-    public void UpdateOTText() {
+    public void UpdateOTText()
+    {
         var max = GameManager.Instance.actualPlayer.otState == OverTimeState.Overtime ?
             GameManager.OVERTIME_DURATION : GameManager.EXHAUSTED_DURATION;
 
         overTimeTurnsLeftText.text = $"{max - GameManager.Instance.actualPlayer.OverTimeCounter}";
     }
-    public void StartOvertime() {
+    public void StartOvertime()
+    {
         overTimeTurnsLabelText.text = "OT Turns Left";
         UpdateOTChargesText();
         overTimeTurnsLeftText.text = $"{GameManager.OVERTIME_DURATION}";
     }
-    public void StartExhaustion() {
+    public void StartExhaustion()
+    {
         overTimeTurnsLabelText.text = "Exhausted";
         overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
     }
-    public void ToggleMeepleSharingMenu(bool enable) {
+    public void ToggleMeepleSharingMenu(bool enable)
+    {
 
-        if (enable) {
+        if (enable)
+        {
             if (GameManager.Instance.actualPlayer.LentMeepleAmount >= GameManager.Instance.MAX_MEEPLE_SHARE) return;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++)
+            {
                 MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i).ToString();
                 MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.currentMeeples[i].ToString();
             }
         }
         MeepleSharingPanel.SetActive(enable);
     }
-    public void ShowAllySelectionMenu(int meepleTypeIndex) {
+    public void ShowAllySelectionMenu(int meepleTypeIndex)
+    {
         Debug.Log($"Enabling ally selection menu after pressing meeple button {meepleTypeIndex}");
         allySelectionButtons.ForEach(button => Destroy(button.gameObject));
         allySelectionButtons.Clear();
-        for (int i = 0; i < GameManager.Instance.playerDictionary.Count; i++) {
+        for (int i = 0; i < GameManager.Instance.playerDictionary.Count; i++)
+        {
             var cardPlayer = GameManager.Instance.playerDictionary.ElementAt(i).Value;
             if (cardPlayer.playerTeam == PlayerTeam.Red) continue;
             if (cardPlayer.NetID == RGNetworkPlayerList.instance.localPlayerID) continue;
@@ -525,25 +592,31 @@ public class UserInterface : MonoBehaviour {
         }
         allySelectionMenu.SetActive(true);
     }
-    public void DisableAllySelectionMenu() {
+    public void DisableAllySelectionMenu()
+    {
         allySelectionMenu.SetActive(false);
         Debug.Log($"Disabling Ally Selection after {GameManager.Instance.actualPlayer.playerName} " +
             $"has shared {GameManager.Instance.actualPlayer.LentMeepleAmount} meeples");
-        if (GameManager.Instance.actualPlayer.LentMeepleAmount < 2) {
+        if (GameManager.Instance.actualPlayer.LentMeepleAmount < 2)
+        {
             ToggleMeepleSharingMenu(true);
         }
-        else {
+        else
+        {
             ToggleMeepleSharingMenu(false);
         }
     }
-    public void UpdateMeepleSharingMenu() {
-        for (int i = 0; i < 3; i++) {
+    public void UpdateMeepleSharingMenu()
+    {
+        for (int i = 0; i < 3; i++)
+        {
             MeepleSharingTextMax[i].text = GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i).ToString();
             MeepleSharingTextCurrent[i].text = GameManager.Instance.actualPlayer.currentMeeples[i].ToString();
         }
     }
 
-    public void ShowEndGameCanvas() {
+    public void ShowEndGameCanvas()
+    {
         endGameCanvas.SetActive(true);
 
         bool blueWon = GameManager.Instance.GetTurnsLeft() == 0;
@@ -598,14 +671,18 @@ public class UserInterface : MonoBehaviour {
         }
     }
 
-    public void HideEndGameCanvas() {
+    public void HideEndGameCanvas()
+    {
         endGameCanvas.SetActive(false);
     }
-    public void DebugToggleDiceRollPanel() {
-        if (diceRollingPanel.activeSelf) {
+    public void DebugToggleDiceRollPanel()
+    {
+        if (diceRollingPanel.activeSelf)
+        {
             HideDiceRollingPanel();
         }
-        else {
+        else
+        {
             var roll = UnityEngine.Random.Range(1, 7);
             Debug.Log($"Debug Rolling Die with roll: {3}");
             //ShowDiceRollingPanel("Test Effect", 3, 0, () => Debug.Log($"DEBUG On Dice Roll Complete"));
@@ -613,9 +690,11 @@ public class UserInterface : MonoBehaviour {
     }
 
 
-    public void ShowDiceRollingPanel(List<SectorType> sectors, string effect, int rollReq) {
+    public void ShowDiceRollingPanel(List<SectorType> sectors, string effect, int rollReq)
+    {
 
-        if (!sectors.Any()) {
+        if (!sectors.Any())
+        {
             GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
             return;
         }
@@ -635,63 +714,77 @@ public class UserInterface : MonoBehaviour {
         });
         LayoutRebuilder.ForceRebuildLayoutImmediate(diceParent.GetComponent<RectTransform>());
         diceRollingPanel.SetActive(true);
-        for (int i = 0; i < sectors.Count; i++) {
-            if (GameManager.Instance.AllSectors.TryGetValue(sectors[i], out Sector sector)) {
+        for (int i = 0; i < sectors.Count; i++)
+        {
+            if (GameManager.Instance.AllSectors.TryGetValue(sectors[i], out Sector sector))
+            {
                 RollDie(i, sector.DieRoll, sector.OnDiceRollComplete, rollReq);
             }
 
         }
 
     }
-    public void HideDiceRollingPanel() {
+    public void HideDiceRollingPanel()
+    {
         diceRollingPanel.SetActive(false);
     }
-    private void RollDie(int index, int roll, Action onDiceRolled, int rollReq) {
+    private void RollDie(int index, int roll, Action onDiceRolled, int rollReq)
+    {
         StartCoroutine(RollingAnimation(index, roll, onDiceRolled, rollReq));
     }
 
 
 
     // Easing function to create acceleration and deceleration
-    private float EasingFunction(float t) {
+    private float EasingFunction(float t)
+    {
         return 1 - Mathf.Pow(1 - t, 5);
     }
-    public void DisplayPassFailText(int index = -1, bool enable = true, int roll = 0, int req = 0) {
-        if (enable) {
-            if (roll >= req) {
+    public void DisplayPassFailText(int index = -1, bool enable = true, int roll = 0, int req = 0)
+    {
+        if (enable)
+        {
+            if (roll >= req)
+            {
                 successText[index].text = "Saved";
                 successText[index].color = Color.green;
             }
-            else {
+            else
+            {
                 successText[index].text = "Fail";
                 successText[index].color = Color.red;
             }
         }
-        else {
+        else
+        {
             successText.ForEach(x => x.text = "");
         }
 
     }
     #region Map GUI
     //enable or disable the map gui
-    public void ToggleMapGUI() {
+    public void ToggleMapGUI()
+    {
         Debug.Log("Toggling map GUI");
         isGameBoardActive = !isGameBoardActive;
         //mapParent.SetActive(!isGameBoardActive);
         mapState = isGameBoardActive ? MapState.Hidden : MapState.FullScreen;
         GameManager.Instance.ToggleAllSectorColliders(isGameBoardActive);
         sectorIcons.ForEach(x => x.gameObject.SetActive(!isGameBoardActive));
-        if (sectorMoveRoutine != null || leftMoveRoutine != null || rightMoveRoutine != null) {
+        if (sectorMoveRoutine != null || leftMoveRoutine != null || rightMoveRoutine != null)
+        {
             StopCoroutine(sectorMoveRoutine);
             StopCoroutine(leftMoveRoutine);
             StopCoroutine(rightMoveRoutine);
         }
-        if (isGameBoardActive) {
+        if (isGameBoardActive)
+        {
             ShowPlayerGUI();
             sectorMoveRoutine = StartCoroutine(MoveMenuItem(sectorParent, sectorVisiblePos, sectorAnimDuration));
 
         }
-        else {
+        else
+        {
             HidePlayerGUI();
             sectorMoveRoutine = StartCoroutine(MoveMenuItem(sectorParent, sectorHiddenPos, sectorAnimDuration));
 
@@ -704,46 +797,57 @@ public class UserInterface : MonoBehaviour {
             sectorIcons.ForEach(icon => icon.UpdateSectorInfo());
 
     }
-    public void ShowConfirmWindow(string message, Action onConfirm, Action onCancel) {
+    public void ShowConfirmWindow(string message, Action onConfirm, Action onCancel)
+    {
         Debug.Log("Showing confirm window");
         confirmationText.text = message;
         OnConfirm = onConfirm;
         OnCancel = onCancel;
         confirmationWindow.SetActive(true);
     }
-    public void ConfirmAction() {
+    public void ConfirmAction()
+    {
         OnConfirm?.Invoke();
         confirmationWindow.SetActive(false);
     }
-    public void CancelAction() {
+    public void CancelAction()
+    {
         OnCancel?.Invoke();
         confirmationWindow.SetActive(false);
     }
-    public void QuitToMenu() {
+    public void QuitToMenu()
+    {
         ShowConfirmWindow("Are you sure you want to quit to the main menu?",
             () => GameManager.Instance.QuitToMenu(),
             null);
     }
-    public void QuitToDesktop() {
+    public void QuitToDesktop()
+    {
         ShowConfirmWindow("Are you sure you want to quit to desktop?",
             () => GameManager.Instance.QuitToDesktop(),
             null);
     }
-    public void ToggleMenu() {
+    public void ToggleMenu()
+    {
 
         menuParent.gameObject.SetActive(!menuParent.gameObject.activeInHierarchy);
     }
-    public void DebugToggleSectorMenu() {
-        if (mapState == MapState.SectorPopup) {
+    public void DebugToggleSectorMenu()
+    {
+        if (mapState == MapState.SectorPopup)
+        {
             HideSectorPopup();
         }
-        else {
+        else
+        {
             HandleSectorIconClick(null);
         }
     }
     //animate in the player GUI elements
-    public void ShowPlayerGUI() {
-        if (mapStateChangeRoutine != null) {
+    public void ShowPlayerGUI()
+    {
+        if (mapStateChangeRoutine != null)
+        {
             menuItemMoveRoutines.ForEach(r => StopCoroutine(r));
             menuItemMoveRoutines.Clear();
             StopCoroutine(leftMoveRoutine);
@@ -771,8 +875,10 @@ public class UserInterface : MonoBehaviour {
 
     }
     //animate out the player GUI elements
-    public void HidePlayerGUI() {
-        if (mapStateChangeRoutine != null) {
+    public void HidePlayerGUI()
+    {
+        if (mapStateChangeRoutine != null)
+        {
             menuItemMoveRoutines.ForEach(r => StopCoroutine(r));
             menuItemMoveRoutines.Clear();
             StopCoroutine(leftMoveRoutine);
@@ -800,7 +906,8 @@ public class UserInterface : MonoBehaviour {
 
     }
     //handles showing changing the map menu from full screen map to showing the sector popup
-    public void HandleSectorIconClick(Sector _sector) {
+    public void HandleSectorIconClick(Sector _sector)
+    {
         GameManager.Instance.SetSectorInView(_sector);
         ToggleMapGUI();
 
@@ -825,7 +932,8 @@ public class UserInterface : MonoBehaviour {
         // mapState = MapState.SectorPopup;
     }
     //handles hiding the sector popup
-    public void HideSectorPopup() {
+    public void HideSectorPopup()
+    {
         //hide player hand ect..
 
         //HidePlayerGUI();
@@ -841,14 +949,16 @@ public class UserInterface : MonoBehaviour {
 
     }
     #region Animation Coroutines
-    private IEnumerator ResizeElement(RectTransform transform, Vector3 targetScale, float duration) {
+    private IEnumerator ResizeElement(RectTransform transform, Vector3 targetScale, float duration)
+    {
         float time = 0;
         Vector3 startScale = transform.localScale;
 
         // Temporarily set mapState to indicate transition
         mapState = targetScale == Vector3.one ? MapState.FullScreen : MapState.SectorPopup;
 
-        while (time < duration) {
+        while (time < duration)
+        {
             time += Time.deltaTime;
             float t = time / duration;
             t = CubicEaseInOut(t);
@@ -861,10 +971,12 @@ public class UserInterface : MonoBehaviour {
         mapState = targetScale == Vector3.one ? MapState.FullScreen : MapState.SectorPopup;
         mapStateChangeRoutine = null; // Animation is done, clear coroutine reference
     }
-    private IEnumerator MoveMenuItem(RectTransform transform, Vector2 finalPos, float duration) {
+    private IEnumerator MoveMenuItem(RectTransform transform, Vector2 finalPos, float duration)
+    {
         var initPos = transform.anchoredPosition;
         float time = 0;
-        while (time < duration) {
+        while (time < duration)
+        {
             time += Time.deltaTime;
             float t = time / duration;
             t = CubicEaseInOut(t);
@@ -874,29 +986,35 @@ public class UserInterface : MonoBehaviour {
         transform.anchoredPosition = finalPos;
 
     }
-    private float CubicEaseInOut(float t) {
-        if (t < 0.5f) {
+    private float CubicEaseInOut(float t)
+    {
+        if (t < 0.5f)
+        {
             return 4f * t * t * t;
         }
-        else {
+        else
+        {
             float f = (2f * t) - 2f;
             return 0.5f * f * f * f + 1f;
         }
     }
-    private IEnumerator RollingAnimation(int index, int finalFace, Action onDiceRolled, int rollReq) {
+    private IEnumerator RollingAnimation(int index, int finalFace, Action onDiceRolled, int rollReq)
+    {
         float elapsedTime = 0f;
         int previousFace = -1;
         Image die = dice[index];
         yield return new WaitForSeconds(0.2f);
 
         // Randomized face changes to simulate rolling
-        while (elapsedTime < rollDuration) {
+        while (elapsedTime < rollDuration)
+        {
             float progress = elapsedTime / rollDuration;
             float easedProgress = EasingFunction(progress);
             float waitTime = Mathf.Lerp(maxRollTime, minRollTime, easedProgress);
 
             int randomFace;
-            do {
+            do
+            {
                 randomFace = UnityEngine.Random.Range(1, 7);
             } while (randomFace == previousFace); // Ensure it's different from the previous face
             previousFace = randomFace;
@@ -922,21 +1040,26 @@ public class UserInterface : MonoBehaviour {
     #endregion
     #endregion
 
-    public void ShowConsoleLog() {
+    public void ShowConsoleLog()
+    {
         Debug.Log("Showing console log");
-        if (consoleMoveRoutine != null) {
+        if (consoleMoveRoutine != null)
+        {
             StopCoroutine(consoleMoveRoutine);
         }
         consoleMoveRoutine = StartCoroutine(MoveMenuItem(consoleLog, consoleVisiblePos, animDuration));
     }
-    public void HideConsoleLog() {
+    public void HideConsoleLog()
+    {
         Debug.Log("Hiding console log");
-        if (consoleMoveRoutine != null) {
+        if (consoleMoveRoutine != null)
+        {
             StopCoroutine(consoleMoveRoutine);
         }
         consoleMoveRoutine = StartCoroutine(MoveMenuItem(consoleLog, consoleHiddenPos, animDuration));
     }
-    public void ToggleRulesMenu(bool enable) {
+    public void ToggleRulesMenu(bool enable)
+    {
         rulesMenu.SetActive(enable);
 
     }
