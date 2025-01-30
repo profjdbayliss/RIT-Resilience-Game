@@ -61,6 +61,6 @@ public class DeckNameHolder : MonoBehaviour
     public void OpenDeck(string deckLocationAndName, string name)
     {
         DECK_NAME = deckLocationAndName;
-        deckName.text = name;
+        deckName.text = name.Substring(0, name.Length - 4); //Meant to remove.csv from the textMeshPro
     }
 }

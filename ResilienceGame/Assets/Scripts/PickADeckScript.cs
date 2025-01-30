@@ -25,7 +25,7 @@ public class PickADeckScript : MonoBehaviour
 
         decksOfCards = new List<GameObject>();
 
-        refreshCards();
+        //refreshCards();
     }
 
     public void ToggleDeckCanvas()
@@ -77,7 +77,7 @@ public class PickADeckScript : MonoBehaviour
             }
             else
             {
-                Debug.Log($"{fileName} is invalid! I'm gonna kill you!");
+                Debug.Log($"{fileName} is invalid! I'm gonna kill you!"); //To check if a deck is invalid
             }
         }
     }
