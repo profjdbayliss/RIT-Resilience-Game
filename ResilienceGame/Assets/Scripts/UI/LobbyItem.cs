@@ -40,6 +40,12 @@ public class LobbyItem : MonoBehaviour
             SetMissingPlayer();
         }
     }
+
+    public void UpdatePlayerData(string name, PlayerTeam team)
+    {
+        SetPlayerNameAndTeam(name, team);
+    }
+
     public void SetMissingPlayer() {
         PlayerName.enabled = false;
         backgroundImage.color = missingPlayerColor;
