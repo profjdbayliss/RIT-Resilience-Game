@@ -104,7 +104,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
                 // manager.opponentPlayer = cardPlayer;
             }
-
+            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
         }
     }
     public void SetAiPlayerAsReadyToStartGame() {
@@ -127,6 +127,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public void SetPlayerType(PlayerTeam type) {
         if (isServer) {
             playerTypes[localPlayerID] = type;
+            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
             if (CheckReadyToStart()) {
                 AddWhitePlayer();
                 Debug.Log("Ready to start server is last!!");
@@ -196,6 +197,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerTypes.RemoveAt(index);
             playerNetworkReadyFlags.RemoveAt(index);
             playerTurnTakenFlags.RemoveAt(index);
+            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
         }
     }
 
@@ -1246,5 +1248,16 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
     #endregion
 
+    private void NotifyPlayerChanges() {
+        if (isServer) {
+            // Create a list of PlayerData objects
+            List<PlayerData> playerDataList = new List<PlayerData>();
+            for (int i = 0; i < playerIDs.Count; i++) {
+                playerDataList.Add(new PlayerData { Name = playerNames[i], Team = playerTypes[i] });
+            }
 
+            // Send the player data to the PlayerLobbyManager
+            PlayerLobbyManager.Instance.HandlePlayerChanges(playerDataList);
+        }
+    }
 }

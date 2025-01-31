@@ -39,6 +39,7 @@ public class PlayerLobbyManager : NetworkBehaviour
             players.Add(new PlayerData { Name = name, Team = team });
             UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
         }
+        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     public void RemovePlayer(string name)
@@ -51,6 +52,7 @@ public class PlayerLobbyManager : NetworkBehaviour
                 players.Remove(player);
             }
         }
+        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     public void ChangePlayerTeam(string playerName, PlayerTeam newTeam)
@@ -64,6 +66,7 @@ public class PlayerLobbyManager : NetworkBehaviour
                 players[players.IndexOf(player)] = player; // SyncList updates automatically
             }
         }
+        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     private void AddPlayerToUI(PlayerData playerData)
@@ -155,6 +158,18 @@ public class PlayerLobbyManager : NetworkBehaviour
         foreach (var player in players)
         {
             AddPlayerToUI(player);
+        }
+    }
+
+    public void HandlePlayerChanges(List<PlayerData> playerDataList)
+    {
+        // Clear the current UI
+        ClearUI();
+
+        // Add each player to the UI
+        foreach (var playerData in playerDataList)
+        {
+            AddPlayerToUI(playerData);
         }
     }
 }
