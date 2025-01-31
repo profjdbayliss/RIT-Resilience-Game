@@ -39,10 +39,15 @@ public class DeckNameHolder : MonoBehaviour
         // Open a file panel and filter for .csv files
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Select a CSV File", "", "csv", false);
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0])) {
+            
+            /*
             DECK_NAME = paths[0]; // Save the selected file path to DECK_NAME
            // Debug.Log($"Selected CSV file: {DECK_NAME}");
             deckName.text = Path.GetFileName(DECK_NAME);
             FileUtil.CopyFileOrDirectory(DECK_NAME, Application.streamingAssetsPath + "/SavedCSVs/" + deckName.text);
+            */
+
+            FileUtil.CopyFileOrDirectory(paths[0], Application.streamingAssetsPath + "/SavedCSVs/" + Path.GetFileName(paths[0]));
         }
         else {
             Debug.Log("No file selected.");
