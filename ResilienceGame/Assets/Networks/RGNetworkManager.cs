@@ -28,7 +28,7 @@ public class RGNetworkManager : NetworkManager
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
-
+        Debug.Log("Player Added to Server");
         int playerID = conn.connectionId;
         RGNetworkPlayer player = (RGNetworkPlayer)conn.identity.GetComponent<RGNetworkPlayer>();
         string name = player.mPlayerName;

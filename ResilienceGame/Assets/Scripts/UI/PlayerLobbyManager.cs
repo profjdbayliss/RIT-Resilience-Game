@@ -16,8 +16,11 @@ public class PlayerLobbyManager : NetworkBehaviour
 
     public SyncList<PlayerData> players = new SyncList<PlayerData>();
 
+    public static PlayerLobbyManager Instance { get; private set; }
+
     private void Awake()
     {
+        Instance = this;
         players.Callback += OnPlayersChanged;
     }
 
@@ -39,7 +42,7 @@ public class PlayerLobbyManager : NetworkBehaviour
             players.Add(new PlayerData { Name = name, Team = team });
             UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
         }
-        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
+        HandlePlayerChanges(new List<PlayerData>(players)); // Notify PlayerLobbyManager of changes
     }
 
     public void RemovePlayer(string name)
@@ -52,7 +55,7 @@ public class PlayerLobbyManager : NetworkBehaviour
                 players.Remove(player);
             }
         }
-        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
+        HandlePlayerChanges(new List<PlayerData>(players)); // Notify PlayerLobbyManager of changes
     }
 
     public void ChangePlayerTeam(string playerName, PlayerTeam newTeam)
@@ -66,7 +69,7 @@ public class PlayerLobbyManager : NetworkBehaviour
                 players[players.IndexOf(player)] = player; // SyncList updates automatically
             }
         }
-        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
+        HandlePlayerChanges(new List<PlayerData>(players)); // Notify PlayerLobbyManager of changes
     }
 
     private void AddPlayerToUI(PlayerData playerData)

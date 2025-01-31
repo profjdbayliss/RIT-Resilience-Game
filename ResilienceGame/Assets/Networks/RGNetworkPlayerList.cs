@@ -733,7 +733,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
                         };
-                        Debug.Log("client received update message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
