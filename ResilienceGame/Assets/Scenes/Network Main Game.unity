@@ -83581,6 +83581,7 @@ MonoBehaviour:
   maxHeightOffset: 0
   SlippyOff: 0
   previousScale: {x: 0, y: 0}
+  glow: {fileID: 0}
 --- !u!1 &6945917863268426752
 GameObject:
   m_ObjectHideFlags: 0
