@@ -15,12 +15,16 @@ public class DeckNameHolder : MonoBehaviour
     //For disabling and reinabling the all buttons with the big button
     [SerializeField] private GameObject bigButton;
     [SerializeField] private float timeD = 1337;
+    public string folderPath;
 
     // Start is called before the first frame update
     void Start()
     {
+        folderPath = Application.persistentDataPath + "/";  //Get path of folder
+
         bigButton.SetActive(false);
         DECK_NAME = Path.Join(Application.streamingAssetsPath + "/SavedCSVs/", "SectorDownCards.csv");
+        File.Copy(DECK_NAME, folderPath + Path.GetFileName(DECK_NAME));
         DontDestroyOnLoad(this);
     }
 
@@ -39,7 +43,7 @@ public class DeckNameHolder : MonoBehaviour
         // Open a file panel and filter for .csv files
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Select a CSV File", "", "csv", false);
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0])) {
-            
+
             /*
             DECK_NAME = paths[0]; // Save the selected file path to DECK_NAME
            // Debug.Log($"Selected CSV file: {DECK_NAME}");
@@ -47,7 +51,7 @@ public class DeckNameHolder : MonoBehaviour
             FileUtil.CopyFileOrDirectory(DECK_NAME, Application.streamingAssetsPath + "/SavedCSVs/" + deckName.text);
             */
 
-            FileUtil.CopyFileOrDirectory(paths[0], Application.streamingAssetsPath + "/SavedCSVs/" + Path.GetFileName(paths[0]));
+            File.Copy(paths[0], folderPath + Path.GetFileName(paths[0]));
         }
         else {
             Debug.Log("No file selected.");
@@ -59,7 +63,7 @@ public class DeckNameHolder : MonoBehaviour
     {
         timeD = 0;
         bigButton.SetActive(true);
-        Debug.Log("ENABLE YOU");
+        Debug.Log("Disable buttons");
     }
 
     //Used to get info from decks

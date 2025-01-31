@@ -18,7 +18,7 @@ public class PickADeckScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        folderPath = Application.streamingAssetsPath + "/SavedCSVs/";  //Get path of folder
+        folderPath = Application.persistentDataPath + "/";  //Get path of folder
 
         isPickACardCanvasActive = false;
         connectPickACardCanvas.SetActive(isPickACardCanvasActive);
@@ -78,6 +78,7 @@ public class PickADeckScript : MonoBehaviour
             else
             {
                 Debug.Log($"{fileName} is invalid! Please fix the file!"); //To check if a deck is invalid
+                File.Delete(filePathsArray[i]);
             }
         }
     }
