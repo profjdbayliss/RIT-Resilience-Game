@@ -77,7 +77,7 @@ public class PickADeckScript : MonoBehaviour
             }
             else
             {
-                Debug.Log($"{fileName} is invalid! I'm gonna kill you!"); //To check if a deck is invalid
+                Debug.Log($"{fileName} is invalid! Please fix the file!"); //To check if a deck is invalid
             }
         }
     }
