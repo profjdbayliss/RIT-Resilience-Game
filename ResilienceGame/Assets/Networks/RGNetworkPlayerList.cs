@@ -105,6 +105,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 // manager.opponentPlayer = cardPlayer;
             }
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+            BroadcastPlayerList();
         }
     }
     public void SetAiPlayerAsReadyToStartGame() {
@@ -198,6 +199,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerNetworkReadyFlags.RemoveAt(index);
             playerTurnTakenFlags.RemoveAt(index);
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+            BroadcastPlayerList();
         }
     }
 
@@ -1265,5 +1267,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     {
         playerIDs = updatedPlayerIDs.ToList();
         playerNames = updatedPlayerNames.ToList();
+    }
+
+    private void BroadcastPlayerList()
+    {
+        RpcUpdatePlayerList(playerIDs.ToArray(), playerNames.ToArray());
     }
 }

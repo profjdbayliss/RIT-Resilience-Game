@@ -35,6 +35,7 @@ public class RGNetworkManager : NetworkManager
 
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
         SynchronizePlayerList();
+        UpdatePlayerVisibilityForAll();
     }
 
     public void SynchronizePlayerList()
@@ -49,6 +50,7 @@ public class RGNetworkManager : NetworkManager
 
         RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId);
         SynchronizePlayerList();
+        UpdatePlayerVisibilityForAll();
 
         base.OnServerDisconnect(conn);
     }
@@ -62,5 +64,13 @@ public class RGNetworkManager : NetworkManager
     public void SetHostname(string hostname)
     {
         networkAddress = hostname;
+    }
+
+    private void UpdatePlayerVisibilityForAll()
+    {
+        foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
+        {
+            player.UpdatePlayerVisibility();
+        }
     }
 }

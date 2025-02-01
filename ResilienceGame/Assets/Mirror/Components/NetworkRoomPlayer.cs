@@ -115,12 +115,18 @@ namespace Mirror
         /// This is a hook that is invoked on clients for all room player objects when entering the room.
         /// <para>Note: isLocalPlayer is not guaranteed to be set until OnStartLocalPlayer is called.</para>
         /// </summary>
-        public virtual void OnClientEnterRoom() {}
+        public virtual void OnClientEnterRoom() 
+        {
+            UpdatePlayerList();
+        }
 
         /// <summary>
         /// This is a hook that is invoked on clients for all room player objects when exiting the room.
         /// </summary>
-        public virtual void OnClientExitRoom() {}
+        public virtual void OnClientExitRoom() 
+        {
+            UpdatePlayerList();
+        }
 
         #endregion
 
@@ -201,6 +207,18 @@ namespace Mirror
             if (NetworkManager.singleton is NetworkRoomManager room)
             {
                 room.roomSlots = new List<NetworkRoomPlayer>(updatedRoomSlots);
+            }
+        }
+
+        #endregion
+
+        #region Player List Update
+
+        private void UpdatePlayerList()
+        {
+            if (NetworkManager.singleton is NetworkRoomManager room)
+            {
+                room.SynchronizeRoomSlots();
             }
         }
 

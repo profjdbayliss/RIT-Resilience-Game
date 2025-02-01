@@ -25,4 +25,17 @@ public class RGNetworkPlayer : NetworkBehaviour
         GameManager.Instance.actualPlayer = cardPlayerInstance;
         Debug.Log(" local player says id is " + mPlayerID);
     }
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        UpdatePlayerVisibility();
+    }
+
+    public void UpdatePlayerVisibility()
+    {
+        foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
+        {
+            player.gameObject.SetActive(true);
+        }
+    }
 }

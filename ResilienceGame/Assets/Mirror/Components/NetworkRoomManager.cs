@@ -255,6 +255,7 @@ namespace Mirror
             if (numPlayers < 1)
                 StopServer();
 #endif
+            SynchronizeRoomSlots();
         }
 
         // Sequential index used in round-robin deployment of players into instances and score positioning
@@ -309,6 +310,7 @@ namespace Mirror
                 Debug.Log($"Not in Room scene...disconnecting {conn}");
                 conn.Disconnect();
             }
+            SynchronizeRoomSlots();
         }
 
         [Server]
@@ -683,7 +685,7 @@ namespace Mirror
         #endregion
 
         [Server]
-        private void SynchronizeRoomSlots()
+        public void SynchronizeRoomSlots()
         {
             if (RoomSyncManager.Instance != null)
             {
