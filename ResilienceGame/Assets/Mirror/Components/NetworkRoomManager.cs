@@ -301,6 +301,7 @@ namespace Mirror
                     newRoomGameObject = Instantiate(roomPlayerPrefab.gameObject, Vector3.zero, Quaternion.identity);
 
                 NetworkServer.AddPlayerForConnection(conn, newRoomGameObject);
+                SynchronizeRoomSlots(); // Synchronize roomSlots list with all clients
             }
             else
             {
@@ -680,5 +681,18 @@ namespace Mirror
         }
 
         #endregion
+
+        [Server]
+        private void SynchronizeRoomSlots()
+        {
+            if (RoomSyncManager.Instance != null)
+            {
+                RoomSyncManager.Instance.RpcUpdateRoomSlots(roomSlots.ToArray());
+            }
+            else
+            {
+                Debug.LogWarning("RoomSyncManager instance is missing!");
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Mirror
@@ -187,6 +188,19 @@ namespace Mirror
                 }
 
                 GUILayout.EndArea();
+            }
+        }
+
+        #endregion
+
+        #region RoomSlots Synchronization
+
+        [ClientRpc]
+        public void RpcUpdateRoomSlots(NetworkRoomPlayer[] updatedRoomSlots)
+        {
+            if (NetworkManager.singleton is NetworkRoomManager room)
+            {
+                room.roomSlots = new List<NetworkRoomPlayer>(updatedRoomSlots);
             }
         }
 

@@ -1260,4 +1260,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             PlayerLobbyManager.Instance.HandlePlayerChanges(playerDataList);
         }
     }
+
+    public void RpcUpdatePlayerList(int[] updatedPlayerIDs, string[] updatedPlayerNames)
+    {
+        playerIDs = updatedPlayerIDs.ToList();
+        playerNames = updatedPlayerNames.ToList();
+    }
 }
