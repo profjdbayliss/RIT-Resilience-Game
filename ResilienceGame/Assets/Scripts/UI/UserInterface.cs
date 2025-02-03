@@ -295,7 +295,7 @@ public class UserInterface : MonoBehaviour {
     }
     public void ToggleEndPhaseButton(bool enable) {
         mEndPhaseButton.GetComponent<Button>().interactable = enable;
-        mEndPhaseButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
+        //mEndPhaseButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
         //mEndPhaseButton.SetActive(enable);
     }
     public void ToggleOvertimeButton(bool enable) {

@@ -10101,7 +10101,7 @@ RectTransform:
   m_GameObject: {fileID: 263109751}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9850377, y: 0.9850377, z: 0.9850377}
+  m_LocalScale: {x: 1.0721151, y: 1.0721151, z: 1.0721151}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1774689029}
@@ -10132,7 +10132,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 2
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9622642, g: 0.7279094, b: 0.46751517, a: 1}
@@ -10142,10 +10142,10 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: 21300000, guid: 328d3a66b7e65eb4cbe5d3dd18f8b8fd, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: ab64024670491fd4c959ac47a69822b3, type: 3}
+    m_SelectedSprite: {fileID: 21300000, guid: 514a0acc6b15b7b45a90b86c0cdca2c7, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: cb29111161ab22c478171c97b506282f, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -10189,8 +10189,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7a20064d81c38564f83c86acaf39ecaf, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 514a0acc6b15b7b45a90b86c0cdca2c7, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -64415,7 +64415,7 @@ GameObject:
   - component: {fileID: 1774689031}
   - component: {fileID: 1774689030}
   m_Layer: 5
-  m_Name: EndPhaseText
+  m_Name: Junk text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -64461,7 +64461,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: End Phase
+  m_text: ' '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
