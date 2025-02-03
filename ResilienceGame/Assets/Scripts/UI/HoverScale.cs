@@ -15,20 +15,30 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private bool wasDropped = false;
     private bool mPointerDown = false;
     public Vector2 previousScale = Vector2.zero;
+    [SerializeField] private GameObject glow;
 
     void Start()
     {
         previousScale = this.gameObject.transform.localScale;
+        glow.SetActive(false);
     }
 
     void Update()
     {
 
+        if (isHovering)
+        {
+            glow.SetActive(true);
+        }
+        else
+        {
+            glow.SetActive(false);
+        }
+
         if (SlippyOff)
         {
             if (isHovering && !isScaled)
             {
-               
                 ScaleCard(2.0f);
             }
             else if (isScaled && !isHovering)

@@ -305,14 +305,14 @@ MonoBehaviour:
   CanvasHolder: {fileID: 0}
   HasCanvas: 0
   stackNumber: 0
-  outlineImage: {fileID: 8251040826005801627}
+  outlineImage: {fileID: 0}
   DefenseHealth: 0
   ModifyingCards: 
   speed: 10
   OpponentCardPlayAnimDuration: 1
   rotationDurationPercent: 0.3
   rotationDelayPercent: 0.3
-  scaleUpFactor: 1.5
+  centerYOffset: 200
   waitTimeAtCenter: 1.5
   shrinkDuration: 1.5
 --- !u!222 &6600138518294792530
@@ -386,6 +386,14 @@ MonoBehaviour:
   meepleBgBlack: {fileID: 7443341333396808543}
   meepleBgBlue: {fileID: 557394391905023587}
   meepleBgPurple: {fileID: 8685887714127896790}
+  titleText: {fileID: 0}
+  descriptionText: {fileID: 0}
+  flavorText: {fileID: 0}
+  blueCost: {fileID: 0}
+  blackCost: {fileID: 0}
+  purpleCost: {fileID: 0}
+  backgroundImage: {fileID: 0}
+  cardImage: {fileID: 0}
 --- !u!114 &9104204982774583798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -393,7 +401,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2025509866969407830}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1e35e91fdb0f2148b55293d32169339, type: 3}
   m_Name: 
@@ -403,6 +411,7 @@ MonoBehaviour:
   maxHeightOffset: 0
   SlippyOff: 0
   previousScale: {x: 0, y: 0}
+  glow: {fileID: 4700192264946514504}
 --- !u!61 &8569617905514962243
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1148,14 +1157,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1962009777877158847}
   - component: {fileID: 330323380776244816}
-  - component: {fileID: 8251040826005801627}
-  m_Layer: 0
+  - component: {fileID: 2065694453884908253}
+  m_Layer: 5
   m_Name: OutlineImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1962009777877158847
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1174,7 +1183,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -1}
-  m_SizeDelta: {x: 500, y: 660}
+  m_SizeDelta: {x: 550, y: 710}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &330323380776244816
 CanvasRenderer:
@@ -1184,7 +1193,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4700192264946514504}
   m_CullTransparentMesh: 1
---- !u!114 &8251040826005801627
+--- !u!114 &2065694453884908253
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1193,24 +1202,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 4700192264946514504}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: 518acbd274e8dbc42aef5b6c2d45b37a, type: 2}
-  m_Color: {r: 1, g: 0.2887039, b: 0, a: 0}
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 0}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+  m_Sprite: {fileID: 21300000, guid: 07a12a3718870264bb53e1d3b3ac3126, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5665147992594595946
 GameObject:
   m_ObjectHideFlags: 0
