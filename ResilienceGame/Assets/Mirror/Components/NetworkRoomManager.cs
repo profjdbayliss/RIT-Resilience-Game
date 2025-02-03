@@ -255,6 +255,7 @@ namespace Mirror
             if (numPlayers < 1)
                 StopServer();
 #endif
+            SynchronizeRoomSlots();
         }
 
         // Sequential index used in round-robin deployment of players into instances and score positioning
@@ -301,6 +302,7 @@ namespace Mirror
                     newRoomGameObject = Instantiate(roomPlayerPrefab.gameObject, Vector3.zero, Quaternion.identity);
 
                 NetworkServer.AddPlayerForConnection(conn, newRoomGameObject);
+                SynchronizeRoomSlots(); // Synchronize roomSlots list with all clients
             }
             else
             {
@@ -308,6 +310,7 @@ namespace Mirror
                 Debug.Log($"Not in Room scene...disconnecting {conn}");
                 conn.Disconnect();
             }
+            SynchronizeRoomSlots();
         }
 
         [Server]
@@ -680,5 +683,18 @@ namespace Mirror
         }
 
         #endregion
+
+        [Server]
+        public void SynchronizeRoomSlots()
+        {
+            if (RoomSyncManager.Instance != null)
+            {
+                RoomSyncManager.Instance.RpcUpdateRoomSlots(roomSlots.ToArray());
+            }
+            else
+            {
+                Debug.LogWarning("RoomSyncManager instance is missing!");
+            }
+        }
     }
 }

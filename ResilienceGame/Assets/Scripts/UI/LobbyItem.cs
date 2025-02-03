@@ -27,13 +27,25 @@ public class LobbyItem : MonoBehaviour
     public void SetPlayerNameAndTeam(string name, PlayerTeam team) {
         PlayerName.text = name;
         PlayerName.enabled = true;
+        Debug.Log($"is red? {team == PlayerTeam.Red}");
+        Debug.Log($"is blue? {team == PlayerTeam.Blue}");
         if (team == PlayerTeam.Red) {
             backgroundImage.color = redColor;
         }
-        else {
+        else if (team == PlayerTeam.Blue) {
             backgroundImage.color = blueColor;
         }
+        else
+        {
+            SetMissingPlayer();
+        }
     }
+
+    public void UpdatePlayerData(string name, PlayerTeam team)
+    {
+        SetPlayerNameAndTeam(name, team);
+    }
+
     public void SetMissingPlayer() {
         PlayerName.enabled = false;
         backgroundImage.color = missingPlayerColor;
