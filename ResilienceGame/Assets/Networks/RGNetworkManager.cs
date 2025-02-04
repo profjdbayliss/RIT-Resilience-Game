@@ -66,7 +66,7 @@ public class RGNetworkManager : NetworkManager
         networkAddress = hostname;
     }
 
-    private void UpdatePlayerVisibilityForAll()
+    public void UpdatePlayerVisibilityForAll()
     {
         foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
         {

@@ -1208,7 +1208,6 @@ namespace Mirror
                 return;
             }
 
-            // FOR SOME FUCKING REASON IT IS CALLING THIS TIWCE
             if (conn.identity != null)
             {
                 Debug.Log("There is already a player for this connection. " + conn.identity.netId);

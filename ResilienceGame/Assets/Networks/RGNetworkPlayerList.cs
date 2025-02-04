@@ -1259,7 +1259,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
 
             // Send the player data to the PlayerLobbyManager
-            PlayerLobbyManager.Instance.HandlePlayerChanges(playerDataList);
+            Debug.Log("Lobby should be updated now");
+            PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
         }
     }
 
@@ -1267,10 +1268,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     {
         playerIDs = updatedPlayerIDs.ToList();
         playerNames = updatedPlayerNames.ToList();
+        NotifyPlayerChanges();
     }
 
     private void BroadcastPlayerList()
     {
         RpcUpdatePlayerList(playerIDs.ToArray(), playerNames.ToArray());
+        NotifyPlayerChanges();
     }
 }

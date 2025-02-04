@@ -151,6 +151,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int UniqueFacilityEffectIdCount { get; set; }
     public bool WaitingForAnimations { get; private set; } = false; //flag to check if all sectors are ready to progress phase
     public bool CanEndPhase => !activeSectors.Any(sector => sector.HasOngoingUpdates || sector.IsAnimating);
+    
+    // Reference to PlayerLobbyManager
+    private PlayerLobbyManager playerLobbyManager;
     #endregion
 
     #region Initialization
@@ -166,7 +169,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 Debug.Log("deck choice is null!");
             }
         }
-
+        
         if (sliderValue != null) {
             // set this player's type
             switch (sliderValue) {
@@ -184,6 +187,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             Debug.Log("player type set to be " + playerTeam);
         }
 
+        // Update player team in the lobby
+        PlayerLobbyManager.Instance.ChangePlayerTeam(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
     }
     // Called when pressing the button to start
     // Doesn't actually start the game until ALL
@@ -209,8 +214,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
 
-
-
+            // Add player to the lobby
+            //PlayerLobbyManager.Instance.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
+           // PlayerLobbyManager.players
 
             // tell everybody else of this player's type
             if (!IsServer) {
