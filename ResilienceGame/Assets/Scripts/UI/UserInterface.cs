@@ -84,6 +84,7 @@ public class UserInterface : MonoBehaviour {
     public GameObject endGameCanvas;
     public TextMeshProUGUI endGameTitle;
     [SerializeField] private GameObject playerScoreItemPrefab;
+    [SerializeField] private GameObject redPopUps;
     [SerializeField] private RectTransform rightParent;
     [SerializeField] private RectTransform leftParent;
 
@@ -509,7 +510,8 @@ public class UserInterface : MonoBehaviour {
         endGameCanvas.SetActive(true);
 
         bool blueWon = GameManager.Instance.GetTurnsLeft() == 0;
-        endGameTitle.text = blueWon ? "Blue Wins!" : "Red Wins!";
+        endGameTitle.text = blueWon ? "BlueWins.exe" : "RedWins.exe";
+        if (blueWon) { redPopUps.SetActive(false); }
         BuildEndgameScoreMenu();
 
     }
