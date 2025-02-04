@@ -106,6 +106,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
             BroadcastPlayerList();
+            PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
         }
     }
     public void SetAiPlayerAsReadyToStartGame() {
@@ -1253,13 +1254,16 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     private void NotifyPlayerChanges() {
         if (isServer) {
             // Create a list of PlayerData objects
-            List<PlayerData> playerDataList = new List<PlayerData>();
+            SyncList<PlayerData> playerDataList = new SyncList<PlayerData>();
             for (int i = 0; i < playerIDs.Count; i++) {
                 playerDataList.Add(new PlayerData { Name = playerNames[i], Team = playerTypes[i] });
             }
 
+            PlayerLobbyManager.Instance.players = playerDataList;
+
             // Send the player data to the PlayerLobbyManager
             Debug.Log("Lobby should be updated now");
+            //PlayerLobbyManager.Instance.HandlePlayerChanges(playerDataList);
             PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
         }
     }

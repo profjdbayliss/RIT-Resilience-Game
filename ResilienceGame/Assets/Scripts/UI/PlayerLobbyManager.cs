@@ -14,7 +14,7 @@ public class PlayerLobbyManager : NetworkBehaviour
     [SerializeField] public Color redColor;
     [SerializeField] public Color blueColor;
 
-    public readonly SyncList<PlayerData> players = new SyncList<PlayerData>();
+    public SyncList<PlayerData> players = new SyncList<PlayerData>();
 
     public static PlayerLobbyManager Instance { get; private set; }
 
@@ -60,20 +60,11 @@ public class PlayerLobbyManager : NetworkBehaviour
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
-    private void AddPlayerToUI(PlayerData playerData)
+    public void AddPlayerToUI(PlayerData playerData)
     {
         GameObject newPlayerPopup = Instantiate(playerPopupPrefab, GetParentForTeam(playerData.Team));
         LobbyItem lobbyItem = newPlayerPopup.GetComponent<LobbyItem>();
         lobbyItem.SetPlayerNameAndTeam(playerData.Name, playerData.Team);
-    }
-
-    private void RemovePlayerFromUI(string name)
-    {
-        var lobbyItem = FindLobbyItemByName(name);
-        if (lobbyItem != null)
-        {
-            Destroy(lobbyItem.gameObject);
-        }
     }
 
     private void ClearUI()

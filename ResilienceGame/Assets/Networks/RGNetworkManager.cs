@@ -36,6 +36,7 @@ public class RGNetworkManager : NetworkManager
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
         SynchronizePlayerList();
         UpdatePlayerVisibilityForAll();
+        PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
     }
 
     public void SynchronizePlayerList()
