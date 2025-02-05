@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -95,5 +96,10 @@ void Start() {
     public void PlayNoSound()
     {
         audio.PlayOneShot(noSound, 1);
+    }
+
+    public void goToEditCards()
+    {
+        SceneManager.LoadScene(3);
     }
 }
