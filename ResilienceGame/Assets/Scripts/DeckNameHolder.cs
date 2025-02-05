@@ -16,11 +16,15 @@ public class DeckNameHolder : MonoBehaviour
     [SerializeField] private GameObject bigButton;
     [SerializeField] private TextMeshProUGUI errorMessage;
     [SerializeField] private float timeD = 1337;
+    AudioSource audio;
+    [SerializeField] private AudioClip errorSound;
     public string folderPath;
 
     // Start is called before the first frame update
     void Start()
     {
+        audio = GetComponent<AudioSource>();
+
         folderPath = Application.persistentDataPath + "/";  //Get path of folder
 
         bigButton.SetActive(false);
@@ -71,6 +75,7 @@ public class DeckNameHolder : MonoBehaviour
             catch (Exception e)
             {
                 Debug.Log(e.Message);
+                audio.PlayOneShot(errorSound, 1);
                 errorMessage.text = (Path.GetFileName(paths[0]) + " already exists!");
             }
         }
