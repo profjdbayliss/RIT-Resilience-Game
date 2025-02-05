@@ -14,6 +14,7 @@ public class DeckNameHolder : MonoBehaviour
     public TextMeshProUGUI deckName;
     //For disabling and reinabling the all buttons with the big button
     [SerializeField] private GameObject bigButton;
+    [SerializeField] private TextMeshProUGUI errorMessage;
     [SerializeField] private float timeD = 1337;
     public string folderPath;
 
@@ -24,7 +25,14 @@ public class DeckNameHolder : MonoBehaviour
 
         bigButton.SetActive(false);
         DECK_NAME = Path.Join(Application.streamingAssetsPath + "/SavedCSVs/", "SectorDownCards.csv");
-        File.Copy(DECK_NAME, folderPath + Path.GetFileName(DECK_NAME));
+        try //Quick catch
+        {
+            File.Copy(DECK_NAME, folderPath + Path.GetFileName(DECK_NAME));
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+        }
         DontDestroyOnLoad(this);
     }
 
@@ -36,6 +44,10 @@ public class DeckNameHolder : MonoBehaviour
         if (timeD >= 0.5f) //disables the big button, which blocks all buttons with it's size
         {
             bigButton.SetActive(false);
+        }
+        if (timeD >= 1.5f)
+        {
+            errorMessage.text = "";
         }
     }
 
@@ -51,7 +63,16 @@ public class DeckNameHolder : MonoBehaviour
             FileUtil.CopyFileOrDirectory(DECK_NAME, Application.streamingAssetsPath + "/SavedCSVs/" + deckName.text);
             */
 
-            File.Copy(paths[0], folderPath + Path.GetFileName(paths[0]));
+            //To make sure there isn't a copy of the file already in the local storage 
+            try
+            {
+                File.Copy(paths[0], folderPath + Path.GetFileName(paths[0]));
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
+                errorMessage.text = (Path.GetFileName(paths[0]) + " already exists!");
+            }
         }
         else {
             Debug.Log("No file selected.");

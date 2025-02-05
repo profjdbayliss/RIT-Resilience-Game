@@ -22,6 +22,13 @@ void Start() {
             Destroy(networkManager.gameObject);
         }
 
+        //Made so if the player returns to the main menu, the DeckNameHolder can be destroyed
+        GameObject DeckNameHolder = GameObject.Find("DeckNameHolder");
+        if (DeckNameHolder != null)
+        {
+            Destroy(DeckNameHolder);
+        }
+
         audio = GetComponent<AudioSource>();
     }
     public void ToggleRulesMenu(bool enable) {
