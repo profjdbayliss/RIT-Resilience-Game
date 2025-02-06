@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
 
         // Update player team in the lobby
-        PlayerLobbyManager.Instance.ChangePlayerTeam(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
+        //PlayerLobbyManager.Instance.ChangePlayerTeam(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
     }
     // Called when pressing the button to start
     // Doesn't actually start the game until ALL
@@ -204,7 +204,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // basic init of player
             SetPlayerType();
             SetupActors();
-            UserInterface.Instance.StartGame(playerTeam);
+            UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
+            // UserInterface.Instance.UpdateLobbyUI(); Doesn't work
 
             // init various objects to be used in the game
             roundsLeft = BASE_MAX_TURNS;

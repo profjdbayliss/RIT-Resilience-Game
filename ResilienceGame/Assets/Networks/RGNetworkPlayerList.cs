@@ -199,8 +199,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerTypes.RemoveAt(index);
             playerNetworkReadyFlags.RemoveAt(index);
             playerTurnTakenFlags.RemoveAt(index);
-            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
-            BroadcastPlayerList();
+            //NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+            //BroadcastPlayerList();
         }
     }
 
@@ -1251,7 +1251,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
     #endregion
 
-    private void NotifyPlayerChanges() {
+    public void NotifyPlayerChanges() { // This is being called when a player disconnects, needs to be called when a player "gets ready"
         if (isServer) {
             // Create a list of PlayerData objects
             SyncList<PlayerData> playerDataList = new SyncList<PlayerData>();
@@ -1278,6 +1278,5 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     private void BroadcastPlayerList()
     {
         RpcUpdatePlayerList(playerIDs.ToArray(), playerNames.ToArray());
-        NotifyPlayerChanges();
     }
 }

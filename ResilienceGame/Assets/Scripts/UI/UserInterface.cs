@@ -191,11 +191,11 @@ public class UserInterface : MonoBehaviour
 
     //[Header("Drag and Drop")]
 
-    // Start is called before the first frame update
+    // Start is called when player presses "begin"
     public void StartGame(PlayerTeam playerType)
     {
         playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType);
-        BuildLobbyMenu();
+        //BuildLobbyMenu();
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
         mTurnText.text = "" + GameManager.Instance.GetTurnsLeft();
 
@@ -243,7 +243,7 @@ public class UserInterface : MonoBehaviour
         };
     }
 
-    public void BuildLobbyMenu()
+    public void BuildLobbyMenu() // does nothing
     {
         foreach (Transform child in playerMenuContainer)
             Destroy(child.gameObject);
@@ -546,7 +546,7 @@ public class UserInterface : MonoBehaviour
     }
     public void ChangePlayerTeam(string name, PlayerTeam team)
     {
-        playerLobbyManager.ChangePlayerTeam(name, team);
+       // playerLobbyManager.ChangePlayerTeam(name, team);
     }
     public void UpdateOTChargesText()
     {

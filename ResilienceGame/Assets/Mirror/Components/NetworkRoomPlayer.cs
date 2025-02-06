@@ -214,7 +214,7 @@ namespace Mirror
 
         #region Player List Update
 
-        private void UpdatePlayerList()
+        public void UpdatePlayerList()
         {
             if (NetworkManager.singleton is NetworkRoomManager room)
             {

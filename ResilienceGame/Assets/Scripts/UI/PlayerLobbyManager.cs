@@ -21,18 +21,18 @@ public class PlayerLobbyManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
-        players.Callback += OnPlayersChanged;
+        //players.Callback += OnPlayersChanged;
     }
 
     private void OnDestroy()
     {
-        players.Callback -= OnPlayersChanged;
+        //players.Callback -= OnPlayersChanged;
     }
 
-    private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem)
+    private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem) // does nothing!
     {
-        UserInterface.Instance.BuildLobbyMenu(); // Notify UI to update
-        UpdatePlayerLobbyUI(); // Update the actual game UI
+        //UserInterface.Instance.BuildLobbyMenu(); // Notify UI to update
+        //UpdatePlayerLobbyUI(); // Update the actual game UI
     }
 
     public void AddPlayer(string name, PlayerTeam team)
@@ -45,7 +45,7 @@ public class PlayerLobbyManager : NetworkBehaviour
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
-    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam)
+    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam) // Dpesn't do anything
     {
         if (isServer)
         {
@@ -53,11 +53,11 @@ public class PlayerLobbyManager : NetworkBehaviour
             if (player != null)
             {
                 player.Team = newTeam;
-                players[players.IndexOf(player)] = player; // SyncList updates automatically
-                UpdatePlayerLobbyUI(); // Update the actual game UI after changing a player's team
+                //players[players.IndexOf(player)] = player; // SyncList updates automatically
+                //UpdatePlayerLobbyUI(); // Update the actual game UI after changing a player's team
             }
         }
-        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
+        //HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     public void AddPlayerToUI(PlayerData playerData)
