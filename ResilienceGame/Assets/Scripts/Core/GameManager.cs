@@ -204,7 +204,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // basic init of player
             SetPlayerType();
             SetupActors();
-            UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
+            //UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
             // UserInterface.Instance.UpdateLobbyUI(); Doesn't work
 
             // init various objects to be used in the game
@@ -217,7 +217,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             // Add player to the lobby
             //PlayerLobbyManager.Instance.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
-           // PlayerLobbyManager.players
+            // PlayerLobbyManager.players
 
             // tell everybody else of this player's type
             if (!IsServer) {
@@ -237,6 +237,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
 
         }
+
+        // Trying to get the lobby to update upon pressing this button... none of these work:
+        RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
+        UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
+        RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
+        RGNetworkPlayerList.instance.NotifyPlayerChanges();
         mStartGameRun = true;
         Debug.Log("start game set!");
     }

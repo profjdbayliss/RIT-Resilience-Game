@@ -134,12 +134,12 @@ public class PlayerLobbyManager : NetworkBehaviour
         return null;
     }
 
-    public void UpdatePlayerLobbyUI()
+    public void UpdatePlayerLobbyUI() // called on client disconnect somewhere
     {
         HandlePlayerChanges(players);
     }
 
-    public void HandlePlayerChanges(SyncList<PlayerData> playerDataList)
+    public void HandlePlayerChanges(SyncList<PlayerData> playerDataList) // called on disconnect and when the host joins in GameManager.
     {
         // Clear the current UI
         ClearUI();

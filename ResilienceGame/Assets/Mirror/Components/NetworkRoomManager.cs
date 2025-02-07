@@ -237,7 +237,7 @@ namespace Mirror
                 }
             }
 
-            allPlayersReady = false;
+            //allPlayersReady = false;
 
             foreach (NetworkRoomPlayer player in roomSlots)
             {
@@ -255,7 +255,6 @@ namespace Mirror
             if (numPlayers < 1)
                 StopServer();
 #endif
-            SynchronizeRoomSlots();
         }
 
         // Sequential index used in round-robin deployment of players into instances and score positioning

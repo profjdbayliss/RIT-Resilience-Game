@@ -35,8 +35,8 @@ public class RGNetworkManager : NetworkManager
 
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
         SynchronizePlayerList();
-        UpdatePlayerVisibilityForAll();
-        PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
+        //UpdatePlayerVisibilityForAll();
+        //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
     }
 
     public void SynchronizePlayerList()
@@ -49,9 +49,9 @@ public class RGNetworkManager : NetworkManager
         if (conn.authenticationData != null)
             RGNetworkAuthenticator.playerNames.Remove((string)conn.authenticationData);
 
-        RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId);
-        SynchronizePlayerList();
-        UpdatePlayerVisibilityForAll();
+        RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId); //removes player who left
+        SynchronizePlayerList();    // THIS UPDATES THE LOBBY
+        //UpdatePlayerVisibilityForAll();
 
         base.OnServerDisconnect(conn);
     }
@@ -69,9 +69,9 @@ public class RGNetworkManager : NetworkManager
 
     public void UpdatePlayerVisibilityForAll()
     {
-        foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
-        {
-            player.UpdatePlayerVisibility();
-        }
+        //foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
+        //{
+            //player.UpdatePlayerVisibility();
+        //}
     }
 }

@@ -194,7 +194,15 @@ public class UserInterface : MonoBehaviour
     // Start is called when player presses "begin"
     public void StartGame(PlayerTeam playerType)
     {
-        playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType);
+        playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType); // how the host sees themselves
+        RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
+        foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
+        {
+            player.UpdatePlayerVisibility();
+        }
+
+        //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
+        //playerLobbyManager.UpdatePlayerLobbyUI();
         //BuildLobbyMenu();
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
         mTurnText.text = "" + GameManager.Instance.GetTurnsLeft();
@@ -217,7 +225,7 @@ public class UserInterface : MonoBehaviour
             }
         }
         UpdateMeepleAmountUI();
-        UpdateLobbyUI();
+        //UpdateLobbyUI(); // doen't work, need to replicate the behavior/method used on client disconnect.
     }
 
     private void Awake()
@@ -542,7 +550,7 @@ public class UserInterface : MonoBehaviour
     }
     public void AddPlayerToLobby(string name, PlayerTeam team)
     {
-        playerLobbyManager.AddPlayer(name, team);
+        //playerLobbyManager.AddPlayer(name, team);
     }
     public void ChangePlayerTeam(string name, PlayerTeam team)
     {
