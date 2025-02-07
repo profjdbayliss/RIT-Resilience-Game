@@ -77900,7 +77900,7 @@ GameObject:
   - component: {fileID: 2036154777}
   m_Layer: 5
   m_Name: Player Hand  Location
-  m_TagString: Untagged
+  m_TagString: PlayerHandLocation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

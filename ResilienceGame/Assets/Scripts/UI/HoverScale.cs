@@ -25,8 +25,11 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     void Update()
     {
+        //Gets the cards value
+        var theCard = targetObject.GetComponent<Card>();
 
-        if (isHovering)
+        //Checks if the mouse is hovering and if its in the player's hands
+        if (isHovering && theCard.cardZone == GameObject.FindGameObjectWithTag("PlayerHandLocation"))
         {
             glow.SetActive(true);
         }
