@@ -102,4 +102,9 @@ void Start() {
     {
         SceneManager.LoadScene(3);
     }
+
+    public void FullScreen()
+    {
+        Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, !Screen.fullScreen);
+    }
 }
