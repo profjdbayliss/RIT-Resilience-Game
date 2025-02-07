@@ -238,11 +238,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
-        // Trying to get the lobby to update upon pressing this button... none of these work:
+        // Trying to get the lobby to update upon pressing this button... none of these work (2/6/2025):
         RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
         UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
         RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
+
+        // 2/7/2025 testing:
+
+
         mStartGameRun = true;
         Debug.Log("start game set!");
     }
