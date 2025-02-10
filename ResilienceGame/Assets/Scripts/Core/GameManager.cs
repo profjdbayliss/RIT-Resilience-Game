@@ -665,6 +665,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
 
+        /*
         //check for tab key to show player menu
         if (Keyboard.current.tabKey.wasPressedThisFrame) {
             UserInterface.Instance.TogglePlayerMenu(true);
@@ -676,7 +677,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (Keyboard.current.escapeKey.wasPressedThisFrame) {
             UserInterface.Instance.ToggleMapGUI();
         }
-
+        */
     }
 
 
