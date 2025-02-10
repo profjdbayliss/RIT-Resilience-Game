@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Yarn.Unity;
 
@@ -74,9 +75,6 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private TMP_InputField imgCol;
     [SerializeField] private Toggle obfuscated;
     [SerializeField] private Toggle doom;
-
-
-
 
 
     private List<EditorCard> cards = new List<EditorCard>();
@@ -368,6 +366,11 @@ public class CardEditor : MonoBehaviour {
 
         // Write all lines to the specified file
         File.WriteAllLines(filePath, allLines);
+    }
+
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 
     #endregion

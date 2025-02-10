@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,6 +21,13 @@ void Start() {
         var networkManager = FindObjectOfType<RGNetworkManager>();
         if (networkManager != null) {
             Destroy(networkManager.gameObject);
+        }
+
+        //Made so if the player returns to the main menu, the DeckNameHolder can be destroyed
+        GameObject DeckNameHolder = GameObject.Find("DeckNameHolder");
+        if (DeckNameHolder != null)
+        {
+            Destroy(DeckNameHolder);
         }
 
         audio = GetComponent<AudioSource>();
@@ -88,5 +96,15 @@ void Start() {
     public void PlayNoSound()
     {
         audio.PlayOneShot(noSound, 1);
+    }
+
+    public void goToEditCards()
+    {
+        SceneManager.LoadScene(3);
+    }
+
+    public void FullScreen()
+    {
+        Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, !Screen.fullScreen);
     }
 }

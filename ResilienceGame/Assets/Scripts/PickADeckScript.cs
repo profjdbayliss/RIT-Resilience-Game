@@ -82,6 +82,28 @@ public class PickADeckScript : MonoBehaviour
             }
         }
     }
+
+    //Removes a deck from the list and destroys it
+    public void DestroyADeck(string name)
+    {
+        for (int i = 0; i < decksOfCards.Count; i++)
+        {
+            if (decksOfCards[i].GetComponent<DeckValues>().name == name)
+            {
+                //Destroys deck and removes from list
+                File.Delete(decksOfCards[i].GetComponent<DeckValues>().deckLocationAndName);
+                Destroy(decksOfCards[i]);
+                decksOfCards.RemoveAt(i);
+
+                //To stop the loop
+                i = decksOfCards.Count + 5;
+            }
+            else
+            {
+                Debug.Log("Deck does not exist. How?");
+            }
+        }
+    }
 }
 
 //https://discussions.unity.com/t/solved-loading-image-from-streamingassets/752274/3
