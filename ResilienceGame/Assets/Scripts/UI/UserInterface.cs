@@ -194,7 +194,7 @@ public class UserInterface : MonoBehaviour
     // Start is called when player presses "begin"
     public void StartGame(PlayerTeam playerType)
     {
-        playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType); // how the host sees themselves
+        playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType); // Clients see a fully empty lobby with this commented out
         RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
         foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
         {

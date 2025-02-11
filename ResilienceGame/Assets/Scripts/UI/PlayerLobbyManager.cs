@@ -107,33 +107,6 @@ public class PlayerLobbyManager : NetworkBehaviour
         return blueLeftParent; // Default to blueLeftParent if all slots are taken
     }
 
-    private LobbyItem FindLobbyItemByName(string name)
-    {
-        // Check in red, blueLeft, and blueRight parents
-        foreach (Transform child in redParent)
-        {
-            var lobbyItem = child.GetComponent<LobbyItem>();
-            if (lobbyItem != null && lobbyItem.PlayerName.text == name)
-                return lobbyItem;
-        }
-
-        foreach (Transform child in blueLeftParent)
-        {
-            var lobbyItem = child.GetComponent<LobbyItem>();
-            if (lobbyItem != null && lobbyItem.PlayerName.text == name)
-                return lobbyItem;
-        }
-
-        foreach (Transform child in blueRightParent)
-        {
-            var lobbyItem = child.GetComponent<LobbyItem>();
-            if (lobbyItem != null && lobbyItem.PlayerName.text == name)
-                return lobbyItem;
-        }
-
-        return null;
-    }
-
     public void UpdatePlayerLobbyUI() // called on client disconnect somewhere
     {
         HandlePlayerChanges(players);
