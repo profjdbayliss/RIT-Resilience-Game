@@ -24,7 +24,7 @@ public class LobbyItem : MonoBehaviour
     {
         
     }
-    public void SetPlayerNameAndTeam(string name, PlayerTeam team) {
+    public void SetPlayerNameAndTeam(string name, PlayerTeam team) { // Called when player disconnects or when host presses "begin"
         PlayerName.text = name;
         PlayerName.enabled = true;
         Debug.Log($"is red? {team == PlayerTeam.Red}");
@@ -39,11 +39,6 @@ public class LobbyItem : MonoBehaviour
         {
             SetMissingPlayer();
         }
-    }
-
-    public void UpdatePlayerData(string name, PlayerTeam team)
-    {
-        SetPlayerNameAndTeam(name, team);
     }
 
     public void SetMissingPlayer() {
