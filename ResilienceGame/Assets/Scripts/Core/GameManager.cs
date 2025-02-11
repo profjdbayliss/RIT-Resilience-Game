@@ -186,9 +186,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // display player type on view???
             Debug.Log("player type set to be " + playerTeam);
         }
-
-        // Update player team in the lobby
-        //PlayerLobbyManager.Instance.ChangePlayerTeam(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
     }
 
     public void ReloadLobby()
@@ -213,6 +210,20 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
 
+    // Used for Lobby "Begin" Button
+    public void BeginLobby()
+    {
+        NetworkRoomManager roomManager = FindObjectOfType<NetworkRoomManager>();
+        if (roomManager.allPlayersReady == true)
+        {
+            roomManager.OnRoomServerPlayersReady();
+        }
+        else
+        {
+            Debug.LogError("NetworkRoomManager not found.");
+        }
+    }
+
     // Called when pressing the button to start
     // Doesn't actually start the game until ALL
     // the players connected have pressed their start buttons.
@@ -227,8 +238,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // basic init of player
             SetPlayerType();
             SetupActors();
-            //UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
-            // UserInterface.Instance.UpdateLobbyUI(); Doesn't work
 
             // init various objects to be used in the game
             roundsLeft = BASE_MAX_TURNS;
@@ -237,10 +246,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
-
-            // Add player to the lobby
-            //PlayerLobbyManager.Instance.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
-            // PlayerLobbyManager.players
 
             // tell everybody else of this player's type
             if (!IsServer) {
@@ -254,27 +259,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             }
             else {
-                // Automatically set the AI player as ready (server only)
-                // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
                 RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
             }
 
         }
 
-        // Trying to get the lobby to update upon pressing this button... none of these work:
+        // Comment these out one by one until you weed out the unneccessary ones:
         RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
-        UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
+        UserInterface.Instance.StartGame(playerTeam);
         RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
-        ReloadLobby();
-        
-
-        // Only changes the player's local lobby, not the host's
-        /*if (PlayerLobbyManager.Instance.players != null)
-        {
-            PlayerLobbyManager.Instance.HandlePlayerChanges(PlayerLobbyManager.Instance.players);
-        }
-        */
 
         mStartGameRun = true;
         Debug.Log("start game set!");
