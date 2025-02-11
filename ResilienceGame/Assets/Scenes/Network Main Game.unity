@@ -7805,7 +7805,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 227047268}
-  - component: {fileID: 227047269}
   m_Layer: 0
   m_Name: HostControlsParent
   m_TagString: Untagged
@@ -7829,27 +7828,6 @@ Transform:
   m_Father: {fileID: 209779841}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &227047269
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227047267}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af36e2710282ffb49854cc668e9f32c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  playerPopupPrefab: {fileID: 8619153982037929663, guid: cbe0343d2407e7f42856366f71bede7c, type: 3}
-  blueLeftParent: {fileID: 1004200005}
-  blueRightParent: {fileID: 1312629941}
-  redParent: {fileID: 885401446}
-  redColor: {r: 0.32050014, g: 1, b: 0, a: 0}
-  blueColor: {r: 0.9559822, g: 0, b: 1, a: 0}
 --- !u!1 &228889690
 GameObject:
   m_ObjectHideFlags: 0
@@ -46196,7 +46174,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1209052422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49758,7 +49736,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1349611815
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59897,7 +59875,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -61002,14 +60980,14 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1672305180}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 227047269}
-        m_TargetAssemblyTypeName: PlayerLobbyManager, Assembly-CSharp
-        m_MethodName: UpdatePlayerLobbyUI
+      - m_Target: {fileID: 2133546051}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ReloadLobby
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -63767,7 +63745,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

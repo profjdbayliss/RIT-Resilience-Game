@@ -190,6 +190,29 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // Update player team in the lobby
         //PlayerLobbyManager.Instance.ChangePlayerTeam(RGNetworkPlayerList.instance.localPlayerName, playerTeam);
     }
+
+    public void ReloadLobby()
+    {
+        // tell everybody else of this player's type
+        if (!IsServer)
+        {
+            Message msg;
+            List<int> tmpList = new List<int>() {
+                    (int)playerTeam
+                };
+            msg = new Message(CardMessageType.SharePlayerType, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
+            AddMessage(msg);
+
+
+        }
+        else
+        {
+            // Automatically set the AI player as ready (server only)
+            // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
+            RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
+        }
+    }
+
     // Called when pressing the button to start
     // Doesn't actually start the game until ALL
     // the players connected have pressed their start buttons.
@@ -243,7 +266,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.StartGame(playerTeam); // is needed (JYE: WORK ON EVERYTHING RELATED TO THIS METHOD)
         RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
-
+        ReloadLobby();
         
 
         // Only changes the player's local lobby, not the host's
