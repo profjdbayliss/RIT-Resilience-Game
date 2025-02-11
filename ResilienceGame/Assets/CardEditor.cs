@@ -76,6 +76,8 @@ public class CardEditor : MonoBehaviour {
     [SerializeField] private Toggle obfuscated;
     [SerializeField] private Toggle doom;
 
+    [Header("Error message")]
+    [SerializeField] private GameObject errorMessage;
 
     private List<EditorCard> cards = new List<EditorCard>();
     private const string DEFAULT_NAME = "SectorDownCards.csv";
@@ -83,10 +85,11 @@ public class CardEditor : MonoBehaviour {
     string headers;
     bool isOpen = false;
     bool cardSelected = false;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        errorMessage.SetActive(false); 
     }
 
 
@@ -305,10 +308,12 @@ public class CardEditor : MonoBehaviour {
                     deckTitle.text = setName;
                     ToggleMenuOpen();
 
+                    errorMessage.SetActive(false);
 
                 }
                 catch (Exception e) {
-                    Debug.LogError($"Error reading CSV file: {e.Message}");
+                    Debug.LogError($"Error reading CSV file: {e.Message}"); 
+                    errorMessage.SetActive(true);
                 }
             }
             else {
