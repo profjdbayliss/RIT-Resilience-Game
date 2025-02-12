@@ -32,4 +32,10 @@ public class DeckValues : MonoBehaviour
         NetworkManager.GetComponent<PickADeckScript>().ToggleDeckCanvas();
         DeckNameHolder.GetComponent<DeckNameHolder>().OpenDeck(deckLocationAndName, name); 
     }
+
+    public void removeDeck()
+    {
+        NetworkManager.GetComponent<PickADeckScript>().DestroyADeck(name);
+    }
+
 }
