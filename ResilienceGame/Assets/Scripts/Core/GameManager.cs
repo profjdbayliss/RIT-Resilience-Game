@@ -213,10 +213,15 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Used for Lobby "Begin" Button
     public void BeginLobby()
     {
-        NetworkRoomManager roomManager = FindObjectOfType<NetworkRoomManager>();
-        if (roomManager.allPlayersReady == true)
+        if (RGNetworkPlayerList.instance.CheckReadyToStart())
         {
-            roomManager.OnRoomServerPlayersReady();
+            RGNetworkPlayerList.instance.AddWhitePlayer();
+            RealGameStart();
+            // get the turn taking flags ready to go again
+            for (int i = 0; i < RGNetworkPlayerList.instance.playerTurnTakenFlags.Count; i++)
+            {
+                RGNetworkPlayerList.instance.playerTurnTakenFlags[i] = false;
+            }
         }
         else
         {

@@ -47,7 +47,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #region Player Lists
     public List<int> playerIDs = new List<int>();
     private List<bool> playerNetworkReadyFlags = new List<bool>();
-    private List<bool> playerTurnTakenFlags = new List<bool>();
+    public List<bool> playerTurnTakenFlags = new List<bool>();
     public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
     public List<string> playerNames = new List<string>();
     private Dictionary<int, NetworkConnectionToClient> playerConnections = new Dictionary<int, NetworkConnectionToClient>();
@@ -99,10 +99,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerNames.Add(name);
             if (id != 0) {
                 manager.networkPlayers.Add(cardPlayer);
-                // manager.playerDictionary.Add(id, cardPlayer);
-                //TODO remove
-
-                // manager.opponentPlayer = cardPlayer;
             }
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
             BroadcastPlayerList();
@@ -130,18 +126,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         if (isServer) {
             playerTypes[localPlayerID] = type;
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
-            if (CheckReadyToStart()) {
-                AddWhitePlayer();
-                Debug.Log("Ready to start server is last!!");
-                manager.RealGameStart();
-                // get the turn taking flags ready to go again
-                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                    playerTurnTakenFlags[i] = false;
-                }
-            }
-            else {
-                Debug.Log("not ready to start!");
-            }
         }
     }
 
@@ -958,7 +942,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             Debug.Log("setting player type to " + playerType);
 
                             // check to see if we've got a player type for everybody!
-                            if (CheckReadyToStart()) {
+                            /*if (CheckReadyToStart()) {
                                 Debug.Log("Ready to start!");
                                 AddWhitePlayer();
                                 manager.RealGameStart();
@@ -966,7 +950,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                                 for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
                                     playerTurnTakenFlags[i] = false;
                                 }
-                            }
+                            }*/
                         }
                     }
                     break;
