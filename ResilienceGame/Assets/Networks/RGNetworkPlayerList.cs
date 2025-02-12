@@ -940,17 +940,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             playerTypes[playerIndex] = playerType;
                             playerTurnTakenFlags[playerIndex] = true;
                             Debug.Log("setting player type to " + playerType);
-
-                            // check to see if we've got a player type for everybody!
-                            /*if (CheckReadyToStart()) {
-                                Debug.Log("Ready to start!");
-                                AddWhitePlayer();
-                                manager.RealGameStart();
-                                // get the turn taking flags ready to go again
-                                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                                    playerTurnTakenFlags[i] = false;
-                                }
-                            }*/
                         }
                     }
                     break;
