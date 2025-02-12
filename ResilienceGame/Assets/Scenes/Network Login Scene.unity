@@ -4262,7 +4262,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2107780630}
+      - m_Target: {fileID: 2107780632}
         m_TargetAssemblyTypeName: PickADeckScript, Assembly-CSharp
         m_MethodName: ToggleDeckCanvas
         m_Mode: 1
