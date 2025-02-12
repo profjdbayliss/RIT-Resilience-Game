@@ -110,6 +110,7 @@ public class PlayerLobbyManager : NetworkBehaviour
     public void UpdatePlayerLobbyUI() // called on client disconnect somewhere
     {
         HandlePlayerChanges(players);
+        ShowLobbyCoverForNonHostPlayers();
     }
 
     public void HandlePlayerChanges(SyncList<PlayerData> playerDataList) // called on disconnect and when the host joins in GameManager.
@@ -121,6 +122,26 @@ public class PlayerLobbyManager : NetworkBehaviour
         foreach (var playerData in playerDataList)
         {
             AddPlayerToUI(playerData);
+        }
+    }
+
+    private void ShowLobbyCoverForNonHostPlayers()
+    {
+        foreach (var player in players)
+        {
+            if (player.Team != PlayerTeam.Red) // Assuming Red is the host team
+            {
+                // Find the corresponding LobbyItem and show the cover
+                var lobbyItems = FindObjectsOfType<LobbyItem>();
+                foreach (var item in lobbyItems)
+                {
+                    if (item.PlayerName.text == player.Name)
+                    {
+                        item.ShowLobbyCover();
+                        break;
+                    }
+                }
+            }
         }
     }
 }

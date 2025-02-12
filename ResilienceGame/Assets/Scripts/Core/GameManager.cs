@@ -154,6 +154,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     
     // Reference to PlayerLobbyManager
     private PlayerLobbyManager playerLobbyManager;
+
+    // Reference to LobbyCover UI element
+    public GameObject lobbyCover;
     #endregion
 
     #region Initialization
@@ -277,6 +280,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         mStartGameRun = true;
         Debug.Log("start game set!");
+
+        // Hide the lobby cover for all players
+        HideLobbyCover();
     }
     //called by the network server to assign the sectors to the players
     public void AssignSectorToPlayer(int playerIndex, int sectorType) {
@@ -1765,6 +1771,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
     public void Quit() {
         Application.Quit();
+    }
+    #endregion
+
+    #region Lobby Cover
+    public void HideLobbyCover() {
+        if (lobbyCover != null) {
+            lobbyCover.SetActive(false);
+        }
     }
     #endregion
 }
