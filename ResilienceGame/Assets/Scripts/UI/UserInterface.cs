@@ -81,6 +81,9 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private List<Button> allySelectionButtons;
     [SerializeField] private GameObject allySelectionButtonPrefab;
 
+    [Header("Lobby Screen")]
+    [SerializeField] private GameObject clientLobbyScreen;
+
     [Header("End Game")]
     public GameObject endGameCanvas;
     public TextMeshProUGUI endGameTitle;
@@ -250,53 +253,6 @@ public class UserInterface : MonoBehaviour
             GamePhase.End => "",
             _ => ""
         };
-    }
-
-    public void BuildLobbyMenu() // does nothing
-    {
-        foreach (Transform child in playerMenuContainer)
-            Destroy(child.gameObject);
-
-        foreach (var player in playerLobbyManager.players)
-        {
-            var playerItem = Instantiate(playerMenuPrefab, playerMenuContainer);
-            var textComponent = playerItem.GetComponentInChildren<TextMeshProUGUI>();
-            if (textComponent != null)
-                textComponent.text = $"{player.Name} - Team: {player.Team}";
-
-            var bgImage = playerItem.GetComponent<Image>();
-            if (bgImage != null)
-                bgImage.color = player.Team == PlayerTeam.Red ? playerLobbyManager.redColor : playerLobbyManager.blueColor;
-        }
-        UpdateLobbyUI();
-    }
-
-    public void UpdateLobbyUI()
-    {
-        foreach (Transform child in playerMenuContainer)
-            Destroy(child.gameObject);
-
-        foreach (var player in playerLobbyManager.players)
-        {
-            var playerItem = Instantiate(playerMenuPrefab, playerMenuContainer);
-            var textComponent = playerItem.GetComponentInChildren<TextMeshProUGUI>();
-            if (textComponent != null)
-                textComponent.text = $"{player.Name} - Team: {player.Team}";
-
-            var bgImage = playerItem.GetComponent<Image>();
-                if (player.Team == PlayerTeam.Red)
-                {
-                    bgImage.color = playerLobbyManager.redColor;
-                }
-                else if (player.Team == PlayerTeam.Blue)
-                {
-                    bgImage.color = playerLobbyManager.blueColor;
-                }
-                else
-                {
-                    bgImage.color = Color.gray; // Default/fallback color
-                }
-        }
     }
 
     public void UpdateMeepleAmountUI(/*float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples*/)
@@ -538,6 +494,7 @@ public class UserInterface : MonoBehaviour
         if (enable) UpdatePlayerMenuItems();
         playerMenuParent.gameObject.SetActive(enable);
     }
+
     public void ToggleDownedSectorInMenu(int sectorIndex, bool enable)
     {
         if (sectorIndex < 0 || sectorIndex >= sectorXIcons.Count)
@@ -549,14 +506,7 @@ public class UserInterface : MonoBehaviour
         sectorXIcons[sectorIndex].color = new Color(255, 255, 255, enable ? 1 : 0);
 
     }
-    public void AddPlayerToLobby(string name, PlayerTeam team)
-    {
-        //playerLobbyManager.AddPlayer(name, team);
-    }
-    public void ChangePlayerTeam(string name, PlayerTeam team)
-    {
-       // playerLobbyManager.ChangePlayerTeam(name, team);
-    }
+
     public void UpdateOTChargesText()
     {
         overTimeChargesText.text = GameManager.Instance.actualPlayer.overTimeCharges.ToString();
@@ -689,6 +639,16 @@ public class UserInterface : MonoBehaviour
         {
             scoreItems[i].scoreItem.transform.SetSiblingIndex(i);
         }
+    }
+
+    public void ShowClientLobby()
+    {
+        clientLobbyScreen.SetActive(true);
+    }
+
+    public void HideClientLobby()
+    {
+        clientLobbyScreen.SetActive(false);
     }
 
     public void HideEndGameCanvas()
