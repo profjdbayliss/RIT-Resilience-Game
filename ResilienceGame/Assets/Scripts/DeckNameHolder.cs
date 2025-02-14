@@ -43,15 +43,18 @@ public class DeckNameHolder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //For counting the time
-        timeD += Time.deltaTime;
-        if (timeD >= 0.5f) //disables the big button, which blocks all buttons with it's size
+        if (bigButton != null)
         {
-            bigButton.SetActive(false);
-        }
-        if (timeD >= 1.5f)
-        {
-            errorMessage.text = "";
+            //For counting the time
+            timeD += Time.deltaTime;
+            if (timeD >= 0.5f) //disables the big button, which blocks all buttons with it's size
+            {
+                bigButton.SetActive(false);
+            }
+            if (timeD >= 1.5f)
+            {
+                errorMessage.text = "";
+            }
         }
     }
 

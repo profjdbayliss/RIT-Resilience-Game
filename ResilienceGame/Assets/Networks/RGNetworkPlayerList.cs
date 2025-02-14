@@ -47,7 +47,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #region Player Lists
     public List<int> playerIDs = new List<int>();
     private List<bool> playerNetworkReadyFlags = new List<bool>();
-    private List<bool> playerTurnTakenFlags = new List<bool>();
+    public List<bool> playerTurnTakenFlags = new List<bool>();
     public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
     public List<string> playerNames = new List<string>();
     private Dictionary<int, NetworkConnectionToClient> playerConnections = new Dictionary<int, NetworkConnectionToClient>();
@@ -99,12 +99,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerNames.Add(name);
             if (id != 0) {
                 manager.networkPlayers.Add(cardPlayer);
-                // manager.playerDictionary.Add(id, cardPlayer);
-                //TODO remove
-
-                // manager.opponentPlayer = cardPlayer;
             }
-
+            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+            BroadcastPlayerList();
+            PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
         }
     }
     public void SetAiPlayerAsReadyToStartGame() {
@@ -127,18 +125,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     public void SetPlayerType(PlayerTeam type) {
         if (isServer) {
             playerTypes[localPlayerID] = type;
-            if (CheckReadyToStart()) {
-                AddWhitePlayer();
-                Debug.Log("Ready to start server is last!!");
-                manager.RealGameStart();
-                // get the turn taking flags ready to go again
-                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                    playerTurnTakenFlags[i] = false;
-                }
-            }
-            else {
-                Debug.Log("not ready to start!");
-            }
+            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
         }
     }
 
@@ -196,6 +183,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerTypes.RemoveAt(index);
             playerNetworkReadyFlags.RemoveAt(index);
             playerTurnTakenFlags.RemoveAt(index);
+            //NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+            //BroadcastPlayerList();
         }
     }
 
@@ -731,7 +720,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             AdditionalFacilitySelectedTwo = (FacilityType)facilityEffect2,
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
                         };
-                        Debug.Log("client received update message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + "for game phase " + gamePhase);
+                        Debug.Log("client received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
 
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
@@ -951,17 +940,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             playerTypes[playerIndex] = playerType;
                             playerTurnTakenFlags[playerIndex] = true;
                             Debug.Log("setting player type to " + playerType);
-
-                            // check to see if we've got a player type for everybody!
-                            if (CheckReadyToStart()) {
-                                Debug.Log("Ready to start!");
-                                AddWhitePlayer();
-                                manager.RealGameStart();
-                                // get the turn taking flags ready to go again
-                                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                                    playerTurnTakenFlags[i] = false;
-                                }
-                            }
                         }
                     }
                     break;
@@ -1245,6 +1223,35 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
     #endregion
+
+    public void NotifyPlayerChanges() { 
+        if (isServer) {
+            // Create a list of PlayerData objects
+            SyncList<PlayerData> playerDataList = new SyncList<PlayerData>();
+            for (int i = 0; i < playerIDs.Count; i++) {
+                playerDataList.Add(new PlayerData { Name = playerNames[i], Team = playerTypes[i] });
+            }
+
+            PlayerLobbyManager.Instance.players = playerDataList;
+
+            // Send the player data to the PlayerLobbyManager
+            Debug.Log("Lobby should be updated now");
+            //PlayerLobbyManager.Instance.HandlePlayerChanges(playerDataList);
+            PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
+        }
+    }
+
+    public void RpcUpdatePlayerList(int[] updatedPlayerIDs, string[] updatedPlayerNames)
+    {
+        playerIDs = updatedPlayerIDs.ToList();
+        playerNames = updatedPlayerNames.ToList();
+        NotifyPlayerChanges();
+    }
+
+    private void BroadcastPlayerList()
+    {
+        RpcUpdatePlayerList(playerIDs.ToArray(), playerNames.ToArray());
+    }
 
 
 }

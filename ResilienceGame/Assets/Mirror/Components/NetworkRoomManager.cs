@@ -87,7 +87,7 @@ namespace Mirror
 
                     if (nowReady)
                     {
-                        OnRoomServerPlayersReady();
+                        //OnRoomServerPlayersReady();
                     }
                     else
                     {
@@ -169,31 +169,6 @@ namespace Mirror
                 }
         }
 
-        /// <summary>
-        /// CheckReadyToBegin checks all of the players in the room to see if their readyToBegin flag is set.
-        /// <para>If all of the players are ready, then the server switches from the RoomScene to the PlayScene, essentially starting the game. This is called automatically in response to NetworkRoomPlayer.CmdChangeReadyState.</para>
-        /// </summary>
-        public void CheckReadyToBegin()
-        {
-            if (!Utils.IsSceneActive(RoomScene))
-                return;
-
-            int numberOfReadyPlayers = NetworkServer.connections.Count(conn =>
-                conn.Value != null &&
-                conn.Value.identity != null &&
-                conn.Value.identity.TryGetComponent(out NetworkRoomPlayer nrp) &&
-                nrp.readyToBegin);
-
-            bool enoughReadyPlayers = minPlayers <= 0 || numberOfReadyPlayers >= minPlayers;
-            if (enoughReadyPlayers)
-            {
-                pendingPlayers.Clear();
-                allPlayersReady = true;
-            }
-            else
-                allPlayersReady = false;
-        }
-
         #region server handlers
 
         /// <summary>
@@ -237,7 +212,7 @@ namespace Mirror
                 }
             }
 
-            allPlayersReady = false;
+            //allPlayersReady = false;
 
             foreach (NetworkRoomPlayer player in roomSlots)
             {
@@ -301,6 +276,7 @@ namespace Mirror
                     newRoomGameObject = Instantiate(roomPlayerPrefab.gameObject, Vector3.zero, Quaternion.identity);
 
                 NetworkServer.AddPlayerForConnection(conn, newRoomGameObject);
+                SynchronizeRoomSlots(); // Synchronize roomSlots list with all clients
             }
             else
             {
@@ -308,6 +284,7 @@ namespace Mirror
                 Debug.Log($"Not in Room scene...disconnecting {conn}");
                 conn.Disconnect();
             }
+            SynchronizeRoomSlots();
         }
 
         [Server]
@@ -593,11 +570,6 @@ namespace Mirror
                         ReadyPlayers++;
                 }
             }
-
-            if (CurrentPlayers == ReadyPlayers)
-                CheckReadyToBegin();
-            else
-                allPlayersReady = false;
         }
 
         /// <summary>
@@ -657,28 +629,17 @@ namespace Mirror
 
         #endregion
 
-        #region optional UI
-
-        /// <summary>
-        /// virtual so inheriting classes can roll their own
-        /// </summary>
-        public virtual void OnGUI()
+        [Server]
+        public void SynchronizeRoomSlots()
         {
-            if (!showRoomGUI)
-                return;
-
-            if (NetworkServer.active && Utils.IsSceneActive(GameplayScene))
+            if (RoomSyncManager.Instance != null)
             {
-                GUILayout.BeginArea(new Rect(Screen.width - 150f, 10f, 140f, 30f));
-                if (GUILayout.Button("Return to Room"))
-                    ServerChangeScene(RoomScene);
-                GUILayout.EndArea();
+                RoomSyncManager.Instance.RpcUpdateRoomSlots(roomSlots.ToArray());
             }
-
-            if (Utils.IsSceneActive(RoomScene))
-                GUI.Box(new Rect(10f, 180f, 520f, 150f), "PLAYERS");
+            else
+            {
+                Debug.LogWarning("RoomSyncManager instance is missing!");
+            }
         }
-
-        #endregion
     }
 }

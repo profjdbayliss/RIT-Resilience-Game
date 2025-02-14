@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Mirror
@@ -114,20 +115,34 @@ namespace Mirror
         /// This is a hook that is invoked on clients for all room player objects when entering the room.
         /// <para>Note: isLocalPlayer is not guaranteed to be set until OnStartLocalPlayer is called.</para>
         /// </summary>
-        public virtual void OnClientEnterRoom() {}
+        public virtual void OnClientEnterRoom() 
+        {
+            UpdatePlayerList();
+            if (!isLocalPlayer)
+            {
+               
+            }
+        }
 
         /// <summary>
         /// This is a hook that is invoked on clients for all room player objects when exiting the room.
         /// </summary>
-        public virtual void OnClientExitRoom() {}
+        public virtual void OnClientExitRoom()
+        {
+            UpdatePlayerList();
+            if (!isLocalPlayer)
+            {
+
+            }
+        }
 
         #endregion
 
-        #region Optional UI
+            #region Optional UI
 
-        /// <summary>
-        /// Render a UI for the room. Override to provide your own UI
-        /// </summary>
+            /// <summary>
+            /// Render a UI for the room. Override to provide your own UI
+            /// </summary>
         public virtual void OnGUI()
         {
             if (!showRoomGUI)
@@ -187,6 +202,31 @@ namespace Mirror
                 }
 
                 GUILayout.EndArea();
+            }
+        }
+
+        #endregion
+
+        #region RoomSlots Synchronization
+
+        [ClientRpc]
+        public void RpcUpdateRoomSlots(NetworkRoomPlayer[] updatedRoomSlots)
+        {
+            if (NetworkManager.singleton is NetworkRoomManager room)
+            {
+                room.roomSlots = new List<NetworkRoomPlayer>(updatedRoomSlots);
+            }
+        }
+
+        #endregion
+
+        #region Player List Update
+
+        public void UpdatePlayerList()
+        {
+            if (NetworkManager.singleton is NetworkRoomManager room)
+            {
+                room.SynchronizeRoomSlots();
             }
         }
 

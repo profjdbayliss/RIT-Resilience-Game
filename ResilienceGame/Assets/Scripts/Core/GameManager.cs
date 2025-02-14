@@ -151,6 +151,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public int UniqueFacilityEffectIdCount { get; set; }
     public bool WaitingForAnimations { get; private set; } = false; //flag to check if all sectors are ready to progress phase
     public bool CanEndPhase => !activeSectors.Any(sector => sector.HasOngoingUpdates || sector.IsAnimating);
+    
+    // Reference to PlayerLobbyManager
+    private PlayerLobbyManager playerLobbyManager;
     #endregion
 
     #region Initialization
@@ -166,7 +169,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 Debug.Log("deck choice is null!");
             }
         }
-
+        
         if (sliderValue != null) {
             // set this player's type
             switch (sliderValue) {
@@ -183,8 +186,54 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // display player type on view???
             Debug.Log("player type set to be " + playerTeam);
         }
-
     }
+
+    public void ReloadLobby()
+    {
+        if (UserInterface.Instance.hostLobbyBeginError != null)
+        {
+            UserInterface.Instance.hostLobbyBeginError.SetActive(false);
+        }
+ 
+        // tell everybody else of this player's type
+        if (!IsServer)
+        {
+            Message msg;
+            List<int> tmpList = new List<int>() {
+                    (int)playerTeam
+                };
+            msg = new Message(CardMessageType.SharePlayerType, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
+            AddMessage(msg);
+
+
+        }
+        else
+        {
+            // Automatically set the AI player as ready (server only)
+            // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
+            RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
+        }
+    }
+
+    // Used for Lobby "Begin" Button
+    public void BeginLobby()
+    {
+        if (RGNetworkPlayerList.instance.CheckReadyToStart())
+        {
+            RGNetworkPlayerList.instance.AddWhitePlayer();
+            RealGameStart();
+            // get the turn taking flags ready to go again
+            for (int i = 0; i < RGNetworkPlayerList.instance.playerTurnTakenFlags.Count; i++)
+            {
+                RGNetworkPlayerList.instance.playerTurnTakenFlags[i] = false;
+            }
+        }
+        else
+        {
+            UserInterface.Instance.hostLobbyBeginError.SetActive(true);
+        }
+    }
+
     // Called when pressing the button to start
     // Doesn't actually start the game until ALL
     // the players connected have pressed their start buttons.
@@ -199,7 +248,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // basic init of player
             SetPlayerType();
             SetupActors();
-            UserInterface.Instance.StartGame(playerTeam);
 
             // init various objects to be used in the game
             roundsLeft = BASE_MAX_TURNS;
@@ -208,9 +256,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
             actualPlayer.playerName = RGNetworkPlayerList.instance.localPlayerName;
-
-
-
 
             // tell everybody else of this player's type
             if (!IsServer) {
@@ -224,12 +269,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
             }
             else {
-                // Automatically set the AI player as ready (server only)
-                // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
                 RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
             }
 
         }
+
+        // Comment these out one by one until you weed out the unneccessary ones:
+        RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
+        UserInterface.Instance.StartGame(playerTeam);
+        RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
+        RGNetworkPlayerList.instance.NotifyPlayerChanges();
+
         mStartGameRun = true;
         Debug.Log("start game set!");
     }

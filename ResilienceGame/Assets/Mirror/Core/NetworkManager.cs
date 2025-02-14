@@ -147,10 +147,6 @@ namespace Mirror
         /// <summary>True if the server is running or client is connected/connecting.</summary>
         public bool isNetworkActive => NetworkServer.active || NetworkClient.active;
 
-        // TODO remove this
-        // internal for tests
-        internal static NetworkConnection clientReadyConnection;
-
         /// <summary>True if the client loaded a new scene when connecting to the server.</summary>
         // This is set before OnClientConnect is called, so it can be checked
         // there to perform different logic if a scene load occurred.
@@ -796,7 +792,6 @@ namespace Mirror
             // reset all statics
             startPositions.Clear();
             startPositionIndex = 0;
-            clientReadyConnection = null;
             loadingSceneAsync = null;
             networkSceneName = string.Empty;
 
@@ -1030,11 +1025,7 @@ namespace Mirror
             // it's very obvious to notice.
             //Debug.Log("Finished loading scene in host mode.");
 
-            if (clientReadyConnection != null)
-            {
                 clientLoadedScene = true;
-                clientReadyConnection = null;
-            }
 
             // do we need to finish a StartHost() call?
             // then call FinishStartHost and let it take care of spawning etc.
@@ -1089,11 +1080,7 @@ namespace Mirror
             // it's very obvious to notice.
             //Debug.Log("Finished loading scene in client-only mode.");
 
-            if (clientReadyConnection != null)
-            {
                 clientLoadedScene = true;
-                clientReadyConnection = null;
-            }
 
             if (NetworkClient.isConnected)
                 OnClientSceneChanged();
@@ -1208,7 +1195,6 @@ namespace Mirror
                 return;
             }
 
-            // FOR SOME FUCKING REASON IT IS CALLING THIS TIWCE
             if (conn.identity != null)
             {
                 Debug.Log("There is already a player for this connection. " + conn.identity.netId);
@@ -1255,7 +1241,6 @@ namespace Mirror
             {
                 // Scene message expected from server.
                 clientLoadedScene = true;
-                clientReadyConnection = NetworkClient.connection;
             }
 
             // Call virtual method regardless of whether a scene change is expected or not.
