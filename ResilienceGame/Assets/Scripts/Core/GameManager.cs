@@ -190,6 +190,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void ReloadLobby()
     {
+        if (UserInterface.Instance.hostLobbyBeginError != null)
+        {
+            UserInterface.Instance.hostLobbyBeginError.SetActive(false);
+        }
+ 
         // tell everybody else of this player's type
         if (!IsServer)
         {
@@ -225,7 +230,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         else
         {
-            Debug.LogError("NetworkRoomManager not found.");
+            UserInterface.Instance.hostLobbyBeginError.SetActive(true);
         }
     }
 

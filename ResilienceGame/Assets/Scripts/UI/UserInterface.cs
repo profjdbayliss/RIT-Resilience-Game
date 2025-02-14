@@ -83,6 +83,7 @@ public class UserInterface : MonoBehaviour
 
     [Header("Lobby Screen")]
     [SerializeField] private GameObject clientLobbyScreen;
+    [SerializeField] public GameObject hostLobbyBeginError;
 
     [Header("End Game")]
     public GameObject endGameCanvas;
@@ -206,6 +207,10 @@ public class UserInterface : MonoBehaviour
             if (player.isLocalPlayer)
             {
                 HideClientLobby();
+            }
+            else
+            {
+                ShowClientLobby();
             }
         }
 
