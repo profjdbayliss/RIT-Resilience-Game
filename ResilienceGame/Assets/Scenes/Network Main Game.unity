@@ -10263,7 +10263,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &252625041
 RectTransform:
   m_ObjectHideFlags: 0
@@ -78525,7 +78525,7 @@ MonoBehaviour:
   rightSelectionparent: {fileID: 1611116910}
   allySelectionButtons: []
   allySelectionButtonPrefab: {fileID: 4509484271477977223, guid: 9301127729008aa43a0aa32cf715aa36, type: 3}
-  clientLobbyScreen: {fileID: 252625041}
+  clientLobbyScreen: {fileID: 252625040}
   endGameCanvas: {fileID: 1756113746}
   endGameTitle: {fileID: 894850864}
   playerScoreItemPrefab: {fileID: 8883647235797787941, guid: 76f14c0fca0b58f48aa95d4025c402c4, type: 3}

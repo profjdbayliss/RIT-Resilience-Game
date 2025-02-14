@@ -1224,7 +1224,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
     #endregion
 
-    public void NotifyPlayerChanges() { // This is being called when a player disconnects, needs to be called when a player "gets ready"
+    public void NotifyPlayerChanges() { 
         if (isServer) {
             // Create a list of PlayerData objects
             SyncList<PlayerData> playerDataList = new SyncList<PlayerData>();
@@ -1252,4 +1252,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     {
         RpcUpdatePlayerList(playerIDs.ToArray(), playerNames.ToArray());
     }
+
+
 }

@@ -203,6 +203,10 @@ public class UserInterface : MonoBehaviour
         foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
         {
             player.UpdatePlayerVisibility();
+            if (player.isLocalPlayer)
+            {
+                HideClientLobby();
+            }
         }
 
         //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
@@ -648,7 +652,7 @@ public class UserInterface : MonoBehaviour
 
     public void HideClientLobby()
     {
-        clientLobbyScreen.SetActive(false);
+            clientLobbyScreen.SetActive(false);
     }
 
     public void HideEndGameCanvas()

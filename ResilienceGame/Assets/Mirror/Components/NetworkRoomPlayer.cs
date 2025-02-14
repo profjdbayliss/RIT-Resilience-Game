@@ -118,23 +118,31 @@ namespace Mirror
         public virtual void OnClientEnterRoom() 
         {
             UpdatePlayerList();
+            if (!isLocalPlayer)
+            {
+               
+            }
         }
 
         /// <summary>
         /// This is a hook that is invoked on clients for all room player objects when exiting the room.
         /// </summary>
-        public virtual void OnClientExitRoom() 
+        public virtual void OnClientExitRoom()
         {
             UpdatePlayerList();
+            if (!isLocalPlayer)
+            {
+
+            }
         }
 
         #endregion
 
-        #region Optional UI
+            #region Optional UI
 
-        /// <summary>
-        /// Render a UI for the room. Override to provide your own UI
-        /// </summary>
+            /// <summary>
+            /// Render a UI for the room. Override to provide your own UI
+            /// </summary>
         public virtual void OnGUI()
         {
             if (!showRoomGUI)
