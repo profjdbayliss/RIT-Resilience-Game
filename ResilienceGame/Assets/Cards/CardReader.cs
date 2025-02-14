@@ -22,7 +22,7 @@ public class CardReader : MonoBehaviour {
     public string outputAtlasName;
 
     // filename + directory path
-    string fileLocation = Path.Join(Application.streamingAssetsPath, "SectorDownCards.csv");
+    string fileLocation = Path.Join(Application.streamingAssetsPath + "/SavedCSVs/", "SectorDownCards.csv");
 
     // card prefab that all cards are made from
     public GameObject cardPrefab;
@@ -322,10 +322,10 @@ public class CardReader : MonoBehaviour {
                             break;
                     }
 
-
-                    // 7/8: card image
                     Texture2D tex3 = new Texture2D(TextureAtlas.SIZE, TextureAtlas.SIZE); // This needs to match the textureatlas pixel width
                     string imageFilename = individualCSVObjects[27].Trim(); // TODO: Set to single image Atlas
+
+                    // 7/8: card image
 
                     if (individualCSVObjects[7] != "") {
                         int col = int.Parse(individualCSVObjects[7].Trim());
@@ -337,9 +337,10 @@ public class CardReader : MonoBehaviour {
                         tex3.Apply();
                     }
                     tempCardFront.img = tex3;
+                    
 
                     // 9/10: card background // TODO: Set to single image Atlas
-                    tex3 = new Texture2D(TextureAtlas.SIZE, TextureAtlas.SIZE); // This needs to match the textureatlas pixel width
+
 
                     if (individualCSVObjects[9] != "") {
                         int col = int.Parse(individualCSVObjects[9].Trim());
@@ -412,6 +413,18 @@ public class CardReader : MonoBehaviour {
                     // 26:  Text description
                     tempCardFront.description = individualCSVObjects[26];
                     tempCardFront.description.Replace(';', ',');
+
+                    // 27:  Image
+                    try
+                    {
+                        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath + "/", individualCSVObjects[27]);
+                        var rawData = System.IO.File.ReadAllBytes(filePath);
+                        tempCardFront.img.LoadImage(rawData); 
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e);
+                    }
 
                     // 28:  Is this card obfuscated?
                     tempCard.data.isObfuscated = bool.Parse(individualCSVObjects[28].Trim());
