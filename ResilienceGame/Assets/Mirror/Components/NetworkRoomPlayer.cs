@@ -117,11 +117,6 @@ namespace Mirror
         /// </summary>
         public virtual void OnClientEnterRoom() 
         {
-            UpdatePlayerList();
-            if (!isLocalPlayer)
-            {
-               
-            }
         }
 
         /// <summary>
@@ -129,11 +124,6 @@ namespace Mirror
         /// </summary>
         public virtual void OnClientExitRoom()
         {
-            UpdatePlayerList();
-            if (!isLocalPlayer)
-            {
-
-            }
         }
 
         #endregion
@@ -220,16 +210,5 @@ namespace Mirror
 
         #endregion
 
-        #region Player List Update
-
-        public void UpdatePlayerList()
-        {
-            if (NetworkManager.singleton is NetworkRoomManager room)
-            {
-                room.SynchronizeRoomSlots();
-            }
-        }
-
-        #endregion
     }
 }
