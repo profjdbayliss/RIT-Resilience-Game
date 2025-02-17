@@ -12,6 +12,10 @@ using static Facility;
 using System;
 using System.Text;
 using System.Collections;
+
+//audio.PlayOneShot(drawSound, 1);
+
+
 #region enums
 // Enum to track player type
 public enum PlayerTeam {
@@ -164,6 +168,12 @@ public class CardPlayer : MonoBehaviour {
     //protected static int sUniqueIDCount = 0;
     public Queue<Update> mUpdatesThisPhase = new Queue<Update>(6);
 
+
+    [Header("SFX")]
+    [SerializeField] private AudioSource audio;
+    [SerializeField] private AudioClip discardSound;
+    [SerializeField] private AudioClip drawSound;
+    [SerializeField] private AudioClip playSound;
 
     // Enum definition
     public enum PlayerReadyState {
@@ -1051,7 +1061,7 @@ public class CardPlayer : MonoBehaviour {
         UserInterface.Instance.UpdateUISizeTrackers(); //update UI
         UserInterface.Instance.UpdatePlayerMenuItem(this);
 
-
+        audio.PlayOneShot(drawSound, 1);
 
         return tempCard;
     }
@@ -1513,10 +1523,11 @@ public class CardPlayer : MonoBehaviour {
                 break;
         }
         if (discard) {
-            Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
+            Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}", this);
             EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
             card.gameObject.SetActive(false);
             UserInterface.Instance.UpdateUISizeTrackers();
+            audio.PlayOneShot(discardSound, 1);
             //GameManager.Instance.AddActionLogMessage($"{playerName} discarded {card.data.name}");
         }
     }
@@ -1642,7 +1653,10 @@ public class CardPlayer : MonoBehaviour {
         }
 
         Debug.Log($"Playing {card.front.title} on {potentialDropLocation.name} - {(canPlay ? "Allowed" : "Rejected")}\n{response}");
-
+        if (canPlay)
+        {
+            audio.PlayOneShot(playSound, 1);
+        }
         return canPlay;
     }
     protected (string, bool) ValidateDiscardPlay(Card card, GameObject potentialDropLocation) {

@@ -154,6 +154,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
     
     // Reference to PlayerLobbyManager
     private PlayerLobbyManager playerLobbyManager;
+
+    [Header("SFX")]
+    [SerializeField] private AudioSource audio;
+    [SerializeField] private AudioClip cardEvent;
+    [SerializeField] private AudioClip handCards;
+
     #endregion
 
     #region Initialization
@@ -341,6 +347,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public void RealGameStart() {
         Debug.Log("running 2nd start of game");
         //gameCanvas.SetActive(true);
+        audio.PlayOneShot(handCards, 1);
         UserInterface.Instance.ToggleGameCanvas(true);
         // send out the starting message with all player info
         // and start the next phase
@@ -1031,6 +1038,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             if (numTurnsTillWhiteCard == 0) {
                 Debug.Log($"Server wants to play a white card");
                 playWhite = true;
+                audio.PlayOneShot(cardEvent, 1);
                 numTurnsTillWhiteCard = UnityEngine.Random.Range(MIN_TURNS_TILL_WHITE_CARD, MAX_TURNS_TILL_WHITE_CARD); //[2-5)
             }
         }
