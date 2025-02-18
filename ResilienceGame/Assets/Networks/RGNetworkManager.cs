@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using Mirror.Examples.Chat;
-using TMPro;
 using UnityEngine.SceneManagement;
 
 public class RGNetworkManager : NetworkManager
@@ -35,8 +31,6 @@ public class RGNetworkManager : NetworkManager
 
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
         SynchronizePlayerList();
-        //UpdatePlayerVisibilityForAll();
-        //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
     }
 
     public void SynchronizePlayerList()
@@ -51,7 +45,6 @@ public class RGNetworkManager : NetworkManager
 
         RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId); //removes player who left
         SynchronizePlayerList();    // THIS UPDATES THE LOBBY
-        //UpdatePlayerVisibilityForAll();
 
         base.OnServerDisconnect(conn);
     }
@@ -60,18 +53,5 @@ public class RGNetworkManager : NetworkManager
     {
         base.OnClientDisconnect();
         SceneManager.LoadScene("MainMenu");
-    }
-
-    public void SetHostname(string hostname)
-    {
-        networkAddress = hostname;
-    }
-
-    public void UpdatePlayerVisibilityForAll()
-    {
-        //foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
-        //{
-            //player.UpdatePlayerVisibility();
-        //}
     }
 }
