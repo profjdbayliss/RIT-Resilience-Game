@@ -8,10 +8,6 @@ using UnityEngine.UI;
 
 public class UserInterface : MonoBehaviour
 {
-
-    //public CardPlayer actualPlayer;
-    //public CardPlayer opponentPlayer; //TODO: remove this and replace with a list of players
-
     public static UserInterface Instance;
     [SerializeField]
     private Sprite[] infoBackgrounds;
@@ -36,8 +32,6 @@ public class UserInterface : MonoBehaviour
     public TextMeshProUGUI mPhaseText;
     public TextMeshProUGUI mPlayerName;
     public TextMeshProUGUI mPlayerDeckType;
-    //public TextMeshProUGUI mOpponentName;
-    //public TextMeshProUGUI mOpponentDeckType;
     public TextMeshProUGUI activePlayerText;
     public Color activePlayerColor;
     public GameObject mEndPhaseButton;
@@ -45,7 +39,6 @@ public class UserInterface : MonoBehaviour
     public Camera cam;
     public TextMeshProUGUI titlee;
     public AlertPanel mAlertPanel;
-    //public DeckSizeTracker deckSizeTracker;
     public GameObject discardDropZone;
     public RectTransform discardRect;
     public GameObject handDropZone;
@@ -100,7 +93,6 @@ public class UserInterface : MonoBehaviour
     [Header("Dice Rolling")]
     [SerializeField] private GameObject diceRollingPanel;
     [SerializeField] private TextMeshProUGUI diceCardEffectText;
-    //[SerializeField] private TextMeshProUGUI dicePassFailText;
     [SerializeField] private Sprite[] dieFaces;
     [SerializeField] private List<Image> dice;
     [SerializeField] private List<TextMeshProUGUI> successText;
@@ -121,7 +113,6 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private RectTransform map;
     [SerializeField] private GameObject mapSectorPanel;
     [SerializeField] private List<MapSector> _mapSectors;
-    //[SerializeField] private GameObject menuButton;
 
     [Header("Sector Lines")]
     [SerializeField] private Image sectorLines;
@@ -129,13 +120,7 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private Color[] doomClockLinesColor;
     [SerializeField] private Color sectorOutlineOwnerColor;
 
-
-
-
-
-
     [Header("Animations")]
-    //animations
     [SerializeField] private float animDuration = 0.2f;
 
     private Coroutine mapStateChangeRoutine;
@@ -147,7 +132,6 @@ public class UserInterface : MonoBehaviour
         SectorPopup
     }
     [SerializeField] public MapState mapState = MapState.Hidden;
-    //[SerializeField] private MapState mapTargetState = MapState.Hidden;
 
     private readonly Vector2 sectorPanelHiddenPos = new Vector2(1421, 105);
     private readonly Vector2 sectorPanelVisiblePos = new Vector2(523, 105);
@@ -214,9 +198,6 @@ public class UserInterface : MonoBehaviour
             }
         }
 
-        //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
-        //playerLobbyManager.UpdatePlayerLobbyUI();
-        //BuildLobbyMenu();
         alertScreenParent.SetActive(false); //Turn off the alert (selection) screen
         mTurnText.text = "" + GameManager.Instance.GetTurnsLeft();
 
@@ -238,7 +219,6 @@ public class UserInterface : MonoBehaviour
             }
         }
         UpdateMeepleAmountUI();
-        //UpdateLobbyUI(); // doen't work, need to replicate the behavior/method used on client disconnect.
     }
 
     private void Awake()
@@ -264,7 +244,7 @@ public class UserInterface : MonoBehaviour
         };
     }
 
-    public void UpdateMeepleAmountUI(/*float blackMeeples, float blueMeeples, float purpleMeeples, float colorlessMeeples*/)
+    public void UpdateMeepleAmountUI()
     {
         for (int i = 0; i < meeplesAmountText.Length; i++)
         {
@@ -275,11 +255,6 @@ public class UserInterface : MonoBehaviour
             meeplesAmountText[i].text = $"{GameManager.Instance.actualPlayer.currentMeeples[i]}/{GameManager.Instance.actualPlayer.GetMaxMeepleAmount(i)}";
 
         }
-        //meeplesAmountText[0].text = blackMeeples.ToString();
-        //meeplesAmountText[1].text = blueMeeples.ToString();
-        //meeplesAmountText[2].text = purpleMeeples.ToString();
-        //if (GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red)
-        //    meeplesAmountText[3].text = colorlessMeeples.ToString();
     }
     public void EnableMeepleButtons()
     {
@@ -315,7 +290,6 @@ public class UserInterface : MonoBehaviour
     }
     public void DisableDiscardDrop()
     {
-        // discardDropZone.SetActive(false);
         if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
         discardMoveRoutine =
             StartCoroutine(
@@ -342,8 +316,6 @@ public class UserInterface : MonoBehaviour
     public void ToggleEndPhaseButton(bool enable)
     {
         mEndPhaseButton.GetComponent<Button>().interactable = enable;
-        //mEndPhaseButton.GetComponent<Image>().sprite = PhaseButtonSprites[enable ? 0 : 1];
-        //mEndPhaseButton.SetActive(enable);
     }
     public void ToggleOvertimeButton(bool enable)
     {
@@ -417,9 +389,6 @@ public class UserInterface : MonoBehaviour
             mAlertPanel.ToggleCardSelectionPanel(true);
 
     }
-    //public void SetPhaseText(string text) {
-    //    mPhaseText.text = text;
-    //}
     public void ResolveTextAlert()
     {
         mAlertPanel.ResolveTextAlert();
@@ -480,7 +449,6 @@ public class UserInterface : MonoBehaviour
             Debug.Log($"Could not find sector shadow for {sector.sectorName}");
             return;
         }
-        //Debug.Log($"sector {sector.sectorName} has sibling index {sector.transform.GetSiblingIndex()}");
         var icon = sectorIcons[sector.transform.GetSiblingIndex() - 1];
         icon.SetSector(sectorShadow, sector.Owner == null);
         icon.gameObject.SetActive(false);
@@ -650,11 +618,13 @@ public class UserInterface : MonoBehaviour
         }
     }
 
+    // Shows the lobby screens for the non-hosting players
     public void ShowClientLobby()
     {
         clientLobbyScreen.SetActive(true);
     }
 
+    // Hides non-host lobby screen (Used so that the Host player doesn't see the screen)
     public void HideClientLobby()
     {
             clientLobbyScreen.SetActive(false);
@@ -673,8 +643,6 @@ public class UserInterface : MonoBehaviour
         else
         {
             var roll = UnityEngine.Random.Range(1, 7);
-            Debug.Log($"Debug Rolling Die with roll: {3}");
-            //ShowDiceRollingPanel("Test Effect", 3, 0, () => Debug.Log($"DEBUG On Dice Roll Complete"));
         }
     }
 
@@ -684,12 +652,9 @@ public class UserInterface : MonoBehaviour
 
         if (!sectors.Any())
         {
-            GameManager.Instance.EndWhitePlayerTurn(); //end white player turn
+            GameManager.Instance.EndWhitePlayerTurn(); //ends the white player's turn
             return;
         }
-
-        Debug.Log($"Displaying Dice roll panel for {sectors.Count} sector rolls with required roll of {rollReq}");
-        //DisplayPassFailText(enable: false);
         diceCardEffectText.text = effect;
         dice.ForEach(x => Destroy(x.transform.parent.gameObject));
         dice.Clear();
