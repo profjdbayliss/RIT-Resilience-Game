@@ -102,9 +102,9 @@ MonoBehaviour:
   otState: 0
   overTimeCharges: 0
   audio: {fileID: 2717440385929867034}
-  discardSound: {fileID: 8300000, guid: 04f336063bfc2f84bb0efe3af26f1c95, type: 3}
-  drawSound: {fileID: 8300000, guid: 896cef2074181244698a5dfb9d870c7f, type: 3}
-  playSound: {fileID: 8300000, guid: 84e9782fb28a60e4fa0deb0aadddffca, type: 3}
+  discardSound: {fileID: 8300000, guid: 49cbfe9ed9f4ff9438ee8aef8ac35c43, type: 3}
+  drawSound: {fileID: 8300000, guid: 36caf6fe544c7c341ba1197fe912362f, type: 3}
+  playSound: {fileID: 8300000, guid: 417c25170c7b95f4ca7cf9c0ef102a8a, type: 3}
 --- !u!82 &2717440385929867034
 AudioSource:
   m_ObjectHideFlags: 0

@@ -84356,8 +84356,8 @@ MonoBehaviour:
   mCreateNegWhiteAtlas: 0
   UniqueCardIdCount: 0
   audio: {fileID: 2133546055}
-  cardEvent: {fileID: 8300000, guid: e55ca1f2d715c4e4096707afe16716de, type: 3}
-  handCards: {fileID: 8300000, guid: ffad29162b1276f49b6d0d4c6bbb4a65, type: 3}
+  cardEvent: {fileID: 8300000, guid: 200212ea55f8b70439f87cb82bd43a69, type: 3}
+  handCards: {fileID: 8300000, guid: 8ff5efce657cebc4195503bde409aff5, type: 3}
 --- !u!4 &2133546054
 Transform:
   m_ObjectHideFlags: 0
