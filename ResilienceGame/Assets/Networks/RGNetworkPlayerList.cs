@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine.InputSystem.Utilities;
 using static Facility;
+using TMPro;
 
 #region Network Message Structs
 public struct RGNetworkShortMessage : NetworkMessage {
@@ -68,6 +69,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         for (int i = 0; i < playerIDs.Count; i++) {
             if (playerTypes[i] == PlayerTeam.Any) {
                 readyToStart = false;
+                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not everyone is ready yet.";
                 break;
             }
         }

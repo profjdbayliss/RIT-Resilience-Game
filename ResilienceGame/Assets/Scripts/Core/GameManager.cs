@@ -202,6 +202,36 @@ public class GameManager : MonoBehaviour, IRGObservable {
     {
         if (RGNetworkPlayerList.instance.CheckReadyToStart())
         {
+            // Check for minimum number of players
+            if (RGNetworkPlayerList.instance.playerIDs.Count < 3)
+            {
+                UserInterface.Instance.hostLobbyBeginError.SetActive(true);
+                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not enough players to start the game. Minimum 3 players required.";
+                return;
+            }
+
+            // Check for at least 1 player on each team
+            int redTeamCount = 0;
+            int blueTeamCount = 0;
+            foreach (var playerType in RGNetworkPlayerList.instance.playerTypes)
+            {
+                if (playerType == PlayerTeam.Red)
+                {
+                    redTeamCount++;
+                }
+                else if (playerType == PlayerTeam.Blue)
+                {
+                    blueTeamCount++;
+                }
+            }
+
+            if (redTeamCount < 1 || blueTeamCount < 1)
+            {
+                UserInterface.Instance.hostLobbyBeginError.SetActive(true);
+                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Each team must have at least 1 player.";
+                return;
+            }
+
             RGNetworkPlayerList.instance.AddWhitePlayer();
             RealGameStart();
             // get the turn taking flags ready to go again
