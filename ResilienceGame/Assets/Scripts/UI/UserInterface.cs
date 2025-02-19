@@ -12,10 +12,13 @@ public class UserInterface : MonoBehaviour
     //public CardPlayer actualPlayer;
     //public CardPlayer opponentPlayer; //TODO: remove this and replace with a list of players
 
+    [SerializeField] AudioSource audio;
+
     public static UserInterface Instance;
     [SerializeField]
     private Sprite[] infoBackgrounds;
     [SerializeField] private Sprite[] doomClockSprites;
+    [SerializeField] private AudioClip doomSound;
     [SerializeField] private GameObject playerMenuPrefab;
     [SerializeField] private PlayerLobbyManager playerLobbyManager;
     [SerializeField] private Sprite[] PhaseButtonSprites;
@@ -440,8 +443,7 @@ public class UserInterface : MonoBehaviour
         {
             doomClockImage.sprite = doomClockSprites[index];
             sectorLines.color = doomClockLinesColor[index];
-
-
+            audio.PlayOneShot(doomSound, 1);
         }
         else
         {
@@ -456,6 +458,7 @@ public class UserInterface : MonoBehaviour
             SetDoomClockActive(false);
             return;
         }
+        audio.PlayOneShot(doomSound, 1);
         doomClockImage.sprite = doomClockSprites[^turnsLeft];
         sectorLines.color = doomClockLinesColor[^turnsLeft];
     }
