@@ -7615,6 +7615,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connectHelpCanvas: {fileID: 1626196624}
   connectHostCanvas: {fileID: 1201568938}
+  connectLobbyCanvas: {fileID: 1201568938}
 --- !u!114 &2107780632
 MonoBehaviour:
   m_ObjectHideFlags: 0
