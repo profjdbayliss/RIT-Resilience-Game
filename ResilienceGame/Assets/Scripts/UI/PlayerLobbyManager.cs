@@ -21,18 +21,10 @@ public class PlayerLobbyManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
-        //players.Callback += OnPlayersChanged;
     }
 
     private void OnDestroy()
     {
-        //players.Callback -= OnPlayersChanged;
-    }
-
-    private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem) // does nothing!
-    {
-        //UserInterface.Instance.BuildLobbyMenu(); // Notify UI to update
-        //UpdatePlayerLobbyUI(); // Update the actual game UI
     }
 
     public void AddPlayer(string name, PlayerTeam team)
@@ -43,21 +35,6 @@ public class PlayerLobbyManager : NetworkBehaviour
             UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
         }
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
-    }
-
-    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam) // Dpesn't do anything
-    {
-        if (isServer)
-        {
-            var player = players.Find(p => p.Name == playerName);
-            if (player != null)
-            {
-                player.Team = newTeam;
-                //players[players.IndexOf(player)] = player; // SyncList updates automatically
-                //UpdatePlayerLobbyUI(); // Update the actual game UI after changing a player's team
-            }
-        }
-        //HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     public void AddPlayerToUI(PlayerData playerData)
@@ -121,6 +98,31 @@ public class PlayerLobbyManager : NetworkBehaviour
         foreach (var playerData in playerDataList)
         {
             AddPlayerToUI(playerData);
+        }
+    }
+    public void KickPlayer(string playerName)
+    {
+        if (isServer)
+        {
+            var player = players.Find(p => p.Name == playerName);
+            if (player != null)
+            {
+                players.Remove(player);
+                UpdatePlayerLobbyUI(); // Update the actual game UI after kicking a player
+            }
+        }
+    }
+
+    public void SwitchPlayerTeam(string playerName)
+    {
+        if (isServer)
+        {
+            var player = players.Find(p => p.Name == playerName);
+            if (player != null)
+            {
+                player.Team = player.Team == PlayerTeam.Red ? PlayerTeam.Blue : PlayerTeam.Red;
+                UpdatePlayerLobbyUI(); // Update the actual game UI after switching a player's team
+            }
         }
     }
 }
