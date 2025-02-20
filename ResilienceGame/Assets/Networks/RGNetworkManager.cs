@@ -32,17 +32,17 @@ public class RGNetworkManager : NetworkManager
         RGNetworkPlayer player = (RGNetworkPlayer)conn.identity.GetComponent<RGNetworkPlayer>();
         string name = player.mPlayerName;
         var cardPlayer = player.cardPlayerInstance;
-
+        //RGNetworkPlayerList.instance.AddPlayer(playerID, name);
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
-        SynchronizePlayerList();
+        //SynchronizePlayerList();
         //UpdatePlayerVisibilityForAll();
         //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
     }
 
-    public void SynchronizePlayerList()
-    {
-        RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
-    }
+    //public void SynchronizePlayerList()
+    //{
+    //    RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
+    //}
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
@@ -50,7 +50,7 @@ public class RGNetworkManager : NetworkManager
             RGNetworkAuthenticator.playerNames.Remove((string)conn.authenticationData);
 
         RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId); //removes player who left
-        SynchronizePlayerList();    // THIS UPDATES THE LOBBY
+        //SynchronizePlayerList();    // THIS UPDATES THE LOBBY
         //UpdatePlayerVisibilityForAll();
 
         base.OnServerDisconnect(conn);

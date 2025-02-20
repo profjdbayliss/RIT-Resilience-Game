@@ -199,20 +199,37 @@ public class UserInterface : MonoBehaviour
     // Start is called when player presses "begin"
     public void StartGame(PlayerTeam playerType)
     {
-        playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType); // Clients see a fully empty lobby with this commented out
-        RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
-        foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
+        int index= RGNetworkPlayerList.instance.playerIDs.FindIndex(x => x == RGNetworkPlayerList.instance.localPlayerID);
+        if(index != -1)
         {
-            player.UpdatePlayerVisibility();
-            if (player.isLocalPlayer)
+            RGNetworkPlayerList.instance.playerTypes[index] = playerType;
+            Debug.Log("player already in list is given type : " + playerType);
+        } else
+        {
+            Debug.Log("local player isn't in player list!" + RGNetworkPlayerList.instance.localPlayerID);
+            int count = 0;
+            foreach (int id in RGNetworkPlayerList.instance.playerIDs)
             {
-                HideClientLobby();
-            }
-            else
-            {
-                ShowClientLobby();
+                Debug.Log("id: " + id + " name: " + RGNetworkPlayerList.instance.playerNames[count]);
+                count++;
+
             }
         }
+        RGNetworkPlayerList.instance.NotifyPlayerChanges();
+        //playerLobbyManager.AddPlayer(RGNetworkPlayerList.instance.localPlayerName, playerType); // Clients see a fully empty lobby with this commented out
+        //RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
+        //foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
+        //{
+        //    player.UpdatePlayerVisibility();
+        //    if (player.isLocalPlayer)
+        //    {
+        //        HideClientLobby();
+        //    }
+        //    else
+        //    {
+        //        ShowClientLobby();
+        //    }
+        //}
 
         //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
         //playerLobbyManager.UpdatePlayerLobbyUI();

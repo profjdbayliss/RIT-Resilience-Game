@@ -4,7 +4,7 @@ using Mirror;
 using TMPro;
 using UnityEngine;
 
-public class PlayerLobbyManager : NetworkBehaviour
+public class PlayerLobbyManager : MonoBehaviour
 {
     [SerializeField] private GameObject playerPopupPrefab;
     [SerializeField] private RectTransform blueLeftParent;
@@ -14,7 +14,7 @@ public class PlayerLobbyManager : NetworkBehaviour
     [SerializeField] public Color redColor;
     [SerializeField] public Color blueColor;
 
-    public SyncList<PlayerData> players = new SyncList<PlayerData>();
+    public List<PlayerData> players = new List<PlayerData>();
 
     public static PlayerLobbyManager Instance { get; private set; }
 
@@ -37,18 +37,20 @@ public class PlayerLobbyManager : NetworkBehaviour
 
     public void AddPlayer(string name, PlayerTeam team)
     {
-        if (isServer)
-        {
+        //if (isServer)
+        //{
             players.Add(new PlayerData { Name = name, Team = team });
             UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
-        }
+        //}
+
+        Debug.Log("add player called for: " + name);
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     public void ChangePlayerTeam(string playerName, PlayerTeam newTeam) // Dpesn't do anything
     {
-        if (isServer)
-        {
+        //if (isServer)
+        //{
             var player = players.Find(p => p.Name == playerName);
             if (player != null)
             {
@@ -56,8 +58,8 @@ public class PlayerLobbyManager : NetworkBehaviour
                 //players[players.IndexOf(player)] = player; // SyncList updates automatically
                 //UpdatePlayerLobbyUI(); // Update the actual game UI after changing a player's team
             }
-        }
-        //HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
+        //}
+        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
     public void AddPlayerToUI(PlayerData playerData)
@@ -112,7 +114,7 @@ public class PlayerLobbyManager : NetworkBehaviour
         HandlePlayerChanges(players);
     }
 
-    public void HandlePlayerChanges(SyncList<PlayerData> playerDataList) // called on disconnect and when the host joins in GameManager.
+    public void HandlePlayerChanges(List<PlayerData> playerDataList) // called on disconnect and when the host joins in GameManager.
     {
         // Clear the current UI
         ClearUI();
@@ -120,7 +122,7 @@ public class PlayerLobbyManager : NetworkBehaviour
         // Add each player to the UI
         foreach (var playerData in playerDataList)
         {
-            AddPlayerToUI(playerData);
+            AddPlayerToUI(playerData);           
         }
     }
 }

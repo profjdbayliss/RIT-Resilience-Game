@@ -37,7 +37,8 @@ public class LobbyItem : MonoBehaviour
         }
         else
         {
-            SetMissingPlayer();
+            backgroundImage.color = missingPlayerColor;
+            //SetMissingPlayer();
         }
     }
 

@@ -273,7 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   redColor: {r: 0.7058824, g: 0.35686275, b: 0.35686275, a: 1}
   blueColor: {r: 0.3882353, g: 0.58431375, b: 0.7529412, a: 1}
-  missingPlayerColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
+  missingPlayerColor: {r: 1, g: 0.96885556, b: 0, a: 1}
   PlayerName: {fileID: 8619153982340501886}
   backgroundImage: {fileID: 7790799613682159410}
 --- !u!1 &8619153982340505216

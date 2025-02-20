@@ -184,6 +184,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
 
             // display player type on view???
+            RGNetworkPlayerList.instance.NotifyPlayerChanges();
             Debug.Log("player type set to be " + playerTeam);
         }
     }
@@ -204,7 +205,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 };
             msg = new Message(CardMessageType.SharePlayerType, (uint)RGNetworkPlayerList.instance.localPlayerID, tmpList);
             AddMessage(msg);
-
+            
 
         }
         else
@@ -277,7 +278,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // Comment these out one by one until you weed out the unneccessary ones:
         RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
         UserInterface.Instance.StartGame(playerTeam);
-        RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
+        //RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
 
         mStartGameRun = true;
@@ -373,6 +374,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         for (int i = 0; i < rgNetPlayers.Length; i++) {
             var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
             var id = rgNetPlayers[i].mPlayerID;
+            Debug.Log("creating players/teams : " + RGNetworkPlayerList.instance.playerNames[id] + " " +
+                RGNetworkPlayerList.instance.playerTypes[id]);
             cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
             cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
             cardPlayer.NetID = id;

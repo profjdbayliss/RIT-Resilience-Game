@@ -9,6 +9,8 @@ using static Facility;
 /// </summary>
 public enum CardMessageType
 {
+    AddLobbyID,
+    RemLobbyID,
     StartGame,
     StartNextPhase,
     EndPhase,
