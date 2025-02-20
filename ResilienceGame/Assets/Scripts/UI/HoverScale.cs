@@ -41,7 +41,7 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             glow.SetActive(true);
             if (playGlowSound)
             {
-                audio.PlayOneShot(glowSound, 0.4f);
+                audio.PlayOneShot(glowSound, 0.2f);
                 playGlowSound = false;
             }
         }

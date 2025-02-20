@@ -158,7 +158,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [Header("SFX")]
     [SerializeField] private AudioSource audio;
     [SerializeField] private AudioClip cardEvent;
-    [SerializeField] private AudioClip handCards;
+    [SerializeField] private AudioClip handCards; 
+    [SerializeField] private AudioClip endJingle;
 
     #endregion
 
@@ -1342,6 +1343,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 if (phaseJustChanged) {
                     Debug.Log("end game has happened. Sending message to other player.");
                     int playerScore = actualPlayer.GetScore();
+                    audio.PlayOneShot(endJingle, 1);
                     AddMessage(new Message(CardMessageType.EndGame, (uint)RGNetworkPlayerList.instance.localPlayerID));
                 }
                 break;
@@ -1404,6 +1406,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             actualPlayer.ReadyState = CardPlayer.PlayerReadyState.EndedPhase;
         }
     }
+
     #endregion
 
     #region Networking
