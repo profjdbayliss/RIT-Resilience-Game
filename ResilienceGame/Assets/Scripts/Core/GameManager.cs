@@ -152,6 +152,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [SerializeField] private AudioClip handCards; 
     [SerializeField] private AudioClip endJingle;
 
+    [Header("debug")]
+    private bool canPlaySolo = false;
+
     #endregion
 
     #region Initialization
@@ -189,7 +192,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (RGNetworkPlayerList.instance.CheckReadyToStart())
         {
             // Check for minimum number of players
-            if (RGNetworkPlayerList.instance.playerIDs.Count < 3)
+            
+            if (RGNetworkPlayerList.instance.playerIDs.Count < 3 && canPlaySolo == false)
             {
                 UserInterface.Instance.hostLobbyBeginError.SetActive(true);
                 UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not enough players to start the game. Minimum 3 players required.";
@@ -211,12 +215,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
             }
 
-            if (redTeamCount < 1 || blueTeamCount < 1)
+            if ((redTeamCount < 1 || blueTeamCount < 1) && canPlaySolo == false)
             {
                 UserInterface.Instance.hostLobbyBeginError.SetActive(true);
                 UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Each team must have at least 1 player.";
                 return;
             }
+            
 
             RGNetworkPlayerList.instance.AddWhitePlayer();
             RealGameStart();
@@ -664,7 +669,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Keypad9) && !canPlaySolo)
+        {
+            canPlaySolo = true;
+            Debug.Log("Can play solo");
+        }
     }
+
 
     #endregion
 
