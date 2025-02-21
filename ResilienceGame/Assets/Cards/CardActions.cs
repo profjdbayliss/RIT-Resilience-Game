@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using System.Linq;
-using System;
 using static Facility;
-using System.ComponentModel;
 
 public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
@@ -54,7 +50,6 @@ public class ReturnHandToDeckAndDraw : ICardAction {
 
 public class AddEffect : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        // PlayerTeam playedTeam = card.DeckName.ToLower().Trim() == "blue" ? PlayerTeam.Blue : PlayerTeam.Red;
         facilityActedUpon.AddRemoveEffectsByIdString(
             card.data.effectString,
             true,
@@ -70,25 +65,6 @@ public class AddEffect : ICardAction {
 }
 
 public class NegateEffect : ICardAction {
-    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        //doesnt exist anymore?
-        //// Get all active effects on the facility
-        //var activeEffects = facilityActedUpon.effectManager.GetEffects();
-
-        //// If there are any active effects, negate a random one
-        //if (activeEffects.Count > 0) {
-        //    int randomIndex = UnityEngine.Random.Range(0, activeEffects.Count);
-        //    var effectToNegate = activeEffects[randomIndex];
-        //    facilityActedUpon.effectManager.NegateEffect(effectToNegate);
-
-        //    Debug.Log($"Negated random effect: {effectToNegate.EffectType} on {facilityActedUpon.facilityName}");
-        //}
-        //else {
-        //    Debug.Log($"No active effects to negate on {facilityActedUpon.facilityName}");
-        //}
-
-        //base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-    }
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " canceled.");
@@ -145,13 +121,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
             Debug.Log($"Executing Select Facilities and Remove Effect action for card {card.data.name}");
             FacilityEffectType effectTypeToRemove = FacilityEffectType.None;
 
-
-            //List<FacilityEffect> cardEffects = FacilityEffect.CreateEffectsFromID(card.data.effectString);
-
-            //var removeEffect = cardEffects.Any(effect => effect.EffectType == FacilityEffectType.Remove);
-
             var removeEffect = card.data.effectString.Contains("Remove");
-
 
             //uses the facility to grab the sector it was played on
             if (facilityActedUpon == null) {
@@ -220,28 +190,6 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 });
         }
     }
-
-    /*
-     * var effectsToRemove = facilityActedUpon.effectManager.GetRemoveableEffects(player.playerTeam);
-        if (effectsToRemove != null) {
-            if (effectsToRemove.Count > 1) {
-                for (var i = 0; i < card.data.effectCount; i++) {
-                    var effectToRemove = effectsToRemove[i];
-                    if (effectToRemove != null) {
-                        if (facilityActedUpon.TryRemoveEffect(effectToRemove)) {
-                            Debug.Log($"Removed effect: {effectToRemove.EffectType} on {facilityActedUpon.facilityName}");
-                        }
-                        else {
-                            Debug.LogError($"Found effect to remove but then got a false value when trying to remove it");
-                        }
-                    }
-                }
-            }            
-        }
-        else {
-            Debug.LogError($"No removable effects to remove on {facilityActedUpon.facilityName}");
-        }
-     */
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " canceled.");
@@ -433,52 +381,6 @@ public class ReduceCardCost : ICardAction {
     }
 }
 
-///// <summary>
-///// NW stands for nation wide as this will affect all the sectors. This method intends to
-///// give each sector a give number of meeples of each type
-///// </summary>
-//public class NWMeepleChangeEach : ICardAction {
-//    //public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-//    //    CardPlayer playerInstance;
-//    //    if (GameManager.Instance.playerType == PlayerTeam.Blue)
-//    //        playerInstance = GameManager.Instance.actualPlayer;
-//    //    else playerInstance = GameManager.Instance.opponentPlayer;
-//    //    //at the moment this method doesnt actually handle multiple sectors because
-//    //    //we dont know how to implement multiple sectors yet. that being said this doesnt 
-//    //    //use stuff like facilityactedupon and relies directly upon the game manager singleton
-//    //    foreach (string meepleType in card.data.meepleType) {
-//    //        playerInstance.AddSubtractMeepleAmount(
-//    //            meepleType switch {
-//    //                "Blue" => 0,
-//    //                "Black" => 1,
-//    //                "Purple" => 2,
-//    //                _ => -1
-//    //            },
-//    //        card.data.meepleAmount);
-
-//    //    }
-//    //    base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-//    //}
-
-//    //public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-//    //    base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-//    //}
-//}
-
-///// <summary>
-///// NW stands for nation wide as this will affect all the sectors. This method intends to
-///// give each sector their choice of a give number of meeples of any given type.
-///// </summary>
-//public class NWMeepleChangeChoice : ICardAction {
-//    public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-//        base.Played(player, opponent, facilityActedUpon, cardActedUpon, card);
-//    }
-
-//    public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-//        base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
-//    }
-//}
-
 /// <summary>
 /// Nation-wide increase overtime amount
 /// </summary>
@@ -521,8 +423,6 @@ public class NWShuffleFromDiscard : ICardAction {
 /// </summary>
 public class ChangeAllFacPointsBySectorType : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        // int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
-        // Debug.Log("$$Sector rolled a " + diceRoll);
 
         //get all the sectors by type
         var sectors = card.data.onlyPlayedOn.Contains(SectorType.All) ?
@@ -560,8 +460,6 @@ public class ChangeAllFacPointsBySectorType : ICardAction {
 }
 public class ChangeTransFacPointsAllSectors : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
-        // int diceRoll = GameManager.Instance.whitePlayer.DiceRoll;
-        // Debug.Log("$$Sector rolled a " + diceRoll);
 
         var sectors = card.data.onlyPlayedOn.Contains(SectorType.All) ?
             GameManager.Instance.AllSectors.Values.ToList().Select(sector => sector.sectorName).ToList() :
@@ -660,9 +558,4 @@ public class IncreaseBaseMaxMeeplesRandom : ICardAction {
         base.Canceled(player, opponent, facilityActedUpon, cardActedUpon, card);
     }
 }
-
-
-
-
-
 

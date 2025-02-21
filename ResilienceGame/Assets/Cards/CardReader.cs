@@ -12,12 +12,6 @@ public class CardReader : MonoBehaviour {
     // deck name to use for the deck
     public string DeckName;
 
-
-
-    // filename - directory path is assumed to be Application.streamingAssetsPath
-    // extension is assumed to be csv
-    // public string cardFileName;
-
     // output atlas filename
     public string outputAtlasName;
 
@@ -32,9 +26,8 @@ public class CardReader : MonoBehaviour {
     private static int sCardID = 0;
 
     public List<Card> CSVRead(bool createAtlas) {
-        List<Card> cards = new List<Card>(50); // TODO: Get number per deck
+        List<Card> cards = new List<Card>(50);
         var cardDeckNameHolder = FindObjectOfType<DeckNameHolder>();
-        //string cardFileName = "";
         if (cardDeckNameHolder != null) {
             fileLocation = cardDeckNameHolder.DECK_NAME;
         }
@@ -43,15 +36,13 @@ public class CardReader : MonoBehaviour {
             
         }
         // Check to see if the file exists
-        //fileLocation = Application.streamingAssetsPath + "/" + cardFileName;
         Debug.Log("Creating deck from file: " + fileLocation);
-        //Debug.Log("trying to read file at location: " + fileLocation);
         if (!File.Exists(fileLocation)) {
-            Debug.LogWarning($"{fileLocation} is missing cannot read card data!!!");
+            Debug.LogWarning($"{fileLocation} is missing cannot read card data");
             fileLocation = Path.Join(Application.streamingAssetsPath, "SectorDownCards.csv");
         }
 
-        Debug.Log("reading the file!");
+        Debug.Log("reading the file");
         FileStream stream = File.OpenRead(fileLocation);
         TextReader reader = new StreamReader(stream);
         Texture2D tex = new Texture2D(1, 1);
@@ -73,7 +64,6 @@ public class CardReader : MonoBehaviour {
                 string[] singleLineCSVObjects = allCSVObjects[i].Split(",");
                 if (singleLineCSVObjects.Length > 1) // excel adds an empty line at the end
                 {
-                    //Debug.Log("number of items in a line is: " + singleLineCSVObjects.Length);
                     if (!singleLineCSVObjects[27].Equals(string.Empty) && !singleLineCSVObjects[27].Equals("")) {
                         filenames.Add(singleLineCSVObjects[27].Trim());
                     }
@@ -178,27 +168,20 @@ public class CardReader : MonoBehaviour {
                                 tempCard.ActionList.Add(new ShuffleAndDrawCards());
                                 break;
                             case "ReduceCardCost":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                 tempCard.ActionList.Add(new ReduceCardCost());
                                 break;
                             case "AddEffect":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                 tempCard.data.effectString = individualCSVObjects[19];
                                 tempCard.ActionList.Add(new AddEffect());
                                 break;
                             case "NegateEffect":
                                 Debug.LogWarning("Negate Effect action is deprecated and will not function");
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                // tempCard.ActionList.Add(new NegateEffect());
                                 break;
                             case "RemoveEffect":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
-                                //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19]);
                                 tempCard.data.effectString = ""; //TODO: If cards negate specific effects add this here, currently they just negate random effects, which should be changed to player choice eventually
                                 tempCard.ActionList.Add(new RemoveEffect());
                                 break;
                             case "SpreadEffect":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                 tempCard.ActionList.Add(new SpreadEffect());
                                 break;
                             case "SelectFacilitiesAddRemoveEffect":
@@ -226,15 +209,12 @@ public class CardReader : MonoBehaviour {
                                 tempCard.ActionList.Add(new IncColorlessMeeplesRoundReduction());
                                 break;
                             case "ChangeMeepleAmount":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                 tempCard.ActionList.Add(new ChangeMeepleAmount());
                                 break;
                             case "IncreaseOvertimeAmount":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                 tempCard.ActionList.Add(new IncreaseOvertimeAmount());
                                 break;
                             case "ShuffleCardsFromDiscard":
-                                //tempCard.ActionList.Add(new ActionImpactFacilityWorth());
                                 tempCard.ActionList.Add(new ShuffleCardsFromDiscard());
                                 break;
                             case "IncreaseBaseMaxMeeplesRandom":
@@ -285,7 +265,6 @@ public class CardReader : MonoBehaviour {
                             break;
                         // Is this needed? Is this handled by just CardActions?
                         default:
-                            //tempCard.data.onlyPlayedOn[0] = PlayerSector.Any;
                             break;
                     }
 
@@ -382,12 +361,6 @@ public class CardReader : MonoBehaviour {
                      
 
                     // 19:  Effect
-                    //tempCard.data.effect = (FacilityEffect)int.Parse(individualCSVObjects[19].Trim());
-                    //string s = "";
-                    //for (int j = 0; j < individualCSVObjects.Length; j++) {
-                    //    s += $"{j}: {individualCSVObjects[j]}\n";
-                    //}
-                    //Debug.Log(s);
                     tempCard.data.effectString = individualCSVObjects[19].Trim();
 
                     // 20:  Number of Effects TODO: this line is wrong in csv if its actually used anywhere
@@ -438,12 +411,8 @@ public class CardReader : MonoBehaviour {
             }
 
         }
-        // Close at the end
         reader.Close();
         stream.Close();
-
-
-
         return cards;
     }
 }
