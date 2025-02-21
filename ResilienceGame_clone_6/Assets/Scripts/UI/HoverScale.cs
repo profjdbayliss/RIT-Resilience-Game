@@ -16,11 +16,18 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private bool mPointerDown = false;
     public Vector2 previousScale = Vector2.zero;
     [SerializeField] private GameObject glow;
+    AudioSource audio;
+    [SerializeField] private AudioClip glowSound;
+    private bool playGlowSound;
 
     void Start()
     {
         previousScale = this.gameObject.transform.localScale;
         glow.SetActive(false);
+
+        audio = GetComponent<AudioSource>();
+
+        playGlowSound = true;
     }
 
     void Update()
@@ -32,9 +39,15 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (isHovering && theCard.cardZone == GameObject.FindGameObjectWithTag("PlayerHandLocation"))
         {
             glow.SetActive(true);
+            if (playGlowSound)
+            {
+                audio.PlayOneShot(glowSound, 0.2f);
+                playGlowSound = false;
+            }
         }
         else
         {
+            playGlowSound = true;
             glow.SetActive(false);
         }
 

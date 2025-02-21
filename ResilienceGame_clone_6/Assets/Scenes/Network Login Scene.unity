@@ -2326,8 +2326,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 674296670}
-  - component: {fileID: 674296669}
   - component: {fileID: 674296671}
+  - component: {fileID: 674296669}
   m_Layer: 0
   m_Name: DeckNameHolder
   m_TagString: DeckNameHolder
