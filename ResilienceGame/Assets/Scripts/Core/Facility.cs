@@ -61,6 +61,7 @@ public class Facility : MonoBehaviour {
     [SerializeField] private HoverMoveUI sectorPopoutMenu;
     [SerializeField] FacilityPointsUIController pointsUIController;
 
+    [SerializeField] private GameObject backDoorIcon;
 
     // public FacilityEffect effect;
     //   public bool effectNegated;
@@ -78,6 +79,15 @@ public class Facility : MonoBehaviour {
     private void Update() {
         if (IsDown && !WasEverDowned)
             WasEverDowned = true;
+
+        if (effectManager.HasEffectOfType(FacilityEffectType.Backdoor))
+        {
+            backDoorIcon.SetActive(true);
+        }
+        else
+        {
+            backDoorIcon.SetActive(false);
+        }
     }
 
 
