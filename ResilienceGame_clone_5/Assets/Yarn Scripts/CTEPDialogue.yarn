@@ -1,0 +1,22 @@
+﻿title: Start
+---
+Day 1: Employees from your local government's Treasurer's Office recieve emails from HR about new benefits for fiscal year 2024. The emails instruct the user to sign the document and send it back to HR by close of business to ensure there is no lapse in benefits.
+Day 1: Some employees follow the instructions and submit their information, while others report the email to you as suspicious.
+
+-> Report the phishing attempt to CISA
+
+Day 4: The Cybersecurity and Infrastructure Security Agency (CISA) releases an alert regarding phishing campaigns targeting state, local, tribal, and territorial (SLTT) government networks. 
+Day 4: The phishing emails mention required updates to important HR documents and contain a malicious attachment that automatically installs ransomware. After gaining access to the network, threat actors escalate privileges for administrator rights without victims’ action or authorization. 
+
+-> Inform your local goverment of the phishing attempts, and request they report any suspicious emails. 
+
+Day 7: You notice unusual traffic to an external IP address over a HTTP port leaving HR’s payroll servers. IT staff begin to investigate the anomaly, but it occurs only for a few minutes and stops, so they assume it was a one-time issue that has been resolved.
+
+3 weeks later...
+
+Day 27: Early in the workday, a high volume of employees report that they are unable to log into their accounts using their credentials. 
+Day 27: Later that day, a number of employee workstations display a red screen with a 72-hour timer counting down and the message:
+Ransom Message: <i>Every 24 hours there will be a new attack if you wait to pay the equivalent of $250,000 in Bitcoin. Pay before the time runs out or your system will be wiped.</i>
+Day 27: Due to the ransomware, the tax revenue system and utility payment system are no longer functioning. 
+
+===
