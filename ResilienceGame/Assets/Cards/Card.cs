@@ -10,7 +10,8 @@ using UnityEditor.Rendering;
 using System;
 
 // Enum to track the state of the card
-public enum CardState {
+public enum CardState
+{
     NotInDeck,
     CardInDeck,
     CardDrawn,
@@ -21,7 +22,8 @@ public enum CardState {
 };
 
 // Enum to indicate what the card is being played on
-public enum CardTarget {
+public enum CardTarget
+{
     Hand,
     Card,
     Effect,
@@ -29,12 +31,14 @@ public enum CardTarget {
     Sector
 };
 
-public struct CardIDInfo {
+public struct CardIDInfo
+{
     public int UniqueID;
     public int CardID;
 };
 
-public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
+public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+{
     public CardData data;
     // this card needs a unique id since multiples of the same card can be played
     public int UniqueID;
@@ -55,15 +59,11 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
 
     [Header("Animation")]
-    // public bool isPaused = false;
-    // public bool skipAnimation = false;
     public float speed = 10f;
     public float OpponentCardPlayAnimDuration = 1f;
     public float rotationDurationPercent = 0.3f; // Rotation happens over 20% of the total duration
     public float rotationDelayPercent = 0.35f;    // Rotation starts after 40% of the duration
-                                                  // public float scaleUpFactor = 1.5f;            // Increases size by 50%
-
-    public float centerYOffset = 200;      
+    public float centerYOffset = 200;
     public float waitTimeAtCenter = 1.5f;           // Waits for 1.5 seconds at the center
     public float shrinkDuration = 1.5f;             // Duration of the shrink and move animation
     private bool isAnimating = false;
@@ -72,36 +72,31 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public int HandPosition { get; set; } = 0;
 
 
-    // NOTE: this is a string currently because mitigations are for 
-    // cards from the other player's deck.
-    //public List<string> MitigatesWhatCards = new List<string>(10);
     Vector2 mDroppedPosition;
-    // GameManager mManager; 
     public List<ICardAction> ActionList = new List<ICardAction>(6);
 
     // Start is called before the first frame update
-    void Start() {
+    void Start()
+    {
         originalPosition = this.gameObject.transform.position;
 
     }
-    
-    public void SetCardState(CardState newState) {
+
+    public void SetCardState(CardState newState)
+    {
         State = newState;
     }
 
-    public void OnPointerClick(PointerEventData eventData) {
-      //  Debug.Log("click release on card");
-        if (this.State == CardState.CardDrawn) {
-            // note that click consumes the release of most drag and release motions
-            //Debug.Log("potentially card dropped.");
-            //State = CardState.CardDrawnDropped;
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (this.State == CardState.CardDrawn)
+        {
             mDroppedPosition = new Vector2(this.transform.position.x, this.transform.position.y);
         }
     }
 
-    public void ToggleOutline(bool enable) {
-        Debug.Log($"{(enable ? "Enabling":"Disabling")} outline on {front.title}");
-        //outlineImage.SetActive(enable);
+    public void ToggleOutline(bool enable)
+    {
         Color c = outlineImage.color;
         c.a = enable ? 1f : 0f;
         outlineImage.color = c;
@@ -109,27 +104,33 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null) {
-        Debug.Log($"Executing card actions for card: {front.name}");
-        if (player.playerTeam == PlayerTeam.White) {
+    public void Play(CardPlayer player, CardPlayer opponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    {
+        if (player.playerTeam == PlayerTeam.White)
+        {
             HistoryMenuController.Instance.AddNewHistoryItem(this, player, "", false, GameManager.Instance.IsServer);
         }
-        foreach (ICardAction action in ActionList) {
+        foreach (ICardAction action in ActionList)
+        {
             action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
         }
     }
 
     // Cancel this card
-    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null) {
-        foreach (ICardAction action in ActionList) {
+    public void Cancel(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    {
+        foreach (ICardAction action in ActionList)
+        {
             action.Canceled(player, opponent, facilityActedUpon, cardActedUpon, this);
         }
     }
 
-    public void ToggleCardVisuals(bool enable) {
+    public void ToggleCardVisuals(bool enable)
+    {
         transform.GetComponentsInChildren<RectTransform>().ToList().ForEach(child => child.gameObject.SetActive(enable));
     }
-    public IEnumerator AnimateAndShrinkCard(Vector3 targetPosition, float duration, Action onComplete = null) {
+    public IEnumerator AnimateAndShrinkCard(Vector3 targetPosition, float duration, Action onComplete = null)
+    {
         isAnimating = true;
         Vector3 startPosition = transform.position;
         Vector3 endPosition = targetPosition;
@@ -137,7 +138,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         Vector3 endScale = Vector3.zero; // Scale down to zero
         float elapsed = 0f;
 
-        while (elapsed < duration) {
+        while (elapsed < duration)
+        {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
 
@@ -146,7 +148,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
             transform.position = Vector3.Lerp(startPosition, endPosition, t);
             transform.localScale = Vector3.Lerp(startScale, endScale, t);
-            if (skipCurrentAnimation) {
+            if (skipCurrentAnimation)
+            {
                 break;
             }
             yield return null;
@@ -165,10 +168,11 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     /// <param name="rectTransform">The RectTransform of the UI element to animate.</param>
     /// <param name="facilityPosition">The target position to move to after waiting at the center.</param>
     /// <param name="onComplete">Callback function to call before destroying the object.</param>
-    public IEnumerator MoveAndRotateToCenter(RectTransform rectTransform, 
-        GameObject facilityTarget = null, 
-        Action onComplete = null, 
-        float scaleUpFactor = 1.5f) {
+    public IEnumerator MoveAndRotateToCenter(RectTransform rectTransform,
+        GameObject facilityTarget = null,
+        Action onComplete = null,
+        float scaleUpFactor = 1.5f)
+    {
         isAnimating = true;
         // Initial and target positions
         Vector2 startPosition = rectTransform.anchoredPosition;
@@ -189,7 +193,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         float elapsedTime = 0f;
 
         // First phase: Move to center, rotate, and scale up
-        while (elapsedTime < OpponentCardPlayAnimDuration) {
+        while (elapsedTime < OpponentCardPlayAnimDuration)
+        {
             float t = elapsedTime / OpponentCardPlayAnimDuration;
             float easedT = CubicEaseInOut(t);
 
@@ -198,33 +203,38 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
             rectTransform.localScale = Vector3.Lerp(startScale, targetScale, easedT);
 
             // Handle rotation
-            if (elapsedTime >= rotationDelay && elapsedTime <= rotationDelay + rotationDuration) {
+            if (elapsedTime >= rotationDelay && elapsedTime <= rotationDelay + rotationDuration)
+            {
                 float rotationElapsed = elapsedTime - rotationDelay;
                 float rotationT = rotationElapsed / rotationDuration;
                 float easedRotationT = CubicEaseInOut(rotationT);
 
                 rectTransform.localRotation = Quaternion.Lerp(startRotation, targetRotation, easedRotationT);
             }
-            else if (elapsedTime > rotationDelay + rotationDuration) {
+            else if (elapsedTime > rotationDelay + rotationDuration)
+            {
                 rectTransform.localRotation = targetRotation;
             }
 
             elapsedTime += Time.deltaTime;
 
-            if (skipCurrentAnimation) {
+            if (skipCurrentAnimation)
+            {
 
                 break;
             }
             yield return null;
         }
-        if (skipCurrentAnimation) {
+        if (skipCurrentAnimation)
+        {
             // Call the callback function
             onComplete?.Invoke();
 
             // Destroy the game object
             Destroy(rectTransform.gameObject);
         }
-        else {
+        else
+        {
             // Ensure final position, rotation, and scale are set
             rectTransform.anchoredPosition = centerPosition;
             rectTransform.localRotation = targetRotation;
@@ -234,18 +244,18 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
             yield return new WaitForSeconds(waitTimeAtCenter);
 
             Vector2 endPosition = centerPosition; // Default to center if facilityTarget is null
-            if (facilityTarget != null) {
+            if (facilityTarget != null)
+            {
                 // Calculate the facility's position relative to the Canvas
                 endPosition = facilityTarget.transform.position;
-                // Debug.Log($"End Position (UI Local): {endPosition}");
             }
 
             Vector3 endScale = Vector3.zero; // Scale down to zero
             Vector3 sPos = transform.position;
-            // Debug.Log($"Moving to facility target: {endPosition}");
             elapsedTime = 0f;
 
-            while (elapsedTime < shrinkDuration) {
+            while (elapsedTime < shrinkDuration)
+            {
                 float t = elapsedTime / shrinkDuration;
                 float easedT = CubicEaseInOut(t);
 
@@ -255,7 +265,8 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
                 elapsedTime += Time.deltaTime;
 
-                if (skipCurrentAnimation) {
+                if (skipCurrentAnimation)
+                {
                     break;
                 }
                 yield return null;
@@ -275,50 +286,26 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     /// </summary>
     /// <param name="t">Normalized time (0 to 1).</param>
     /// <returns>Eased value.</returns>
-    private float CubicEaseInOut(float t) {
+    private float CubicEaseInOut(float t)
+    {
         if (t < 0.5f)
             return 4f * t * t * t;
-        else {
+        else
+        {
             float f = (2f * t) - 2f;
             return 0.5f * f * f * f + 1f;
         }
     }
-    //private Vector2 GetUIPositionRelativeToCanvas(Transform targetTransform) {
-    //    Vector2 position = Vector2.zero;
-    //    Transform current = targetTransform;
 
-    //    // Loop until we reach the Canvas or there are no more parents
-    //    while (current != null) {
-    //        RectTransform rectTransform = current.GetComponent<RectTransform>();
-    //        if (rectTransform != null) {
-    //            position += rectTransform.anchoredPosition;
-    //        }
-    //        else {
-    //            // If there's no RectTransform, check for localPosition (for non-UI elements)
-    //            position += new Vector2(current.localPosition.x, current.localPosition.y);
-    //        }
-
-    //        // Check if we've reached the Canvas
-    //        if (current.GetComponent<Canvas>() != null) {
-    //            break;
-    //        }
-
-    //        current = current.parent;
-    //    }
-
-    //    return position;
-    //}
-
-
-    public void OnPointerEnter(PointerEventData eventData) {
-        // isPaused = true;
+    public void OnPointerEnter(PointerEventData eventData)
+    {
     }
 
-    public void OnPointerExit(PointerEventData eventData) {
-        //  isPaused = false;
+    public void OnPointerExit(PointerEventData eventData)
+    {
     }
 
-    void OnMouseDown() {
-        // skipAnimation = true;
+    void OnMouseDown()
+    {
     }
 }

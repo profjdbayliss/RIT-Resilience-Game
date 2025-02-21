@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
     // Static Members
     public static GameManager Instance;
     private bool hasStartedAlready = false;
-    //  public static event Action OnRoundEnd;
 
     // Debug
     public bool DEBUG_ENABLED = true;
@@ -38,10 +37,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public WhiteCardPlayer whitePlayer;
     public AICardPlayer aiPlayer;
     public List<CardPlayer> networkPlayers = new List<CardPlayer>();
-    // public CardPlayer opponentPlayer;
     private bool myTurn = false;
     public int activePlayerNumber;
-    // [SerializeField] private List<CardPlayer> playerList;
     public Dictionary<int, CardPlayer> playerDictionary = new Dictionary<int, CardPlayer>();
 
     [Header("Sectors")]
@@ -90,13 +87,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     public readonly int MAX_MEEPLE_SHARE = 2;
 
     //// UI Elements
-    //[Header("UI Elements")]
     public GameObject playerSlide;
-
-    // End Game
-    //[Header("End Game")]
-    //public GameObject endGameCanvas;
-    //public TMP_Text endGameText;
 
     // Tutorial
     [Header("Tutorial")]
@@ -157,20 +148,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Initialization
-    // Called by dropdown list box to set up the player type
+    // Called by the begin game button to set up the player type
     public void SetPlayerType() {
         //Creates the float by getting the value from the slider
         float sliderValue = playerSlide.GetComponent<Slider>().value;
 
-        //Left over from when it was a drop down box. Could possibly be removed. 
-        if (sliderValue == null) {
             playerDeckChoice = playerDeckList.GetComponent<TMPro.TMP_Dropdown>();
             if (playerDeckChoice == null) {
                 Debug.Log("deck choice is null!");
             }
-        }
         
-        if (sliderValue != null) {
+
             // set this player's type
             switch (sliderValue) {
                 case 0: //red
@@ -210,8 +198,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         else
         {
-            // Automatically set the AI player as ready (server only)
-            // RGNetworkPlayerList.instance.SetAiPlayerAsReadyToStartGame();
             RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
         }
     }
@@ -221,6 +207,36 @@ public class GameManager : MonoBehaviour, IRGObservable {
     {
         if (RGNetworkPlayerList.instance.CheckReadyToStart())
         {
+            // Check for minimum number of players
+            if (RGNetworkPlayerList.instance.playerIDs.Count < 3)
+            {
+                UserInterface.Instance.hostLobbyBeginError.SetActive(true);
+                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not enough players to start the game. Minimum 3 players required.";
+                return;
+            }
+
+            // Check for at least 1 player on each team
+            int redTeamCount = 0;
+            int blueTeamCount = 0;
+            foreach (var playerType in RGNetworkPlayerList.instance.playerTypes)
+            {
+                if (playerType == PlayerTeam.Red)
+                {
+                    redTeamCount++;
+                }
+                else if (playerType == PlayerTeam.Blue)
+                {
+                    blueTeamCount++;
+                }
+            }
+
+            if (redTeamCount < 1 || blueTeamCount < 1)
+            {
+                UserInterface.Instance.hostLobbyBeginError.SetActive(true);
+                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Each team must have at least 1 player.";
+                return;
+            }
+
             RGNetworkPlayerList.instance.AddWhitePlayer();
             RealGameStart();
             // get the turn taking flags ready to go again
@@ -246,7 +262,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             AssignableSectors = new List<Sector>(activeSectors);
             activeSectors.ForEach(sector => AllSectors.Add(sector.sectorName, sector));
 
-            // basic init of player
+            // basic init of players
             SetPlayerType();
             SetupActors();
 
@@ -275,8 +291,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
         }
 
-        // Comment these out one by one until you weed out the unneccessary ones:
-        RGNetworkPlayerList.instance.SetPlayerType(playerTeam);
         UserInterface.Instance.StartGame(playerTeam);
         //RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
@@ -302,13 +316,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             sector.SetOwner(player);
             player.AssignSector(sector);
-            //AssignableSectors.Remove(sector);
 
             //all sectors have been assigned
             if (assignedSectors >= numBluePlayers) {
                 Debug.Log($"Client {actualPlayer.playerName} has finished assigning all sectors to blue players");
                 //turn off leftover sectors
-                //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
                 var unAssignedSectors = AssignableSectors.Where(sector => sector.Owner == null).ToList();
                 Debug.Log($"Unassigned sectors: {unAssignedSectors.Count}");
                 SimulatedSectors = new Dictionary<SectorType, Sector>();
@@ -341,7 +353,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     public void RealGameStart() {
         Debug.Log("running 2nd start of game");
-        //gameCanvas.SetActive(true);
         UserInterface.Instance.ToggleGameCanvas(true);
         // send out the starting message with all player info
         // and start the next phase
@@ -386,7 +397,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 numBluePlayers++;
             }
         }
-        // playerDictionary.Add(whitePlayer.NetID, whitePlayer); //
+
         //assign sectors to all players
         if (IsServer) {
 
@@ -416,9 +427,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 sector.SetOwner(player);
                 player.AssignSector(sector);
 
-                // Remove the sector from the list and activate it
-                // AssignableSectors.Remove(sector);
-
                 var sectorPayload = new List<int> { kvp.Key, sectorIndex }; // player id, sector index pairs
                 var sectorMsg = new Message(CardMessageType.SectorAssignment, (uint)RGNetworkPlayerList.instance.localPlayerID, sectorPayload);
                 AddMessage(sectorMsg);
@@ -426,7 +434,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
             //turn off leftover sectors
             AssignableSectors.RemoveAll(sectorList.Contains);
-            //AssignableSectors.ForEach(sector => sector.gameObject.SetActive(false));
             SimulatedSectors = AssignableSectors.ToDictionary(Sector => Sector.sectorName, Sector => Sector);
             SimulatedSectorList = SimulatedSectors.Keys.ToList();
             SimulatedSectors.Values.ToList().ForEach(sector => sector.SetSimulated(true));
@@ -463,17 +470,14 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
 
-        // in this game people go in parallel to each other
-        // per phase
+        // In this game people go in parallel to each other per phase
         myTurn = true;
         gameStarted = true;
 
         // go on to the next phase
-        // MGamePhase = GamePhase.DrawRed;
         StartNextPhase();
         UserInterface.Instance.ToggleOvertimeButton(false);
         UserInterface.Instance.ToggleStartScreen(false);
-        //startScreen.SetActive(false);
 
     }
     public void Awake() {
@@ -486,37 +490,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
         Debug.Log("start run on GameManager");
         if (!hasStartedAlready) {
             CardPlayer.cards.Clear();
-            // Debug.Log("has not already started");
-            //startScreen.SetActive(true);
             UserInterface.Instance.ToggleStartScreen(true);
-
-            //TODO: Read based on number of players/selection
 
             // read water deck
             CardReader reader = blueDeckReader.GetComponent<CardReader>();
             if (reader != null) {
-                // TODO: Set with csv
-                blueCards = reader.CSVRead(mCreateWaterAtlas); // TODO: Remove var, single atlas
+                blueCards = reader.CSVRead(mCreateWaterAtlas);
                 CardPlayer.AddCards(blueCards);
-                //waterPlayer.playerTeam = PlayerTeam.Blue;
-                //waterPlayer.DeckName = "blue";
-                //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
             }
             else {
                 Debug.Log("Blue deck reader is null.");
             }
 
-
-            // TODO: Remove, should be selected by csv
             // read energy deck
             reader = redDeckReader.GetComponent<CardReader>();
             if (reader != null) {
                 redCards = reader.CSVRead(mCreateEnergyAtlas);
                 CardPlayer.AddCards(redCards);
-                //energyPlayer.playerTeam = PlayerTeam.Red;
-                //energyPlayer.DeckName = "red";
-                //Debug.Log("number of cards in all cards is: " + CardPlayer.cards.Count);
-
             }
             else {
                 Debug.Log("Energy deck reader is null.");
@@ -543,7 +533,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             // Set dialogue runner for tutorial
             runner = yarnSpinner.GetComponent<DialogueRunner>();
             background = yarnSpinner.transform.GetChild(0).GetChild(0).gameObject;
-            //Debug.Log(background);
             hasStartedAlready = true;
         }
         else {
@@ -553,40 +542,24 @@ public class GameManager : MonoBehaviour, IRGObservable {
     }
 
     // Set up the main player of the game
-
     public void SetupActors() {
-        // we should know when choice they
-        // wanted by now and can set up
-        // appropriate values
-
-        // TODO: Change PlayerType
         if (playerTeam == PlayerTeam.Red) {
-            //actualPlayer = energyPlayer;
             actualPlayer.playerTeam = PlayerTeam.Red;
             actualPlayer.DeckName = "red";
 
         }
         else if (playerTeam == PlayerTeam.Blue) {
-            //actualPlayer = waterPlayer;
             actualPlayer.playerTeam = PlayerTeam.Blue;
             actualPlayer.DeckName = "blue";
 
         }
 
-
-
-
-        // Initialize the deck info and set various
-        // player zones active
+        // Initialize the deck info and set various player zones active
         whitePlayer.InitializeCards();
-        //actualPlayer.InitializeCards();
         actualPlayer.InitMeeples();
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
         tutorialToggle.WhenGameStarts();
-
-
-
     }
 
     #endregion
@@ -632,8 +605,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private void HandleDebugLogInput() {
         if (Keyboard.current.f1Key.wasPressedThisFrame) {
             Debug.Log($"{(IsServer ? "**[SERVER]**" : "**[CLIENT]**")}");
-            //actualPlayer.LogPlayerInfo();
-            //opponentPlayer.LogPlayerInfo();
             foreach (var kvp in playerDictionary) {
                 kvp.Value.LogPlayerInfo();
             }
@@ -693,46 +664,24 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 HandlePhases(MGamePhase);
             }
 
-
-            // always notify observers in case there's a message
-            // waiting to be processed.
+            // always notify observers in case there's a message waiting to be processed.
             NotifyObservers();
 
         }
         else {
-            // the network takes a while to start up and 
-            // we wait for it.
+            // the network takes a while to start up and we wait for it.
             mRGNetworkPlayerList = RGNetworkPlayerList.instance;
-            if (mRGNetworkPlayerList != null) {
-                // means network init is done
-                // and we're joined
+            if (mRGNetworkPlayerList != null) {  // means network init is done and we're joined
                 RegisterObserver(mRGNetworkPlayerList);
                 IsServer = mRGNetworkPlayerList.isServer;
                 CardPlayer player = GameObject.FindObjectOfType<CardPlayer>();
                 if (player != null) {
-                    // player is initialized and ready to go
-                    // this follows the network init and also
-                    // takes a while to happen
+                    // player is initialized
                     isInit = true;
                 }
             }
         }
-
-        //check for tab key to show player menu
-        if (Keyboard.current.tabKey.wasPressedThisFrame) {
-            UserInterface.Instance.TogglePlayerMenu(true);
-        }
-        else if (Keyboard.current.tabKey.wasReleasedThisFrame) {
-            UserInterface.Instance.TogglePlayerMenu(false);
-        }
-
-        if (Keyboard.current.escapeKey.wasPressedThisFrame) {
-            UserInterface.Instance.ToggleMapGUI();
-        }
-
     }
-
-
 
     #endregion
 

@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using Mirror.Examples.Chat;
-using TMPro;
 using UnityEngine.SceneManagement;
 
 public class RGNetworkManager : NetworkManager
@@ -60,18 +56,5 @@ public class RGNetworkManager : NetworkManager
     {
         base.OnClientDisconnect();
         SceneManager.LoadScene("MainMenu");
-    }
-
-    public void SetHostname(string hostname)
-    {
-        networkAddress = hostname;
-    }
-
-    public void UpdatePlayerVisibilityForAll()
-    {
-        //foreach (var player in FindObjectsOfType<RGNetworkPlayer>())
-        //{
-            //player.UpdatePlayerVisibility();
-        //}
     }
 }

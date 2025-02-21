@@ -31,7 +31,8 @@ public class DeckNameHolder : MonoBehaviour
         DECK_NAME = Path.Join(Application.streamingAssetsPath + "/SavedCSVs/", "SectorDownCards.csv");
         try //Quick catch
         {
-            File.Copy(DECK_NAME, folderPath + Path.GetFileName(DECK_NAME));
+            
+            File.Copy(DECK_NAME, folderPath + Path.GetFileName(DECK_NAME)); //often leads to an error upon joining (when client disconnects and rejoins the lobby)
         }
         catch (Exception e)
         {
@@ -100,5 +101,10 @@ public class DeckNameHolder : MonoBehaviour
     {
         DECK_NAME = deckLocationAndName;
         deckName.text = "Deck: " + name.Substring(0, name.Length - 4); //Meant to remove.csv from the textMeshPro
+    }
+
+    public void OpenFileExplorer()
+    {
+        Application.OpenURL(Application.persistentDataPath + "/");
     }
 }

@@ -14,23 +14,12 @@ public class CardFront : MonoBehaviour {
     public string title;
     public string description;
     public string flavor;
-    //public GameObject innerTexts;
     public Texture2D background;
     public Texture2D img;
 
     public Image meepleBgBlack;
     public Image meepleBgBlue;
     public Image meepleBgPurple;
-
-    //public void DisableBlackMeeple() {
-    //    meepleBgBlack.enabled = false;
-    //}
-    //public void DisableBlueMeeple() {
-    //    meepleBgBlue.enabled = false;
-    //}
-    //public void DisablePurpleMeeple() {
-    //    meepleBgPurple.enabled = false;
-    //}
 
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI descriptionText;

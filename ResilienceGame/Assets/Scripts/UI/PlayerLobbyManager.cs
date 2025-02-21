@@ -21,18 +21,10 @@ public class PlayerLobbyManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        //players.Callback += OnPlayersChanged;
     }
 
     private void OnDestroy()
     {
-        //players.Callback -= OnPlayersChanged;
-    }
-
-    private void OnPlayersChanged(SyncList<PlayerData>.Operation op, int index, PlayerData oldItem, PlayerData newItem) // does nothing!
-    {
-        //UserInterface.Instance.BuildLobbyMenu(); // Notify UI to update
-        //UpdatePlayerLobbyUI(); // Update the actual game UI
     }
 
     public void AddPlayer(string name, PlayerTeam team)
