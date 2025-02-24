@@ -950,6 +950,8 @@ MonoBehaviour:
   maxHeightOffset: 0
   SlippyOff: 0
   previousScale: {x: 0, y: 0}
+  glow: {fileID: 0}
+  glowSound: {fileID: 0}
 --- !u!61 &2750227064985535582
 BoxCollider2D:
   m_ObjectHideFlags: 0
