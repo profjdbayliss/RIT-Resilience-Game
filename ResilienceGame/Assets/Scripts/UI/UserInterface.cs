@@ -107,7 +107,7 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private float maxRollTime = 0.5f;
     [SerializeField] private GameObject diceParent;
     [SerializeField] private GameObject diceRollingPrefab;
-
+    [SerializeField] private AudioClip diceRoll;
 
     [Header("Map GUI")]
     [SerializeField] private List<SectorIconController> sectorIcons = new List<SectorIconController>();
@@ -978,6 +978,7 @@ public class UserInterface : MonoBehaviour
     private IEnumerator RollingAnimation(int index, int finalFace, Action onDiceRolled, int rollReq)
     {
         float elapsedTime = 0f;
+        float pitchAmount = 1f;
         int previousFace = -1;
         Image die = dice[index];
         yield return new WaitForSeconds(0.2f);
@@ -999,10 +1000,18 @@ public class UserInterface : MonoBehaviour
             // Set the sprite to the random face
             die.sprite = dieFaces[randomFace - 1]; // Subtract 1 because array is 0-indexed
 
+            //Plays sound and changes pitch
+            audio.PlayOneShot(diceRoll);
+            pitchAmount += 0.2f;
+            audio.pitch = pitchAmount;
+
             yield return new WaitForSeconds(waitTime);
 
             elapsedTime += waitTime;
         }
+
+        //reset pitch
+        audio.pitch = 1;
 
         // Set the final face
         //  Debug.Log($"Set final face to {finalFace}");

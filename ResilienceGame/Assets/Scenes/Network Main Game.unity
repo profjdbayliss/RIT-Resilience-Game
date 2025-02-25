@@ -79566,6 +79566,7 @@ MonoBehaviour:
   maxRollTime: 0.5
   diceParent: {fileID: 224623750}
   diceRollingPrefab: {fileID: 3728056048097265862, guid: ba54176f19d69fb41af6b157118be07b, type: 3}
+  diceRoll: {fileID: 8300000, guid: 45054bdec6d87b54bb71bd0ef6cd78cb, type: 3}
   sectorIcons:
   - {fileID: 4852573566282071047}
   - {fileID: 1332915418}
