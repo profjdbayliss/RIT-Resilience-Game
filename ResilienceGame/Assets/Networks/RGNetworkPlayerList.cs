@@ -9,13 +9,15 @@ using static Facility;
 using TMPro;
 
 #region Network Message Structs
-public struct RGNetworkShortMessage : NetworkMessage {
+public struct RGNetworkShortMessage : NetworkMessage
+{
     public uint playerID;
     public uint type;
 }
 
 // for messages that need to update one or more arguments
-public struct RGNetworkLongMessage : NetworkMessage {
+public struct RGNetworkLongMessage : NetworkMessage
+{
     public uint playerID;
     public uint type;
     // number of arguments
@@ -28,7 +30,8 @@ public struct RGNetworkLongMessage : NetworkMessage {
 // many messages actually have no arguments
 
 
-public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
+public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
+{
     public static RGNetworkPlayerList instance;
 
     int nextCardUID = 0;
@@ -51,23 +54,28 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Start/Initialization
-    private void Awake() {
+    private void Awake()
+    {
         instance = this;
         DontDestroyOnLoad(this);
         SetupHandlers();
 
     }
 
-    public void Start() {
+    public void Start()
+    {
         manager = GameManager.Instance;
 
         Debug.Log("start run on RGNetworkPlayerList.cs");
 
     }
-    public bool CheckReadyToStart() {
+    public bool CheckReadyToStart()
+    {
         bool readyToStart = true;
-        for (int i = 0; i < playerIDs.Count; i++) {
-            if (playerTypes[i] == PlayerTeam.Any) {
+        for (int i = 0; i < playerIDs.Count; i++)
+        {
+            if (playerTypes[i] == PlayerTeam.Any)
+            {
                 readyToStart = false;
                 UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not everyone is ready yet.";
                 break;
@@ -75,7 +83,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
         return readyToStart;
     }
-    public void AddWhitePlayer() {
+    public void AddWhitePlayer()
+    {
         playerIDs.Add(playerIDs.Count);
         playerNetworkReadyFlags.Add(true); // AI is always ready
         playerTurnTakenFlags.Add(false);
@@ -114,7 +123,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             int count = 0;
             // every time somebody joins we need to send the whole list to them
             // and update everybody else
-            foreach(int playerID in playerIDs)
+            foreach (int playerID in playerIDs)
             {
                 Message data = CreateNewPlayerMessage(playerID, playerNames[count], (int)playerTypes[count]);
                 // only servers start the game!
@@ -126,35 +135,41 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     payload = data.byteArguments.ToArray()
                 };
                 NetworkServer.SendToAll(msg);
- 
+
                 count++;
-            }         
+            }
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
             PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
-        } 
+        }
     }
 
-    public void SetAiPlayerAsReadyToStartGame() {
+    public void SetAiPlayerAsReadyToStartGame()
+    {
         int aiPlayerIndex = playerIDs.Count - 1;
-        if (aiPlayerIndex != -1) {
+        if (aiPlayerIndex != -1)
+        {
             playerNetworkReadyFlags[aiPlayerIndex] = true;
             playerTurnTakenFlags[aiPlayerIndex] = false; // reset for new game start
             Debug.Log("AI player automatically marked as ready by server.");
         }
     }
-    public void SetWhitePlayerEndPhase() {
+    public void SetWhitePlayerEndPhase()
+    {
         int aiPlayerIndex = playerIDs.Count - 1;
-        if (aiPlayerIndex != -1) {
+        if (aiPlayerIndex != -1)
+        {
             playerTurnTakenFlags[aiPlayerIndex] = true;
         }
     }
 
-    public void SetPlayerType(PlayerTeam type) {
-        if (isServer) {
+    public void SetPlayerType(PlayerTeam type)
+    {
+        if (isServer)
+        {
             playerTypes[localPlayerID] = type;
             int id = playerIDs.FindIndex(x => x == localPlayerID);
             // make sure to update the lobby
-            Message data = CreateNewPlayerMessage(id, playerNames[id], (int)playerTypes[id]);          
+            Message data = CreateNewPlayerMessage(id, playerNames[id], (int)playerTypes[id]);
             RGNetworkLongMessage msg = new RGNetworkLongMessage
             {
                 playerID = data.senderID,
@@ -167,11 +182,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
-    public Message CreateStartGameMessage() {
+    public Message CreateStartGameMessage()
+    {
         Message msg;
         List<byte> data = new List<byte>(100);
         int messageCount = playerIDs.Count;
-        for (int i = 0; i < messageCount; i++) {
+        for (int i = 0; i < messageCount; i++)
+        {
             // note that the player id is actually its order in this
             // message
             byte[] id = BitConverter.GetBytes((int)playerIDs[i]);
@@ -218,7 +235,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         return (msg);
     }
 
-    public void SetupHandlers() {
+    public void SetupHandlers()
+    {
         NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessage);
         NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessage);
         NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessage);
@@ -227,33 +245,40 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Helpers
-    public void DebugLogPlayerLists() {
+    public void DebugLogPlayerLists()
+    {
         Debug.Log($"Player List({playerIDs.Count}): ");
-        for (int i = 0; i < playerIDs.Count; i++) {
+        for (int i = 0; i < playerIDs.Count; i++)
+        {
             Debug.Log($"[{playerIDs[i]}]: {playerNames[i]}, team {playerTypes[i]}, has taken turn: {playerTurnTakenFlags[i]}");
         }
     }
-    public int DrawCardForPlayer(int playerId) {
+    public int DrawCardForPlayer(int playerId)
+    {
         int cardUID = nextCardUID++;
         drawnCardUIDs[playerId] = cardUID;
         return cardUID;
     }
-    public void ResetAllPlayersToNotReady() {
-        for (int i = 0; i < playerIDs.Count; i++) {
+    public void ResetAllPlayersToNotReady()
+    {
+        for (int i = 0; i < playerIDs.Count; i++)
+        {
             playerTypes[i] = PlayerTeam.Any;
         }
     }
-    public void RemovePlayer(int id) {
+    public void RemovePlayer(int id)
+    {
         if (isServer)
         {
             int index = playerIDs.FindIndex(x => x == id);
-            if (index != -1)
+            if (index != -1) // this check right here needs to be updated?
             {
                 playerIDs.Remove(id);
                 playerNames.RemoveAt(index);
                 playerTypes.RemoveAt(index);
                 playerNetworkReadyFlags.RemoveAt(index);
                 playerTurnTakenFlags.RemoveAt(index);
+                playerConnections.Remove(id); // Remove the connection
                 // need to send a message to delete player from the clients
                 Message data = RemoveNewPlayerMessage(id);
                 // only servers start the game!
@@ -283,7 +308,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
-    public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
+    public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload)
+    {
         int returnValue = 0;
         byte first = payload.ElementAt(indexStart);
         byte second = payload.ElementAt(indexStart + 1);
@@ -295,10 +321,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Direct Message Sending
-    public void SendStringToClients(string stringMsg) {
-        if (isServer) {
+    public void SendStringToClients(string stringMsg)
+    {
+        if (isServer)
+        {
             Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
-            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+            RGNetworkLongMessage netMsg = new RGNetworkLongMessage
+            {
                 playerID = (uint)localPlayerID,
                 type = (uint)msg.Type,
                 count = (uint)msg.byteArguments.Count,
@@ -309,10 +338,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             NetworkServer.SendToAll(netMsg);
         }
     }
-    public void SendStringToServer(string stringMsg) {
-        if (!isServer) {
+    public void SendStringToServer(string stringMsg)
+    {
+        if (!isServer)
+        {
             Message msg = new Message(CardMessageType.LogAction, (uint)localPlayerID, stringMsg);
-            RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+            RGNetworkLongMessage netMsg = new RGNetworkLongMessage
+            {
                 playerID = (uint)localPlayerID,
                 type = (uint)msg.Type,
                 count = (uint)msg.byteArguments.Count,
@@ -323,33 +355,40 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     }
 
     //send message to specific client via net ID
-    public void SendMessageToClient(int playerId, RGNetworkLongMessage msg) {
-        if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn)) {
+    public void SendMessageToClient(int playerId, RGNetworkLongMessage msg)
+    {
+        if (playerConnections.TryGetValue(playerId, out NetworkConnectionToClient conn))
+        {
             conn.Send<RGNetworkLongMessage>(msg);
         }
-        else {
+        else
+        {
             Debug.LogError($"No connection found for player ID {playerId}");
         }
     }
-    public void SendSectorDataMessage(int playerID, List<(int sectorType, bool[] sectorValues)> sectors) {
+    public void SendSectorDataMessage(int playerID, List<(int sectorType, bool[] sectorValues)> sectors)
+    {
         if (!isServer) return;
 
         // Prepare a list of bytes to contain all the sector data
         List<byte> sectorData = new List<byte>();
 
-        foreach (var sector in sectors) {
+        foreach (var sector in sectors)
+        {
             // Add the sector type as an int (4 bytes)
             sectorData.AddRange(BitConverter.GetBytes(sector.sectorType));
 
             // Add the 3 boolean values as bytes 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++)
+            {
                 sectorData.Add(sector.sectorValues[i] ? (byte)1 : (byte)0);
             }
         }
 
         // Create a new message with this data
         Message msg = new Message(CardMessageType.SendSectorData, (uint)localPlayerID, sectorData);
-        RGNetworkLongMessage netMsg = new RGNetworkLongMessage {
+        RGNetworkLongMessage netMsg = new RGNetworkLongMessage
+        {
             playerID = (uint)playerID,
             type = (uint)msg.Type,
             count = (uint)sectorData.Count,
@@ -363,13 +402,18 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Update Observer
-    public void UpdateObserver(Message data) {
+    public void UpdateObserver(Message data)
+    {
         // send messages here over network to appropriate place(s)
-        switch (data.Type) {
-            case CardMessageType.StartGame: {
-                    if (isServer) {
+        switch (data.Type)
+        {
+            case CardMessageType.StartGame:
+                {
+                    if (isServer)
+                    {
                         // only servers start the game!
-                        RGNetworkLongMessage msg = new RGNetworkLongMessage {
+                        RGNetworkLongMessage msg = new RGNetworkLongMessage
+                        {
                             playerID = data.senderID,
                             type = (uint)data.Type,
                             count = (uint)playerIDs.Count,
@@ -380,9 +424,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     }
                 }
                 break;
-            case CardMessageType.SectorAssignment: {
-                    if (isServer) {
-                        RGNetworkLongMessage sectorMsg = new RGNetworkLongMessage {
+            case CardMessageType.SectorAssignment:
+                {
+                    if (isServer)
+                    {
+                        RGNetworkLongMessage sectorMsg = new RGNetworkLongMessage
+                        {
                             playerID = data.senderID,
                             type = (uint)data.Type,
                             count = (uint)data.arguments.Count,
@@ -394,34 +441,41 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 }
                 break;
 
-            case CardMessageType.EndPhase: {
+            case CardMessageType.EndPhase:
+                {
                     // turn taking is handled here because the list of players on 
                     // the network happens here
-                    RGNetworkShortMessage msg = new RGNetworkShortMessage {
+                    RGNetworkShortMessage msg = new RGNetworkShortMessage
+                    {
                         playerID = data.senderID,
                         type = (uint)data.Type
                     };
                     Debug.Log("update observer called end phase! ");
-                    if (isServer) {
+                    if (isServer)
+                    {
                         // we've played so we're no longer on the ready list
-                        int playerIndex = (int) msg.playerID;
+                        int playerIndex = (int)msg.playerID;
                         playerTurnTakenFlags[playerIndex] = true;
                         // find next player to ok to play and send them a message
                         int nextPlayerId = -1;
-                        for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                            if (!playerTurnTakenFlags[i]) {
+                        for (int i = 0; i < playerTurnTakenFlags.Count; i++)
+                        {
+                            if (!playerTurnTakenFlags[i])
+                            {
                                 nextPlayerId = i;
                                 Debug.Log("first player not done is " + i);
                                 break;
                             }
                         }
 
-                        if (nextPlayerId == -1) {
+                        if (nextPlayerId == -1)
+                        {
                             Debug.Log("update observer everybody has ended phase!");
                             GamePhase nextPhase = manager.GetNextPhase();
 
                             // need to increment the turn and set all the players to ready again
-                            for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+                            for (int i = 0; i < playerTurnTakenFlags.Count; i++)
+                            {
                                 playerTurnTakenFlags[i] = false;
                             }
 
@@ -432,23 +486,28 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             // server needs to start their next phase too
                             manager.StartNextPhase();
 
-                            if (nextPhase == GamePhase.DrawRed) {
+                            if (nextPhase == GamePhase.DrawRed)
+                            {
                                 manager.IncrementTurn();
                                 Debug.Log("Turn is done - incrementing and starting again.");
                             }
                         }
                     }
-                    else {
+                    else
+                    {
 
                         NetworkClient.Send(msg);
                         Debug.Log("CLIENT ENDED TURN AND GAVE IT BACK TO SERVER");
                     }
                 }
                 break;
-            case CardMessageType.IncrementTurn: {
+            case CardMessageType.IncrementTurn:
+                {
                     Debug.Log("update observer called increment turn! ");
-                    if (isServer) {
-                        RGNetworkShortMessage msg = new RGNetworkShortMessage {
+                    if (isServer)
+                    {
+                        RGNetworkShortMessage msg = new RGNetworkShortMessage
+                        {
                             playerID = data.senderID,
                             type = (uint)data.Type
                         };
@@ -458,10 +517,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 }
 
                 break;
-            case CardMessageType.SharePlayerType: {
+            case CardMessageType.SharePlayerType:
+                {
                     // servers only receive types in separate messages
-                    if (!isServer) {
-                        RGNetworkLongMessage msg = new RGNetworkLongMessage {
+                    if (!isServer)
+                    {
+                        RGNetworkLongMessage msg = new RGNetworkLongMessage
+                        {
                             playerID = data.senderID,
                             type = (uint)data.Type,
                             count = (uint)data.arguments.Count,
@@ -484,8 +546,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.DrawCard:
             case CardMessageType.ReturnCardToDeck:
             case CardMessageType.ChangeCardID:
-            case CardMessageType.MeepleShare: {
-                    RGNetworkLongMessage msg = new RGNetworkLongMessage {
+            case CardMessageType.MeepleShare:
+                {
+                    RGNetworkLongMessage msg = new RGNetworkLongMessage
+                    {
                         playerID = data.senderID,
                         type = (uint)data.Type,
                         count = (uint)data.arguments.Count,
@@ -500,27 +564,33 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         $"\nPayload size: {msg.payload.Count} bytes");
 
 
-                    if (!isServer) {
+                    if (!isServer)
+                    {
                         NetworkClient.Send(msg);
                         Debug.Log("CLIENT sent type: " + data.Type + " with value " + data.ToString());
                     }
-                    else {
+                    else
+                    {
                         // share it with everybody
                         NetworkServer.SendToAll(msg);
                         Debug.Log("SERVER sent type: " + data.Type + " with value " + data.ToString());
                     }
                 }
                 break;
-            case CardMessageType.EndGame: {
-                    RGNetworkShortMessage msg = new RGNetworkShortMessage {
+            case CardMessageType.EndGame:
+                {
+                    RGNetworkShortMessage msg = new RGNetworkShortMessage
+                    {
                         playerID = data.senderID,
                         type = (uint)data.Type
                     };
-                    if (isServer) {
+                    if (isServer)
+                    {
                         NetworkServer.SendToAll(msg);
                         Debug.Log("SERVER SENT GAME END MESSAGE FIRST");
                     }
-                    else {
+                    else
+                    {
                         NetworkClient.Send(msg);
                         Debug.Log("CLIENT SENT GAME END MESSAGE FIRST");
                     }
@@ -534,14 +604,17 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Client Receive Messages
-    public void OnClientReceiveShortMessage(RGNetworkShortMessage msg) {
+    public void OnClientReceiveShortMessage(RGNetworkShortMessage msg)
+    {
         Debug.Log("CLIENT RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
 
         // NOTE: SENDTOALL ALSO SENDS THE MESSAGE TO THE SERVER AGAIN, WHICH WE DON'T NEED
-        if (!isServer) {
-            switch (type) {
+        if (!isServer)
+        {
+            switch (type)
+            {
                 case CardMessageType.StartNextPhase:
                     Debug.Log("received start next phase message");
                     manager.StartNextPhase();
@@ -554,8 +627,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     Debug.Log("client received increment turn message!");
                     manager.IncrementTurn();
                     break;
-                case CardMessageType.EndGame: {
-                        if (!manager.HasReceivedEndGame()) {
+                case CardMessageType.EndGame:
+                    {
+                        if (!manager.HasReceivedEndGame())
+                        {
                             manager.SetReceivedEndGame(true);
                             manager.AddMessage(new Message(CardMessageType.EndGame, (uint)localPlayerID));
                             manager.ShowEndGameCanvas();
@@ -569,9 +644,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
         }
     }
-    public void OnClientReceiveLongMessage(RGNetworkLongMessage msg) {
+    public void OnClientReceiveLongMessage(RGNetworkLongMessage msg)
+    {
         var playerName = msg.playerID + "";
-        if (manager!=null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player)) {
+        if (manager != null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player))
+        {
             playerName = player.playerName;
         }
 
@@ -580,9 +657,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
 
-        if (msg.playerID != localPlayerID && !isServer) {
+        if (msg.playerID != localPlayerID && !isServer)
+        {
             // we don't send messages to ourself
-            switch (type) {
+            switch (type)
+            {
                 case CardMessageType.AddLobbyID:
                     {
                         Debug.Log("client received message to add player to lobby");
@@ -594,7 +673,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         id = GetIntFromByteArray(element, msg.payload);
                         // make sure the player isn't added twice
                         int existingPlayer = playerIDs.FindIndex(x => x == id);
-                        
+
                         if (existingPlayer == -1)
                         {
                             // get the player type
@@ -604,7 +683,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             // get length of player name
                             element += 4;
                             actualInt = GetIntFromByteArray(element, msg.payload);
-                  
+
                             // get player name
                             element += 4;
                             ArraySegment<byte> name = msg.payload.Slice(element, actualInt);
@@ -612,7 +691,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             // since this doesn't exist, add it
                             AddPotentialPlayer(id, Encoding.ASCII.GetString(name), typeData);
                             NotifyPlayerChanges(); // Update the lobby screen when a player is added
-                        } else
+                        }
+                        else
                         {
                             // this is only changing the player type
                             element += 4;
@@ -641,11 +721,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-                case CardMessageType.StartGame: {
+                case CardMessageType.StartGame:
+                    {
                         Debug.Log("client received message to start the game");
                         uint count = msg.count;
                         int element = 0;
-                        for (int i = 0; i < count; i++) {
+                        for (int i = 0; i < count; i++)
+                        {
                             // player id is the first arg
                             int newID = GetIntFromByteArray(element, msg.payload);
                             int existingPlayer = playerIDs.FindIndex(x => x == newID);
@@ -662,18 +744,20 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                             ArraySegment<byte> name = msg.payload.Slice(element, actualInt);
                             element += actualInt;
 
-                            if (existingPlayer == -1) {
+                            if (existingPlayer == -1)
+                            {
                                 playerIDs.Add(newID);
                                 playerTypes.Add((PlayerTeam)actualInt);
                                 playerNames.Add(Encoding.ASCII.GetString(name));
                                 Debug.Log("player being added : " + playerIDs[i] + " " + playerTypes[i] +
                                     " " + playerNames[i]);
                             }
-                            else {
+                            else
+                            {
                                 // when a game is reset we only need the player type again
                                 playerTypes[existingPlayer] = (PlayerTeam)actualInt;
                                 Debug.Log("player " + playerNames[existingPlayer] + " already exists! new type is: " + playerTypes[existingPlayer]);
-                            
+
                             }
                             NotifyPlayerChanges();
                         }
@@ -682,17 +766,20 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
                     }
                     break;
-                case CardMessageType.SendSectorData: {
+                case CardMessageType.SendSectorData:
+                    {
                         Debug.Log("Client received sector data message");
                         int element = 0;
-                        while (element < msg.payload.Count) {
+                        while (element < msg.payload.Count)
+                        {
                             // Read the sector type
                             SectorType sectorType = (SectorType)GetIntFromByteArray(element, msg.payload);
                             element += 4;
 
                             // Read the 3 boolean values
                             bool[] sectorValues = new bool[3];
-                            for (int i = 0; i < 3; i++) {
+                            for (int i = 0; i < 3; i++)
+                            {
                                 sectorValues[i] = msg.payload.ElementAt(element++) == 1;
                             }
 
@@ -702,14 +789,16 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-                case CardMessageType.LogAction: {
+                case CardMessageType.LogAction:
+                    {
                         string receivedString = Encoding.UTF8.GetString(msg.payload.ToArray());
                         Debug.Log("CLIENT RECEIVED string message: " + receivedString);
                         manager.AddActionLogMessage(receivedString, true); //now log the message to the action log
                         // Handle the received string here
                     }
                     break;
-                case CardMessageType.SectorAssignment: {
+                case CardMessageType.SectorAssignment:
+                    {
                         // Get the assigned sector index from the message payload
                         int element = 0;
                         int playerIndex = GetIntFromByteArray(element, msg.payload);
@@ -722,26 +811,31 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         Debug.Log("CLIENT RECEIVED sector assignment: Sector " + sectorIndex);
                     }
                     break;
-                case CardMessageType.SectorDieRoll: {
+                case CardMessageType.SectorDieRoll:
+                    {
                         // Get the assigned sector index from the message payload
                         int element = 0;
                         SectorType sectorPlayedOn = (SectorType)GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         int roll = GetIntFromByteArray(element, msg.payload);
-                        if (GameManager.Instance.AllSectors.TryGetValue(sectorPlayedOn, out Sector sector)) {
+                        if (GameManager.Instance.AllSectors.TryGetValue(sectorPlayedOn, out Sector sector))
+                        {
                             sector.UpdateDieRollFromNetwork(roll);
                         }
-                        else {
+                        else
+                        {
                             Debug.LogError($"Could not find sector {(int)sectorPlayedOn}");
                         }
                         Debug.Log("CLIENT RECEIVED sector die roll: Sector " + sectorPlayedOn + " roll " + roll);
                     }
                     break;
-                case CardMessageType.ShareDiscardNumber: {
+                case CardMessageType.ShareDiscardNumber:
+                    {
                         uint count = msg.count;
 
                         Debug.Log("client received a player's discard amount!" + count);
-                        if (count == 1) {
+                        if (count == 1)
+                        {
                             // turn the first element into an int
                             int discardCount = BitConverter.ToInt32(msg.payload);
                             int playerIndex = (int)msg.playerID;
@@ -754,18 +848,23 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-                case CardMessageType.ChangeCardID: {
+                case CardMessageType.ChangeCardID:
+                    {
                         int element = 0;
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         int newUID = GetIntFromByteArray(element, msg.payload);
 
                         // Check if this message is for the current client
-                        if (msg.playerID == localPlayerID) {
+                        if (msg.playerID == localPlayerID)
+                        {
                             // Update the card with the new UID
-                            if (manager.actualPlayer.HandCards.TryGetValue(cardId, out GameObject cardGo)) {
-                                if (cardGo.TryGetComponent(out Card drawnCard)) {
-                                    if (drawnCard != null) {
+                            if (manager.actualPlayer.HandCards.TryGetValue(cardId, out GameObject cardGo))
+                            {
+                                if (cardGo.TryGetComponent(out Card drawnCard))
+                                {
+                                    if (drawnCard != null)
+                                    {
                                         drawnCard.UniqueID = newUID;
                                         Debug.Log($"Client updated card {cardId} with new UID {newUID}");
                                         break;
@@ -776,7 +875,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-                case CardMessageType.DrawCard: {
+                case CardMessageType.DrawCard:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -785,7 +885,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.DrawCard,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -795,7 +896,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.ReturnCardToDeck: {
+                case CardMessageType.ReturnCardToDeck:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -803,7 +905,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.ReturnCardToDeck,
                             UniqueID = uniqueId,
                             CardID = cardId
@@ -813,7 +916,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.CardUpdate: {
+                case CardMessageType.CardUpdate:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -828,7 +932,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int facilityEffectToRemoveType = GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         int amount = GetIntFromByteArray(element, msg.payload);
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -841,7 +946,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.CardUpdateWithExtraFacilityInfo: {
+                case CardMessageType.CardUpdateWithExtraFacilityInfo:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -861,7 +967,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int facilityEffect3 = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.CardUpdateWithExtraFacilityInfo,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -877,7 +984,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.ReduceCost: {
+                case CardMessageType.ReduceCost:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -887,7 +995,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int amount = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.ReduceCost,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -898,7 +1007,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.RemoveEffect: {
+                case CardMessageType.RemoveEffect:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -910,7 +1020,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int effect = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.RemoveEffect,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -921,7 +1032,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.DiscardCard: {
+                case CardMessageType.DiscardCard:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -930,7 +1042,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.DiscardCard,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -940,7 +1053,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.MeepleShare: {
+                case CardMessageType.MeepleShare:
+                    {
                         Debug.Log("Processing meeple share message in client received");
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -952,7 +1066,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int amount = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.MeepleShare,
                             UniqueID = playerToShareWith,
                             CardID = meepleColor,
@@ -972,16 +1087,19 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Server Receive Messages
-    public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg) {
+    public void OnServerReceiveShortMessage(NetworkConnectionToClient client, RGNetworkShortMessage msg)
+    {
         Debug.Log("SERVER RECEIVED SHORT MESSAGE::: " + msg.playerID + " " + msg.type);
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
         // Update the connection mapping
         int playerId = (int)msg.playerID;
-        if (!playerConnections.ContainsKey(playerId)) {
+        if (!playerConnections.ContainsKey(playerId))
+        {
             playerConnections[playerId] = client;
         }
-        switch (type) {
+        switch (type)
+        {
             case CardMessageType.StartNextPhase:
                 // nobody tells server to start a turn, so this shouldn't happen
                 Debug.Log("server start next phase message when it shouldn't!");
@@ -995,27 +1113,32 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                 playerTurnTakenFlags[playerIndex] = true;
                 // find next player to ok to play and send them a message
                 int nextPlayerId = -1;
-                for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
-                    if (!playerTurnTakenFlags[i]) {
+                for (int i = 0; i < playerTurnTakenFlags.Count; i++)
+                {
+                    if (!playerTurnTakenFlags[i])
+                    {
                         nextPlayerId = playerIDs[i];
                         break;
                     }
                 }
-                if (nextPlayerId == -1) {
+                if (nextPlayerId == -1)
+                {
                     GamePhase nextPhase = manager.GetNextPhase();
 
                     // need to increment the turn and set all the players to ready again
-                    for (int i = 0; i < playerTurnTakenFlags.Count; i++) {
+                    for (int i = 0; i < playerTurnTakenFlags.Count; i++)
+                    {
                         playerTurnTakenFlags[i] = false;
                     }
-            
+
                     // tell all the clients to go to the next phase
                     msg.playerID = (uint)localPlayerID;
                     msg.type = (uint)CardMessageType.StartNextPhase;
                     NetworkServer.SendToAll(msg);
                     // server needs to start next phase as well
                     manager.StartNextPhase();
-                    if (nextPhase == GamePhase.DrawRed) {
+                    if (nextPhase == GamePhase.DrawRed)
+                    {
                         manager.IncrementTurn();
                         Debug.Log("Turn is done - incrementing and starting again.");
                     }
@@ -1025,8 +1148,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             case CardMessageType.IncrementTurn:
                 Debug.Log("Server received increment message and did nothing.");
                 break;
-            case CardMessageType.EndGame: {
-                    if (!manager.HasReceivedEndGame()) {
+            case CardMessageType.EndGame:
+                {
+                    if (!manager.HasReceivedEndGame())
+                    {
                         manager.SetReceivedEndGame(true);
                         manager.AddMessage(new Message(CardMessageType.EndGame, (uint)localPlayerID));
                         manager.ShowEndGameCanvas();
@@ -1039,9 +1164,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
 
     }
-    public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg) {
+    public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg)
+    {
         var playerName = msg.playerID + "";
-        if (manager!=null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player)) {
+        if (manager != null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player))
+        {
             playerName = player.playerName;
         }
 
@@ -1049,15 +1176,25 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         CardMessageType type = (CardMessageType)msg.type;
         // Update the connection mapping
         int playerId = (int)msg.playerID;
-        if (!playerConnections.ContainsKey(playerId)) {
+        if (!playerConnections.ContainsKey(playerId))
+        {
             playerConnections[playerId] = client;
         }
-        if (msg.playerID != localPlayerID) {
-            switch (type) {
-                case CardMessageType.SharePlayerType: {
+        if (msg.playerID != localPlayerID)
+        {
+            if (!playerIDs.Contains(playerId))
+            {
+                Debug.LogWarning($"Received message from removed player ID {playerId}. Ignoring message.");
+                return;
+            }
+            switch (type)
+            {
+                case CardMessageType.SharePlayerType:
+                    {
                         uint count = msg.count;
                         Debug.Log("server received a player's type!" + count);
-                        if (count == 1) {
+                        if (count == 1)
+                        {
                             // turn the first element into an int
                             PlayerTeam playerType = (PlayerTeam)BitConverter.ToInt32(msg.payload);
                             int playerIndex = (int)msg.playerID;
@@ -1084,11 +1221,13 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-                case CardMessageType.ShareDiscardNumber: {
+                case CardMessageType.ShareDiscardNumber:
+                    {
                         uint count = msg.count;
 
                         Debug.Log("server received a player's discard amount!" + count);
-                        if (count == 1) {
+                        if (count == 1)
+                        {
                             // turn the first element into an int
                             int discardCount = BitConverter.ToInt32(msg.payload);
                             int playerIndex = (int)msg.playerID;
@@ -1101,28 +1240,33 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         }
                     }
                     break;
-                case CardMessageType.LogAction: {
+                case CardMessageType.LogAction:
+                    {
                         string receivedString = Encoding.UTF8.GetString(msg.payload.ToArray());
                         Debug.Log("SERVER RECEIVED string message: " + receivedString);
                         manager.AddActionLogMessage(receivedString, true); //log the action locally
                     }
                     break;
-                case CardMessageType.SectorDieRoll: {
+                case CardMessageType.SectorDieRoll:
+                    {
                         // Get the assigned sector index from the message payload
                         int element = 0;
                         SectorType sectorPlayedOn = (SectorType)GetIntFromByteArray(element, msg.payload);
                         element += 4;
                         int roll = -1;
-                        if (GameManager.Instance.AllSectors.TryGetValue(sectorPlayedOn, out Sector sector)) {
+                        if (GameManager.Instance.AllSectors.TryGetValue(sectorPlayedOn, out Sector sector))
+                        {
                             roll = sector.SectorRollDie();
                         }
-                        else {
+                        else
+                        {
                             Debug.LogError($"Could not find sector {(int)sectorPlayedOn}");
                         }
                         Debug.Log("Server RECEIVED sector die roll request from sector " + sectorPlayedOn + " and rolled " + roll);
                     }
                     break;
-                case CardMessageType.DrawCard: {
+                case CardMessageType.DrawCard:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1132,7 +1276,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         NetworkServer.SendToAll(msg); //relay draw card message to clients
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.DrawCard,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -1142,7 +1287,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.ReturnCardToDeck: {
+                case CardMessageType.ReturnCardToDeck:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1150,7 +1296,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.ReturnCardToDeck,
                             UniqueID = uniqueId,
                             CardID = cardId
@@ -1160,7 +1307,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.CardUpdate: {
+                case CardMessageType.CardUpdate:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1174,7 +1322,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
 
                         element += 4;
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.CardUpdate,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -1186,7 +1335,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.CardUpdateWithExtraFacilityInfo: {
+                case CardMessageType.CardUpdateWithExtraFacilityInfo:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1206,7 +1356,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int facilityEffect3 = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.CardUpdateWithExtraFacilityInfo,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -1222,7 +1373,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.ReduceCost: {
+                case CardMessageType.ReduceCost:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1232,7 +1384,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int amount = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.ReduceCost,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -1243,7 +1396,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.RemoveEffect: {
+                case CardMessageType.RemoveEffect:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1255,7 +1409,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         element += 4;
                         int effect = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.RemoveEffect,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -1266,7 +1421,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.DiscardCard: {
+                case CardMessageType.DiscardCard:
+                    {
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
                         element += 4;
@@ -1275,7 +1431,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.DiscardCard,
                             UniqueID = uniqueId,
                             CardID = cardId,
@@ -1285,7 +1442,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
-                case CardMessageType.MeepleShare: {
+                case CardMessageType.MeepleShare:
+                    {
                         Debug.Log("Processing meeple share message in server received");
                         int element = 0;
                         GamePhase gamePhase = (GamePhase)GetIntFromByteArray(element, msg.payload);
@@ -1297,7 +1455,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                         int amount = GetIntFromByteArray(element, msg.payload);
                         element += 4;
 
-                        Update update = new Update {
+                        Update update = new Update
+                        {
                             Type = CardMessageType.MeepleShare,
                             UniqueID = playerToShareWith,
                             CardID = meepleColor,
