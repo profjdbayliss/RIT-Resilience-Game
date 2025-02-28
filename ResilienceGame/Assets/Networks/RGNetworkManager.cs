@@ -35,10 +35,6 @@ public class RGNetworkManager : NetworkManager
         //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
     }
 
-    //public void SynchronizePlayerList()
-    //{
-    //    RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
-    //}
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {

@@ -110,6 +110,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         if (isServer)
         {
             Debug.Log("adding player to server : " + id);
+            Debug.Log("Index List: " + playerIDs.ToArray());
+            /*if (id < 0 || id >= playerIDs.Count)
+            {
+                Debug.LogError("Invalid player ID: " + id);
+                return;
+            }*/
             playerIDs.Add(id);
             playerNetworkReadyFlags.Add(true);
             playerTurnTakenFlags.Add(false);
@@ -138,8 +144,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 
                 count++;
             }
-            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
-            PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
+            //NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+            //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
         }
     }
 
@@ -270,18 +276,23 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         if (isServer)
         {
-            int index = playerIDs.FindIndex(x => x == id);
-            if (index != -1) // this check right here needs to be updated?
+            int index = playerIDs.IndexOf(id);
+            if (index != -1)
             {
-                playerIDs.Remove(id);
+                Debug.Log($"Removing player {id} at index {index}");
+
+                // Remove from lists by index
+                playerIDs.RemoveAt(index);
                 playerNames.RemoveAt(index);
                 playerTypes.RemoveAt(index);
                 playerNetworkReadyFlags.RemoveAt(index);
                 playerTurnTakenFlags.RemoveAt(index);
-                playerConnections.Remove(id); // Remove the connection
-                // need to send a message to delete player from the clients
+
+                // Remove from dictionary
+                playerConnections.Remove(id);
+
+                // Notify all clients
                 Message data = RemoveNewPlayerMessage(id);
-                // only servers start the game!
                 RGNetworkLongMessage msg = new RGNetworkLongMessage
                 {
                     playerID = data.senderID,
@@ -290,23 +301,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     payload = data.byteArguments.ToArray()
                 };
                 NetworkServer.SendToAll(msg);
-                NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
-            }
-        }
-        else
-        {
-            int index = playerIDs.FindIndex(x => x == id);
-            if (index != -1)
-            {
-                Debug.Log("removing player " + id);
-                playerIDs.Remove(id);
-                playerNames.RemoveAt(index);
-                playerTypes.RemoveAt(index);
-                playerNetworkReadyFlags.RemoveAt(index);
-                playerTurnTakenFlags.RemoveAt(index);
+
+                NotifyPlayerChanges();
             }
         }
     }
+
 
     public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload)
     {
@@ -1098,6 +1098,14 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         {
             playerConnections[playerId] = client;
         }
+
+        // Add safety check for player index
+        if (playerId < 0 || playerId >= playerIDs.Count)
+        {
+            Debug.LogError($"Invalid player index: {playerId}. Disconnecting client to prevent exploits.");
+            client.Disconnect();
+            return;
+        }
         switch (type)
         {
             case CardMessageType.StartNextPhase:
@@ -1164,7 +1172,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         }
 
     }
-    public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg)
+    public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg) // change how playerIndex is acquired here
     {
         var playerName = msg.playerID + "";
         if (manager != null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player))
@@ -1207,7 +1215,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                                 Debug.Log("setting player type to " + playerType);
                                 // send info about player to everybody
                                 // and update the lobby
-                                Message data = CreateNewPlayerMessage(playerIndex, playerNames[playerIndex], (int)playerTypes[playerIndex]);
+                                Message data = CreateNewPlayerMessage(playerIndex, playerNames[playerIndex], (int)playerTypes[playerIndex]); //First Part of index error
                                 RGNetworkLongMessage msg2 = new RGNetworkLongMessage
                                 {
                                     playerID = data.senderID,
