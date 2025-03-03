@@ -784,7 +784,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         else {
             NetworkManager.singleton.StopClient();
         }
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(0);
 
     }
     public void QuitToDesktop() {
