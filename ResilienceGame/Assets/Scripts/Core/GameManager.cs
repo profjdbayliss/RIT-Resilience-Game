@@ -670,7 +670,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Keypad9) && !canPlaySolo)
+        if (Keyboard.current.numpad9Key.wasPressedThisFrame && !canPlaySolo)
         {
             canPlaySolo = true;
             Debug.Log("Can play solo");
