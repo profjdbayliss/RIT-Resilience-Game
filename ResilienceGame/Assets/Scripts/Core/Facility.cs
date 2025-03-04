@@ -76,6 +76,12 @@ public class Facility : MonoBehaviour {
     public bool HasMaxPhysicalPoints => Points[0] == MaxPhysicalPoints;
     public bool HasMaxNetworkPoints => Points[1] == MaxNetworkPoints;
     public bool HasMaxFinancialPoints => Points[2] == MaxFinancialPoints;
+
+    //Audio, mostly for loosing a point 
+    [Header("SFX")]
+    [SerializeField] private AudioSource audio;
+    [SerializeField] private AudioClip loosePoint;
+
     private void Update() {
         if (IsDown && !WasEverDowned)
             WasEverDowned = true;
@@ -298,6 +304,13 @@ public class Facility : MonoBehaviour {
         pointsUIController.UpdateTempPoints(tempPhysPoints, tempNetPoints, tempFinPoints);
     }
     public void ChangeFacilityPoints(FacilityEffectTarget target, int createdById, int value) {
+
+        //Check if it's a negative value
+        if (value < 0)
+        {
+            audio.PlayOneShot(loosePoint, 1);
+        }
+
         Debug.Log($"Changing {target} points by {value} for facility {facilityName}");
         List<int> currentPoints = new List<int>(Points);
 
