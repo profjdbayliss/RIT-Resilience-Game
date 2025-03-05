@@ -90,11 +90,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     // before calling
     public void AddPotentialPlayer(int id, string name, int type)
     {
-        playerIDs.Add(id, id);
-        playerNetworkReadyFlags.Add(id, true);
-        playerTurnTakenFlags.Add(id, false);
-        playerTypes.Add(id, (PlayerTeam)type);
-        playerNames.Add(id, name);
+        // Add or update all dictionaries
+        playerIDs[id] = id; // Upsert
+        playerNetworkReadyFlags[id] = true;
+        playerTurnTakenFlags[id] = false;
+        playerTypes[id] = (PlayerTeam)type;
+        playerNames[id] = name;
     }
 
     public void AddPlayer(int id, string name, CardPlayer cardPlayer, NetworkConnectionToClient conn)
@@ -1301,9 +1302,18 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
     public void NotifyPlayerChanges()
     {
         PlayerLobbyManager.Instance.players.Clear();
-        for (int i = 0; i < playerIDs.Count; i++)
+        foreach (var kvp in playerIDs)
         {
-            PlayerLobbyManager.Instance.players.Add(new PlayerData { Name = playerNames[i], Team = playerTypes[i] });
+            int id = kvp.Key;
+            // Safely get name and team, skip if missing
+            if (playerNames.TryGetValue(id, out string name) && playerTypes.TryGetValue(id, out PlayerTeam team))
+            {
+                PlayerLobbyManager.Instance.players.Add(new PlayerData { Name = name, Team = team });
+            }
+            else
+            {
+                Debug.LogError($"Missing data for player ID: {id}");
+            }
         }
         PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
     }
