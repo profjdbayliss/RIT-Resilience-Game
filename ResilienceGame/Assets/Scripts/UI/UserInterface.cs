@@ -146,7 +146,8 @@ public class UserInterface : MonoBehaviour
     private readonly Vector2 buttonBgHiddenPos = new Vector2(-800, -691);
     private readonly Vector2 buttonBgVisiblePos = new Vector2(-800, -383.5f);
 
-    private readonly Vector2 discardHiddenPos = new Vector2(0, 771);
+    private readonly Vector2 discardHiddenPos = new Vector2(0, 9771);
+    private readonly Vector2 discardHiddenPos2 = new Vector2(0, 890);
     private readonly Vector2 discardVisiblePos = new Vector2(0, 475);
     private Coroutine discardMoveRoutine;
 
@@ -166,6 +167,7 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private RectTransform sectorParent;
     private readonly Vector2 sectorHiddenPos = new Vector2(0, -1105);
     private readonly Vector2 sectorVisiblePos = new Vector2(0, 0);
+    private readonly float sectorAnimDuration2 = 0.9f;
     private readonly float sectorAnimDuration = 0.4f;
     private Coroutine sectorMoveRoutine;
 
@@ -305,9 +307,11 @@ public class UserInterface : MonoBehaviour
     {
         //discardDropZone.SetActive(true);
         if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
+        discardMoveRoutine = StartCoroutine(
+            MoveMenuItem(discardRect, discardHiddenPos2, 0.01f));
         discardMoveRoutine =
             StartCoroutine(
-                MoveMenuItem(discardRect, discardVisiblePos, sectorAnimDuration));
+                MoveMenuItem(discardRect, discardVisiblePos, sectorAnimDuration2));
 
         tutorialToggle.DiscardPanelToggle(true);
     }
@@ -316,8 +320,9 @@ public class UserInterface : MonoBehaviour
         if (discardMoveRoutine != null) StopCoroutine(discardMoveRoutine);
         discardMoveRoutine =
             StartCoroutine(
-                MoveMenuItem(discardRect, discardHiddenPos, sectorAnimDuration));
+                MoveMenuItem(discardRect, discardHiddenPos, sectorAnimDuration2));
         tutorialToggle.DiscardPanelToggle(false);
+
     }
     public void EnableMeepleButtonByIndex(int index)
     {
