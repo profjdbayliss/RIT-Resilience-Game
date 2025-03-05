@@ -201,11 +201,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
             int blueTeamCount = 0;
             foreach (var playerType in RGNetworkPlayerList.instance.playerTypes)
             {
-                if (playerType == PlayerTeam.Red)
+                if (playerType.Value == PlayerTeam.Red)
                 {
                     redTeamCount++;
                 }
-                else if (playerType == PlayerTeam.Blue)
+                else if (playerType.Value == PlayerTeam.Blue)
                 {
                     blueTeamCount++;
                 }
@@ -364,20 +364,35 @@ public class GameManager : MonoBehaviour, IRGObservable {
         var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
 
         actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
-        //create and populate the players using the network player list
-        for (int i = 0; i < rgNetPlayers.Length; i++) {
-            var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
-            var id = rgNetPlayers[i].mPlayerID;
-            Debug.Log("creating players/teams : " + RGNetworkPlayerList.instance.playerNames[id] + " " +
-                RGNetworkPlayerList.instance.playerTypes[id]);
-            cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
-            cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
-            cardPlayer.NetID = id;
-            cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
-            cardPlayer.InitializeCards();
-            playerDictionary.Add(id, cardPlayer);
-            if (cardPlayer.playerTeam == PlayerTeam.Blue) {
-                numBluePlayers++;
+        // Set the local player's NetID
+        actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
+
+        // Create and populate players using the network player list's ID registry
+        foreach (var playerEntry in RGNetworkPlayerList.instance.playerIDs)
+        {
+            int id = playerEntry.Key;
+
+            // Find the player object by ID instead of array index
+            RGNetworkPlayer rgPlayer = FindObjectsOfType<RGNetworkPlayer>()
+                .FirstOrDefault(p => p.mPlayerID == id);
+
+            if (rgPlayer != null)
+            {
+                var cardPlayer = rgPlayer.GetComponent<CardPlayer>();
+                Debug.Log($"Creating player: {RGNetworkPlayerList.instance.playerNames[id]} ({id})");
+
+                // Get values directly from player list dictionaries
+                cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
+                cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
+                cardPlayer.NetID = id;
+                cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
+                cardPlayer.InitializeCards();
+
+                playerDictionary[id] = cardPlayer; // Use ID as key
+                if (cardPlayer.playerTeam == PlayerTeam.Blue)
+                {
+                    numBluePlayers++;
+                }
             }
         }
 

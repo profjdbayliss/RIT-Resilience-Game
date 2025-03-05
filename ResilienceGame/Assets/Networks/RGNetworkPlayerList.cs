@@ -42,11 +42,11 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
     #endregion
 
     #region Player Lists
-    public List<int> playerIDs = new List<int>();
-    private List<bool> playerNetworkReadyFlags = new List<bool>();
-    public List<bool> playerTurnTakenFlags = new List<bool>();
-    public List<PlayerTeam> playerTypes = new List<PlayerTeam>();
-    public List<string> playerNames = new List<string>();
+    public Dictionary<int, int> playerIDs = new Dictionary<int, int>(); 
+    private Dictionary<int, bool> playerNetworkReadyFlags = new Dictionary<int, bool>();
+    public Dictionary<int, bool> playerTurnTakenFlags = new Dictionary<int, bool>();
+    public Dictionary<int, PlayerTeam> playerTypes = new Dictionary<int, PlayerTeam>();
+    public Dictionary<int, string> playerNames = new Dictionary<int, string>();
     private Dictionary<int, NetworkConnectionToClient> playerConnections = new Dictionary<int, NetworkConnectionToClient>();
     #endregion
 
@@ -75,63 +75,51 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
         return readyToStart;
     }
-    public void AddWhitePlayer() {
-        playerIDs.Add(playerIDs.Count);
-        playerNetworkReadyFlags.Add(true); // AI is always ready
-        playerTurnTakenFlags.Add(false);
-        playerTypes.Add(PlayerTeam.White); // Define PlayerTeam.AI in your enum if not done
-        playerNames.Add("White_Player");
-        GameManager.Instance.whitePlayer.NetID = playerIDs.Count - 1;
-        // No need to add a NetworkConnection for the AI
+    public void AddWhitePlayer()
+    {
+        int newPlayerID = playerIDs.Count;
+        playerIDs.Add(newPlayerID, newPlayerID);
+        playerNetworkReadyFlags.Add(newPlayerID, true);
+        playerTurnTakenFlags.Add(newPlayerID, false);
+        playerTypes.Add(newPlayerID, PlayerTeam.White);
+        playerNames.Add(newPlayerID, "White_Player");
+        GameManager.Instance.whitePlayer.NetID = newPlayerID;
     }
 
     // Assumes this doesn't exist in the list yet so please check
     // before calling
     public void AddPotentialPlayer(int id, string name, int type)
     {
-        playerIDs.Add(id);
-        playerNetworkReadyFlags.Add(true);
-        playerTurnTakenFlags.Add(false);
-        playerTypes.Add((PlayerTeam)type);
-        playerNames.Add(name);
+        playerIDs.Add(id, id);
+        playerNetworkReadyFlags.Add(id, true);
+        playerTurnTakenFlags.Add(id, false);
+        playerTypes.Add(id, (PlayerTeam)type);
+        playerNames.Add(id, name);
     }
 
     public void AddPlayer(int id, string name, CardPlayer cardPlayer, NetworkConnectionToClient conn)
     {
         if (isServer)
         {
-            Debug.Log("adding player to server : " + id);
-            playerIDs.Add(id);
-            playerNetworkReadyFlags.Add(true);
-            playerTurnTakenFlags.Add(false);
-            playerTypes.Add(PlayerTeam.Any);
-            playerConnections[id] = conn; // Store the connection
-            playerNames.Add(name);
-            if (id != 0)
+            playerIDs[id] = id;
+            playerNetworkReadyFlags[id] = true;
+            playerTurnTakenFlags[id] = false;
+            playerTypes[id] = PlayerTeam.Any;
+            playerConnections[id] = conn;
+            playerNames[id] = name;
+
+            // Send updated player list to all clients
+            Message data = CreateNewPlayerMessage(id, name, (int)PlayerTeam.Any);
+            RGNetworkLongMessage msg = new RGNetworkLongMessage
             {
-                manager.networkPlayers.Add(cardPlayer);
-            }
-            int count = 0;
-            // every time somebody joins we need to send the whole list to them
-            // and update everybody else
-            foreach(int playerID in playerIDs)
-            {
-                Message data = CreateNewPlayerMessage(playerID, playerNames[count], (int)playerTypes[count]);
-                // only servers start the game!
-                RGNetworkLongMessage msg = new RGNetworkLongMessage
-                {
-                    playerID = data.senderID,
-                    type = (uint)data.Type,
-                    count = 1,
-                    payload = data.byteArguments.ToArray()
-                };
-                NetworkServer.SendToAll(msg);
- 
-                count++;
-            }         
-            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
-            PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
-        } 
+                playerID = data.senderID,
+                type = (uint)data.Type,
+                count = 1,
+                payload = data.byteArguments.ToArray()
+            };
+            NetworkServer.SendToAll(msg);
+            NotifyPlayerChanges();
+        }
     }
 
     public void SetAiPlayerAsReadyToStartGame() {
@@ -149,12 +137,26 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
-    public void SetPlayerType(PlayerTeam type) {
-        if (isServer) {
+    // Helper method to replace FindIndex
+    private int FindPlayerKey(int targetID)
+    {
+        foreach (var kvp in playerIDs)
+        {
+            if (kvp.Value == targetID)
+            {
+                return kvp.Key;
+            }
+        }
+        return -1;
+    }
+
+    public void SetPlayerType(PlayerTeam type)
+    {
+        if (isServer)
+        {
             playerTypes[localPlayerID] = type;
-            int id = playerIDs.FindIndex(x => x == localPlayerID);
-            // make sure to update the lobby
-            Message data = CreateNewPlayerMessage(id, playerNames[id], (int)playerTypes[id]);          
+            int key = FindPlayerKey(localPlayerID);
+            Message data = CreateNewPlayerMessage(key, playerNames[key], (int)playerTypes[key]);
             RGNetworkLongMessage msg = new RGNetworkLongMessage
             {
                 playerID = data.senderID,
@@ -243,47 +245,31 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             playerTypes[i] = PlayerTeam.Any;
         }
     }
-    public void RemovePlayer(int id) {
+    public void RemovePlayer(int id)
+    {
         if (isServer)
         {
-            int index = playerIDs.FindIndex(x => x == id);
-            if (index != -1)
+            playerIDs.Remove(id);
+            playerNames.Remove(id);
+            playerTypes.Remove(id);
+            playerNetworkReadyFlags.Remove(id);
+            playerTurnTakenFlags.Remove(id);
+            playerConnections.Remove(id);
+
+            Message data = RemoveNewPlayerMessage(id);
+            RGNetworkLongMessage msg = new RGNetworkLongMessage
             {
-                playerIDs.Remove(id);
-                playerNames.RemoveAt(index);
-                playerTypes.RemoveAt(index);
-                playerNetworkReadyFlags.RemoveAt(index);
-                playerTurnTakenFlags.RemoveAt(index);
-                // need to send a message to delete player from the clients
-                Message data = RemoveNewPlayerMessage(id);
-                // only servers start the game!
-                RGNetworkLongMessage msg = new RGNetworkLongMessage
-                {
-                    playerID = data.senderID,
-                    type = (uint)data.Type,
-                    count = 1,
-                    payload = data.byteArguments.ToArray()
-                };
-                NetworkServer.SendToAll(msg);
-                NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
-            }
-        }
-        else
-        {
-            int index = playerIDs.FindIndex(x => x == id);
-            if (index != -1)
-            {
-                Debug.Log("removing player " + id);
-                playerIDs.Remove(id);
-                playerNames.RemoveAt(index);
-                playerTypes.RemoveAt(index);
-                playerNetworkReadyFlags.RemoveAt(index);
-                playerTurnTakenFlags.RemoveAt(index);
-            }
+                playerID = data.senderID,
+                type = (uint)data.Type,
+                count = 1,
+                payload = data.byteArguments.ToArray()
+            };
+            NetworkServer.SendToAll(msg);
+            NotifyPlayerChanges();
         }
     }
 
-    public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
+public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
         int returnValue = 0;
         byte first = payload.ElementAt(indexStart);
         byte second = payload.ElementAt(indexStart + 1);
@@ -569,13 +555,18 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
             }
         }
     }
-    public void OnClientReceiveLongMessage(RGNetworkLongMessage msg) {
-        var playerName = msg.playerID + "";
-        if (manager!=null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player)) {
-            playerName = player.playerName;
+    public void OnClientReceiveLongMessage(RGNetworkLongMessage msg)
+    {
+        var senderName = msg.playerID.ToString();
+
+        if (manager != null &&
+            manager.playerDictionary != null &&
+            manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player))
+        {
+            senderName = player.playerName;
         }
 
-        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: From: " + playerName + " of type: " + (CardMessageType)msg.type);
+        Debug.Log("CLIENT RECEIVED LONG MESSAGE::: From: " + senderName + " of type: " + (CardMessageType)msg.type);
 
         uint senderId = msg.playerID;
         CardMessageType type = (CardMessageType)msg.type;
@@ -587,101 +578,90 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
                     {
                         Debug.Log("client received message to add player to lobby");
                         int element = 0;
-                        int actualInt = 0;
-                        int typeData = 0;
-                        int id = 0;
-                        // first, get the player id we're adding
-                        id = GetIntFromByteArray(element, msg.payload);
-                        // make sure the player isn't added twice
-                        int existingPlayer = playerIDs.FindIndex(x => x == id);
-                        
-                        if (existingPlayer == -1)
-                        {
-                            // get the player type
-                            element += 4;
-                            typeData = GetIntFromByteArray(element, msg.payload);
 
-                            // get length of player name
-                            element += 4;
-                            actualInt = GetIntFromByteArray(element, msg.payload);
-                  
-                            // get player name
-                            element += 4;
-                            ArraySegment<byte> name = msg.payload.Slice(element, actualInt);
+                        // Get the player ID
+                        int id = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
 
-                            // since this doesn't exist, add it
-                            AddPotentialPlayer(id, Encoding.ASCII.GetString(name), typeData);
-                            NotifyPlayerChanges(); // Update the lobby screen when a player is added
-                        } else
+                        // Get the player type
+                        int typeData = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        // Get the length of the player name
+                        int nameLength = GetIntFromByteArray(element, msg.payload);
+                        element += 4;
+
+                        // Get the player name
+                        string playerName = Encoding.ASCII.GetString(msg.payload.Array, msg.payload.Offset + element, nameLength);
+
+                        // Check if the player already exists
+                        if (!playerIDs.ContainsKey(id))
                         {
-                            // this is only changing the player type
-                            element += 4;
-                            typeData = GetIntFromByteArray(element, msg.payload);
-                            playerTypes[existingPlayer] = (PlayerTeam)typeData;
-                            Debug.Log(id + " player type changed to: " + playerTypes[existingPlayer]);
-                            NotifyPlayerChanges(); // Update the lobby screen when a player is added
+                            // Player doesn't exist, add them
+                            AddPotentialPlayer(id, playerName, typeData);
+                            Debug.Log($"Added new player: {playerName} (ID: {id}, Type: {(PlayerTeam)typeData})");
                         }
+                        else
+                        {
+                            // Player exists, update their type
+                            playerTypes[id] = (PlayerTeam)typeData;
+                            Debug.Log($"Updated player type for {playerName} (ID: {id}): {(PlayerTeam)typeData}");
+                        }
+
+                        // Notify the UI to update
+                        NotifyPlayerChanges();
                     }
                     break;
                 case CardMessageType.RemLobbyID:
                     {
                         Debug.Log("client received message to rem player from lobby");
                         int element = 0;
-                        int id = 0;
-                        // first, get the player id
-                        id = GetIntFromByteArray(element, msg.payload);
-                        // does it exist
-                        int existingPlayer = playerIDs.FindIndex(x => x == id);
+                        int id = GetIntFromByteArray(element, msg.payload);
 
-                        if (existingPlayer != -1)
+                        // Replace FindIndex with ContainsKey check
+                        if (playerIDs.ContainsKey(id))
                         {
                             Debug.Log("removing player msg received for player " + id);
                             RemovePlayer(id);
                             NotifyPlayerChanges();
                         }
+                        break;
                     }
-                    break;
-                case CardMessageType.StartGame: {
+                case CardMessageType.StartGame:
+                    {
                         Debug.Log("client received message to start the game");
-                        uint count = msg.count;
                         int element = 0;
-                        for (int i = 0; i < count; i++) {
-                            // player id is the first arg
+                        for (int i = 0; i < msg.count; i++)
+                        {
                             int newID = GetIntFromByteArray(element, msg.payload);
-                            int existingPlayer = playerIDs.FindIndex(x => x == newID);
-
                             element += 4;
-                            // next is type
+
+                            // Replace FindIndex with ContainsKey check
+                            bool exists = playerIDs.ContainsKey(newID);
+
+                            // Rest of the parsing logic
                             int actualInt = GetIntFromByteArray(element, msg.payload);
-                            // get length of player name
                             element += 4;
                             actualInt = GetIntFromByteArray(element, msg.payload);
-
-                            // get player name
                             element += 4;
                             ArraySegment<byte> name = msg.payload.Slice(element, actualInt);
                             element += actualInt;
 
-                            if (existingPlayer == -1) {
-                                playerIDs.Add(newID);
-                                playerTypes.Add((PlayerTeam)actualInt);
-                                playerNames.Add(Encoding.ASCII.GetString(name));
-                                Debug.Log("player being added : " + playerIDs[i] + " " + playerTypes[i] +
-                                    " " + playerNames[i]);
+                            if (!exists)
+                            {
+                                playerIDs.Add(newID, newID);
+                                playerTypes.Add(newID, (PlayerTeam)actualInt);
+                                playerNames.Add(newID, Encoding.ASCII.GetString(name));
                             }
-                            else {
-                                // when a game is reset we only need the player type again
-                                playerTypes[existingPlayer] = (PlayerTeam)actualInt;
-                                Debug.Log("player " + playerNames[existingPlayer] + " already exists! new type is: " + playerTypes[existingPlayer]);
-                            
+                            else
+                            {
+                                playerTypes[newID] = (PlayerTeam)actualInt;
                             }
                             NotifyPlayerChanges();
                         }
-                        // no start game
                         manager.RealGameStart();
-
+                        break;
                     }
-                    break;
                 case CardMessageType.SendSectorData: {
                         Debug.Log("Client received sector data message");
                         int element = 0;
@@ -1054,19 +1034,20 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
         if (msg.playerID != localPlayerID) {
             switch (type) {
-                case CardMessageType.SharePlayerType: {
+                case CardMessageType.SharePlayerType:
+                    {
                         uint count = msg.count;
                         Debug.Log("server received a player's type!" + count);
-                        if (count == 1) {
-                            // turn the first element into an int
+                        if (count == 1)
+                        {
                             PlayerTeam playerType = (PlayerTeam)BitConverter.ToInt32(msg.payload);
                             int playerIndex = (int)msg.playerID;
-                            Debug.Log("player type being set for player: " + playerIndex);
-                            int index = playerIDs.FindIndex(x => x == playerIndex);
-                            if (index != -1)
+
+                            // Replace FindIndex with ContainsKey check
+                            if (playerIDs.ContainsKey(playerIndex))
                             {
-                                playerTypes[index] = playerType;
-                                playerTurnTakenFlags[index] = true;
+                                playerTypes[playerIndex] = playerType;
+                                playerTurnTakenFlags[playerIndex] = true;
                                 Debug.Log("setting player type to " + playerType);
                                 // send info about player to everybody
                                 // and update the lobby

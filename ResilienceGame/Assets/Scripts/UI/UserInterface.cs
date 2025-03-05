@@ -189,20 +189,20 @@ public class UserInterface : MonoBehaviour
     // Start is called when player presses "begin"
     public void StartGame(PlayerTeam playerType)
     {
-        int index= RGNetworkPlayerList.instance.playerIDs.FindIndex(x => x == RGNetworkPlayerList.instance.localPlayerID);
-        if(index != -1)
+        // Replace FindIndex with ContainsKey check
+        bool exists = RGNetworkPlayerList.instance.playerIDs.ContainsKey(RGNetworkPlayerList.instance.localPlayerID);
+        if (exists)
         {
-            RGNetworkPlayerList.instance.playerTypes[index] = playerType;
-            Debug.Log("player already in list is given type : " + playerType);
-        } else
+            RGNetworkPlayerList.instance.playerTypes[RGNetworkPlayerList.instance.localPlayerID] = playerType;
+            Debug.Log("player already in list is given type: " + playerType);
+        }
+        else
         {
-            Debug.Log("local player isn't in player list!" + RGNetworkPlayerList.instance.localPlayerID);
-            int count = 0;
-            foreach (int id in RGNetworkPlayerList.instance.playerIDs)
+            Debug.Log("local player isn't in player list! " + RGNetworkPlayerList.instance.localPlayerID);
+            // Iterate through dictionary keys instead of values
+            foreach (int id in RGNetworkPlayerList.instance.playerIDs.Keys)
             {
-                Debug.Log("id: " + id + " name: " + RGNetworkPlayerList.instance.playerNames[count]);
-                count++;
-
+                Debug.Log("id: " + id + " name: " + RGNetworkPlayerList.instance.playerNames[id]);
             }
         }
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
