@@ -1446,6 +1446,7 @@ GameObject:
   - component: {fileID: 371463617}
   - component: {fileID: 371463619}
   - component: {fileID: 371463618}
+  - component: {fileID: 371463620}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1495,8 +1496,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Edit Deck
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
-  m_sharedMaterial: {fileID: 5164718467235058921, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8713a684d1fa831419084a5df313bba3, type: 2}
+  m_sharedMaterial: {fileID: 5164718467235058921, guid: 8713a684d1fa831419084a5df313bba3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1570,6 +1571,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 371463616}
   m_CullTransparentMesh: 1
+--- !u!114 &371463620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371463616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 0, y: 0}
+  m_UseGraphicAlpha: 1
 --- !u!1 &373983769
 GameObject:
   m_ObjectHideFlags: 0
@@ -1971,7 +1987,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32210752, g: 0.32694915, b: 0.4528302, a: 1}
+  m_Color: {r: 0.68447846, g: 0.8642761, b: 0.9622642, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
