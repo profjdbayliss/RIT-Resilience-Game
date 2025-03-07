@@ -548,16 +548,20 @@ public class UserInterface : MonoBehaviour
         Debug.Log($"Enabling ally selection menu after pressing meeple button {meepleTypeIndex}");
         allySelectionButtons.ForEach(button => Destroy(button.gameObject));
         allySelectionButtons.Clear();
-        for (int i = 0; i < GameManager.Instance.playerDictionary.Count; i++)
+
+        foreach (var kvp in GameManager.Instance.playerDictionary)
         {
-            var cardPlayer = GameManager.Instance.playerDictionary.ElementAt(i).Value;
-            if (cardPlayer.playerTeam == PlayerTeam.Red) continue;
-            if (cardPlayer.NetID == RGNetworkPlayerList.instance.localPlayerID) continue;
-            var parent = i < 8 ? leftSelectionparent : rightSelectionparent;
-            var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
-            newButton.onClick.AddListener(() => GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID));
-            newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
-            allySelectionButtons.Add(newButton);
+            var cardPlayer = kvp.Value;
+            // Only show players on the same team
+            if (cardPlayer.playerTeam == GameManager.Instance.actualPlayer.playerTeam &&
+                cardPlayer.NetID != RGNetworkPlayerList.instance.localPlayerID)
+            {
+                var parent = allySelectionButtons.Count < 8 ? leftSelectionparent : rightSelectionparent;
+                var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
+                newButton.onClick.AddListener(() => GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID));
+                newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
+                allySelectionButtons.Add(newButton);
+            }
         }
         allySelectionMenu.SetActive(true);
     }

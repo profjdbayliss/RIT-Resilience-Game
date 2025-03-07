@@ -690,19 +690,17 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
                         // Handle the received string here
                     }
                     break;
-                case CardMessageType.SectorAssignment: {
-                        // Get the assigned sector index from the message payload
+                case CardMessageType.SectorAssignment:
+                    {
                         int element = 0;
                         int playerIndex = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        int sectorIndex = GetIntFromByteArray(element, msg.payload);
-                        manager.AssignSectorToPlayer(playerIndex, sectorIndex);
+                        int sectorIndex = GetIntFromByteArray(element, msg.payload); // Use this directly
 
-
-
-                        Debug.Log("CLIENT RECEIVED sector assignment: Sector " + sectorIndex);
+                        // Call with sectorIndex (int), not the Sector object
+                        GameManager.Instance.AssignSectorToPlayer(playerIndex, sectorIndex);
+                        break;
                     }
-                    break;
                 case CardMessageType.SectorDieRoll: {
                         // Get the assigned sector index from the message payload
                         int element = 0;

@@ -1791,20 +1791,32 @@ public class CardPlayer : MonoBehaviour {
 
     #region Discarding
     //attempts to discard the card with the given UID
-    public bool TryDiscardFromHandByUID(int uid, bool addUpdate = false) {
-        if (HandCards.TryGetValue(uid, out GameObject cardGameObject)) {
-            if (cardGameObject.TryGetComponent(out Card card)) {
-                // Debug.Log($"Discarding {card.data.name}");
+    public bool TryDiscardFromHandByUID(int uid, bool addUpdate = false)
+    {
+        // Search through all hand cards for matching UID
+        foreach (var kvp in HandCards.ToList())
+        { // ToList() for safe iteration
+            if (kvp.Value.TryGetComponent(out Card card) && card.UniqueID == uid)
+            {
+                // Remove using the actual dictionary key (card ID)
+                HandCards.Remove(kvp.Key);
+
+                // Move to discard
                 card.SetCardState(CardState.CardNeedsToBeDiscarded);
-                Discards.Add(uid, cardGameObject);
-                cardGameObject.transform.SetParent(UserInterface.Instance.discardDropZone.transform, false);
-                cardGameObject.transform.localPosition = new Vector3();
-                cardGameObject.SetActive(false);
-                HandCards.Remove(uid);
-                if (addUpdate) {
-                    // Debug.Log($"Adding discard update from {playerName} who discarded {card.data.name} with uid {card.UniqueID}");
-                    EnqueueAndSendCardMessageUpdate(CardMessageType.DiscardCard, card.data.cardID, card.UniqueID);
+                Discards.Add(uid, kvp.Value);
+                kvp.Value.transform.SetParent(UserInterface.Instance.discardDropZone.transform, false);
+                kvp.Value.SetActive(false);
+
+                if (addUpdate)
+                {
+                    // Send both card ID and UID for reference
+                    EnqueueAndSendCardMessageUpdate(
+                        CardMessageType.DiscardCard,
+                        card.data.cardID,
+                        card.UniqueID
+                    );
                 }
+
                 UserInterface.Instance.UpdateUISizeTrackers();
                 return true;
             }
@@ -1992,20 +2004,17 @@ public class CardPlayer : MonoBehaviour {
         }
     }
     //Actually process the card action, used to create the update queue and is called when the update is ready to be resolved
-    void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent) {
-        Debug.Log($"Player {playerName} is processing a card update from {opponent.playerName} of type {update.Type} on sector {update.sectorPlayedOn}");
+    void ProcessCardPlay(Update update, GamePhase phase, CardPlayer opponent)
+    {
+        if (update.Type == CardMessageType.DiscardCard)
+        {
+            // Use both ID and UID for validation
+            bool success = opponent.TryDiscardFromHandByUID(update.UniqueID);
 
-
-        if (update.Type == CardMessageType.DiscardCard) {
-            if (opponent.TryDiscardFromHandByUID(update.UniqueID)) {
-                Debug.Log($"Successfully removed card with uid {update.UniqueID} from {opponent.playerName}'s hand");
-            }
-            else {
-                Debug.LogError($"Did not find card with uid {update.UniqueID} in {opponent.playerName}'s hand!!");
-            }
-        }
-        else {
-            Debug.Log($"Unhandled update type or facility: {update.Type}, {update.FacilityPlayedOnType}");
+            Debug.Log(success ?
+                $"Discarded card {update.CardID} (UID: {update.UniqueID})" :
+                $"Failed to discard card {update.CardID} (UID: {update.UniqueID})"
+            );
         }
     }
 

@@ -1691,16 +1691,26 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         //UserInterface.Instance.UpdateMeepleAmountUI();
     }
-    public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId) {
-        if (playerDictionary.TryGetValue(playerNetId, out CardPlayer player)) {
-            Debug.Log($"{actualPlayer.playerName} is trying to share meeple index {meepleType} with {player.playerName}");
-            actualPlayer.ShareMeepleWithPlayer(meepleType, player);
+    public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId)
+    {
+        if (playerDictionary.TryGetValue(playerNetId, out CardPlayer targetPlayer))
+        {
+            // Check if the target player is on the same team
+            if (targetPlayer.playerTeam == actualPlayer.playerTeam)
+            {
+                Debug.Log($"{actualPlayer.playerName} is sharing meeple type {meepleType} with {targetPlayer.playerName}");
+                actualPlayer.ShareMeepleWithPlayer(meepleType, targetPlayer);
+            }
+            else
+            {
+                Debug.LogError($"Cannot share meeples with {targetPlayer.playerName} - they are on the opposing team!");
+            }
         }
-        else {
+        else
+        {
             Debug.LogError($"Player with net id {playerNetId} not found in player dictionary");
         }
         UserInterface.Instance.DisableAllySelectionMenu();
-        //  UserInterface.Instance.UpdateMeepleAmountUI();
     }
     #endregion
 
