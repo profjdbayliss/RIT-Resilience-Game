@@ -127,7 +127,7 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private Color sectorOutlineOwnerColor;
 
     [Header("Animations")]
-    [SerializeField] private float animDuration = 0.2f;
+    [SerializeField] private float animDuration = 0.7f;
 
     private Coroutine mapStateChangeRoutine;
     private List<Coroutine> menuItemMoveRoutines = new List<Coroutine>();
@@ -146,14 +146,14 @@ public class UserInterface : MonoBehaviour
     private readonly Vector2 buttonBgHiddenPos = new Vector2(-800, -691);
     private readonly Vector2 buttonBgVisiblePos = new Vector2(-800, -383.5f);
 
-    private readonly Vector2 discardHiddenPos = new Vector2(0, 9771);
+    private readonly Vector2 discardHiddenPos = new Vector2(0, 6000);
     private readonly Vector2 discardHiddenPos2 = new Vector2(0, 890);
     private readonly Vector2 discardVisiblePos = new Vector2(0, 475);
     private Coroutine discardMoveRoutine;
 
     [SerializeField] private RectTransform playerHandPosition;
-    private readonly Vector2 handHiddenPos = new Vector2(173, -800);
-    private readonly Vector2 handVisiblePos = new Vector2(173, -385);
+    private readonly Vector2 handHiddenPos = new Vector2(0, -1500);
+    private readonly Vector2 handVisiblePos = new Vector2(0, -385);
 
     [SerializeField] private RectTransform meepleParent;
     private readonly Vector2 meepleHiddenPos = new Vector2(1761, -301);
@@ -167,8 +167,8 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private RectTransform sectorParent;
     private readonly Vector2 sectorHiddenPos = new Vector2(0, -1105);
     private readonly Vector2 sectorVisiblePos = new Vector2(0, 0);
-    private readonly float sectorAnimDuration2 = 0.9f;
-    private readonly float sectorAnimDuration = 0.4f;
+    private readonly float sectorAnimDuration2 = 0.7f;
+    private readonly float sectorAnimDuration = 0.5f;
     private Coroutine sectorMoveRoutine;
 
     [SerializeField] private RectTransform rightMenu;
@@ -845,9 +845,21 @@ public class UserInterface : MonoBehaviour
         leftMoveRoutine = StartCoroutine(MoveMenuItem(leftMenu, leftVisiblePos, sectorAnimDuration));
         rightMoveRoutine = StartCoroutine(MoveMenuItem(rightMenu, rightMenuVisiblePos, sectorAnimDuration));
 
-        discardMoveRoutine =
+
+        //Used to check if they can show the discard box
+        if ((GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Red
+            && GameManager.Instance.MGamePhase == GamePhase.DrawRed)
+                || ((GameManager.Instance.actualPlayer.playerTeam == PlayerTeam.Blue
+                && GameManager.Instance.MGamePhase == GamePhase.DrawBlue)))
+        {
+            discardMoveRoutine =
             StartCoroutine(
-                MoveMenuItem(discardRect, discardVisiblePos, animDuration));
+                    MoveMenuItem(discardRect, discardHiddenPos2, 0.01f));
+            discardMoveRoutine =
+                StartCoroutine(
+                    MoveMenuItem(discardRect, discardVisiblePos, sectorAnimDuration2));
+        }
+
         //menuItemMoveRoutines.Add(
         //    StartCoroutine(
         //        MoveMenuItem(meepleParent, meepleVisiblePos, animDuration)));
@@ -876,9 +888,10 @@ public class UserInterface : MonoBehaviour
         leftMoveRoutine = StartCoroutine(MoveMenuItem(leftMenu, leftHiddenPos, sectorAnimDuration));
         rightMoveRoutine = StartCoroutine(MoveMenuItem(rightMenu, rightMenuHiddenPos, sectorAnimDuration));
 
-        discardMoveRoutine =
-            StartCoroutine(
-                MoveMenuItem(discardRect, discardHiddenPos, animDuration));
+            discardMoveRoutine =
+        StartCoroutine(
+        MoveMenuItem(discardRect, discardHiddenPos, animDuration));
+
         //menuItemMoveRoutines.Add(
         //    StartCoroutine(
         //        MoveMenuItem(meepleParent, meepleHiddenPos, animDuration)));
