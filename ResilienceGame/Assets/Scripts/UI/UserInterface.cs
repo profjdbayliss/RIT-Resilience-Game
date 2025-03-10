@@ -549,20 +549,30 @@ public class UserInterface : MonoBehaviour
         allySelectionButtons.ForEach(button => Destroy(button.gameObject));
         allySelectionButtons.Clear();
 
+        // Get the current player's team and ID
+        PlayerTeam currentTeam = GameManager.Instance.actualPlayer.playerTeam;
+        int currentPlayerID = RGNetworkPlayerList.instance.localPlayerID;
+
         foreach (var kvp in GameManager.Instance.playerDictionary)
         {
-            var cardPlayer = kvp.Value;
-            // Only show players on the same team
-            if (cardPlayer.playerTeam == GameManager.Instance.actualPlayer.playerTeam &&
-                cardPlayer.NetID != RGNetworkPlayerList.instance.localPlayerID)
+            CardPlayer cardPlayer = kvp.Value;
+
+            // Skip players not on the same team OR the current player
+            if (cardPlayer.playerTeam != currentTeam || cardPlayer.NetID == currentPlayerID)
             {
-                var parent = allySelectionButtons.Count < 8 ? leftSelectionparent : rightSelectionparent;
-                var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
-                newButton.onClick.AddListener(() => GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID));
-                newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
-                allySelectionButtons.Add(newButton);
+                continue; // Skip to next iteration
             }
+
+            // Add valid teammates to the menu
+            var parent = allySelectionButtons.Count < 8 ? leftSelectionparent : rightSelectionparent;
+            var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
+            newButton.onClick.AddListener(() =>
+                GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID)
+            );
+            newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
+            allySelectionButtons.Add(newButton);
         }
+
         allySelectionMenu.SetActive(true);
     }
     public void DisableAllySelectionMenu()

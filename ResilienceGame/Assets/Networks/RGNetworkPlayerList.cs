@@ -170,6 +170,24 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver {
         }
     }
 
+    public void ChangePlayerTeam(int playerID, PlayerTeam newTeam)
+    {
+        if (isServer)
+        {
+            playerTypes[playerID] = newTeam;
+            Message data = CreateNewPlayerMessage(playerID, playerNames[playerID], (int)newTeam);
+            RGNetworkLongMessage msg = new RGNetworkLongMessage
+            {
+                playerID = data.senderID,
+                type = (uint)data.Type,
+                count = 1,
+                payload = data.byteArguments.ToArray()
+            };
+            NetworkServer.SendToAll(msg);
+            NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
+        }
+    }
+
     public Message CreateStartGameMessage() {
         Message msg;
         List<byte> data = new List<byte>(100);

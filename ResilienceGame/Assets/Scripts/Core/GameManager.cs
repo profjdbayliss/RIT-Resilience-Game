@@ -371,8 +371,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         foreach (var playerEntry in RGNetworkPlayerList.instance.playerIDs)
         {
             int id = playerEntry.Key;
-
-            // Find the player object by ID instead of array index
             RGNetworkPlayer rgPlayer = FindObjectsOfType<RGNetworkPlayer>()
                 .FirstOrDefault(p => p.mPlayerID == id);
 
@@ -381,15 +379,19 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 var cardPlayer = rgPlayer.GetComponent<CardPlayer>();
                 Debug.Log($"Creating player: {RGNetworkPlayerList.instance.playerNames[id]} ({id})");
 
-                // Get values directly from player list dictionaries
-                cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
+                // Use server-synced team data
+                PlayerTeam team = RGNetworkPlayerList.instance.playerTypes[id];
+                cardPlayer.playerTeam = team;
                 cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
                 cardPlayer.NetID = id;
-                cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
+                cardPlayer.DeckName = team == PlayerTeam.Red ? "red" : "blue";
                 cardPlayer.InitializeCards();
 
-                playerDictionary[id] = cardPlayer; // Use ID as key
-                if (cardPlayer.playerTeam == PlayerTeam.Blue)
+                // Add to dictionary regardless of team
+                playerDictionary[id] = cardPlayer;
+
+                // Track blue players for sector assignment
+                if (team == PlayerTeam.Blue)
                 {
                     numBluePlayers++;
                 }
@@ -458,11 +460,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             });
             //assign sectors to map icons and enable them
             AllSectors.Values.ToList().ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
-
-
-
-
-
 
         } //end isServer
 
