@@ -201,11 +201,11 @@ public class GameManager : MonoBehaviour, IRGObservable {
             int blueTeamCount = 0;
             foreach (var playerType in RGNetworkPlayerList.instance.playerTypes)
             {
-                if (playerType == PlayerTeam.Red)
+                if (playerType.Value == PlayerTeam.Red)
                 {
                     redTeamCount++;
                 }
-                else if (playerType == PlayerTeam.Blue)
+                else if (playerType.Value == PlayerTeam.Blue)
                 {
                     blueTeamCount++;
                 }
@@ -364,20 +364,37 @@ public class GameManager : MonoBehaviour, IRGObservable {
         var rgNetPlayers = FindObjectsOfType<RGNetworkPlayer>();
 
         actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
-        //create and populate the players using the network player list
-        for (int i = 0; i < rgNetPlayers.Length; i++) {
-            var cardPlayer = rgNetPlayers[i].GetComponent<CardPlayer>();
-            var id = rgNetPlayers[i].mPlayerID;
-            Debug.Log("creating players/teams : " + RGNetworkPlayerList.instance.playerNames[id] + " " +
-                RGNetworkPlayerList.instance.playerTypes[id]);
-            cardPlayer.playerTeam = RGNetworkPlayerList.instance.playerTypes[id];
-            cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
-            cardPlayer.NetID = id;
-            cardPlayer.DeckName = cardPlayer.playerTeam == PlayerTeam.Red ? "red" : "blue";
-            cardPlayer.InitializeCards();
-            playerDictionary.Add(id, cardPlayer);
-            if (cardPlayer.playerTeam == PlayerTeam.Blue) {
-                numBluePlayers++;
+        // Set the local player's NetID
+        actualPlayer.NetID = RGNetworkPlayerList.instance.localPlayerID;
+
+        // Create and populate players using the network player list's ID registry
+        foreach (var playerEntry in RGNetworkPlayerList.instance.playerIDs)
+        {
+            int id = playerEntry.Key;
+            RGNetworkPlayer rgPlayer = FindObjectsOfType<RGNetworkPlayer>()
+                .FirstOrDefault(p => p.mPlayerID == id);
+
+            if (rgPlayer != null)
+            {
+                var cardPlayer = rgPlayer.GetComponent<CardPlayer>();
+                Debug.Log($"Creating player: {RGNetworkPlayerList.instance.playerNames[id]} ({id})");
+
+                // Use server-synced team data
+                PlayerTeam team = RGNetworkPlayerList.instance.playerTypes[id];
+                cardPlayer.playerTeam = team;
+                cardPlayer.playerName = RGNetworkPlayerList.instance.playerNames[id];
+                cardPlayer.NetID = id;
+                cardPlayer.DeckName = team == PlayerTeam.Red ? "red" : "blue";
+                cardPlayer.InitializeCards();
+
+                // Add to dictionary regardless of team
+                playerDictionary[id] = cardPlayer;
+
+                // Track blue players for sector assignment
+                if (team == PlayerTeam.Blue)
+                {
+                    numBluePlayers++;
+                }
             }
         }
 
@@ -443,11 +460,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             });
             //assign sectors to map icons and enable them
             AllSectors.Values.ToList().ForEach(sector => UserInterface.Instance.AssignSectorToIcon(sector));
-
-
-
-
-
 
         } //end isServer
 
@@ -1677,16 +1689,26 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
         //UserInterface.Instance.UpdateMeepleAmountUI();
     }
-    public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId) {
-        if (playerDictionary.TryGetValue(playerNetId, out CardPlayer player)) {
-            Debug.Log($"{actualPlayer.playerName} is trying to share meeple index {meepleType} with {player.playerName}");
-            actualPlayer.ShareMeepleWithPlayer(meepleType, player);
+    public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId)
+    {
+        if (playerDictionary.TryGetValue(playerNetId, out CardPlayer targetPlayer))
+        {
+            // Check if the target player is on the same team
+            if (targetPlayer.playerTeam == actualPlayer.playerTeam)
+            {
+                Debug.Log($"{actualPlayer.playerName} is sharing meeple type {meepleType} with {targetPlayer.playerName}");
+                actualPlayer.ShareMeepleWithPlayer(meepleType, targetPlayer);
+            }
+            else
+            {
+                Debug.LogError($"Cannot share meeples with {targetPlayer.playerName} - they are on the opposing team!");
+            }
         }
-        else {
+        else
+        {
             Debug.LogError($"Player with net id {playerNetId} not found in player dictionary");
         }
         UserInterface.Instance.DisableAllySelectionMenu();
-        //  UserInterface.Instance.UpdateMeepleAmountUI();
     }
     #endregion
 

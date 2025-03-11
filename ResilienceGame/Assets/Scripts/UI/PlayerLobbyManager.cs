@@ -29,28 +29,19 @@ public class PlayerLobbyManager : MonoBehaviour
 
     public void AddPlayer(string name, PlayerTeam team)
     {
-        //if (isServer)
-        //{
-            players.Add(new PlayerData { Name = name, Team = team });
-            UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
-        //}
-
+        players.Add(new PlayerData { Name = name, Team = team });
+        UpdatePlayerLobbyUI(); // Update the actual game UI after adding a player
         Debug.Log("add player called for: " + name);
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
-    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam) // Dpesn't do anything
+    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam) // Doesn't do anything (yet)
     {
-        //if (isServer)
-        //{
-            var player = players.Find(p => p.Name == playerName);
-            if (player != null)
-            {
-                player.Team = newTeam;
-                //players[players.IndexOf(player)] = player; // SyncList updates automatically
-                //UpdatePlayerLobbyUI(); // Update the actual game UI after changing a player's team
-            }
-        //}
+        var player = players.Find(p => p.Name == playerName);
+        if (player != null)
+        {
+            player.Team = newTeam;
+        }
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
