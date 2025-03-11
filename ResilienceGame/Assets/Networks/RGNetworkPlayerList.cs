@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -45,7 +46,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     #endregion
 
     #region Player Lists
-    public Dictionary<int, int> playerIDs = new Dictionary<int, int>(); 
+    public Dictionary<int, int> playerIDs = new Dictionary<int, int>();
     private Dictionary<int, bool> playerNetworkReadyFlags = new Dictionary<int, bool>();
     public Dictionary<int, bool> playerTurnTakenFlags = new Dictionary<int, bool>();
     public Dictionary<int, PlayerTeam> playerTypes = new Dictionary<int, PlayerTeam>();
@@ -148,6 +149,19 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         {
             playerTurnTakenFlags[aiPlayerIndex] = true;
         }
+    }
+
+    // Helper method to replace FindIndex
+    private int FindPlayerKey(int targetID)
+    {
+        foreach (var kvp in playerIDs)
+        {
+            if (kvp.Value == targetID)
+            {
+                return kvp.Key;
+            }
+        }
+        return -1;
     }
 
     public void SetPlayerType(PlayerTeam type)
@@ -295,7 +309,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         }
     }
 
-public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
+    public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload)
+    {
         int returnValue = 0;
         byte first = payload.ElementAt(indexStart);
         byte second = payload.ElementAt(indexStart + 1);
@@ -745,7 +760,8 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
                         manager.RealGameStart();
                         break;
                     }
-                case CardMessageType.SendSectorData: {
+                case CardMessageType.SendSectorData:
+                    {
                         Debug.Log("Client received sector data message");
                         int element = 0;
                         while (element < msg.payload.Count)
@@ -786,7 +802,8 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
                         GameManager.Instance.AssignSectorToPlayer(playerIndex, sectorIndex);
                         break;
                     }
-                case CardMessageType.SectorDieRoll: {
+                case CardMessageType.SectorDieRoll:
+                    {
                         // Get the assigned sector index from the message payload
                         int element = 0;
                         SectorType sectorPlayedOn = (SectorType)GetIntFromByteArray(element, msg.payload);
@@ -1072,14 +1089,6 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
         {
             playerConnections[playerId] = client;
         }
-
-        // Add safety check for player index
-        if (playerId < 0 || playerId >= playerIDs.Count)
-        {
-            Debug.LogError($"Invalid player index: {playerId}. Disconnecting client to prevent exploits.");
-            client.Disconnect();
-            return;
-        }
         switch (type)
         {
             case CardMessageType.StartNextPhase:
@@ -1146,7 +1155,7 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
         }
 
     }
-    public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg) // change how playerIndex is acquired here
+    public void OnServerReceiveLongMessage(NetworkConnectionToClient client, RGNetworkLongMessage msg)
     {
         var playerName = msg.playerID + "";
         if (manager != null && manager.playerDictionary != null && manager.playerDictionary.TryGetValue((int)msg.playerID, out CardPlayer player))
@@ -1162,8 +1171,10 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
         {
             playerConnections[playerId] = client;
         }
-        if (msg.playerID != localPlayerID) {
-            switch (type) {
+        if (msg.playerID != localPlayerID)
+        {
+            switch (type)
+            {
                 case CardMessageType.SharePlayerType:
                     {
                         uint count = msg.count;
@@ -1181,7 +1192,7 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
                                 Debug.Log("setting player type to " + playerType);
                                 // send info about player to everybody
                                 // and update the lobby
-                                Message data = CreateNewPlayerMessage(playerIndex, playerNames[playerIndex], (int)playerTypes[playerIndex]); //First Part of index error
+                                Message data = CreateNewPlayerMessage(playerIndex, playerNames[playerIndex], (int)playerTypes[playerIndex]);
                                 RGNetworkLongMessage msg2 = new RGNetworkLongMessage
                                 {
                                     playerID = data.senderID,

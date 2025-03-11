@@ -12,7 +12,7 @@ public class DeckNameHolder : MonoBehaviour
 {
     public string DECK_NAME = "";
     public TextMeshProUGUI deckName;
-    //For disabling and reinabling the all buttons with the big button
+    //For disabling and reinabling the all buttons with the big buttonff
     [SerializeField] private GameObject bigButton;
     [SerializeField] private TextMeshProUGUI errorMessage;
     [SerializeField] private float timeD = 1337;
