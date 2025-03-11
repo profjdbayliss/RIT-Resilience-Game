@@ -476,6 +476,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
     }
     public void Awake() {
+        Application.targetFrameRate = 60;
         Instance = this;
     }
 
