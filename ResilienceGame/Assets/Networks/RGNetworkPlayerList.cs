@@ -648,36 +648,42 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
                     }
                 case CardMessageType.StartGame:
                     {
-                        Debug.Log("client received message to start the game");
+                        Debug.Log("Client received message to start the game");
                         int element = 0;
                         for (int i = 0; i < msg.count; i++)
                         {
+                            // Parse player ID
                             int newID = GetIntFromByteArray(element, msg.payload);
                             element += 4;
 
-                            // Replace FindIndex with ContainsKey check
-                            bool exists = playerIDs.ContainsKey(newID);
-
-                            // Rest of the parsing logic
-                            int actualInt = GetIntFromByteArray(element, msg.payload);
+                            // Parse team type (PlayerTeam)
+                            int teamType = GetIntFromByteArray(element, msg.payload);
                             element += 4;
-                            actualInt = GetIntFromByteArray(element, msg.payload);
-                            element += 4;
-                            ArraySegment<byte> name = msg.payload.Slice(element, actualInt);
-                            element += actualInt;
 
-                            if (!exists)
+                            // Parse name length
+                            int nameLength = GetIntFromByteArray(element, msg.payload);
+                            element += 4;
+
+                            // Parse player name
+                            ArraySegment<byte> nameBytes = msg.payload.Slice(element, nameLength);
+                            string playerName = Encoding.ASCII.GetString(nameBytes.Array, nameBytes.Offset, nameLength);
+                            element += nameLength;
+
+                            // Add/update player data
+                            if (!playerIDs.ContainsKey(newID))
                             {
                                 playerIDs.Add(newID, newID);
-                                playerTypes.Add(newID, (PlayerTeam)actualInt);
-                                playerNames.Add(newID, Encoding.ASCII.GetString(name));
+                                playerNames.Add(newID, playerName);
+                                playerTypes.Add(newID, (PlayerTeam)teamType);
+                                Debug.Log($"Added new player: {playerName} (ID: {newID}, Team: {(PlayerTeam)teamType})");
                             }
                             else
                             {
-                                playerTypes[newID] = (PlayerTeam)actualInt;
+                                playerTypes[newID] = (PlayerTeam)teamType;
+                                Debug.Log($"Updated player {playerName} (ID: {newID}) to team: {(PlayerTeam)teamType}");
                             }
-                            NotifyPlayerChanges();
                         }
+                        NotifyPlayerChanges();
                         manager.RealGameStart();
                         break;
                     }
@@ -1321,15 +1327,14 @@ public int GetIntFromByteArray(int indexStart, ArraySegment<byte> payload) {
         foreach (var kvp in playerIDs)
         {
             int id = kvp.Key;
-            // Safely get name and team, skip if missing
-            if (playerNames.TryGetValue(id, out string name) && playerTypes.TryGetValue(id, out PlayerTeam team))
+            string name = playerNames[id];
+            PlayerTeam team = playerTypes.ContainsKey(id) ? playerTypes[id] : PlayerTeam.Any;
+
+            PlayerLobbyManager.Instance.players.Add(new PlayerData
             {
-                PlayerLobbyManager.Instance.players.Add(new PlayerData { Name = name, Team = team });
-            }
-            else
-            {
-                Debug.LogError($"Missing data for player ID: {id}");
-            }
+                Name = name,
+                Team = team // Include "Any" (unassigned) players
+            });
         }
         PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
     }
