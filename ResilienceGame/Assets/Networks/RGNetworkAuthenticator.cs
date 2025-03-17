@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class RGNetworkAuthenticator : NetworkAuthenticator
 {
+    // Use a static dictionary to track active players by username
+    public static readonly Dictionary<string, NetworkConnection> activePlayers = new Dictionary<string, NetworkConnection>();
+
     readonly HashSet<NetworkConnection> connectionsPendingDisconnect = new HashSet<NetworkConnection>();
     internal static readonly HashSet<string> playerNames = new HashSet<string>();
 
@@ -14,8 +17,6 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     #region Messages
     public struct AuthRequestMessage : NetworkMessage
     {
-        // use whatever credentials make sense for your game
-        // for example, you might want to pass the accessToken if using oauth
         public string authUsername;
     }
 
@@ -33,6 +34,7 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     static void ResetStatics()
     {
         playerNames.Clear();
+        activePlayers.Clear(); // Clear the active players dictionary on reset
     }
 
     /// <summary>
@@ -73,50 +75,59 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     {
         Debug.Log($"Authentication Request: {msg.authUsername}");
 
+        // Reject if the game has already started
+        if (GameManager.Instance != null && GameManager.Instance.gameStarted)
+        {
+            AuthResponseMessage gameStartedResponse = new AuthResponseMessage // Renamed variable
+            {
+                code = 205, // Custom code for "Game already started"
+                message = "Game already started. Cannot join."
+            };
+            conn.Send(gameStartedResponse);
+            ServerReject(conn);
+            return;
+        }
+
         if (connectionsPendingDisconnect.Contains(conn)) return;
 
-        // check the credentials by calling your web server, database table, playfab api, or any method appropriate.
-        if (!playerNames.Contains(msg.authUsername))
-        {
-            // Add the name to the HashSet
-            playerNames.Add(msg.authUsername);
-
-            // Store username in authenticationData
-            // This will be read in Player.OnStartServer
-            // to set the playerName SyncVar.
-            conn.authenticationData = msg.authUsername;
-
-            // create and send msg to client so it knows to proceed
-            AuthResponseMessage authResponseMessage = new AuthResponseMessage
-            {
-                code = 100,
-                message = "Success"
-            };
-
-            conn.Send(authResponseMessage);
-
-            // Accept the successful authentication
-            ServerAccept(conn);
-        }
-        else
+        // Check if the username is already in use
+        if (activePlayers.ContainsKey(msg.authUsername))
         {
             connectionsPendingDisconnect.Add(conn);
 
-            // create and send msg to client so it knows to disconnect
-            AuthResponseMessage authResponseMessage = new AuthResponseMessage
+            AuthResponseMessage usernameDuplicateResponse = new AuthResponseMessage // Renamed variable
             {
                 code = 200,
                 message = "Username already in use...try again"
             };
 
-            conn.Send(authResponseMessage);
-
-            // must set NetworkConnection isAuthenticated = false
+            conn.Send(usernameDuplicateResponse);
             conn.isAuthenticated = false;
 
-            // disconnect the client after 1 second so that response message gets delivered
             StartCoroutine(DelayedDisconnect(conn, 1f));
+            return;
         }
+
+        // Add the player to the active players dictionary
+        activePlayers[msg.authUsername] = conn;
+
+        // Add the name to the HashSet
+        playerNames.Add(msg.authUsername);
+
+        // Store username in authenticationData
+        conn.authenticationData = msg.authUsername;
+
+        // Send success response to the client
+        AuthResponseMessage authResponseMessage = new AuthResponseMessage
+        {
+            code = 100,
+            message = "Success"
+        };
+
+        conn.Send(authResponseMessage);
+
+        // Accept the successful authentication
+        ServerAccept(conn);
     }
 
     IEnumerator DelayedDisconnect(NetworkConnectionToClient conn, float waitTime)
@@ -128,7 +139,7 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
 
         yield return null;
 
-        // remove conn from pending connections
+        // Remove the connection from pending connections
         connectionsPendingDisconnect.Remove(conn);
     }
 

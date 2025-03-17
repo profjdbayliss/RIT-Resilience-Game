@@ -189,20 +189,20 @@ public class UserInterface : MonoBehaviour
     // Start is called when player presses "begin"
     public void StartGame(PlayerTeam playerType)
     {
-        int index= RGNetworkPlayerList.instance.playerIDs.FindIndex(x => x == RGNetworkPlayerList.instance.localPlayerID);
-        if(index != -1)
+        // Replace FindIndex with ContainsKey check
+        bool exists = RGNetworkPlayerList.instance.playerIDs.ContainsKey(RGNetworkPlayerList.instance.localPlayerID);
+        if (exists)
         {
-            RGNetworkPlayerList.instance.playerTypes[index] = playerType;
-            Debug.Log("player already in list is given type : " + playerType);
-        } else
+            RGNetworkPlayerList.instance.playerTypes[RGNetworkPlayerList.instance.localPlayerID] = playerType;
+            Debug.Log("player already in list is given type: " + playerType);
+        }
+        else
         {
-            Debug.Log("local player isn't in player list!" + RGNetworkPlayerList.instance.localPlayerID);
-            int count = 0;
-            foreach (int id in RGNetworkPlayerList.instance.playerIDs)
+            Debug.Log("local player isn't in player list! " + RGNetworkPlayerList.instance.localPlayerID);
+            // Iterate through dictionary keys instead of values
+            foreach (int id in RGNetworkPlayerList.instance.playerIDs.Keys)
             {
-                Debug.Log("id: " + id + " name: " + RGNetworkPlayerList.instance.playerNames[count]);
-                count++;
-
+                Debug.Log("id: " + id + " name: " + RGNetworkPlayerList.instance.playerNames[id]);
             }
         }
         RGNetworkPlayerList.instance.NotifyPlayerChanges();
@@ -548,17 +548,31 @@ public class UserInterface : MonoBehaviour
         Debug.Log($"Enabling ally selection menu after pressing meeple button {meepleTypeIndex}");
         allySelectionButtons.ForEach(button => Destroy(button.gameObject));
         allySelectionButtons.Clear();
-        for (int i = 0; i < GameManager.Instance.playerDictionary.Count; i++)
+
+        // Get the current player's team and ID
+        PlayerTeam currentTeam = GameManager.Instance.actualPlayer.playerTeam;
+        int currentPlayerID = RGNetworkPlayerList.instance.localPlayerID;
+
+        foreach (var kvp in GameManager.Instance.playerDictionary)
         {
-            var cardPlayer = GameManager.Instance.playerDictionary.ElementAt(i).Value;
-            if (cardPlayer.playerTeam == PlayerTeam.Red) continue;
-            if (cardPlayer.NetID == RGNetworkPlayerList.instance.localPlayerID) continue;
-            var parent = i < 8 ? leftSelectionparent : rightSelectionparent;
+            CardPlayer cardPlayer = kvp.Value;
+
+            // Skip players not on the same team OR the current player
+            if (cardPlayer.playerTeam != currentTeam || cardPlayer.NetID == currentPlayerID)
+            {
+                continue; // Skip to next iteration
+            }
+
+            // Add valid teammates to the menu
+            var parent = allySelectionButtons.Count < 8 ? leftSelectionparent : rightSelectionparent;
             var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
-            newButton.onClick.AddListener(() => GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID));
+            newButton.onClick.AddListener(() =>
+                GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID)
+            );
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
             allySelectionButtons.Add(newButton);
         }
+
         allySelectionMenu.SetActive(true);
     }
     public void DisableAllySelectionMenu()

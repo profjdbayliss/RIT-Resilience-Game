@@ -35,20 +35,14 @@ public class RGNetworkManager : NetworkManager
         //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
     }
 
-    //public void SynchronizePlayerList()
-    //{
-    //    RGNetworkPlayerList.instance.RpcUpdatePlayerList(RGNetworkPlayerList.instance.playerIDs.ToArray(), RGNetworkPlayerList.instance.playerNames.ToArray());
-    //}
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
+        int playerId = conn.connectionId;
         if (conn.authenticationData != null)
             RGNetworkAuthenticator.playerNames.Remove((string)conn.authenticationData);
 
-        RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId); //removes player who left
-        //SynchronizePlayerList();    // THIS UPDATES THE LOBBY
-        //UpdatePlayerVisibilityForAll();
-
+        RGNetworkPlayerList.instance.RemovePlayer(playerId);
         base.OnServerDisconnect(conn);
     }
 

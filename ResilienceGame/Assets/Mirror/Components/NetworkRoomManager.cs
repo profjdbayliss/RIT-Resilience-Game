@@ -292,6 +292,11 @@ namespace Mirror
             {
                 for (int i = 0; i < roomSlots.Count; i++)
                 {
+                    if (i < 0 || i >= roomSlots.Count)
+                    {
+                        Debug.LogError("Invalid player index: " + i);
+                        continue;
+                    }
                     roomSlots[i].index = i;
                 }
             }
