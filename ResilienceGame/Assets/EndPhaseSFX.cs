@@ -13,7 +13,7 @@ public class EndPhaseSFX : MonoBehaviour
     {
         if (self.interactable == true)
         {
-            audio.PlayOneShot(sound, 1);
+            audio.PlayOneShot(sound, 0.4f);
         }
     }
 }

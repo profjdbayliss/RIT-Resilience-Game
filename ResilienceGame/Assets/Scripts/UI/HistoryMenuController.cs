@@ -29,7 +29,7 @@ public class HistoryMenuController : MonoBehaviour {
 
     }
     public void AddNewHistoryItem(Card card, CardPlayer player, string message, bool fromNet, bool IsServer) {
-        string s = $"{player.playerName} played {card.front.title} {message}";
+        string s = $"{player.playerName} played {card.front.title} {message}. Description: '{card.front.description}'";
         Destroy(historyItems.Dequeue().gameObject);
         var newItem = Instantiate(historyItemPrefab, menuParent).GetComponent<HistoryItem>();
         var texture = card.front.img;

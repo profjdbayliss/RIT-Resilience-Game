@@ -152,6 +152,9 @@ public class GameManager : MonoBehaviour, IRGObservable {
     [SerializeField] private AudioClip handCards; 
     [SerializeField] private AudioClip endJingle;
 
+    [Header("debug")]
+    private bool canPlaySolo = false;
+
     #endregion
 
     #region Initialization
@@ -189,7 +192,8 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (RGNetworkPlayerList.instance.CheckReadyToStart())
         {
             // Check for minimum number of players
-            if (RGNetworkPlayerList.instance.playerIDs.Count < 3)
+            
+            if (RGNetworkPlayerList.instance.playerIDs.Count < 3 && canPlaySolo == false)
             {
                 UserInterface.Instance.hostLobbyBeginError.SetActive(true);
                 UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not enough players to start the game. Minimum 3 players required.";
@@ -211,12 +215,13 @@ public class GameManager : MonoBehaviour, IRGObservable {
                 }
             }
 
-            if (redTeamCount < 1 || blueTeamCount < 1)
+            if ((redTeamCount < 1 || blueTeamCount < 1) && canPlaySolo == false)
             {
                 UserInterface.Instance.hostLobbyBeginError.SetActive(true);
                 UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Each team must have at least 1 player.";
                 return;
             }
+            
 
             RGNetworkPlayerList.instance.AddWhitePlayer();
             RealGameStart();
@@ -646,17 +651,23 @@ public class GameManager : MonoBehaviour, IRGObservable {
             }
         }
 
+
+
     }
     #endregion
 
     #region Update
     // Update is called once per frame
-    void Update() {
-        if (DEBUG_ENABLED) {
+    void Update()
+    {
+        if (DEBUG_ENABLED)
+        {
             HandleDebugLogInput();
         }
-        if (isInit) {
-            if (gameStarted) {
+        if (isInit)
+        {
+            if (gameStarted)
+            {
                 HandlePhases(MGamePhase);
             }
 
@@ -664,20 +675,36 @@ public class GameManager : MonoBehaviour, IRGObservable {
             NotifyObservers();
 
         }
-        else {
+        else
+        {
             // the network takes a while to start up and we wait for it.
             mRGNetworkPlayerList = RGNetworkPlayerList.instance;
-            if (mRGNetworkPlayerList != null) {  // means network init is done and we're joined
+            if (mRGNetworkPlayerList != null)
+            {  // means network init is done and we're joined
                 RegisterObserver(mRGNetworkPlayerList);
                 IsServer = mRGNetworkPlayerList.isServer;
                 CardPlayer player = GameObject.FindObjectOfType<CardPlayer>();
-                if (player != null) {
+                if (player != null)
+                {
                     // player is initialized
                     isInit = true;
                 }
             }
         }
+
+        if (Keyboard.current.numpad9Key.wasPressedThisFrame && !canPlaySolo)
+        {
+            canPlaySolo = true;
+            Debug.Log("Can play solo");
+        }
+
+        //check for tab key to show player menu
+        if (Keyboard.current.tabKey.wasPressedThisFrame)
+        {
+            UserInterface.Instance.ToggleMapGUI();
+        }
     }
+
 
     #endregion
 
@@ -785,7 +812,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
         else {
             NetworkManager.singleton.StopClient();
         }
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(0);
 
     }
     public void QuitToDesktop() {
