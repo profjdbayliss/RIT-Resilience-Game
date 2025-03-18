@@ -12187,8 +12187,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Not everyone is ready yet.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
-  m_sharedMaterial: {fileID: 5164718467235058921, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8713a684d1fa831419084a5df313bba3, type: 2}
+  m_sharedMaterial: {fileID: 5164718467235058921, guid: 8713a684d1fa831419084a5df313bba3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
