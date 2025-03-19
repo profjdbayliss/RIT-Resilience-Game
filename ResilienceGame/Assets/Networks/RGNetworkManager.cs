@@ -28,11 +28,10 @@ public class RGNetworkManager : NetworkManager
         RGNetworkPlayer player = (RGNetworkPlayer)conn.identity.GetComponent<RGNetworkPlayer>();
         string name = player.mPlayerName;
         var cardPlayer = player.cardPlayerInstance;
-        //RGNetworkPlayerList.instance.AddPlayer(playerID, name);
         RGNetworkPlayerList.instance.AddPlayer(playerID, name, cardPlayer, conn);
-        //SynchronizePlayerList();
-        //UpdatePlayerVisibilityForAll();
-        //PlayerLobbyManager.Instance.UpdatePlayerLobbyUI(); // Update the lobby screen when a player is added
+
+        // Sync existing players and game state to the new client
+        RGNetworkPlayerList.instance.SyncPlayerListToClient(conn);
     }
 
 

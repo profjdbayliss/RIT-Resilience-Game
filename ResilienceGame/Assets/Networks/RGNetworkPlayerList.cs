@@ -264,6 +264,41 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     #endregion
 
     #region Helpers
+    public void SyncPlayerListToClient(NetworkConnectionToClient conn)
+    {
+        if (!isServer) return;
+
+        foreach (var kvp in playerIDs)
+        {
+            int id = kvp.Key;
+            string name = playerNames[id];
+            int type = (int)playerTypes[id];
+
+            Message data = CreateNewPlayerMessage(id, name, type);
+            RGNetworkLongMessage msg = new RGNetworkLongMessage
+            {
+                playerID = data.senderID,
+                type = (uint)data.Type,
+                count = 1,
+                payload = data.byteArguments.ToArray()
+            };
+            conn.Send(msg);
+        }
+
+        // If the game has already started, send the StartGame message
+        if (GameManager.Instance.gameStarted)
+        {
+            Message startMsg = CreateStartGameMessage();
+            RGNetworkLongMessage startNetMsg = new RGNetworkLongMessage
+            {
+                playerID = startMsg.senderID,
+                type = (uint)startMsg.Type,
+                count = (uint)playerIDs.Count,
+                payload = startMsg.byteArguments.ToArray()
+            };
+            conn.Send(startNetMsg);
+        }
+    }
     public void DebugLogPlayerLists()
     {
         Debug.Log($"Player List({playerIDs.Count}): ");
