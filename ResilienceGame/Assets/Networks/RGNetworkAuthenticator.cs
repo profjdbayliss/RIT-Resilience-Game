@@ -75,6 +75,16 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     {
         Debug.Log($"Authentication Request: {msg.authUsername}");
 
+        // Check if the username exists in activePlayers but connection is invalid
+        if (activePlayers.TryGetValue(msg.authUsername, out NetworkConnection existingConn))
+        {
+            if (existingConn.owned == null)
+            {
+                // Remove stale entry
+                RemovePlayer(msg.authUsername);
+            }
+        }
+
         // Reject if the game has already started
         if (GameManager.Instance != null && GameManager.Instance.gameStarted)
         {
@@ -146,6 +156,12 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     #endregion
 
     #region Client
+    public static void RemovePlayer(string username)
+    {
+        // Remove from both collections
+        activePlayers.Remove(username);
+        playerNames.Remove(username);
+    }
 
     // Called by UI element UsernameInput.OnValueChanged
     public void SetPlayername(string username)

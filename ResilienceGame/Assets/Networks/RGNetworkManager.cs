@@ -37,11 +37,13 @@ public class RGNetworkManager : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
-        int playerId = conn.connectionId;
         if (conn.authenticationData != null)
-            RGNetworkAuthenticator.playerNames.Remove((string)conn.authenticationData);
+        {
+            string username = (string)conn.authenticationData;
+            RGNetworkAuthenticator.RemovePlayer(username);
+        }
 
-        RGNetworkPlayerList.instance.RemovePlayer(playerId);
+        RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId);
         base.OnServerDisconnect(conn);
     }
 

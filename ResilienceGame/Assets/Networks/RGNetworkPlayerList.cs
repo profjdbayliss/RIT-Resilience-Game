@@ -73,12 +73,14 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     public bool CheckReadyToStart()
     {
         bool readyToStart = true;
-        for (int i = 0; i < playerIDs.Count; i++)
+        foreach (var kvp in playerIDs) // Iterate through dictionary entries
         {
-            if (playerTypes[i] == PlayerTeam.Any)
+            int playerId = kvp.Key;
+            if (playerTypes[playerId] == PlayerTeam.Any)
             {
                 readyToStart = false;
-                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text = "Not everyone is ready yet.";
+                UserInterface.Instance.hostLobbyBeginError.GetComponentInChildren<TextMeshProUGUI>().text =
+                    "Not everyone is ready yet.";
                 break;
             }
         }
@@ -86,7 +88,9 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     }
     public void AddWhitePlayer()
     {
-        int newPlayerID = playerIDs.Count;
+        // Generate a unique ID that doesn't conflict with existing connection IDs
+        int newPlayerID = playerIDs.Count > 0 ? playerIDs.Keys.Max() + 1 : 0;
+
         playerIDs.Add(newPlayerID, newPlayerID);
         playerNetworkReadyFlags.Add(newPlayerID, true);
         playerTurnTakenFlags.Add(newPlayerID, false);
@@ -111,12 +115,15 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         if (isServer)
         {
-            playerIDs[id] = id;
-            playerNetworkReadyFlags[id] = true;
-            playerTurnTakenFlags[id] = false;
-            playerTypes[id] = PlayerTeam.Any;
-            playerConnections[id] = conn;
-            playerNames[id] = name;
+            // Use the connection ID directly
+            int playerId = conn.connectionId;
+
+            playerIDs[playerId] = playerId;
+            playerNetworkReadyFlags[playerId] = true;
+            playerTurnTakenFlags[playerId] = false;
+            playerTypes[playerId] = PlayerTeam.Any;
+            playerConnections[playerId] = conn;
+            playerNames[playerId] = name;
 
             // Send updated player list to all clients
             Message data = CreateNewPlayerMessage(id, name, (int)PlayerTeam.Any);
@@ -205,23 +212,24 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         Message msg;
         List<byte> data = new List<byte>(100);
-        int messageCount = playerIDs.Count;
-        for (int i = 0; i < messageCount; i++)
+
+        // Iterate through dictionary entries directly
+        foreach (var kvp in playerIDs)
         {
-            // note that the player id is actually its order in this
-            // message
-            byte[] id = BitConverter.GetBytes((int)playerIDs[i]);
-            byte[] type = BitConverter.GetBytes((int)playerTypes[i]);
-            int nameSize = playerNames[i].Length;
+            int playerId = kvp.Key;
+            byte[] id = BitConverter.GetBytes(playerId);
+            byte[] type = BitConverter.GetBytes((int)playerTypes[playerId]);
+            int nameSize = playerNames[playerId].Length;
             byte[] nameSizeBytes = BitConverter.GetBytes(nameSize);
-            byte[] name = Encoding.ASCII.GetBytes(playerNames[i]);
+            byte[] name = Encoding.ASCII.GetBytes(playerNames[playerId]);
             data.AddRange(id);
             data.AddRange(type);
             data.AddRange(nameSizeBytes);
             data.AddRange(name);
         }
+
         msg = new Message(CardMessageType.StartGame, (uint)localPlayerID, data);
-        return (msg);
+        return msg;
     }
 
     public Message CreateNewPlayerMessage(int playerID, string playerName, int type)
