@@ -487,10 +487,28 @@ public class Sector : MonoBehaviour {
     }
     //handles when the opponent plays a non facility/effect card
     void HandleFreeOpponentPlay(Update update, GamePhase phase, CardPlayer player) {
-        //Card card = DrawCard(random: false, cardId: update.CardID, uniqueId: -1,
-        //    deckToDrawFrom: ref opponent.DeckIDs, dropZone: null,
-        //    allowSlippy: false, activeDeck: ref ActiveCards);
-        if (player.HandCards.TryGetValue(update.UniqueID, out GameObject cardObject)) {
+        // Add null check for player reference
+        if (player == null)
+        {
+            Debug.LogError("Received update for null player");
+            return;
+        }
+
+        // Add validation for empty hands
+        if (player.HandCards.Count == 0)
+        {
+            Debug.LogWarning($"{player.playerName} has empty hands - likely already processed this update");
+            return;
+        }
+
+        // Add try-catch for key access
+        GameObject cardObject;
+        if (!player.HandCards.TryGetValue(update.UniqueID, out cardObject))
+        {
+            Debug.LogWarning($"Card {update.UniqueID} not found in {player.playerName}'s hand. " +
+                           "This might be normal if card was already played/discarded");
+            return;
+        }
 
             Action<Update, Card> OnAnimationResolveCardAction = null;
 
@@ -526,12 +544,6 @@ public class Sector : MonoBehaviour {
                 resolveCardAction: OnAnimationResolveCardAction,
                 cUpdate: update,
                 facility: tempFacility);
-        }
-        else {
-            Debug.LogError($"{sectorName} was looking for card with uid {update.UniqueID} but did not find it in {player.playerName}'s hand which has size [{player.HandCards.Count}]");
-        }
-
-
     }
     //handles when the opponent plays a facility/effect card
     void HandleFacilityOpponentPlay(Update update, GamePhase phase, CardPlayer player) {

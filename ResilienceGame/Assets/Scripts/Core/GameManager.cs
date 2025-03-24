@@ -345,6 +345,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
         // send out the starting message with all player info
         // and start the next phase
         if (IsServer) {
+            // Ensure white player exists before creating start message
+            if (RGNetworkPlayerList.instance.playerTypes.All(p => p.Value != PlayerTeam.White))
+            {
+                RGNetworkPlayerList.instance.AddWhitePlayer();
+            }
+
             Message msg = RGNetworkPlayerList.instance.CreateStartGameMessage();
             AddMessage(msg);
         }
