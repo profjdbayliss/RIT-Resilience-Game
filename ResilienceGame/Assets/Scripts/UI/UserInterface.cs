@@ -79,6 +79,7 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private RectTransform rightSelectionparent;
     [SerializeField] private List<Button> allySelectionButtons;
     [SerializeField] private GameObject allySelectionButtonPrefab;
+    [SerializeField] private int lastMeepleTypeIndex;
 
     [Header("Lobby Screen")]
     [SerializeField] private GameObject clientLobbyScreen;
@@ -560,6 +561,7 @@ public class UserInterface : MonoBehaviour
 
         foreach (var kvp in GameManager.Instance.playerDictionary)
         {
+
             CardPlayer cardPlayer = kvp.Value;
 
             // Skip players not on the same team OR the current player
@@ -594,6 +596,15 @@ public class UserInterface : MonoBehaviour
             ToggleMeepleSharingMenu(false);
         }
     }
+    //For the cancel button
+    public void DisableAllySelectionMenuNoWaste()
+    {
+        allySelectionMenu.SetActive(false);
+
+        //TODO: Return meeple
+
+    }
+
     public void UpdateMeepleSharingMenu()
     {
         for (int i = 0; i < 3; i++)

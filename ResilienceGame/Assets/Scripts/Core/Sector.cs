@@ -719,43 +719,42 @@ public class Sector : MonoBehaviour {
     //Sets the action to be taken when the die roll is complete
     //This will change the meeple amount by the 'amount' float for all meeples
     //also sets up the action tracker to remove the effect later on
-    public void AddOnDiceRollChangeMeepleAmtMulti(int minRoll, string[] meepleType, int removalTime, float amount) {
+    public void AddOnDiceRollChangeMeepleAmtMulti(int minRoll, string[] meepleType, int removalTime, float amount)
+    {
         OnDiceRollComplete = null;
         if (Owner == null) return;
         OnDiceRollComplete += () => {
-
-            if (DieRoll < minRoll) {
+            if (DieRoll < minRoll)
+            {
                 int[] playerMeepls = Owner.currentMeeples;
                 int[] meeplesChanged = new int[playerMeepls.Length];
-                //setup the multipliers
-                for (int i = 0; i < playerMeepls.Length; i++) {
-                    var meepleString = i switch {
+                // Corrected calculation: Apply reduction as negative value
+                for (int i = 0; i < playerMeepls.Length; i++)
+                {
+                    var meepleString = i switch
+                    {
                         0 => "Black",
                         1 => "Blue",
                         2 => "Purple",
                         3 => "Colorless",
                         _ => ""
                     };
+                    // Calculate reduction as negative value
                     meeplesChanged[i] = meepleType.Contains(meepleString) ?
-                        (int)(playerMeepls[i] * (amount < 1 ? amount : -amount)) : 0;
+                        (int)(-playerMeepls[i] * amount) : 0; // Negative sign added here
                 }
-                //add them as temporary meeples
-                //  Debug.Log($"Adding meeple change to sector owner: {Owner.playerName}");
-                for (int i = 0; i < playerMeepls.Length; i++) {
+                // Apply the changes as temporary reductions
+                for (int i = 0; i < playerMeepls.Length; i++)
+                {
                     Owner.SetTempMeeples(i, meeplesChanged[i]);
                 }
-
-                //add the action to remove the meeples later
-                //TODO: this will mean that these white card meeple multiplier
-                //will overwrite/be overwritten by Overtime
-                Owner.AddActionToCallAfterTurns(removalTime,
-                    () => {
-                        // Debug.Log($"Remove meeple change");
-                        for (int i = 0; i < playerMeepls.Length; i++) {
-                            Owner.SetTempMeeples(i, 0);
-                        }
-                    });
-
+                // Schedule removal after duration
+                Owner.AddActionToCallAfterTurns(removalTime, () => {
+                    for (int i = 0; i < playerMeepls.Length; i++)
+                    {
+                        Owner.SetTempMeeples(i, 0); // Reset temp
+                    }
+                });
             }
         };
     }

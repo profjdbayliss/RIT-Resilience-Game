@@ -16,7 +16,7 @@ public class EditorCard : MonoBehaviour {
         public int imgRow, imgCol, bgRow, bgCol;
         public int blueCost, blackCost, purpleCost;
         public string meeplesChanged;
-        public int meepleChangeAmt;
+        public double meepleChangeAmt;
         public int cardsDrawn;
         public int cardsRemoved;
         public string effect;
@@ -111,7 +111,7 @@ public class EditorCard : MonoBehaviour {
 
             if (meepleChangeData != "") {
                 cardData.meeplesChanged = meepleChangeData;
-                cardData.meepleChangeAmt = int.Parse(meepleChangeAmtData);
+                cardData.meepleChangeAmt = double.Parse(meepleChangeAmtData);
             }
 
             cardData.blueCost = int.Parse(csvData[13]);
