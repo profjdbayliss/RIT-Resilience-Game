@@ -45,7 +45,7 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                 playGlowSound = false;
             }
         }
-        else
+        else if (playGlowSound == false && !isHovering && theCard.cardZone == GameObject.FindGameObjectWithTag("PlayerHandLocation"))
         {
             playGlowSound = true;
             glow.SetActive(false);

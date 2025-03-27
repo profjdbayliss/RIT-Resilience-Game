@@ -860,9 +860,11 @@ public class CardPlayer : MonoBehaviour {
                     allowSlippy: true,
                     activeDeck: ref HandCards,
                     sendUpdate: updateNetwork);
+                
                 if (highlight) {
                     cardDrawn.ToggleOutline(true);
                 }
+                
                 cardsDrawn?.Add(cardDrawn);
             }
         }

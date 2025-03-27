@@ -52,7 +52,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public GameObject CanvasHolder;
     public bool HasCanvas = false;
     public int stackNumber = 0;
-    [SerializeField] RawImage outlineImage;
+    [SerializeField] private GameObject outlineImage;
     public int DefenseHealth = 0;
     public List<int> ModifyingCards = new List<int>(10);
     public List<CardIDInfo> AttackingCards = new List<CardIDInfo>(10);
@@ -97,9 +97,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
     public void ToggleOutline(bool enable)
     {
-        Color c = outlineImage.color;
-        c.a = enable ? 1f : 0f;
-        outlineImage.color = c;
+        outlineImage.SetActive(enable);
     }
 
 

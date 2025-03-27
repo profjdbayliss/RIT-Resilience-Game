@@ -306,7 +306,7 @@ MonoBehaviour:
   CanvasHolder: {fileID: 0}
   HasCanvas: 0
   stackNumber: 0
-  outlineImage: {fileID: 0}
+  outlineImage: {fileID: 4700192264946514504}
   DefenseHealth: 0
   ModifyingCards: 
   speed: 10
