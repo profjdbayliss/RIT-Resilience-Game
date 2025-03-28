@@ -12,7 +12,7 @@ Her repo can be found here: [Access Denied](https://github.com/profjdbayliss/acc
 ### Set up:
 Start with 1 Red Player and up to 4 Blue Players. Another Red Player should join the game for every fifth Blue Player added.
 
-Every Blue Player will control a Sector with 3 Facilities each. Each Facility will have different Sector Products and Resistance Points. All players will have 2 Meeples of each color with Red Players having an additional Colorless Meeple. 
+Every Blue Player will control a Sector with 3 Facilities each. Each Facility will have different Sector Products and Resistance Points. All players will have 2 Workers of each color with Red Players having an additional Colorless Worker. 
 
 All players begin play by drawing 5 cards from their decks
 
@@ -25,11 +25,11 @@ All players begin play by drawing 5 cards from their decks
 
 ### Turn Composition:
 1. **DRAW PHASE:** Players must draw until they have 5 cards in their hand. If a player cannot draw any more cards the game ends. Players can discard and redraw up to 2 cards. 
-    - Any Meeples used in the previous turn are replenished. Meeples can work Overtime for 2 turns, adding 2 Meeples per color to a Sector. After 2 turns, Meeples enter exhaustion for 4 turns, limiting a Sector to 1 Meeple per color.
+    - Any Workers used in the previous turn are replenished. Workers can work Overtime for 2 turns, adding 2 Workers per color to a Sector. After 2 turns, Workers enter exhaustion for 4 turns, limiting a Sector to 1 Worker per color.
 
-2. **ACTION PHASE:** Players are able to activate their cards by using the required number of meeples as indicated by each card.
+2. **ACTION PHASE:** Players are able to activate their cards by using the required number of Workers as indicated by each card.
 
-3. **END TURN PHASE:** Players must discard their cards until they have 5 cards left in their hand. During this phase, players can donate any remaining Meeples to their allies.
+3. **END TURN PHASE:** Players must discard their cards until they have 5 cards left in their hand. During this phase, players can donate any remaining Workers to their allies.
 
 
 ### White Cards:
@@ -37,8 +37,8 @@ These cards are split into two decks, a Positive Deck and a Negative Deck. Every
 
 
 ### Red Players:
-#### Colorless Meeple:
-Red Players have 1 Colorless Meeple which can be used in place of any other regular Meeple. 
+#### Colorless Worker:
+Red Players have 1 Colorless Worker which can be used in place of any other regular Worker. 
 
 
 #### Backdoor: 
