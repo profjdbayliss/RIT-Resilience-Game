@@ -15,6 +15,7 @@ TagManager:
   - NetworkManager
   - DeckNameHolder
   - PlayerHandLocation
+  - EndTurnBlocker
   layers:
   - Default
   - TransparentFX

@@ -97,12 +97,13 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
     public void ToggleOutline(bool enable)
     {
+        Debug.Log("Toggling the outline to: " + enable);
         outlineImage.SetActive(enable);
     }
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    public void Play(CardPlayer player, CardPlayer opoutlineImageponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null)
     {
         if (player.playerTeam == PlayerTeam.White)
         {
@@ -110,7 +111,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         }
         foreach (ICardAction action in ActionList)
         {
-            action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
+            action.Played(player, opoutlineImageponent, facilityActedUpon, cardActedUpon, this);
         }
     }
 

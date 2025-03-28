@@ -39,13 +39,14 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (isHovering && theCard.cardZone == GameObject.FindGameObjectWithTag("PlayerHandLocation"))
         {
             glow.SetActive(true);
+            //checks and makes sure if bool is true so it can only play it once
             if (playGlowSound)
             {
                 audio.PlayOneShot(glowSound, 0.2f);
                 playGlowSound = false;
             }
         }
-        else if (playGlowSound == false && !isHovering && theCard.cardZone == GameObject.FindGameObjectWithTag("PlayerHandLocation"))
+        else
         {
             playGlowSound = true;
             glow.SetActive(false);
