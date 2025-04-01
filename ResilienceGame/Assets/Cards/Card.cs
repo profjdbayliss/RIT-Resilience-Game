@@ -52,7 +52,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public GameObject CanvasHolder;
     public bool HasCanvas = false;
     public int stackNumber = 0;
-    [SerializeField] RawImage outlineImage;
+    [SerializeField] private GameObject outlineImage;
     public int DefenseHealth = 0;
     public List<int> ModifyingCards = new List<int>(10);
     public List<CardIDInfo> AttackingCards = new List<CardIDInfo>(10);
@@ -97,14 +97,13 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
     public void ToggleOutline(bool enable)
     {
-        Color c = outlineImage.color;
-        c.a = enable ? 1f : 0f;
-        outlineImage.color = c;
+        Debug.Log("Toggling the outline to: " + enable);
+        outlineImage.SetActive(enable);
     }
 
 
     // Play all of a cards actions
-    public void Play(CardPlayer player, CardPlayer opponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null)
+    public void Play(CardPlayer player, CardPlayer opoutlineImageponent = null, Facility facilityActedUpon = null, Card cardActedUpon = null)
     {
         if (player.playerTeam == PlayerTeam.White)
         {
@@ -112,7 +111,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         }
         foreach (ICardAction action in ActionList)
         {
-            action.Played(player, opponent, facilityActedUpon, cardActedUpon, this);
+            action.Played(player, opoutlineImageponent, facilityActedUpon, cardActedUpon, this);
         }
     }
 

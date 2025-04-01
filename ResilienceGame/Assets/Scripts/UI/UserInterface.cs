@@ -401,7 +401,7 @@ public class UserInterface : MonoBehaviour
     {
         StatusText.text = message;
     }
-    public void DisplayAlertMessage(string message, CardPlayer player, int duration = -1, Action onAlertFinish = null)
+    public void DisplayAlertMessage(string message, CardPlayer player, int duration = 3, Action onAlertFinish = null)
     {
         if (player == GameManager.Instance.actualPlayer)
         {

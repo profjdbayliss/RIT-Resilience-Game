@@ -12,6 +12,7 @@ using static Facility;
 using System;
 using System.Text;
 using System.Collections;
+using UnityEditor.PackageManager;
 
 //audio.PlayOneShot(drawSound, 1);
 
@@ -217,7 +218,6 @@ public class CardPlayer : MonoBehaviour {
 
     #region Initialization
     public virtual void Start() {
-
         if (UserInterface.Instance.handDropZone)
             handPositioner = UserInterface.Instance.handDropZone.GetComponent<HandPositioner>();
         else {
@@ -384,6 +384,14 @@ public class CardPlayer : MonoBehaviour {
         UserInterface.Instance.EnableDiscardDrop();                   //enable the discard drop zone
         CardsAllowedToBeDiscard = cardsAllowedToBeDiscard;  //holds the cards that are allowed to be discarded (like draw 3 discard 1 of them)
         Debug.Log($"Enabling {playerName}'s discard temporarily");
+
+        //Prevents the player from starting a new turn before discarding the cards 
+        GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+        Image tempImage = tempBlocker.GetComponent<Image>();
+        var tempColor = tempImage.color;
+        tempColor.a = 1f;
+        tempImage.color = tempColor;
+        tempImage.raycastTarget = true;
     }
     //Returns the player to ready to play state by disabling necessary ui elements and setting player state
     public void StopDiscard() {
@@ -393,6 +401,14 @@ public class CardPlayer : MonoBehaviour {
         UserInterface.Instance.DisableDiscardDrop();           //disable the discard drop zone
         UserInterface.Instance.ResolveTextAlert();    //hide alert panel
         Debug.Log($"Disabling {playerName}'s discard");
+
+        //Allows the player from starting a new turn after discarding the cards 
+        GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+        Image tempImage = tempBlocker.GetComponent<Image>();
+        var tempColor = tempImage.color;
+        tempColor.a = 0f;
+        tempImage.color = tempColor;
+        tempImage.raycastTarget = false;
     }
     //returns the card from the hand to the deck
     protected void ReturnCardToDeck(Card card, bool updateNetwork) {
@@ -860,9 +876,11 @@ public class CardPlayer : MonoBehaviour {
                     allowSlippy: true,
                     activeDeck: ref HandCards,
                     sendUpdate: updateNetwork);
+                
                 if (highlight) {
                     cardDrawn.ToggleOutline(true);
                 }
+                
                 cardsDrawn?.Add(cardDrawn);
             }
         }

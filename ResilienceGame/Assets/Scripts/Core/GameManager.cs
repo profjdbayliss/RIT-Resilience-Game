@@ -909,7 +909,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         if (numDoomClockTurnsLeft > 0) {
             UserInterface.Instance.UpdateDoomClockTurnsLeft(numDoomClockTurnsLeft);
         }
-
     }
     public void AllowPlayerDiscard(CardPlayer player, int amount, List<Card> cardsAllowedToDiscard = null) {
         if (actualPlayer == player) {

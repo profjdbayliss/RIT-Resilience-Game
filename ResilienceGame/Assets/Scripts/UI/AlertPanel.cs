@@ -15,6 +15,7 @@ public class AlertPanel : MonoBehaviour {
     List<GameObject> cardList = new List<GameObject>();
 
     public void ShowTextAlert(string message, float duration = -1) {
+        Debug.Log("From the alert panel: " + message);
         textAlertTextMesh.text = message;
         textAlertPanel.SetActive(true);
         if (duration != -1) {
