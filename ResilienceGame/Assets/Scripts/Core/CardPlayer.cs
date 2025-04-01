@@ -450,7 +450,14 @@ public class CardPlayer : MonoBehaviour {
             AmountToReturnToDeck = amount;
             OnCardsReturnedToDeck = onCardsReturned;
             ReadyState = PlayerReadyState.ReturnCardsToDeck;
-            UserInterface.Instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} cards to the deck\nby dragging them to the play area", this);
+            UserInterface.Instance.DisplayAlertMessage($"Return {AmountToReturnToDeck} card to the deck\nby dragging them to the play area", this);
+            //Prevents the player from starting a new turn before discarding the cards 
+            GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+            Image tempImage = tempBlocker.GetComponent<Image>();
+            var tempColor = tempImage.color;
+            tempColor.a = 1f;
+            tempImage.color = tempColor;
+            tempImage.raycastTarget = true;
         }
     }
     #endregion
@@ -884,6 +891,14 @@ public class CardPlayer : MonoBehaviour {
                 cardsDrawn?.Add(cardDrawn);
             }
         }
+
+        //Allows the player from starting a new turn after discarding the cards 
+        GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+        Image tempImage = tempBlocker.GetComponent<Image>();
+        var tempColor = tempImage.color;
+        tempColor.a = 0f;
+        tempImage.color = tempColor;
+        tempImage.raycastTarget = false;
     }
     //Draws a specific card from the deck and adds it to the handParent by calling the CardDraw function
     //Currently used to add a card to opponents hand when receiving a draw message from the network
