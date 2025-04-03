@@ -137,6 +137,14 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 return;
             }
 
+            // Show the EndTurnBlocker
+            GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+            Image tempImage = tempBlocker.GetComponent<Image>();
+            var tempColor = tempImage.color;
+            tempColor.a = 1f;
+            tempImage.color = tempColor;
+            tempImage.raycastTarget = true;
+
             player.ForcePlayerSelectFacilities(
                 numFacilitiesToSelect: card.data.targetAmount,
                 removeEffect: removeEffect,
