@@ -1712,34 +1712,33 @@ public class GameManager : MonoBehaviour, IRGObservable {
     #endregion
 
     #region Meeple Sharing UI Buttons
-    public void HandleShareMeepleButtonPress(int index) {
-        Debug.Log("HandleShareMeepleButtonPress in GameManager");
+    // Add temporary storage for pending worker sharing
+    private int mPendingWorkerType = -1;
+
+    public void HandleShareWorkerButtonPress(int index)
+    {
+        Debug.Log("HandleShareWorkerButtonPress in GameManager");
         if (index < 0 || index >= actualPlayer.BaseMaxMeeples.Length) return;
         if (actualPlayer.BaseMaxMeeples[index] == 0) return;
-        if (actualPlayer.LendMeeple(index)) {
-            UserInterface.Instance.ShowAllySelectionMenu(index);
-        }
-        //UserInterface.Instance.UpdateMeepleAmountUI();
+
+        // Store worker type but don't deduct yet
+        mPendingWorkerType = index;
+        UserInterface.Instance.ShowAllySelectionMenu(index);
     }
-    public void HandleChoosePlayerToShareWithButtonPress(int meepleType, int playerNetId)
+
+    public void HandleChoosePlayerToShareWithButtonPress(int playerNetId)
     {
+        if (mPendingWorkerType == -1) return;
+
         if (playerDictionary.TryGetValue(playerNetId, out CardPlayer targetPlayer))
         {
-            // Check if the target player is on the same team
-            if (targetPlayer.playerTeam == actualPlayer.playerTeam)
+            // Deduct the meeple ONLY after confirming the share
+            if (actualPlayer.LendWorker(mPendingWorkerType))
             {
-                Debug.Log($"{actualPlayer.playerName} is sharing meeple type {meepleType} with {targetPlayer.playerName}");
-                actualPlayer.ShareMeepleWithPlayer(meepleType, targetPlayer);
-            }
-            else
-            {
-                Debug.LogError($"Cannot share meeples with {targetPlayer.playerName} - they are on the opposing team!");
+                actualPlayer.ShareWorkerWithPlayer(mPendingWorkerType, targetPlayer);
             }
         }
-        else
-        {
-            Debug.LogError($"Player with net id {playerNetId} not found in player dictionary");
-        }
+        mPendingWorkerType = -1;
         UserInterface.Instance.DisableAllySelectionMenu();
     }
     #endregion

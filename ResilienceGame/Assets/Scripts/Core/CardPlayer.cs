@@ -627,19 +627,14 @@ public class CardPlayer : MonoBehaviour {
     protected bool HasMeepleOfColor(int index) => index >= 0 && index < currentMeeples.Length && currentMeeples[index] > 0;
 
 
-    //reduces the meeple count of the specified color index by 1
+    //reduces the worker count of the specified color index by 1
     //and adds it to the shared meeple tracker
-    public bool LendMeeple(int index) {
-        if (index >= 0 && index < BaseMaxMeeples.Length) {
-            if (BaseMaxMeeples[index] > 0) {
-                if (HasMeepleOfColor(index)) {
-                    // DecrememntMeepleByIndex(index);
-                    ScoreManager.Instance.AddMeepleShare(NetID);
-                    LendOneMeeple(index);
-                    // sharedMeepleTypes.Add((MEEPLE_SHARE_DURATION, index));
-                    return true;
-                }
-            }
+    public bool LendWorker(int index)
+    {
+        if (index >= 0 && index < BaseMaxMeeples.Length && HasMeepleOfColor(index))
+        {
+            ChangeLentMeeples(index, 1);
+            return true;
         }
         return false;
     }
@@ -675,11 +670,13 @@ public class CardPlayer : MonoBehaviour {
         borrowedMeepleTypes.RemoveAll(expiredMeeples.Contains);
 
     }
-    public void ShareMeepleWithPlayer(int index, CardPlayer player) {
+    public void ShareWorkerWithPlayer(int index, CardPlayer player)
+    {
+        // Only deduct when actually sharing
         EnqueueAndSendCardMessageUpdate(CardMessageType.MeepleShare,
-                                            UniqueID: player.NetID,
-                                            CardID: index,
-                                            Amount: 1);
+            UniqueID: player.NetID,
+            CardID: index,
+            Amount: 1);
     }
     //protected void SetTempMeeplesForMultiplier(float multiplier) {
     //    for (int i = 0; i < BaseMaxMeeples.Length; i++) {
