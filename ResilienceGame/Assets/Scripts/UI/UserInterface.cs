@@ -574,7 +574,7 @@ public class UserInterface : MonoBehaviour
             var parent = allySelectionButtons.Count < 8 ? leftSelectionparent : rightSelectionparent;
             var newButton = Instantiate(allySelectionButtonPrefab, parent).GetComponent<Button>();
             newButton.onClick.AddListener(() =>
-                GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(meepleTypeIndex, cardPlayer.NetID)
+                GameManager.Instance.HandleChoosePlayerToShareWithButtonPress(cardPlayer.NetID)
             );
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = cardPlayer.playerName;
             allySelectionButtons.Add(newButton);
