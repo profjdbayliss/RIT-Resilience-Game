@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
 using static Facility;
 
 public class DrawAndDiscardCards : ICardAction {
@@ -136,11 +137,28 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 return;
             }
 
+            // Show the EndTurnBlocker
+            GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+            Image tempImage = tempBlocker.GetComponent<Image>();
+            var tempColor = tempImage.color;
+            tempColor.a = 1f;
+            tempImage.color = tempColor;
+            tempImage.raycastTarget = true;
+
             player.ForcePlayerSelectFacilities(
                 numFacilitiesToSelect: card.data.targetAmount,
                 removeEffect: removeEffect,
                 preReqEffect: card.data.preReqEffectType,
                 onFacilitySelect: (selectedFacilities) => {
+
+                    //Allows the player from starting a new turn after selecting the facilities 
+                    GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
+                    Image tempImage = tempBlocker.GetComponent<Image>();
+                    var tempColor = tempImage.color;
+                    tempColor.a = 0f;
+                    tempImage.color = tempColor;
+                    tempImage.raycastTarget = false;
+
                     //this code is run when the player has selected the facilities they want to remove effects from
                     selectedFacilities.ForEach(facility => {
                         Debug.Log($"Selected facility: {facility.facilityName}");
