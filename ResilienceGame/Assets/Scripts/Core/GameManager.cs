@@ -97,6 +97,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
     private bool skip;
     private bool skipClicked;
     [SerializeField] private TutorialToggle tutorialToggle;
+    private bool isTutorialMode;
 
     // Networking
     [Header("Networking")]
@@ -567,6 +568,16 @@ public class GameManager : MonoBehaviour, IRGObservable {
         UserInterface.Instance.discardDropZone.SetActive(true);
         UserInterface.Instance.handDropZone.SetActive(true);
         tutorialToggle.WhenGameStarts();
+    }
+
+    public void InitializeTutorialMode() 
+    {
+        isTutorialMode = true;
+        playerTeam = PlayerTeam.Blue;
+        actualPlayer.playerTeam = PlayerTeam.Blue;
+        actualPlayer.DeckName = "blue";
+        SetupActors();
+        StartGame();
     }
 
     #endregion
