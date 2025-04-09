@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 using static Facility;
+using System;
 
 public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
@@ -139,11 +140,19 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
 
             bool areThereBackDoors = false;
 
+            //Checks each active facility to see if there are any backdoors TODO: MAKE SURE THE IF STATEMENT WORKS, AND CHECKS TO MAKE THERE ARE ACTUALLY BACKDOORS 
             for (int i = 0; i < 3; i++)
             {
-                if (player.facilites[i].therebackdoor == true)
+                try
                 {
-                    areThereBackDoors = true;
+                    if (player.ActiveFacilities[i].GetComponent<Facility>().HasEffectOfType(FacilityEffectType.Backdoor))
+                    {
+                        areThereBackDoors = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e);
                 }
             }
 
