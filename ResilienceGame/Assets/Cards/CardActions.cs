@@ -141,20 +141,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
             bool areThereBackDoors = false;
 
             //Checks each active facility to see if there are any backdoors TODO: MAKE SURE THE IF STATEMENT WORKS, AND CHECKS TO MAKE THERE ARE ACTUALLY BACKDOORS 
-            for (int i = 0; i < 3; i++)
-            {
-                try
-                {
-                    if (player.ActiveFacilities[i].GetComponent<Facility>().HasEffectOfType(FacilityEffectType.Backdoor))
-                    {
-                        areThereBackDoors = true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(e);
-                }
-            }
+            areThereBackDoors = true;
 
             if (areThereBackDoors)
             {
