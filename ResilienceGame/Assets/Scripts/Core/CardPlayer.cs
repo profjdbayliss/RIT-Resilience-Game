@@ -12,7 +12,6 @@ using static Facility;
 using System;
 using System.Text;
 using System.Collections;
-using UnityEditor.PackageManager;
 
 //audio.PlayOneShot(drawSound, 1);
 
