@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -54,7 +55,7 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         if (SlippyOff)
         {
-            if (isHovering && !isScaled)
+            if (isHovering && !isScaled && (theCard.DeckName != "positive" || theCard.DeckName != "negative"))
             {
                 ScaleCard(2.0f);
             }
@@ -67,13 +68,13 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         // always scale a dragged card to make it easier to get to where you're going
         if (mPointerDown && !SlippyOff)
         {
-            if (!isScaled) ScaleCard(.5f);
+            if (!isScaled && (theCard.DeckName != "positive" || theCard.DeckName != "negative")) ScaleCard(.5f);
         } 
       
         else
         if (isHovering && !mPointerDown)
         {
-            if (!isScaled) ScaleCard(.5f);
+            if (!isScaled && (theCard.DeckName != "positive" || theCard.DeckName != "negative")) ScaleCard(.5f);
 
             // current card game has no extra info, so this isn't used
             //timer += Time.deltaTime;
@@ -94,25 +95,37 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void ScaleCard(float scaleAmount)
     {
-        if(!isScaled)
-        this.gameObject.layer = 30; 
-        else
+        //Gets the cards value
+        var theCard = targetObject.GetComponent<Card>();
+        
+        //TEMP string to make sure it isn't a white card
+        string tempName = theCard.DeckName.ToLower().Trim();
+
+        //if (tempName == "blue" || tempName == "red")
+        if (theCard.cardZone == GameObject.FindGameObjectWithTag("PlayerHandLocation"))
         {
-            this.gameObject.layer = 6;
+            Debug.Log("This card is: '" + theCard.DeckName + "'");
+
+                if (!isScaled)
+                this.gameObject.layer = 30; 
+            else
+            {
+                this.gameObject.layer = 6;
+            }
+
+            Vector2 tempScale = targetObject.transform.localScale;
+            //Vector3 offset = targetObject.transform.localPosition;
+            
+            previousScale = tempScale;
+            tempScale.x = (float)(targetObject.transform.localScale.x + scaleAmount);
+            tempScale.y = (float)(targetObject.transform.localScale.y + scaleAmount);
+            //offset.y = offset.y + scaleAmount * 200;
+            
+            targetObject.transform.localScale = tempScale;
+            //targetObject.transform.localPosition = offset;
+
+            isScaled = !isScaled;    
         }
-
-        Vector2 tempScale = targetObject.transform.localScale;
-        //Vector3 offset = targetObject.transform.localPosition;
-        
-        previousScale = tempScale;
-        tempScale.x = (float)(targetObject.transform.localScale.x + scaleAmount);
-        tempScale.y = (float)(targetObject.transform.localScale.y + scaleAmount);
-        //offset.y = offset.y + scaleAmount * 200;
-        
-        targetObject.transform.localScale = tempScale;
-        //targetObject.transform.localPosition = offset;
-
-        isScaled = !isScaled;
     }
 
     public void ResetScale()
