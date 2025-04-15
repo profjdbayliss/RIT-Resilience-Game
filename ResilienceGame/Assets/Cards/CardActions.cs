@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 using static Facility;
+using System;
 
 public class DrawAndDiscardCards : ICardAction {
     public override void Played(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
@@ -137,6 +138,13 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 return;
             }
 
+            bool areThereBackDoors = false;
+
+            //Checks each active facility to see if there are any backdoors TODO: MAKE SURE THE IF STATEMENT WORKS, AND CHECKS TO MAKE THERE ARE ACTUALLY BACKDOORS 
+            areThereBackDoors = true;
+
+            if (areThereBackDoors)
+            {
             // Show the EndTurnBlocker
             GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
             Image tempImage = tempBlocker.GetComponent<Image>();
@@ -144,13 +152,15 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
             tempColor.a = 1f;
             tempImage.color = tempColor;
             tempImage.raycastTarget = true;
+            }
+
 
             player.ForcePlayerSelectFacilities(
                 numFacilitiesToSelect: card.data.targetAmount,
                 removeEffect: removeEffect,
                 preReqEffect: card.data.preReqEffectType,
                 onFacilitySelect: (selectedFacilities) => {
-
+                    
                     //Allows the player from starting a new turn after selecting the facilities 
                     GameObject tempBlocker = GameObject.FindWithTag("EndTurnBlocker");
                     Image tempImage = tempBlocker.GetComponent<Image>();
@@ -158,6 +168,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                     tempColor.a = 0f;
                     tempImage.color = tempColor;
                     tempImage.raycastTarget = false;
+                   
 
                     //this code is run when the player has selected the facilities they want to remove effects from
                     selectedFacilities.ForEach(facility => {
