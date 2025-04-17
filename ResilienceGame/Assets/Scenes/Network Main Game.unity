@@ -3525,7 +3525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6154,7 +6154,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 77.4273, y: 50}
+  m_SizeDelta: {x: 77.4273, y: 57.503}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &96236304
 MonoBehaviour:
@@ -6178,8 +6178,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 2/2
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
+  m_sharedMaterial: {fileID: 5164718467235058921, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -12725,7 +12725,7 @@ PrefabInstance:
       objectReference: {fileID: 1858202787}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -12900,7 +12900,7 @@ PrefabInstance:
       objectReference: {fileID: 1941791106}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -19818,7 +19818,7 @@ PrefabInstance:
       objectReference: {fileID: 903527564}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -26516,6 +26516,10 @@ PrefabInstance:
       propertyPath: mapSector
       value: 
       objectReference: {fileID: 851251554}
+    - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
 --- !u!224 &535343931 stripped
@@ -27951,7 +27955,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 77.4273, y: 50}
+  m_SizeDelta: {x: 77.4273, y: 57.503}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &581825361
 MonoBehaviour:
@@ -27975,8 +27979,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 2/2
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
+  m_sharedMaterial: {fileID: 5164718467235058921, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -30814,7 +30818,7 @@ PrefabInstance:
       objectReference: {fileID: 317706502}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -33750,7 +33754,7 @@ PrefabInstance:
       objectReference: {fileID: 788153623}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -34578,7 +34582,7 @@ PrefabInstance:
       objectReference: {fileID: 949249981}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -54268,6 +54272,10 @@ PrefabInstance:
       propertyPath: mapSector
       value: 
       objectReference: {fileID: 716741617}
+    - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
 --- !u!224 &1032835303 stripped
@@ -62137,6 +62145,10 @@ PrefabInstance:
       propertyPath: mapSector
       value: 
       objectReference: {fileID: 1390658899}
+    - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
 --- !u!224 &1332915415 stripped
@@ -72378,7 +72390,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 77.4273, y: 50}
+  m_SizeDelta: {x: 77.4273, y: 57.503}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1514866355
 MonoBehaviour:
@@ -72402,8 +72414,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1/1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
+  m_sharedMaterial: {fileID: 5164718467235058921, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -75160,7 +75172,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 77.4273, y: 50}
+  m_SizeDelta: {x: 77.4273, y: 57.503}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1628577507
 MonoBehaviour:
@@ -75184,8 +75196,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 2/2
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
+  m_sharedMaterial: {fileID: 5164718467235058921, guid: 84e8a6fde7b80b14e8f38fe18ebdfcec, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -77056,7 +77068,7 @@ PrefabInstance:
       objectReference: {fileID: 2087078534}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -80593,7 +80605,7 @@ PrefabInstance:
       objectReference: {fileID: 34156362}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -83483,7 +83495,7 @@ PrefabInstance:
       objectReference: {fileID: 1280864660}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -83901,7 +83913,7 @@ PrefabInstance:
       objectReference: {fileID: 423311631}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -84130,7 +84142,7 @@ PrefabInstance:
       objectReference: {fileID: 1986535834}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
@@ -86951,6 +86963,10 @@ PrefabInstance:
       propertyPath: mapSector
       value: 
       objectReference: {fileID: 1419769438}
+    - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
 --- !u!224 &1912610218 stripped
@@ -104344,7 +104360,7 @@ PrefabInstance:
       objectReference: {fileID: 4852573566282071046}
     - target: {fileID: 5946544935205305869, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_RaycastTarget
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7211241011089532873, guid: 408cd707268f6ff4a879cdd3e4e4d593, type: 3}
       propertyPath: m_AnchorMax.y
