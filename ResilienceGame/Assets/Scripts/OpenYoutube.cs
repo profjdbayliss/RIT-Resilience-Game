@@ -4,16 +4,16 @@ public class OpenYoutube : MonoBehaviour
 {
     public void OpenBlueVideo()
     {
-        Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+        Application.OpenURL("https://youtu.be/4LCVtVxQNeg");
     }
 
     public void OpenRedVideo()
     {
-        Application.OpenURL("https://www.youtube.com/watch?v=eeAZ5s2ZaGw");
+        Application.OpenURL("https://youtu.be/DjhndJMU_10");
     }
 
     public void OpenConnectionVideo()
     {
-        Application.OpenURL("https://www.youtube.com/watch?v=N6hVmn9FM7o");
+        Application.OpenURL("https://youtu.be/PMPxtg1oOv4");
     }
 }
