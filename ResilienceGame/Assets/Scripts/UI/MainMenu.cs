@@ -72,6 +72,10 @@ void Start() {
     public void StartGame() {
         SceneManager.LoadScene("Network Login Scene");
     }
+    public void StartBlueTutorial()
+    {
+        SceneManager.LoadScene("Blue Player Tutorial");
+    }
     public void OpenPDF() {
         string filePath = Path.Combine(Application.streamingAssetsPath, rulesPath + ".pdf");
 

@@ -76,4 +76,9 @@ public class TutorialToggle : MonoBehaviour
     {
         discardPanel.SetActive(shouldDiscardPanelBeActive);
     }
+
+    public void StartTutorial()
+    {
+        manager.InitializeTutorialMode();
+    }
 }

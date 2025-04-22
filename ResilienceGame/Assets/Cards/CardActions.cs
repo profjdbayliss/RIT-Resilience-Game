@@ -138,10 +138,8 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 return;
             }
 
-            bool areThereBackDoors = false;
-
-            //Checks each active facility to see if there are any backdoors TODO: MAKE SURE THE IF STATEMENT WORKS, AND CHECKS TO MAKE THERE ARE ACTUALLY BACKDOORS 
-            areThereBackDoors = true;
+            //Checks each active facility to see if there are any backdoors
+            bool areThereBackDoors = CheckForBackdoors(sectorToActOn);
 
             if (areThereBackDoors)
             {
@@ -222,6 +220,17 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
 
     public override void Canceled(CardPlayer player, CardPlayer opponent, Facility facilityActedUpon, Card cardActedUpon, Card card) {
         Debug.Log("card " + card.front.title + " canceled.");
+    }
+    private bool CheckForBackdoors(Sector sector)
+    {
+        foreach (var facility in sector.facilities)
+        {
+            if (facility.HasEffectOfType(FacilityEffectType.Backdoor))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
