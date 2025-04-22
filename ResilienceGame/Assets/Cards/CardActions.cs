@@ -138,7 +138,7 @@ public class SelectFacilitiesAddRemoveEffect : ICardAction {
                 return;
             }
 
-            //Checks each active facility to see if there are any backdoors TODO: MAKE SURE THE IF STATEMENT WORKS, AND CHECKS TO MAKE THERE ARE ACTUALLY BACKDOORS 
+            //Checks each active facility to see if there are any backdoors
             bool areThereBackDoors = CheckForBackdoors(sectorToActOn);
 
             if (areThereBackDoors)
