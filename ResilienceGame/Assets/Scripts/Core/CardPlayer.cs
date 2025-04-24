@@ -317,7 +317,7 @@ public class CardPlayer : MonoBehaviour {
 
         if (numAvail == 0) {
             ReadyState = PlayerReadyState.ReadyToPlay;
-            Debug.LogError("No facilities available to select");
+            //Debug.LogError("No facilities available to select");
             return;
         }
         if (numFacilitiesToSelect != 3)
