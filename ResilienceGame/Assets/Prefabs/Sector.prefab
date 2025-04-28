@@ -84,7 +84,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &8216217765661524805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4709,7 +4709,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1bcbc39fb7437944482849cb53dee020, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 229ba8b6d1565274a84e8ab385b871e4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7501,7 +7501,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1bcbc39fb7437944482849cb53dee020, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 229ba8b6d1565274a84e8ab385b871e4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7974,7 +7974,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1bcbc39fb7437944482849cb53dee020, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 229ba8b6d1565274a84e8ab385b871e4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
