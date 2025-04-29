@@ -2503,7 +2503,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.41499135, g: 0.4200522, b: 0.582, a: 1}
+  m_Color: {r: 0.46564615, g: 0.47090197, b: 0.754717, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5139,8 +5139,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -162.4, y: 242.7}
-  m_SizeDelta: {x: 59.0742, y: 59.0524}
+  m_AnchoredPosition: {x: -156.89, y: 241.3}
+  m_SizeDelta: {x: 76.2241, y: 68.9663}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1461371684
 MonoBehaviour:
@@ -5382,6 +5382,7 @@ GameObject:
   - component: {fileID: 1556729455}
   - component: {fileID: 1556729457}
   - component: {fileID: 1556729456}
+  - component: {fileID: 1556729458}
   m_Layer: 5
   m_Name: SectorDownImage
   m_TagString: Untagged
@@ -5429,7 +5430,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 72723fe877cd8854d8c415b8d3db5324, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6bc8c098958c5b24aa0fa7f3b9d64eea, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5447,6 +5448,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1556729454}
   m_CullTransparentMesh: 1
+--- !u!114 &1556729458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556729454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.69, y: -1.69}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1572651545
 GameObject:
   m_ObjectHideFlags: 0
