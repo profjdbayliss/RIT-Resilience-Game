@@ -35,12 +35,22 @@ public class PlayerLobbyManager : MonoBehaviour
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }
 
-    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam) // Doesn't do anything (yet)
+    public void ChangePlayerTeam(string playerName, PlayerTeam newTeam)
     {
         var player = players.Find(p => p.Name == playerName);
         if (player != null)
         {
             player.Team = newTeam;
+        }
+        HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
+    }
+
+    public void RemovePlayer(string playerName)
+    {
+        var player = players.Find(p => p.Name == playerName);
+        if (player != null)
+        {
+            players.Remove(player);
         }
         HandlePlayerChanges(players); // Notify PlayerLobbyManager of changes
     }

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Mirror;
+using System;
 
 public class LobbyItem : MonoBehaviour
 {
@@ -69,5 +70,33 @@ public class LobbyItem : MonoBehaviour
         HostControlMenu.SetActive(true);
         PlayerName.enabled = false;
         backgroundImage.color = missingPlayerColor;
+    }
+
+    public void KickPlayer()
+    {
+        if (NetworkServer.active)
+        {
+            string playerName = PlayerName.text;
+            PlayerLobbyManager.Instance.RemovePlayer(playerName);
+            //NetworkServer.DestroyPlayerForConnection()
+        }
+    }
+
+    public void MovePlayerToTeam(string originalTeam) // If moving to red team, set to "blue", and viceversa
+    {
+        if (NetworkServer.active)
+        {
+            string playerName = PlayerName.text;
+
+            // Try to parse the string into a PlayerTeam enum
+            if (Enum.TryParse(originalTeam, true, out PlayerTeam newTeam))
+            {
+                PlayerLobbyManager.Instance.ChangePlayerTeam(playerName, newTeam);
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid team name: {originalTeam}");
+            }
+        }
     }
 }
