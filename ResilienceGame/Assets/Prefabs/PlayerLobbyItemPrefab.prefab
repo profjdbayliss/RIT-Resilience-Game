@@ -147,7 +147,6 @@ GameObject:
   - component: {fileID: 3372030476369733897}
   - component: {fileID: 8241644977245946878}
   - component: {fileID: 2397470928347882843}
-  - component: {fileID: 1630827678714749038}
   m_Layer: 5
   m_Name: KickPlayer
   m_TagString: Untagged
@@ -270,21 +269,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1630827678714749038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1977594393412146812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8136bb25db2255641909ed319e3b3fee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
 --- !u!1 &3605590200813166686
 GameObject:
   m_ObjectHideFlags: 0

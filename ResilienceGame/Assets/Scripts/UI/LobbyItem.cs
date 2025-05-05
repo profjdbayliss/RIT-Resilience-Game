@@ -16,6 +16,7 @@ public class LobbyItem : MonoBehaviour
     public TextMeshProUGUI PlayerName;
     [SerializeField] private GameObject HostControlMenu;
     public Image backgroundImage;
+    private bool isLocalPlayer;
 
     // Start is called before the first frame update
     void Start()
@@ -52,7 +53,8 @@ public class LobbyItem : MonoBehaviour
         PlayerName.enabled = true;
         Debug.Log($"is red? {team == PlayerTeam.Red}");
         Debug.Log($"is blue? {team == PlayerTeam.Blue}");
-        HostControlMenu.SetActive(false);
+        isLocalPlayer = name == RGNetworkPlayerList.instance.localPlayerName;
+        HostControlMenu.SetActive(!isLocalPlayer);
         if (team == PlayerTeam.Red) {
             backgroundImage.color = redColor;
         }
@@ -74,7 +76,7 @@ public class LobbyItem : MonoBehaviour
 
     public void KickPlayer()
     {
-        if (NetworkServer.active)
+        if (!isLocalPlayer) // if player isn't the host, you're allowed to kick them.
         {
             string playerName = PlayerName.text;
             PlayerLobbyManager.Instance.RemovePlayer(playerName);
