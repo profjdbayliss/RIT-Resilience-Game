@@ -34,6 +34,11 @@ public class RGNetworkManager : NetworkManager
         RGNetworkPlayerList.instance.SyncPlayerListToClient(conn);
     }
 
+    // Called by UI element NetworkAddressInput.OnValueChanged
+    public void SetHostname(string hostname)
+    {
+        networkAddress = hostname;
+    }
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
