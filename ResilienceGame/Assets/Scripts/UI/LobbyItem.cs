@@ -32,7 +32,7 @@ public class LobbyItem : MonoBehaviour
 
     public void OnHover()
     {
-        if (NetworkServer.active)
+        if (isLocalPlayer)
         {
             // Unhide the specified component
             HostControlMenu.SetActive(true);
@@ -41,7 +41,7 @@ public class LobbyItem : MonoBehaviour
 
     public void OffHover()
     {
-        if (NetworkServer.active)
+        if (isLocalPlayer)
         {
             // Hide the specified component
             HostControlMenu.SetActive(false);
