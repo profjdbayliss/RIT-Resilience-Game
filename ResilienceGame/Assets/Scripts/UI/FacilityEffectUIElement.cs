@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.PerformanceData;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.LookDev;
 using UnityEngine.UI;
 
 public class FacilityEffectUIElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {

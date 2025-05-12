@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] private RulesPagesController rulesPagesController;
     AudioSource audio; 
     [SerializeField] private AudioClip noSound;
+    [SerializeField] private GameObject tutorialFolder;
 
 // Start is called before the first frame update
 void Start() {
@@ -97,6 +98,7 @@ void Start() {
         }
     }
 
+    //Plays when the icon is clicked
     public void PlayNoSound()
     {
         audio.PlayOneShot(noSound, 1);
@@ -107,8 +109,15 @@ void Start() {
         SceneManager.LoadScene(3);
     }
 
+    //Is used when clicking the square icon.
     public void FullScreen()
     {
         Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, !Screen.fullScreen);
+    }
+
+    //For opening and closing the tutorial folder.
+    public void OpenCloseFolder()
+    {
+        tutorialFolder.SetActive(!tutorialFolder.activeSelf);
     }
 }

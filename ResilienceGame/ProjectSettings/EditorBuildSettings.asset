@@ -32,8 +32,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CardEditor.unity
     guid: 6062f0ef8f9b640448d05013806b1126
-  - enabled: 1
-    path: Assets/Scenes/Blue Player Tutorial.unity
-    guid: c5fb3762c79444c48ba883f177aa9c43
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 8e32c805cf1b84242b648b152a6963bf, type: 2}
