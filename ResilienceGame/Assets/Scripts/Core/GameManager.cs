@@ -832,6 +832,17 @@ public class GameManager : MonoBehaviour, IRGObservable {
         SceneManager.LoadScene(0);
 
     }
+    public void QuitToLogin()
+    {
+        if (IsServer)
+            NetworkManager.singleton.StopHost();
+        else
+        {
+            NetworkManager.singleton.StopClient();
+        }
+        SceneManager.LoadScene(1);
+
+    }
     public void QuitToDesktop() {
         if (IsServer)
             NetworkManager.singleton.StopHost();
