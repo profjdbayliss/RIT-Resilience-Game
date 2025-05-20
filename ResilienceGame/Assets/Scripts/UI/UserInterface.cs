@@ -258,12 +258,12 @@ public class UserInterface : MonoBehaviour
         {
             GamePhase.Start => "Start",
             GamePhase.DrawRed => "Red's Draw",
-            GamePhase.DrawBlue => "Blues' Draw",
+            GamePhase.DrawBlue => "Blue's Draw",
             GamePhase.BonusBlue => "Bonus",
             GamePhase.ActionRed => "Red's Play",
             GamePhase.ActionBlue => "Blue's Play",
-            GamePhase.DiscardRed => "Red Discard",
-            GamePhase.DiscardBlue => "Blue Discard",
+            GamePhase.DiscardRed => "Red's Discard",
+            GamePhase.DiscardBlue => "Blue's Discard",
             GamePhase.PlayWhite => "White's Play",
             GamePhase.End => "",
             _ => ""
