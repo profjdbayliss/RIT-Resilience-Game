@@ -21,7 +21,15 @@ public class PickADeckScript : MonoBehaviour
         folderPath = Application.persistentDataPath + "/";  //Get path of folder
 
         isPickACardCanvasActive = false;
-        connectPickACardCanvas.SetActive(isPickACardCanvasActive);
+        if (connectPickACardCanvas != null)
+        {
+            isPickACardCanvasActive = false;
+        }
+        else
+        {
+            isPickACardCanvasActive = true; // Default to true if connectPickACardCanvas is not assigned
+        }
+        //connectPickACardCanvas.SetActive(isPickACardCanvasActive);
 
         decksOfCards = new List<GameObject>();
 

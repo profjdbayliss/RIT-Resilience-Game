@@ -18,8 +18,25 @@ public class ConnectHelp : MonoBehaviour
     {
         isConnectHelpCanvasActive = false;
         isHostHelpCanvasActive = false;
-        connectHelpCanvas.SetActive(isConnectHelpCanvasActive);
-        connectHostCanvas.SetActive(isHostHelpCanvasActive);
+        if (connectLobbyCanvas != null)
+        {
+            isLobbyHelpCanvasActive = false;
+        }
+        else
+        {
+            isLobbyHelpCanvasActive = true; // Default to true if connectLobbyCanvas is not assigned
+        }
+        //connectHelpCanvas.SetActive(isConnectHelpCanvasActive);
+        
+        if (connectHostCanvas != null)
+        {
+            isHostHelpCanvasActive = false;
+        }
+        else
+        {
+            isHostHelpCanvasActive = true; // Default to true if connectHostCanvas is not assigned
+        }
+        //connectHostCanvas.SetActive(isHostHelpCanvasActive);
     }
 
     public void ToggleConnectHelpCanvas()
