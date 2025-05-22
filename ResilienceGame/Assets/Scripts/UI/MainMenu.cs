@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
 
@@ -17,6 +18,8 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] private AudioClip noSound;
     [SerializeField] private GameObject tutorialFolder;
     [SerializeField] private GameObject annoyingPopUp;
+    [SerializeField] private Sprite[] annoyingPopUpIMG = new Sprite[6];
+    private int timesClicked = 0;
     private string path;
 
     // Start is called before the first frame update
@@ -135,7 +138,16 @@ public class MainMenu : MonoBehaviour {
     //For the popup at every fresh install
     public void PopUpBegining()
     {
-        annoyingPopUp.SetActive(false);
-        File.WriteAllText(path, "I love Porche of the Foxy Pirates");
+        //When the max number of clicks are reached.
+        if (timesClicked >= 5)
+        {
+            annoyingPopUp.SetActive(false);
+            File.WriteAllText(path, "I love Porche of the Foxy Pirates");
+        }
+        else //Changes the sprite and adds to counter
+        {
+            timesClicked++;
+            annoyingPopUp.GetComponent<Image>().sprite = annoyingPopUpIMG[timesClicked];
+        }
     }
 }

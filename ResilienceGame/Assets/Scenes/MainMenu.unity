@@ -2340,6 +2340,13 @@ MonoBehaviour:
   noSound: {fileID: 8300000, guid: 70deb8acc8506514eb3e8da7ed88af4b, type: 3}
   tutorialFolder: {fileID: 1001745529}
   annoyingPopUp: {fileID: 2052793334}
+  annoyingPopUpIMG:
+  - {fileID: -1419743206, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
+  - {fileID: 1473074621, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
+  - {fileID: 407155169, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
+  - {fileID: -1027554183, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
+  - {fileID: -106205938, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
+  - {fileID: 1156080531, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
 --- !u!82 &614207480
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8240,7 +8247,7 @@ RectTransform:
   m_GameObject: {fileID: 2052793334}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 11.580001, y: 11.580001, z: 11.580001}
+  m_LocalScale: {x: 11.449914, y: 11.170648, z: 11.170648}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1597361976}
@@ -8248,8 +8255,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 170, y: 100}
+  m_AnchoredPosition: {x: 0.00091597, y: -0.000057284}
+  m_SizeDelta: {x: 167.76, y: 96.682}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2052793336
 MonoBehaviour:
@@ -8327,7 +8334,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 177f0e94162cb3c47ad5e90284caa2e0, type: 3}
+  m_Sprite: {fileID: -1419743206, guid: c00a4995e57ad964782174ea5a3d247b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
