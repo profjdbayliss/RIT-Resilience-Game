@@ -10172,7 +10172,7 @@ MonoBehaviour:
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
   sendRate: 60
-  offlineScene: Assets/Scenes/Network Login Scene.unity
+  offlineScene: Assets/Scenes/MainMenu.unity
   onlineScene: Assets/Scenes/Network Main Game.unity
   transport: {fileID: 2107780626}
   networkAddress: localhost
