@@ -15,6 +15,13 @@ public class TutorialToggle : MonoBehaviour
     [SerializeField] private GameObject coreSectorPanel;
     [SerializeField] private GameObject blueWeeksPanel;
     [SerializeField] private GameObject redWeeksPanel;
+    [SerializeField] private GameObject sectorOwnerPanel;
+    [SerializeField] private GameObject numCardsInDeckPanel;
+    [SerializeField] private GameObject overtimePanel;
+    [SerializeField] private GameObject currentlySelectedSectorPanel;
+    [SerializeField] private GameObject phaseTrackerPanel;
+    [SerializeField] private GameObject cardWorkerCostPanel;
+    [SerializeField] private GameObject cardHistoryPanel;
     #endregion
     private bool isTutorialActive;
     private PlayerTeam playerTeam;
