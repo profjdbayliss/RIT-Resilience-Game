@@ -1,6 +1,7 @@
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class RGNetworkManager : NetworkManager
 {
@@ -42,15 +43,31 @@ public class RGNetworkManager : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
-        if (conn.authenticationData != null)
+        int playerId = conn.connectionId;
+
+        // Remove player data
+        if (RGNetworkPlayerList.instance != null)
         {
-            string username = (string)conn.authenticationData;
-            RGNetworkAuthenticator.RemovePlayer(username);
+            RGNetworkPlayerList.instance.RemovePlayer(playerId);
         }
 
-        RGNetworkPlayerList.instance.RemovePlayer(conn.connectionId);
+        // Remove from GameManager observers (if present)
+        if (GameManager.Instance != null)
+        {
+            var observers = GameManager.Instance.GetObservers();
+            foreach (var observer in observers.ToList()) // ToList avoids modifying the collection during iteration
+            {
+                if (observer is RGNetworkPlayerList && RGNetworkPlayerList.instance.localPlayerID == playerId)
+                {
+                    GameManager.Instance.RemoveObserver(observer);
+                    Debug.Log($"Observer for player {playerId} removed.");
+                }
+            }
+        }
+
         base.OnServerDisconnect(conn);
     }
+
 
     public override void OnClientDisconnect()
     {
