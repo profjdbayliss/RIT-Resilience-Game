@@ -7,18 +7,23 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
 
     [SerializeField] private GameObject rulesMenu;
     [SerializeField] private string rulesPath;
     [SerializeField] private RulesPagesController rulesPagesController;
-    AudioSource audio; 
+    AudioSource audio;
     [SerializeField] private AudioClip noSound;
     [SerializeField] private GameObject tutorialFolder;
+    [SerializeField] private GameObject annoyingPopUp;
+    [SerializeField] private Sprite[] annoyingPopUpIMG = new Sprite[6];
+    private int timesClicked = 0;
+    private string path;
 
-// Start is called before the first frame update
-void Start() {
+    // Start is called before the first frame update
+    void Start() {
         var networkManager = FindObjectOfType<RGNetworkManager>();
         if (networkManager != null) {
             Destroy(networkManager.gameObject);
@@ -32,10 +37,19 @@ void Start() {
         }
 
         audio = GetComponent<AudioSource>();
+
+        //Path
+        path = Application.persistentDataPath + "/AnnoyingPopUp.txt";
+
+        //Finds txt file, doesn't actually read the file.
+        if (!File.Exists(path))
+        {
+            annoyingPopUp.SetActive(true);
+        }
     }
     public void ToggleRulesMenu(bool enable) {
         rulesMenu.SetActive(enable);
-        
+
     }
 
     // Update is called once per frame
@@ -119,5 +133,21 @@ void Start() {
     public void OpenCloseFolder()
     {
         tutorialFolder.SetActive(!tutorialFolder.activeSelf);
+    }
+
+    //For the popup at every fresh install
+    public void PopUpBegining()
+    {
+        //When the max number of clicks are reached.
+        if (timesClicked >= 5)
+        {
+            annoyingPopUp.SetActive(false);
+            File.WriteAllText(path, "I love Porche of the Foxy Pirates");
+        }
+        else //Changes the sprite and adds to counter
+        {
+            timesClicked++;
+            annoyingPopUp.GetComponent<Image>().sprite = annoyingPopUpIMG[timesClicked];
+        }
     }
 }
