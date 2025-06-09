@@ -37,7 +37,20 @@ public class TutorialToggle : MonoBehaviour
         {
             tutorialCanvas.gameObject.SetActive(false);
         }
-        else tutorialCanvas.gameObject.SetActive(isTutorialActive);
+        else
+        {
+            tutorialCanvas.gameObject.SetActive(isTutorialActive);
+        }
+
+        // Show overtimePanel only during the draw phase
+        if (manager.MGamePhase == GamePhase.DrawRed || manager.MGamePhase == GamePhase.DrawBlue)
+        {
+            overtimePanel.SetActive(true);
+        }
+        else
+        {
+            overtimePanel.SetActive(false);
+        }
     }
 
     public void WhenGameStarts()
