@@ -15,6 +15,13 @@ public class TutorialToggle : MonoBehaviour
     [SerializeField] private GameObject coreSectorPanel;
     [SerializeField] private GameObject blueWeeksPanel;
     [SerializeField] private GameObject redWeeksPanel;
+    [SerializeField] private GameObject sectorOwnerPanel;
+    [SerializeField] private GameObject numCardsInDeckPanel;
+    [SerializeField] private GameObject overtimePanel;
+    [SerializeField] private GameObject currentlySelectedSectorPanel;
+    [SerializeField] private GameObject phaseTrackerPanel;
+    [SerializeField] private GameObject cardWorkerCostPanel;
+    [SerializeField] private GameObject cardHistoryPanel;
     #endregion
     private bool isTutorialActive;
     private PlayerTeam playerTeam;
@@ -30,7 +37,20 @@ public class TutorialToggle : MonoBehaviour
         {
             tutorialCanvas.gameObject.SetActive(false);
         }
-        else tutorialCanvas.gameObject.SetActive(isTutorialActive);
+        else
+        {
+            tutorialCanvas.gameObject.SetActive(isTutorialActive);
+        }
+
+        // Show overtimePanel only during the draw phase
+        if (manager.MGamePhase == GamePhase.DrawRed || manager.MGamePhase == GamePhase.DrawBlue)
+        {
+            overtimePanel.SetActive(true);
+        }
+        else
+        {
+            overtimePanel.SetActive(false);
+        }
     }
 
     public void WhenGameStarts()

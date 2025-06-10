@@ -227,10 +227,12 @@ public class GameManager : MonoBehaviour, IRGObservable {
             RGNetworkPlayerList.instance.AddWhitePlayer();
             RealGameStart();
             // get the turn taking flags ready to go again
-            for (int i = 0; i < RGNetworkPlayerList.instance.playerTurnTakenFlags.Count; i++)
+            var keys = RGNetworkPlayerList.instance.playerTurnTakenFlags.Keys.ToList();
+            foreach (var key in keys)
             {
-                RGNetworkPlayerList.instance.playerTurnTakenFlags[i] = false;
+                RGNetworkPlayerList.instance.playerTurnTakenFlags[key] = false;
             }
+
         }
         else
         {
@@ -1422,18 +1424,44 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
 
+    // Returns the list of observers.
+    public List<IRGObserver> GetObservers()
+    {
+        return mObservers;
+    }
+
     // Notifies all observers that there is a message.
-    public void NotifyObservers() {
-        if (!mMessageQueue.IsEmpty()) {
-            while (!mMessageQueue.IsEmpty()) {
+    public void NotifyObservers()
+    {
+        if (!mMessageQueue.IsEmpty())
+        {
+            while (!mMessageQueue.IsEmpty())
+            {
                 Message m = mMessageQueue.Dequeue();
-                foreach (IRGObserver o in mObservers) {
-                    o.UpdateObserver(m);
-                    //messageLog.Add(m.ToString()); not correct spot?
+
+                // Skip if sender ID no longer valid
+                if (!RGNetworkPlayerList.instance.playerIDs.ContainsKey((int)m.senderID))
+                {
+                    Debug.LogWarning($"Skipping message from disconnected player ID: {m.senderID}");
+                    continue;
+                }
+
+                foreach (IRGObserver o in mObservers.ToList()) // Safe against modification
+                {
+                    try
+                    {
+                        o.UpdateObserver(m);
+                    }
+                    catch (KeyNotFoundException e)
+                    {
+                        //Debug.LogError($"Observer error (likely player disconnected): {e.Message}. Removing observer.");
+                        mObservers.Remove(o); // auto-remove bad observer
+                    }
                 }
             }
         }
     }
+
     public void SendUpdateFromSector(GamePhase phase, Update update) {
         if (update.Type == CardMessageType.SectorDieRoll) {
             var msg = new Message(CardMessageType.SectorDieRoll,
