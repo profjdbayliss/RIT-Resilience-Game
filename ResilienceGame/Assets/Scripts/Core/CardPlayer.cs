@@ -2258,6 +2258,8 @@ public class CardPlayer : MonoBehaviour {
         for (int i = 0; i < 3; i++) {
             SetTempMeeples(i, 0);
         }
+
+        UserInterface.Instance.EndExhaustion();
     }
     public void AddOvertimeCharge() {
         overTimeCharges++;
