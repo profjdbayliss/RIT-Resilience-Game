@@ -538,6 +538,7 @@ public class UserInterface : MonoBehaviour
     public void EndExhaustion()
     {
         overTimeTurnsLabelText.text = "";
+        overTimeTurnsLeftText.text = "";
     }
     public void ToggleMeepleSharingMenu(bool enable)
     {
