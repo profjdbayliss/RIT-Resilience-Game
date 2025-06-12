@@ -42,15 +42,9 @@ public class TutorialToggle : MonoBehaviour
             tutorialCanvas.gameObject.SetActive(isTutorialActive);
         }
 
-        // Show overtimePanel only during the draw phase
-        if (manager.MGamePhase == GamePhase.DrawRed || manager.MGamePhase == GamePhase.DrawBlue)
-        {
-            overtimePanel.SetActive(true);
-        }
-        else
-        {
-            overtimePanel.SetActive(false);
-        }
+        // Show overtimePanel only for blue player during their draw phase
+        bool showOvertimePanel = manager.playerTeam == PlayerTeam.Blue && manager.MGamePhase == GamePhase.DrawBlue;
+        overtimePanel.SetActive(showOvertimePanel);
     }
 
     public void WhenGameStarts()

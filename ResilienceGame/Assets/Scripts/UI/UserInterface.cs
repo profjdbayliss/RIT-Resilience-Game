@@ -535,6 +535,11 @@ public class UserInterface : MonoBehaviour
         overTimeTurnsLabelText.text = "Exhausted";
         overTimeTurnsLeftText.text = $"{GameManager.EXHAUSTED_DURATION}";
     }
+    public void EndExhaustion()
+    {
+        overTimeTurnsLabelText.text = "";
+        overTimeTurnsLeftText.text = "";
+    }
     public void ToggleMeepleSharingMenu(bool enable)
     {
 

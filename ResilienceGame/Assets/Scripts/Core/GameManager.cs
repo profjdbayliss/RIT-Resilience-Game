@@ -875,6 +875,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
 
 
     public void EnableOvertime() {
+        Debug.Log("EnableOvertime called");
         actualPlayer.StartOvertime();
     }
     public void CheckDownedFacilities() {
