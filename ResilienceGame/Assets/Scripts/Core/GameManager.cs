@@ -255,9 +255,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
             SetPlayerType();
             SetupActors();
 
-            // Assign sectors to blue players
-            AssignSectorsToBluePlayers();
-
             // init various objects to be used in the game
             roundsLeft = BASE_MAX_TURNS;
             turnTotal = 0;
@@ -583,38 +580,6 @@ public class GameManager : MonoBehaviour, IRGObservable {
         actualPlayer.DeckName = "blue";
         SetupActors();
         StartGame();
-    }
-
-    public void AssignSectorsToBluePlayers()
-    {
-        // 1. Get all blue players
-        var bluePlayers = playerDictionary.Values.Where(p => p.playerTeam == PlayerTeam.Blue).ToList();
-
-        // 2. Get all assignable sectors (not already owned)
-        var unassignedSectors = AllSectors.Values
-            .Where(sector => sector.Owner == null && !sector.isCore) // or include core sectors as needed
-            .ToList();
-
-        // 3. Shuffle the sectors
-        System.Random rng = new System.Random();
-        unassignedSectors = unassignedSectors.OrderBy(_ => rng.Next()).ToList();
-
-        // 4. Assign one sector to each blue player
-        for (int i = 0; i < bluePlayers.Count; i++)
-        {
-            if (i < unassignedSectors.Count)
-            {
-                var player = bluePlayers[i];
-                var sector = unassignedSectors[i];
-                sector.SetOwner(player);
-                player.AssignSector(sector);
-            }
-            else
-            {
-                Debug.LogWarning("Not enough sectors to assign to all blue players!");
-                break;
-            }
-        }
     }
 
     #endregion
