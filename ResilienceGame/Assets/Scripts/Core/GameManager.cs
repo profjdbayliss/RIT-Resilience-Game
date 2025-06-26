@@ -1463,6 +1463,28 @@ public class GameManager : MonoBehaviour, IRGObservable {
         }
     }
 
+    public void HandlePlayerDisconnect(int playerId)
+    {
+        if (playerDictionary.TryGetValue(playerId, out var player))
+        {
+            // Cleanup player resources
+            // (call a cleanup method if needed)
+
+            // Remove from lists
+            playerDictionary.Remove(playerId);
+            networkPlayers.Remove(player);
+
+            // If it was their turn, force phase progression
+            if (activePlayerNumber == playerId)
+            {
+                // Option 1: End their phase and move to next
+                EndPhase();
+                // Option 2: Or directly start next phase
+                // StartNextPhase();
+            }
+        }
+    }
+
     public void SendUpdateFromSector(GamePhase phase, Update update) {
         if (update.Type == CardMessageType.SectorDieRoll) {
             var msg = new Message(CardMessageType.SectorDieRoll,

@@ -45,6 +45,7 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     {
         // register a handler for the authentication request we expect from client
         NetworkServer.RegisterHandler<AuthRequestMessage>(OnAuthRequestMessage, false);
+        // Only register JoinPermissionMessage here if it's an auth message
     }
 
     /// <summary>
@@ -138,6 +139,9 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
 
         // Accept the successful authentication
         ServerAccept(conn);
+
+        // Notify the network manager about the authenticated connection
+        ((RGNetworkManager)NetworkManager.singleton).OnConnectionAuthenticated(conn);
     }
 
     IEnumerator DelayedDisconnect(NetworkConnectionToClient conn, float waitTime)
@@ -175,8 +179,9 @@ public class RGNetworkAuthenticator : NetworkAuthenticator
     /// </summary>
     public override void OnStartClient()
     {
-        // register a handler for the authentication response we expect from server
+        // Register authentication response handler
         NetworkClient.RegisterHandler<AuthResponseMessage>(OnAuthResponseMessage, false);
+        // Only register JoinPermissionMessage here if it's an auth message
     }
 
     /// <summary>

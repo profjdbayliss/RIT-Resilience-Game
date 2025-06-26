@@ -345,7 +345,7 @@ namespace Mirror
                                 // -> return to avoid the below unbatches.count error.
                                 //    we already disconnected and handled it.
                                 Debug.LogWarning($"NetworkClient: failed to unpack and invoke message. Disconnecting.");
-                                connection.Disconnect();
+                                //connection.Disconnect();
                                 return;
                             }
                         }

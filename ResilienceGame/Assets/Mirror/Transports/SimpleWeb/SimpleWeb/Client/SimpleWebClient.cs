@@ -95,6 +95,11 @@ namespace Mirror.SimpleWeb
                 Debug.LogWarning($"SimpleWebClient ProcessMessageQueue has {receiveQueue.Count} remaining.");
         }
 
+        public void ClearReceiveQueue()
+        {
+            while (receiveQueue.TryDequeue(out _)) { }
+        }
+
         public abstract void Connect(Uri serverAddress);
         public abstract void Disconnect();
         public abstract void Send(ArraySegment<byte> segment);
