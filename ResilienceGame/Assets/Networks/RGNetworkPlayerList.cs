@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -334,32 +333,31 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     }
     public void RemovePlayer(int id)
     {
-        if (isServer)
+        playerIDs.Remove(id);
+        playerTurnTakenFlags.Remove(id);
+        playerNames.Remove(id);
+        playerTypes.Remove(id);
+        playerNetworkReadyFlags.Remove(id);
+        playerConnections.Remove(id);
+
+        // Instead of removing the turn flag, just mark it true to automatically pass turn
+        if (playerTurnTakenFlags.ContainsKey(id))
         {
-            playerIDs.Remove(id);
-            playerNames.Remove(id);
-            playerTypes.Remove(id);
-            playerNetworkReadyFlags.Remove(id);
-            playerConnections.Remove(id);
-
-            // Instead of removing the turn flag, just mark it true to automatically pass turn
-            if (playerTurnTakenFlags.ContainsKey(id))
-            {
-                playerTurnTakenFlags[id] = true;
-                Debug.Log($"[RemovePlayer] Marking player {id} as having taken their turn.");
-            }
-
-            Message data = RemoveNewPlayerMessage(id);
-            RGNetworkLongMessage msg = new RGNetworkLongMessage
-            {
-                playerID = data.senderID,
-                type = (uint)data.Type,
-                count = 1,
-                payload = data.byteArguments.ToArray()
-            };
-            NetworkServer.SendToAll(msg);
-            NotifyPlayerChanges();
+            playerTurnTakenFlags[id] = true;
+            Debug.Log($"[RemovePlayer] Marking player {id} as having taken their turn.");
         }
+
+        Message data = RemoveNewPlayerMessage(id);
+        RGNetworkLongMessage msg = new RGNetworkLongMessage
+        {
+            playerID = data.senderID,
+            type = (uint)data.Type,
+            count = 1,
+            payload = data.byteArguments.ToArray()
+        };
+        NetworkServer.SendToAll(msg);
+        NotifyPlayerChanges();
+        GameManager.Instance.CheckIfCanEndPhase(); // or whatever triggers phase progression
     }
 
     public void ResetAllPlayerTurnFlags()
@@ -529,20 +527,14 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             Debug.LogWarning($"Player ID {playerIndex} not found in playerTurnTakenFlags during EndPhase.");
                             return;
                         }
-                        // find next player to ok to play and send them a message
-                        int nextPlayerId = -1;
-                        foreach (int playerId in playerTurnTakenFlags.Keys)
-                        {
-                            if (!playerTurnTakenFlags[playerId])
-                            {
-                                nextPlayerId = playerId;
-                                Debug.Log("first player not done is " + playerId);
-                                break;
-                            }
-                        }
+                        // Only consider currently connected players
+                        var connectedPlayerIds = RGNetworkPlayerList.instance.playerIDs.Keys;
+                        bool allPlayersDone = connectedPlayerIds.All(id =>
+                            playerTurnTakenFlags.TryGetValue(id, out bool taken) && taken);
 
-                        if (nextPlayerId == -1)
+                        if (allPlayersDone)
                         {
+                            // Advance phase
                             Debug.Log("update observer everybody has ended phase!");
                             GamePhase nextPhase = manager.GetNextPhase();
 
@@ -1187,19 +1179,12 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 Debug.Log("Turn flags snapshot: " + string.Join(", ",
     playerTurnTakenFlags.Select(kvp => $"P{kvp.Key}:{kvp.Value}")));
 
-                //var connectedPlayerIDs = RGNetworkPlayerList.instance.GetConnectedPlayerIDs();
+                // Only consider currently connected players
+                var connectedPlayerIds = RGNetworkPlayerList.instance.playerIDs.Keys;
+                bool allPlayersDone = connectedPlayerIds.All(id =>
+                    playerTurnTakenFlags.TryGetValue(id, out bool taken) && taken);
 
-                int nextPlayerIndex = -1;
-                for (int i = 0; i < playerTurnTakenFlags.Count; i++)
-                {
-                    if (!playerTurnTakenFlags[i])
-                    {
-                        nextPlayerIndex = i;
-                        Debug.Log("first player not done is " + i);
-                        break;
-                    }
-                }
-                if (nextPlayerIndex == -1)
+                if (allPlayersDone)
                 {
                     GamePhase nextPhase = manager.GetNextPhase();
 
@@ -1220,7 +1205,6 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                         manager.IncrementTurn();
                         Debug.Log("Turn is done - incrementing and starting again.");
                     }
-
                 }
                 break;
             case CardMessageType.IncrementTurn:
@@ -1566,4 +1550,9 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         PlayerLobbyManager.Instance.UpdatePlayerLobbyUI();
     }
 
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        GameManager.Instance.HandlePlayerDisconnect(localPlayerID);
+    }
 }

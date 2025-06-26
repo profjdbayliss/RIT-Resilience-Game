@@ -8098,6 +8098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playernameInput: {fileID: 1758025889}
+  ipInputField: {fileID: 1717725270}
   hostButton: {fileID: 2083671348}
   clientButton: {fileID: 67829724}
 --- !u!1 &1808144403
