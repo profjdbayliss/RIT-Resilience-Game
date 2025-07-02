@@ -285,7 +285,15 @@ public class CardEditor : MonoBehaviour {
         string s = "";
         if (Application.isEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.OSXPlayer) {
             // Show the file browser dialog
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("Open CSV File", "", "csv", false);
+
+            //Just incase the directory doesn't exist
+            if (!Directory.Exists((Application.streamingAssetsPath) + "/SavedCSVs/"))
+            {
+                Directory.CreateDirectory((Application.streamingAssetsPath) + "/SavedCSVs/");
+            }
+
+            //Opens the Saved CSV file for ease of access + it's where the game's CSV file is
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Open CSV File", ((Application.streamingAssetsPath) + "/SavedCSVs/"), "csv", false);
 
             if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0])) {
                 string filePath = paths[0];
