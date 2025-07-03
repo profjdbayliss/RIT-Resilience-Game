@@ -257,41 +257,44 @@ namespace Mirror
         }
 
         // helper function
-        static bool UnpackAndInvoke(NetworkReader reader, int channelId)
+        static bool UnpackAndInvoke(NetworkReader reader, int channelId, ArraySegment<byte> message)
         {
+            long startPosition = reader.Position;
             if (NetworkMessages.UnpackId(reader, out ushort msgType))
             {
-                // try to invoke the handler for that message
                 if (handlers.TryGetValue(msgType, out NetworkMessageDelegate handler))
                 {
                     handler.Invoke(connection, reader, channelId);
-
-                    // message handler may disconnect client, making connection = null
-                    // therefore must check for null to avoid NRE.
                     if (connection != null)
                         connection.lastMessageTime = Time.time;
-
                     return true;
                 }
                 else
                 {
-                    // message in a batch are NOT length prefixed to save bandwidth.
-                    // every message needs to be handled and read until the end.
-                    // otherwise it would overlap into the next message.
-                    // => need to warn and disconnect to avoid undefined behaviour.
-                    // => WARNING, not error. can happen if attacker sends random data.
-                    Debug.LogWarning($"Unknown message id: {msgType}. This can happen if no handler was registered for this message.");
-                    // simply return false. caller is responsible for disconnecting.
-                    //connection.Disconnect();
+                    string knownTypes = string.Join(", ", NetworkMessages.Lookup.Select(kv => $"{kv.Key}=0x{kv.Key:X4}:{kv.Value.Name}"));
+                    // Show up to 16 bytes of the message for context
+                    int previewLen = Math.Min(16, message.Count);
+                    string hex = BitConverter.ToString(message.Array, message.Offset, previewLen);
+                    Debug.LogWarning(
+                        $"Unknown message id: {msgType} (0x{msgType:X4}). " +
+                        $"No handler was registered for this message. " +
+                        $"Known message types: {knownTypes}. " +
+                        $"Reader position: {startPosition}, Remaining: {reader.Remaining}. " +
+                        $"First {previewLen} bytes: {hex}"
+                    );
                     return false;
                 }
             }
             else
             {
-                // => WARNING, not error. can happen if attacker sends random data.
-                Debug.LogWarning("Invalid message header.");
-                // simply return false. caller is responsible for disconnecting.
-                //connection.Disconnect();
+                // Show up to 16 bytes of the message for context
+                int previewLen = Math.Min(16, message.Count);
+                string hex = BitConverter.ToString(message.Array, message.Offset, previewLen);
+                Debug.LogWarning(
+                    $"Invalid message header. " +
+                    $"First {previewLen} bytes: {hex}. " +
+                    $"Reader position: {startPosition}, Remaining: {reader.Remaining}."
+                );
                 return false;
             }
         }
@@ -334,7 +337,7 @@ namespace Mirror
                             connection.remoteTimeStamp = remoteTimestamp;
 
                             // handle message
-                            if (!UnpackAndInvoke(reader, channelId))
+                            if (!UnpackAndInvoke(reader, channelId, message))
                             {
                                 // warn, disconnect and return if failed
                                 // -> warning because attackers might send random data
@@ -345,7 +348,7 @@ namespace Mirror
                                 // -> return to avoid the below unbatches.count error.
                                 //    we already disconnected and handled it.
                                 Debug.LogWarning($"NetworkClient: failed to unpack and invoke message. Disconnecting.");
-                                //connection.Disconnect();
+                                connection.Disconnect();
                                 return;
                             }
                         }

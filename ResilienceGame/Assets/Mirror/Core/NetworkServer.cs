@@ -625,7 +625,7 @@ namespace Mirror
                     // => WARNING, not error. can happen if attacker sends random data.
                     Debug.LogWarning($"Unknown message id: {msgType} for connection: {connection}. This can happen if no handler was registered for this message.");
                     // simply return false. caller is responsible for disconnecting.
-                    //connection.Disconnect();
+                    connection.Disconnect();
                     return false;
                 }
             }
@@ -634,7 +634,7 @@ namespace Mirror
                 // => WARNING, not error. can happen if attacker sends random data.
                 Debug.LogWarning($"Invalid message header for connection: {connection}.");
                 // simply return false. caller is responsible for disconnecting.
-                //connection.Disconnect();
+                connection.Disconnect();
                 return false;
             }
         }

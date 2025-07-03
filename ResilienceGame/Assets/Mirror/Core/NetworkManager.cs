@@ -221,6 +221,15 @@ namespace Mirror
         // virtual so that inheriting classes' Start() can call base.Start() too
         public virtual void Start()
         {
+
+            // Log all registered message types and IDs
+            Mirror.NetworkMessages.LogTypes();
+
+            // Now start the server or connect the client
+            // NetworkManager.singleton.StartHost();
+            // or
+            // NetworkManager.singleton.StartClient();
+
             // headless mode? then start the server
             // can't do this in Awake because Awake is for initialization.
             // some transports might not be ready until Start.

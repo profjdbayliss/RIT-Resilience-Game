@@ -45,7 +45,12 @@ namespace Mirror
         public virtual void OnStopClient() {}
 
         /// <summary>Called on client from OnClientConnectInternal when a client needs to authenticate</summary>
-        public virtual void OnClientAuthenticate() {}
+        public virtual void OnClientAuthenticate() 
+        {
+            // Now safe to start join flow
+            NetworkClient.Ready();
+            // Start WaitAndAddPlayer coroutine here if needed
+        }
 
         protected void ClientAccept()
         {

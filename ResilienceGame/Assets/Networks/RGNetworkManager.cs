@@ -25,34 +25,38 @@ public class RGNetworkManager : NetworkManager
     {
         base.OnStartServer();
 
+        // Register all custom messages first, in the same order as client
+        NetworkServer.RegisterHandler<AddPlayerMessage>(OnAddPlayerRequest, false);
+        // ... any other custom messages
+
+        if (authenticator != null)
+            authenticator.OnServerAuthenticated.AddListener(OnConnectionAuthenticated);
+
         GameObject obj = Instantiate(playerListPrefab);
         playerListPrefab.transform.localScale = Vector3.one;
         NetworkServer.Spawn(obj);
-
-        NetworkServer.RegisterHandler<AddPlayerMessage>(OnAddPlayerRequest, false);
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        // Register all custom messages first, in the same order as server
         NetworkClient.RegisterHandler<JoinPermissionMessage>(OnJoinPermissionMessage, false);
+        // Only register AddPlayerMessage if you need to handle it on the client
+        // NetworkClient.RegisterHandler<AddPlayerMessage>(OnAddPlayerMessage, false);
+
+        Mirror.NetworkMessages.LogTypes();
     }
 
     public void OnJoinPermissionMessage(JoinPermissionMessage msg)
     {
-        if (msg.canJoin)
+        if (msg.canJoin && !NetworkClient.ready)
         {
-            if (!NetworkClient.ready)
-            {
-                NetworkClient.Ready();
-                if (waitAndAddPlayerCoroutine != null)
-                    StopCoroutine(waitAndAddPlayerCoroutine);
-                waitAndAddPlayerCoroutine = StartCoroutine(WaitAndAddPlayer());
-            }
-            else if (NetworkClient.localPlayer == null)
-            {
-                NetworkClient.AddPlayer();
-            }
+            NetworkClient.Ready();
+            if (waitAndAddPlayerCoroutine != null)
+                StopCoroutine(waitAndAddPlayerCoroutine);
+            waitAndAddPlayerCoroutine = StartCoroutine(WaitAndAddPlayer());
         }
     }
 
@@ -100,6 +104,9 @@ public class RGNetworkManager : NetworkManager
         // Sync existing players and game state to the new client
         RGNetworkPlayerList.instance.SyncPlayerListToClient(conn);
 
+        // Mark this player as fully ready and allow the next in the join queue to proceed
+        OnPlayerFullyReady(conn);
+
         // After player is added, dequeue and process next
         addPlayerQueue.Dequeue();
         isAddingPlayer = false;
@@ -121,8 +128,17 @@ public class RGNetworkManager : NetworkManager
         isProcessingJoin = true;
         var conn = joinQueue.Peek();
 
-        // Tell the client it's their turn to join
+        // Only send JoinPermissionMessage to the first in queue
         conn.Send(new JoinPermissionMessage { canJoin = true });
+    }
+
+    private void OnPlayerFullyReady(NetworkConnectionToClient conn)
+    {
+        // Remove from queue and process next
+        if (joinQueue.Count > 0 && joinQueue.Peek() == conn)
+            joinQueue.Dequeue();
+        isProcessingJoin = false;
+        TryProcessNextJoin();
     }
 
     private void OnAddPlayerRequest(NetworkConnectionToClient conn, AddPlayerMessage msg)
@@ -133,6 +149,12 @@ public class RGNetworkManager : NetworkManager
             base.OnServerAddPlayer(conn);
             // ...
         }
+    }
+
+    // If you need a client handler for AddPlayerMessage:
+    private void OnAddPlayerMessage(AddPlayerMessage msg)
+    {
+        Debug.Log("Received AddPlayerMessage on client.");
     }
 
     // Called by the authenticator when authentication is complete
