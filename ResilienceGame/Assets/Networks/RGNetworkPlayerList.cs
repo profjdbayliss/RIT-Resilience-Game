@@ -1621,7 +1621,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     public override void OnStartClient()
     {
         base.OnStartClient();
-        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnRGNetworkLongMessage, false);
+        //NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnRGNetworkLongMessage, false);
     }
 
     void OnRGNetworkLongMessage(RGNetworkLongMessage msg)
