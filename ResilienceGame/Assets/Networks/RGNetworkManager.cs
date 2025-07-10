@@ -23,6 +23,7 @@ public class RGNetworkManager : NetworkManager
 
     public override void OnStartServer()
     {
+        RGNetworkPlayerList.SetupHandlers(); // Register handlers globally and early
         base.OnStartServer();
 
         // Register all custom messages first, in the same order as client
@@ -39,6 +40,7 @@ public class RGNetworkManager : NetworkManager
 
     public override void OnStartClient()
     {
+        RGNetworkPlayerList.SetupHandlers(); // Register handlers globally and early
         base.OnStartClient();
 
         // Register all custom messages first, in the same order as server

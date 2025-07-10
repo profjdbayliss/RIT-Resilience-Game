@@ -33,6 +33,7 @@ public struct RGNetworkLongMessage : NetworkMessage
 public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 {
     public static RGNetworkPlayerList instance;
+    public static bool sHandlersInitialized = false;
 
     int nextCardUID = 0;
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
@@ -58,8 +59,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         instance = this;
         DontDestroyOnLoad(this);
-        SetupHandlers();
 
+        SetupHandlers();
     }
 
     public void Start()
@@ -67,8 +68,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         manager = GameManager.Instance;
 
         Debug.Log("start run on RGNetworkPlayerList.cs");
-
     }
+
     public bool CheckReadyToStart()
     {
         bool readyToStart = true;
@@ -85,6 +86,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         }
         return readyToStart;
     }
+
     public void AddWhitePlayer()
     {
         // Generate a unique ID that doesn't conflict with existing connection IDs
@@ -151,6 +153,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
             Debug.Log("AI player automatically marked as ready by server.");
         }
     }
+
     public void SetWhitePlayerEndPhase()
     {
         int aiPlayerIndex = playerIDs.Count - 1;
@@ -270,12 +273,32 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         return (msg);
     }
 
-    public void SetupHandlers()
+    public static void SetupHandlers()
     {
-        NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessage);
-        NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessage);
-        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessage);
-        NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessage);
+        if (sHandlersInitialized) return;
+        sHandlersInitialized = true;
+        NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessageStatic);
+        NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessageStatic);
+        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessageStatic);
+        NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessageStatic);
+    }
+
+    // Static wrappers that call instance methods if needed
+    private static void OnClientReceiveShortMessageStatic(RGNetworkShortMessage msg)
+    {
+        instance?.OnClientReceiveShortMessage(msg);
+    }
+    private static void OnServerReceiveShortMessageStatic(NetworkConnectionToClient conn, RGNetworkShortMessage msg)
+    {
+        instance?.OnServerReceiveShortMessage(conn, msg);
+    }
+    private static void OnClientReceiveLongMessageStatic(RGNetworkLongMessage msg)
+    {
+        instance?.OnClientReceiveLongMessage(msg);
+    }
+    private static void OnServerReceiveLongMessageStatic(NetworkConnectionToClient conn, RGNetworkLongMessage msg)
+    {
+        instance?.OnServerReceiveLongMessage(conn, msg);
     }
     #endregion
 
