@@ -33,6 +33,7 @@ public struct RGNetworkLongMessage : NetworkMessage
 public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
 {
     public static RGNetworkPlayerList instance;
+    public static bool sHandlersInitialized = false;
 
     int nextCardUID = 0;
     Dictionary<int, int> drawnCardUIDs = new Dictionary<int, int>();
@@ -58,8 +59,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         instance = this;
         DontDestroyOnLoad(this);
-        SetupHandlers();
 
+        SetupHandlers();
     }
 
     public void Start()
@@ -67,8 +68,8 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         manager = GameManager.Instance;
 
         Debug.Log("start run on RGNetworkPlayerList.cs");
-
     }
+
     public bool CheckReadyToStart()
     {
         bool readyToStart = true;
@@ -85,6 +86,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         }
         return readyToStart;
     }
+
     public void AddWhitePlayer()
     {
         // Generate a unique ID that doesn't conflict with existing connection IDs
@@ -133,7 +135,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 count = 1,
                 payload = data.byteArguments.ToArray()
             };
-            NetworkServer.SendToAll(msg);
+            if (NetworkServer.active)
+            {
+                NetworkServer.SendToAll(msg);
+            }
             NotifyPlayerChanges();
         }
     }
@@ -148,6 +153,7 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
             Debug.Log("AI player automatically marked as ready by server.");
         }
     }
+
     public void SetWhitePlayerEndPhase()
     {
         int aiPlayerIndex = playerIDs.Count - 1;
@@ -184,7 +190,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 count = 1,
                 payload = data.byteArguments.ToArray()
             };
-            NetworkServer.SendToAll(msg);
+            if (NetworkServer.active)
+            {
+                NetworkServer.SendToAll(msg);
+            }
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
         }
     }
@@ -202,7 +211,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                 count = 1,
                 payload = data.byteArguments.ToArray()
             };
-            NetworkServer.SendToAll(msg);
+            if (NetworkServer.active)
+            {
+                NetworkServer.SendToAll(msg);
+            }
             NotifyPlayerChanges(); // Notify PlayerLobbyManager of changes
         }
     }
@@ -261,12 +273,32 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         return (msg);
     }
 
-    public void SetupHandlers()
+    public static void SetupHandlers()
     {
-        NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessage);
-        NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessage);
-        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessage);
-        NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessage);
+        if (sHandlersInitialized) return;
+        sHandlersInitialized = true;
+        NetworkClient.RegisterHandler<RGNetworkShortMessage>(OnClientReceiveShortMessageStatic);
+        NetworkServer.RegisterHandler<RGNetworkShortMessage>(OnServerReceiveShortMessageStatic);
+        NetworkClient.RegisterHandler<RGNetworkLongMessage>(OnClientReceiveLongMessageStatic);
+        NetworkServer.RegisterHandler<RGNetworkLongMessage>(OnServerReceiveLongMessageStatic);
+    }
+
+    // Static wrappers that call instance methods if needed
+    private static void OnClientReceiveShortMessageStatic(RGNetworkShortMessage msg)
+    {
+        instance?.OnClientReceiveShortMessage(msg);
+    }
+    private static void OnServerReceiveShortMessageStatic(NetworkConnectionToClient conn, RGNetworkShortMessage msg)
+    {
+        instance?.OnServerReceiveShortMessage(conn, msg);
+    }
+    private static void OnClientReceiveLongMessageStatic(RGNetworkLongMessage msg)
+    {
+        instance?.OnClientReceiveLongMessage(msg);
+    }
+    private static void OnServerReceiveLongMessageStatic(NetworkConnectionToClient conn, RGNetworkLongMessage msg)
+    {
+        instance?.OnServerReceiveLongMessage(conn, msg);
     }
     #endregion
 
@@ -355,7 +387,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
             count = 1,
             payload = data.byteArguments.ToArray()
         };
-        NetworkServer.SendToAll(msg);
+        if (NetworkServer.active)
+        {
+            NetworkServer.SendToAll(msg);
+        }
         NotifyPlayerChanges();
         GameManager.Instance.CheckIfCanEndPhase(); // or whatever triggers phase progression
     }
@@ -398,7 +433,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
             };
 
             // Send to all clients
-            NetworkServer.SendToAll(netMsg);
+            if (NetworkServer.active)
+            {
+                NetworkServer.SendToAll(netMsg);
+            }
         }
     }
     public void SendStringToServer(string stringMsg)
@@ -459,7 +497,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
         };
 
         // Send to all clients
-        NetworkServer.SendToAll(netMsg);
+        if (NetworkServer.active)
+        {
+            NetworkServer.SendToAll(netMsg);
+        }
         Debug.Log("SERVER SENT sector data message to clients");
     }
     #endregion
@@ -482,7 +523,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             count = (uint)playerIDs.Count,
                             payload = data.byteArguments.ToArray()
                         };
-                        NetworkServer.SendToAll(msg);
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg);
+                        }
                         Debug.Log("SERVER SENT a new player name and id to clients");
                     }
                 }
@@ -498,7 +542,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             count = (uint)data.arguments.Count,
                             payload = data.arguments.SelectMany<int, byte>(BitConverter.GetBytes).ToArray()
                         };
-                        NetworkServer.SendToAll(sectorMsg);
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(sectorMsg);
+                        }
                         Debug.Log("SERVER SENT sector assignment to clients.");
                     }
                 }
@@ -583,7 +630,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             playerID = data.senderID,
                             type = (uint)data.Type
                         };
-                        NetworkServer.SendToAll(msg);
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg);
+                        }
                         Debug.Log("sending turn increment to all clients");
                     }
                 }
@@ -644,7 +694,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     else
                     {
                         // share it with everybody
-                        NetworkServer.SendToAll(msg);
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg);
+                        }
                         Debug.Log("SERVER sent type: " + data.Type + " with value " + data.ToString());
                     }
                 }
@@ -658,7 +711,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     };
                     if (isServer)
                     {
-                        NetworkServer.SendToAll(msg);
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg);
+                        }
                         Debug.Log("SERVER SENT GAME END MESSAGE FIRST");
                     }
                     else
@@ -1197,7 +1253,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                     // tell all the clients to go to the next phase
                     msg.playerID = (uint)localPlayerID;
                     msg.type = (uint)CardMessageType.StartNextPhase;
-                    NetworkServer.SendToAll(msg);
+                    if (NetworkServer.active)
+                    {
+                        NetworkServer.SendToAll(msg);
+                    }
                     // server needs to start next phase as well
                     manager.StartNextPhase();
                     if (nextPhase == GamePhase.DrawRed)
@@ -1271,7 +1330,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                                     count = 1,
                                     payload = data.byteArguments.ToArray()
                                 };
-                                NetworkServer.SendToAll(msg2);
+                                if (NetworkServer.active)
+                                {
+                                    NetworkServer.SendToAll(msg2);
+                                }
                                 NotifyPlayerChanges();
                             }
                         }
@@ -1330,8 +1392,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                         element += 4;
                         int cardId = GetIntFromByteArray(element, msg.payload);
                         element += 4;
-                        NetworkServer.SendToAll(msg); //relay draw card message to clients
-
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay draw card message to clients
+                        }
                         Update update = new Update
                         {
                             Type = CardMessageType.DrawCard,
@@ -1359,7 +1423,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             CardID = cardId
                         };
                         Debug.Log("server received ReturnCardToHand message from opponent containing playerID : " + msg.playerID + " and card id: " + cardId + " for game phase " + gamePhase);
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1387,7 +1454,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             FacilityPlayedOnType = (FacilityType)facilityType
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1425,7 +1495,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             AdditionalFacilitySelectedThree = (FacilityType)facilityEffect3,
                         };
                         Debug.Log("server received update message from opponent containing playerID : " + uniqueId + " and card id: " + cardId + "for game phase " + gamePhase);
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1448,7 +1521,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             Amount = amount,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1473,7 +1549,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             FacilityPlayedOnType = (FacilityType)facilityType,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1494,7 +1573,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                             CardID = cardId,
                         };
                         Debug.Log("server received update message from opponent containing : " + uniqueId + " and cardid " + cardId + "for game phase " + gamePhase);
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1521,7 +1603,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
                         Debug.Log("server received update message from opponent containing player to share with : " + playerToShareWith +
                             " and meeple color " + meepleColor + "for game phase " + gamePhase);
 
-                        NetworkServer.SendToAll(msg); //relay to all clients
+                        if (NetworkServer.active)
+                        {
+                            NetworkServer.SendToAll(msg); //relay to all clients
+                        }
                         manager.AddUpdateFromPlayer(update, gamePhase, msg.playerID);
                     }
                     break;
@@ -1554,5 +1639,10 @@ public class RGNetworkPlayerList : NetworkBehaviour, IRGObserver
     {
         base.OnStopClient();
         GameManager.Instance.HandlePlayerDisconnect(localPlayerID);
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
     }
 }
