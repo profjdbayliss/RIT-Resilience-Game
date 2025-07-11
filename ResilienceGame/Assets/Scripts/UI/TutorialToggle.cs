@@ -22,6 +22,7 @@ public class TutorialToggle : MonoBehaviour
     [SerializeField] private GameObject phaseTrackerPanel;
     [SerializeField] private GameObject cardWorkerCostPanel;
     [SerializeField] private GameObject cardHistoryPanel;
+    [SerializeField] private GameObject redOvertimePanel;
     #endregion
     private bool isTutorialActive;
     private PlayerTeam playerTeam;
@@ -54,12 +55,14 @@ public class TutorialToggle : MonoBehaviour
         {
             colorLessPanel.SetActive(true);
             redWeeksPanel.SetActive(true);
+            redOvertimePanel.SetActive(true);
             blueWeeksPanel.SetActive(false);
         }
         else if (playerTeam == PlayerTeam.Blue)
         {
             colorLessPanel.SetActive(false);
             redWeeksPanel.SetActive(false);
+            redOvertimePanel.SetActive(false);
             blueWeeksPanel.SetActive(true);
         }
         else Debug.Log("Player team not red or blue");

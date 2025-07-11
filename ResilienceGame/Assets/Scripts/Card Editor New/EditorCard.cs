@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using TMPro;
 using UnityEngine;
 
 public class EditorCard : MonoBehaviour {
@@ -38,9 +41,21 @@ public class EditorCard : MonoBehaviour {
     public GameObject cardGameObject;
     public EditorCardData cardData = new EditorCardData();
     public Action onClick;
+    
+    [Header("Error message")]
+    [SerializeField] private GameObject errorMessage;
+
     // Start is called before the first frame update
     void Start() {
-
+        try
+        {
+            errorMessage = GameObject.Find("card popup 2");
+            //errorMessageText = GameObject.Find("card popup").GetComponent<TextMeshProUGUI>();
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e);
+        }
     }
     public void UpdateCSVData() {
         data = $"{cardData.team}," +
@@ -135,6 +150,7 @@ public class EditorCard : MonoBehaviour {
         }
         catch (System.Exception e) {
             Debug.LogError("Error reading card " + data);
+            errorMessage.SetActive(true); 
             Debug.LogError(e);
         }
 
