@@ -7,6 +7,8 @@ This is Sector Down, an asymmetrical card game meant to simulate cyber-attacks a
 The current version of this game was based on the foundation of Jessica Bayliss' game accessDenied.
 Her repo can be found here: [Access Denied](https://github.com/profjdbayliss/accessDenied)
 
+If you are having issues joining another player's game, check to see if your system has any firewall blocking port 14623 (The port used for the server and joining clients): [Troubleshooting Tips](https://www.wikihow.com/Check-if-Your-Firewall-Is-Blocking-Something#Check-for-Blocked-Ports-.28Windows.29)
+
 **Rochester Institute of Technology produced this game and its data under United States Military Academy (USMA) Award Number W911NF-23-2-0036. USMA, as the Federal awarding agency, reserves a royalty-free, nonexclusive, and irrevocable right to reproduce, publish, or otherwise use this data for Federal purposes, and to authorize others to do so in accordance with 2 CFR 200.315(b).**
 
 ## Gameplay
