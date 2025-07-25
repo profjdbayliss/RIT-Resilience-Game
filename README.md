@@ -4,12 +4,10 @@
 
 This is Sector Down, an asymmetrical card game meant to simulate cyber-attacks and cyber-security principles.
 
-The current version of this game was based on the foundation of Jessica Bayliss' game accessDenied.
+The current version of this game was based on the foundation of Jessica Bayliss' game Access Denied.
 Her repo can be found here: [Access Denied](https://github.com/profjdbayliss/accessDenied)
 
 If you are having issues joining another player's game, check to see if your system has any firewall blocking port 14623 (The port used for the server and joining clients), if you don't have access to your firewall permissions, talk to your computer's IT manager: [Troubleshooting Tips](https://www.wikihow.com/Check-if-Your-Firewall-Is-Blocking-Something#Check-for-Blocked-Ports-.28Windows.29)
-
-**Rochester Institute of Technology produced this game and its data under United States Military Academy (USMA) Award Number W911NF-23-2-0036. USMA, as the Federal awarding agency, reserves a royalty-free, nonexclusive, and irrevocable right to reproduce, publish, or otherwise use this data for Federal purposes, and to authorize others to do so in accordance with 2 CFR 200.315(b).**
 
 ## Gameplay
 
@@ -71,3 +69,13 @@ If all Facilities in every Sector are down the Red Players win.
 
 #### Doom Clock:
 If half of all Sectors are down or a Core Sector (Energy, Communication, Water, Information Technology) has 2 or more of their Facilities down at the same time the Blue Players have only 3 turns to have more than half of all Sectors online or to restore the Core Sector. If Blue Players manages this then the Doom Clock resets to 3 turns. If 3 turns have passed the Red Players win.
+
+## Credits
+
+A large team created this work and related products: 
+- Students (Liam Andres, Diego Barilla, Sam Beckman, Lizhao Cao, Jye Crocker, Michael Eaton, Elad Flaison, Ben Garvey, Emmett McEvoy, Kevin LaPorte, Mukund Suresh, Emily Nack, Henry Orsagh, Dariel Ravelo-Ramos, Lee Smith, Heena Thadani, Huadong Zhang, James Zilberman)
+- Faculty (Jessica Bayliss, Chao Peng, David I. Schwartz, Brian Tomaszewski)
+- Research scientist (Chris Schwartz)
+- DoD representatives (David Abitbol, Karen Guttieri, Mark McElwain, Steve Whitham, Chris Wilkinson).
+
+**Rochester Institute of Technology produced this game and its data under United States Military Academy (USMA) Award Number W911NF-23-2-0036. USMA, as the Federal awarding agency, reserves a royalty-free, nonexclusive, and irrevocable right to reproduce, publish, or otherwise use this data for Federal purposes, and to authorize others to do so in accordance with 2 CFR 200.315(b).**
