@@ -295,9 +295,13 @@ public class CardEditor : MonoBehaviour {
             //Opens the Saved CSV file for ease of access + it's where the game's CSV file is
             string[] paths = StandaloneFileBrowser.OpenFilePanel("Open CSV File", ((Application.streamingAssetsPath) + "/SavedCSVs/"), "csv", false);
 
+            //Used to count the lines for a possible error message
+            int possibleErrorLine = 1;
+
             if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0])) {
                 string filePath = paths[0];
                 try {
+
                     // Read the CSV file contents
                     var rawLines = File.ReadAllLines(filePath);
                     headers = rawLines[0];
@@ -306,6 +310,7 @@ public class CardEditor : MonoBehaviour {
                     // Process each line (for example, split by commas)
                     foreach (string line in lines) {
 
+                        possibleErrorLine++;
 
                         var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
                         editorCard.onClick += () => SetSelectedCard(editorCard);
@@ -320,8 +325,11 @@ public class CardEditor : MonoBehaviour {
 
                 }
                 catch (Exception e) {
-                    Debug.LogError($"Error reading CSV file: {e.Message}"); 
+                    //Used to display an error message if a line in the CSV is improperly formated.
+                    Debug.LogError($"Error reading CSV file: {e.Message}");
                     errorMessage.SetActive(true);
+                    Debug.Log(possibleErrorLine);
+                    errorMessage.GetComponent<TextMeshProUGUI>().text = $"The CSV has improperly formated data at line {possibleErrorLine}! Please exit the card editor, fix or use a diffrent CSV, and try again!";
                 }
             }
             else {
