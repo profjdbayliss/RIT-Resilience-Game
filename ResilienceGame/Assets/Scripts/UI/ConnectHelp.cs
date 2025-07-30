@@ -9,15 +9,18 @@ public class ConnectHelp : MonoBehaviour
     // Currently they are just assigned arbitrarily to avoid the error, this doesn't lead to any other errors so it's an easy fix that can stay as-is
     [SerializeField] private GameObject connectHelpCanvas;
     [SerializeField] private GameObject connectHostCanvas;
+    [SerializeField] private GameObject connectJoinCanvas;
     [SerializeField] private GameObject connectLobbyCanvas;
     private bool isConnectHelpCanvasActive;
     private bool isHostHelpCanvasActive;
+    private bool isJoinHelpCanvasActive;
     private bool isLobbyHelpCanvasActive;
     // Start is called before the first frame update
     void Start()
     {
         isConnectHelpCanvasActive = false;
         isHostHelpCanvasActive = false;
+        isJoinHelpCanvasActive = false;
         if (connectLobbyCanvas != null)
         {
             isLobbyHelpCanvasActive = false;
@@ -37,6 +40,15 @@ public class ConnectHelp : MonoBehaviour
             isHostHelpCanvasActive = true; // Default to true if connectHostCanvas is not assigned
         }
         //connectHostCanvas.SetActive(isHostHelpCanvasActive);
+
+        if (connectJoinCanvas != null)
+        {
+            isJoinHelpCanvasActive = false;
+        }
+        else
+        {
+            isJoinHelpCanvasActive = true; // Default to true if connectJoinCanvas is not assigned
+        }
     }
 
     public void ToggleConnectHelpCanvas()
@@ -49,6 +61,12 @@ public class ConnectHelp : MonoBehaviour
     {
         isHostHelpCanvasActive = !isHostHelpCanvasActive;
         connectHostCanvas.SetActive(isHostHelpCanvasActive);
+    }
+
+    public void ToggleJoinHelpCanvas()
+    {
+        isJoinHelpCanvasActive = !isJoinHelpCanvasActive;
+        connectJoinCanvas.SetActive(isJoinHelpCanvasActive);
     }
 
     public void ToggleLobbyHelpCanvas()
