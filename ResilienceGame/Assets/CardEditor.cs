@@ -307,8 +307,6 @@ public class CardEditor : MonoBehaviour {
                     headers = rawLines[0];
                     string[] lines = rawLines.Skip(1).ToArray();
 
-                    // Process each line (for example, split by commas)
-                    int possibleErrorLine = 0;
 foreach (string line in lines)
 {
     possibleErrorLine++;
