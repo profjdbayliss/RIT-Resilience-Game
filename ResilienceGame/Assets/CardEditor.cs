@@ -304,8 +304,11 @@ public class CardEditor : MonoBehaviour {
                     string[] lines = rawLines.Skip(1).ToArray();
 
                     // Process each line (for example, split by commas)
-                    foreach (string line in lines)
+                    int possibleErrorLine = 0;
+foreach (string line in lines)
 {
+    possibleErrorLine++;
+
     var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
     editorCard.onClick += () => SetSelectedCard(editorCard);
 
@@ -313,10 +316,11 @@ public class CardEditor : MonoBehaviour {
     int errorColumn = editorCard.InitWithColumnTracking(line);
     if (errorColumn != -1)
     {
-        Debug.LogError($"Error parsing card data at column index {errorColumn} in line: {line}");
+        Debug.LogError($"Error parsing card data at column index {errorColumn} in line {possibleErrorLine}: {line}");
         errorMessage.SetActive(true);
-        // Optionally, continue to next line or handle as needed
-        continue;
+        errorMessage.GetComponent<TextMeshProUGUI>().text =
+            $"The CSV has improperly formatted data at line {possibleErrorLine}, column {errorColumn + 1}! Please exit the card editor, fix or use a different CSV, and try again!";
+        break; // Stop processing further lines on error
     }
 
     cards.Add(editorCard);
