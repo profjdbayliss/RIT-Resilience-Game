@@ -304,14 +304,23 @@ public class CardEditor : MonoBehaviour {
                     string[] lines = rawLines.Skip(1).ToArray();
 
                     // Process each line (for example, split by commas)
-                    foreach (string line in lines) {
+                    foreach (string line in lines)
+{
+    var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
+    editorCard.onClick += () => SetSelectedCard(editorCard);
 
+    // Use InitWithColumnTracking to detect column errors
+    int errorColumn = editorCard.InitWithColumnTracking(line);
+    if (errorColumn != -1)
+    {
+        Debug.LogError($"Error parsing card data at column index {errorColumn} in line: {line}");
+        errorMessage.SetActive(true);
+        // Optionally, continue to next line or handle as needed
+        continue;
+    }
 
-                        var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
-                        editorCard.onClick += () => SetSelectedCard(editorCard);
-                        editorCard.Init(line);
-                        cards.Add(editorCard);
-                    }
+    cards.Add(editorCard);
+}
                     setName = Path.GetFileName(filePath);
                     deckTitle.text = setName;
                     ToggleMenuOpen();
