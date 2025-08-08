@@ -89,7 +89,7 @@ public class CardEditor : MonoBehaviour {
     // Start is called before the first frame update
     void Start()
     {
-        errorMessage.SetActive(false); 
+        errorMessage.GetComponent<TextMeshProUGUI>().text = "";
     }
 
 
@@ -307,27 +307,25 @@ public class CardEditor : MonoBehaviour {
                     headers = rawLines[0];
                     string[] lines = rawLines.Skip(1).ToArray();
 
-foreach (string line in lines)
-{
-    possibleErrorLine++;
-
+                    foreach (string line in lines)
+                    {
                         possibleErrorLine++;
-    var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
-    editorCard.onClick += () => SetSelectedCard(editorCard);
-
-    // Use InitWithColumnTracking to detect column errors
-    int errorColumn = editorCard.InitWithColumnTracking(line);
-    if (errorColumn != -1)
-    {
-        Debug.LogError($"Error parsing card data at column index {errorColumn} in line {possibleErrorLine}: {line}");
-        errorMessage.SetActive(true);
-        errorMessage.GetComponent<TextMeshProUGUI>().text =
-            $"The CSV has improperly formatted data at line {possibleErrorLine}, column {errorColumn + 1}! Please exit the card editor, fix or use a different CSV, and try again!";
-        break; // Stop processing further lines on error
-    }
-
-    cards.Add(editorCard);
-}
+                    
+                        var editorCard = Instantiate(editorCardPrefab, editorCardContainer).GetComponent<EditorCard>();
+                        editorCard.onClick += () => SetSelectedCard(editorCard);
+                    
+                        // Use InitWithColumnTracking to detect column errors
+                        int errorColumn = editorCard.InitWithColumnTracking(line);
+                        if (errorColumn != -1)
+                        {
+                            errorMessage.GetComponent<TextMeshProUGUI>().text =
+                                $"The CSV has improperly formatted data at line {possibleErrorLine}, column {errorColumn + 1}! Please exit the card editor, fix or use a different CSV, and try again!";
+                            Debug.LogError($"Error parsing card data at column index {errorColumn} in line {possibleErrorLine}: {line}");
+                            break; // Stop processing further lines on error
+                        }
+                    
+                        cards.Add(editorCard);
+                    }
                     setName = Path.GetFileName(filePath);
                     deckTitle.text = setName;
                     ToggleMenuOpen();
@@ -338,7 +336,6 @@ foreach (string line in lines)
                 catch (Exception e) {
                     //Used to display an error message if a line in the CSV is improperly formated.
                     Debug.LogError($"Error reading CSV file: {e.Message}");
-                    errorMessage.SetActive(true);
                     Debug.Log(possibleErrorLine);
                     errorMessage.GetComponent<TextMeshProUGUI>().text = $"The CSV has improperly formated data at line {possibleErrorLine}! Please exit the card editor, fix or use a diffrent CSV, and try again!";
                 }
