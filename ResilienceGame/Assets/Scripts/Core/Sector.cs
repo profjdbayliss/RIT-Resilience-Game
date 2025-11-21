@@ -47,6 +47,7 @@ public class Sector : MonoBehaviour {
     public CardPlayer Owner { get; private set; }
     [SerializeField] private TextMeshProUGUI sectorOwnerText;
     [SerializeField] private Canvas sectorCanvas;
+    public Canvas SectorCanvas => sectorCanvas;
     [SerializeField] private BoxCollider2D[] facilityColliders;
     public bool isCore; // Indicates if this is the core sector
     public HashSet<Facility> selectedFacilities;
