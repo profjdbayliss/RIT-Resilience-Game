@@ -1254,7 +1254,7 @@ public class GameManager : MonoBehaviour, IRGObservable {
                         actualPlayer.HandlePlayCard(MGamePhase); //still need to resolve the card played that spend the final meeples
                         Debug.Log($"Spent: {actualPlayer.GetMeeplesSpent()}/{actualPlayer.GetMaxMeeples()}");
                         mIsActionAllowed = false;
-                        UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has spent their meeples. Please push End Phase to continue.");
+                        UserInterface.Instance.DisplayGameStatus(actualPlayer.playerName + " has spent their workers. Please push End Phase to continue.");
                     }
                     else {
                         actualPlayer.HandlePlayCard(MGamePhase);

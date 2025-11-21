@@ -97149,6 +97149,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connectHelpCanvas: {fileID: 1816061501}
   connectHostCanvas: {fileID: 1816061501}
+  connectJoinCanvas: {fileID: 0}
   connectLobbyCanvas: {fileID: 1816061501}
 --- !u!1 &1997509555
 GameObject:

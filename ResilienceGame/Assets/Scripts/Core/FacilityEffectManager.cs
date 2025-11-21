@@ -156,11 +156,141 @@ public class FacilityEffectManager : MonoBehaviour {
             trapEffectsFromOpposingTeam.ForEach(trapEffect => {
                 //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
                 Debug.Log($"Triggering trap effect: {trapEffect.EffectType}");
+                // Display honeypot card animation when honeypot is triggered
+                if (trapEffect.EffectType == FacilityEffectType.HoneyPot)
+                {
+                    DisplayHoneypotCard(trapEffect);
+                }
                 RemoveEffect(trapEffect, createdById, true); //remove the trap effect
             });
             return true;
         }
         return false;
+    }
+
+    private void DisplayHoneypotCard(FacilityEffect honeypotEffect)
+    {
+        // Find the honeypot card from the static cards dictionary
+        // Look for a card that creates a honeypot effect
+        Card honeypotCardTemplate = null;
+        foreach (var cardPair in CardPlayer.cards)
+        {
+            if (cardPair.Value.data.effectString != null)
+            {
+                // Parse the effect string to check if it creates a honeypot effect
+                var effects = FacilityEffect.CreateEffectsFromID(cardPair.Value.data.effectString);
+                if (effects.Any(e => e.EffectType == FacilityEffectType.HoneyPot))
+                {
+                    honeypotCardTemplate = cardPair.Value;
+                    break;
+                }
+            }
+        }
+
+        if (honeypotCardTemplate == null)
+        {
+            Debug.LogWarning("Could not find honeypot card for display");
+            return;
+        }
+
+        // Get the player who created the honeypot effect
+        CardPlayer honeypotCreator = null;
+        if (GameManager.Instance.playerDictionary.TryGetValue(honeypotEffect.CreatedByPlayerID, out honeypotCreator))
+        {
+            // Create a temporary card GameObject for animation
+            GameObject tempCardObj = Instantiate(honeypotCreator.cardPrefab);
+            Card tempCard = tempCardObj.GetComponent<Card>();
+            tempCard.data = honeypotCardTemplate.data;
+            tempCard.ActionList = new List<ICardAction>(honeypotCardTemplate.ActionList);
+            tempCard.target = honeypotCardTemplate.target;
+            tempCard.DeckName = honeypotCardTemplate.DeckName;
+            tempCard.UniqueID = GameManager.Instance.UniqueCardIdCount++;
+
+            // Set up the card front by copying from the template
+            CardFront templateFront = honeypotCardTemplate.GetComponent<CardFront>();
+            tempCard.front = templateFront;
+
+            // Copy visual elements from the template card
+            RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
+            for (int i = 0; i < tempRaws.Length; i++)
+            {
+                if (tempRaws[i].name == "Image")
+                {
+                    tempRaws[i].texture = templateFront.img;
+                }
+                else if (tempRaws[i].name == "Background")
+                {
+                    tempRaws[i].color = templateFront.color;
+                }
+            }
+
+            // Set up text elements
+            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
+            for (int i = 0; i < tempTexts.Length; i++)
+            {
+                if (tempTexts[i].name.Equals("Title Text"))
+                {
+                    tempTexts[i].text = templateFront.title;
+                }
+                else if (tempTexts[i].name.Equals("Description Text"))
+                {
+                    tempTexts[i].text = templateFront.description;
+                }
+                else if (tempTexts[i].name.Equals("Flavor Text"))
+                {
+                    tempTexts[i].text = templateFront.flavor;
+                }
+            }
+
+            // Add to honeypot creator's hand temporarily so it can be found by the animation system
+            // This is required for the animation coroutine to access the card GameObject
+            honeypotCreator.HandCards.Add(tempCard.UniqueID, tempCardObj);
+            tempCardObj.SetActive(true);
+
+            // Display the card animation through the facility's sector
+            if (facility != null && facility.sectorItsAPartOf != null)
+            {
+                facility.sectorItsAPartOf.StartCoroutine(
+                    DisplayHoneypotCardAnimation(tempCard, honeypotCreator, facility)
+                );
+            }
+        }
+    }
+
+    private IEnumerator DisplayHoneypotCardAnimation(Card card, CardPlayer player, Facility facility)
+    {
+        if (!player.HandCards.TryGetValue(card.UniqueID, out GameObject cardObject))
+        {
+            yield break;
+        }
+
+        RectTransform cardRect = cardObject.GetComponent<RectTransform>();
+        cardRect.localScale = new Vector3(0.5f, 0.5f, 1f);
+
+        // Set the card's parent to nothing, in order to position it in world space
+        cardRect.SetParent(null, true);
+        Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height / 2);
+        cardRect.anchoredPosition = topMiddle;
+        card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
+        cardRect.SetParent(facility.sectorItsAPartOf.SectorCanvas.transform, true);
+        cardObject.SetActive(true);
+
+        // Start the card animation
+        yield return card.MoveAndRotateToCenter(
+            rectTransform: cardRect,
+            facilityTarget: facility.gameObject,
+            onComplete: () => {
+                Debug.Log($"Honeypot card animation complete for {card.data.name}");
+                // Clean up: remove the temporary card from the player's hand dictionary
+                player.HandCards.Remove(card.UniqueID);
+                // Destroy the temporary card GameObject to prevent memory leaks
+                if (cardObject != null)
+                {
+                    Destroy(cardObject);
+                }
+            },
+            scaleUpFactor: 1.0f
+        );
     }
     private bool WillEffectDownFacility(FacilityEffect effect) =>
 
