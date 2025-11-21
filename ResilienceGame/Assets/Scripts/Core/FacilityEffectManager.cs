@@ -169,12 +169,16 @@ public class FacilityEffectManager : MonoBehaviour {
 
     private void DisplayHoneypotCard(FacilityEffect honeypotEffect) {
         // Find the honeypot card from the static cards dictionary
+        // Look for a card that creates a honeypot effect
         Card honeypotCardTemplate = null;
         foreach (var cardPair in CardPlayer.cards) {
-            if (cardPair.Value.data.effectString != null && 
-                cardPair.Value.data.effectString.ToLower().Contains("honeypot")) {
-                honeypotCardTemplate = cardPair.Value;
-                break;
+            if (cardPair.Value.data.effectString != null) {
+                // Parse the effect string to check if it creates a honeypot effect
+                var effects = FacilityEffect.CreateEffectsFromID(cardPair.Value.data.effectString);
+                if (effects.Any(e => e.EffectType == FacilityEffectType.HoneyPot)) {
+                    honeypotCardTemplate = cardPair.Value;
+                    break;
+                }
             }
         }
 
@@ -224,7 +228,8 @@ public class FacilityEffectManager : MonoBehaviour {
                 }
             }
 
-            // Add to honeypot creator's hand temporarily so it can be displayed
+            // Add to honeypot creator's hand temporarily so it can be found by the animation system
+            // This is required for the animation coroutine to access the card GameObject
             honeypotCreator.HandCards.Add(tempCard.UniqueID, tempCardObj);
             tempCardObj.SetActive(true);
 
@@ -258,8 +263,12 @@ public class FacilityEffectManager : MonoBehaviour {
             facilityTarget: facility.gameObject,
             onComplete: () => {
                 Debug.Log($"Honeypot card animation complete for {card.data.name}");
-                // Remove the card from the player's hand
+                // Clean up: remove the temporary card from the player's hand dictionary
                 player.HandCards.Remove(card.UniqueID);
+                // Destroy the temporary card GameObject to prevent memory leaks
+                if (cardObject != null) {
+                    Destroy(cardObject);
+                }
             },
             scaleUpFactor: 1.0f
         );
