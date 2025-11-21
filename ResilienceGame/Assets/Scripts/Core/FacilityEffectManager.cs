@@ -195,10 +195,33 @@ public class FacilityEffectManager : MonoBehaviour {
             tempCard.DeckName = honeypotCardTemplate.DeckName;
             tempCard.UniqueID = GameManager.Instance.UniqueCardIdCount++;
 
-            // Set up the card front
-            CardFront front = tempCardObj.GetComponent<CardFront>();
-            if (front != null) {
-                front.SetCard(tempCard);
+            // Set up the card front by copying from the template
+            CardFront templateFront = honeypotCardTemplate.GetComponent<CardFront>();
+            tempCard.front = templateFront;
+
+            // Copy visual elements from the template card
+            RawImage[] tempRaws = tempCardObj.GetComponentsInChildren<RawImage>();
+            for (int i = 0; i < tempRaws.Length; i++) {
+                if (tempRaws[i].name == "Image") {
+                    tempRaws[i].texture = templateFront.img;
+                }
+                else if (tempRaws[i].name == "Background") {
+                    tempRaws[i].color = templateFront.color;
+                }
+            }
+
+            // Set up text elements
+            TextMeshProUGUI[] tempTexts = tempCardObj.GetComponentsInChildren<TextMeshProUGUI>(true);
+            for (int i = 0; i < tempTexts.Length; i++) {
+                if (tempTexts[i].name.Equals("Title Text")) {
+                    tempTexts[i].text = templateFront.title;
+                }
+                else if (tempTexts[i].name.Equals("Description Text")) {
+                    tempTexts[i].text = templateFront.description;
+                }
+                else if (tempTexts[i].name.Equals("Flavor Text")) {
+                    tempTexts[i].text = templateFront.flavor;
+                }
             }
 
             // Add to honeypot creator's hand temporarily so it can be displayed
@@ -226,7 +249,7 @@ public class FacilityEffectManager : MonoBehaviour {
         Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2);
         cardRect.anchoredPosition = topMiddle;
         card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
-        cardRect.SetParent(facility.sectorItsAPartOf.sectorCanvas.transform, true);
+        cardRect.SetParent(facility.sectorItsAPartOf.SectorCanvas.transform, true);
         cardObject.SetActive(true);
 
         // Start the card animation
