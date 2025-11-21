@@ -156,11 +156,90 @@ public class FacilityEffectManager : MonoBehaviour {
             trapEffectsFromOpposingTeam.ForEach(trapEffect => {
                 //   trapEffect.OnEffectRemoved?.Invoke(createdById); //triggered on removal
                 Debug.Log($"Triggering trap effect: {trapEffect.EffectType}");
+                // Display honeypot card animation when honeypot is triggered
+                if (trapEffect.EffectType == FacilityEffectType.HoneyPot) {
+                    DisplayHoneypotCard(trapEffect);
+                }
                 RemoveEffect(trapEffect, createdById, true); //remove the trap effect
             });
             return true;
         }
         return false;
+    }
+
+    private void DisplayHoneypotCard(FacilityEffect honeypotEffect) {
+        // Find the honeypot card from the static cards dictionary
+        Card honeypotCardTemplate = null;
+        foreach (var cardPair in CardPlayer.cards) {
+            if (cardPair.Value.data.effectString != null && 
+                cardPair.Value.data.effectString.ToLower().Contains("honeypot")) {
+                honeypotCardTemplate = cardPair.Value;
+                break;
+            }
+        }
+
+        if (honeypotCardTemplate == null) {
+            Debug.LogWarning("Could not find honeypot card for display");
+            return;
+        }
+
+        // Get the player who created the honeypot effect
+        CardPlayer honeypotCreator = null;
+        if (GameManager.Instance.playerDictionary.TryGetValue(honeypotEffect.CreatedByPlayerID, out honeypotCreator)) {
+            // Create a temporary card GameObject for animation
+            GameObject tempCardObj = Instantiate(honeypotCreator.cardPrefab);
+            Card tempCard = tempCardObj.GetComponent<Card>();
+            tempCard.data = honeypotCardTemplate.data;
+            tempCard.ActionList = new List<ICardAction>(honeypotCardTemplate.ActionList);
+            tempCard.target = honeypotCardTemplate.target;
+            tempCard.DeckName = honeypotCardTemplate.DeckName;
+            tempCard.UniqueID = GameManager.Instance.UniqueCardIdCount++;
+
+            // Set up the card front
+            CardFront front = tempCardObj.GetComponent<CardFront>();
+            if (front != null) {
+                front.SetCard(tempCard);
+            }
+
+            // Add to honeypot creator's hand temporarily so it can be displayed
+            honeypotCreator.HandCards.Add(tempCard.UniqueID, tempCardObj);
+            tempCardObj.SetActive(true);
+
+            // Display the card animation through the facility's sector
+            if (facility != null && facility.sectorItsAPartOf != null) {
+                facility.sectorItsAPartOf.StartCoroutine(
+                    DisplayHoneypotCardAnimation(tempCard, honeypotCreator, facility)
+                );
+            }
+        }
+    }
+
+    private IEnumerator DisplayHoneypotCardAnimation(Card card, CardPlayer player, Facility facility) {
+        if (!player.HandCards.TryGetValue(card.UniqueID, out GameObject cardObject)) {
+            yield break;
+        }
+
+        RectTransform cardRect = cardObject.GetComponent<RectTransform>();
+        
+        // Set the card's parent to nothing, in order to position it in world space
+        cardRect.SetParent(null, true);
+        Vector2 topMiddle = new Vector2(Screen.width / 2, Screen.height + cardRect.rect.height / 2);
+        cardRect.anchoredPosition = topMiddle;
+        card.transform.localRotation = Quaternion.Euler(0, 0, 180); // flip upside down as if played by opponent
+        cardRect.SetParent(facility.sectorItsAPartOf.sectorCanvas.transform, true);
+        cardObject.SetActive(true);
+
+        // Start the card animation
+        yield return card.MoveAndRotateToCenter(
+            rectTransform: cardRect,
+            facilityTarget: facility.gameObject,
+            onComplete: () => {
+                Debug.Log($"Honeypot card animation complete for {card.data.name}");
+                // Remove the card from the player's hand
+                player.HandCards.Remove(card.UniqueID);
+            },
+            scaleUpFactor: 1.0f
+        );
     }
     private bool WillEffectDownFacility(FacilityEffect effect) =>
 
